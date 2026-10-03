@@ -34,7 +34,7 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 
 **The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. When our team takes the field, the same spot holds the pitcher’s warm-up music button. The song fades out by itself after 12 seconds of song (the length is a setting), with a small countdown on the button; tapping stops it early. A second setting, off by default, also fades it when the first pitch is recorded. For their hitters, the same spot is an empty gray bar.
 
-**Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Cardinals 4, Mudcats 2”) and the next team’s batter.
+**Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Diamond Dogs 4, Mudcats 2”) and the next team’s batter.
 
 ## Finish line
 
