@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage-primary.dia",
+    "emit-module-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage-primary-emit-module.dia",
+    "pch" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage-primary.swiftdeps"
+  },
+  "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/Sources/Storage/Storage.swift" : {
+    "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.swiftconstvalues",
+    "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.d",
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.dia",
+    "index-unit-output-path" : "/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.o",
+    "llvm-bc" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.bc",
+    "object" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.o",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage.swiftdeps",
+    "swiftmodule" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/Storage-t.build/Objects-normal/arm64/Storage~partial.swiftmodule"
+  }
+}

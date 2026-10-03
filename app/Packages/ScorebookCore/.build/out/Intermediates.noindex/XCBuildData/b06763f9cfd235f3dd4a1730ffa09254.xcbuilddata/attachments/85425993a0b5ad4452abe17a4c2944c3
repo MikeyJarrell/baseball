@@ -1,0 +1,4 @@
+module BoxScoreText {
+header "BoxScoreText-Swift.h"
+export *
+}

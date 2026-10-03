@@ -1,0 +1,29 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTests-primary.dia",
+    "emit-module-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTests-primary-emit-module.dia",
+    "pch" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTests-primary.swiftdeps"
+  },
+  "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/DerivedSources/test_entry_point.swift" : {
+    "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.swiftconstvalues",
+    "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.d",
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.dia",
+    "index-unit-output-path" : "/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.o",
+    "llvm-bc" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.bc",
+    "object" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.o",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point.swiftdeps",
+    "swiftmodule" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/test_entry_point~partial.swiftmodule"
+  },
+  "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/Tests/BoxScoreTextTests/BoxScoreTextTestsPlaceholder.swift" : {
+    "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.swiftconstvalues",
+    "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.d",
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.dia",
+    "index-unit-output-path" : "/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.o",
+    "llvm-bc" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.bc",
+    "object" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.o",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder.swiftdeps",
+    "swiftmodule" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/BoxScoreTextTests-p.build/Objects-normal/arm64/BoxScoreTextTestsPlaceholder~partial.swiftmodule"
+  }
+}

@@ -1,0 +1,4 @@
+module SampleData {
+header "SampleData-Swift.h"
+export *
+}
