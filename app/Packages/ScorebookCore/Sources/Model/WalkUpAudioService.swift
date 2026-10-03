@@ -9,7 +9,7 @@
 import Foundation
 import Observation
 
-/// Plays walk-up songs, announcer introductions and between-innings music, and manages
+/// Plays walk-up songs, announcer introductions and pitchers' warm-up songs, and manages
 /// the song library.
 ///
 /// The player keeps the library it was given. Whenever it changes (new songs added, a new
@@ -22,7 +22,7 @@ import Observation
 public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// The song library as the player has it now.
     var library: SongLibrary { get }
-    /// True while a song, introduction or between-innings track is playing.
+    /// True while a song, introduction or warm-up song is playing.
     var isPlaying: Bool { get }
     /// The song playing now, if any.
     var nowPlaying: SongID? { get }

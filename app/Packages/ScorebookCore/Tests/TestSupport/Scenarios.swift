@@ -196,8 +196,8 @@ extension ExpectedSituation {
         check(&problems, "situation", "defenseCheckDue", defenseCheckDue, s.defenseCheckDue)
         check(&problems, "situation", "droppedThirdStrikePossible", droppedThirdStrikePossible, s.droppedThirdStrikePossible)
         check(&problems, "situation", "isRegulationComplete", isRegulationComplete, s.isRegulationComplete)
-        check(&problems, "situation", "gameOver", gameOver, s.gameOver)
-        check(&problems, "situation", "isGameOver", isGameOver, s.gameOver != nil)
+        check(&problems, "situation", "gameOverQuestion", gameOverQuestion, s.gameOverQuestion)
+        check(&problems, "situation", "isGameOverQuestionOpen", isGameOverQuestionOpen, s.gameOverQuestion != nil)
         check(&problems, "situation", "isLastInning", isLastInning, s.isLastInning)
         check(&problems, "situation", "isFinal", isFinal, s.isFinal)
 

@@ -124,6 +124,17 @@ struct SampleGameTests {
         #expect(caught == [RunnerMove(runner: "m3", from: .first, to: .out, reason: .caughtStealing, outAt: .second)])
     }
 
+    @Test("The sample game's time limit runs out during the fifth, which began before it")
+    func sampleGameClock() {
+        let end = SampleGame.finalSituation.timeLimitEndsAt!
+        #expect(end == SampleGame.finalSituation.gameStartedAt!.addingTimeInterval(3 * 3600))
+        let fifth = log.entries.filter { $0.inning == 5 && $0.pitches > 0 }
+        #expect(fifth.first!.event.enteredAt < end)
+        #expect(fifth.last!.event.enteredAt >= end)
+        #expect(log.entries.filter { $0.pitches > 0 }.allSatisfy { $0.inning <= 5 })
+        #expect(SampleGame.game.ending?.reason == .timeLimit)
+    }
+
     @Test("Sample situations put the pitcher with a pitch count on the mound")
     func pitchersOnTheMound() {
         for sample in SampleSituations.all {

@@ -35,6 +35,36 @@ struct ScenarioFileTests {
         "hard-sacrifice-fly-with-throwing-error",
     ]
 
+    /// Scenarios for the league's own rules: designated non-runners, batting holes, the time
+    /// limit and the run rule.
+    static let leagueRuleScenarios = [
+        "designated-non-runner-runs-themself",
+        "designated-non-runner-last-out-now-batting",
+        "batting-hole-automatic-out",
+        "time-limit-passes-mid-inning",
+        "time-limit-home-ahead-after-top",
+        "tie-at-time-limit",
+        "keep-playing-past-time-limit",
+        "tie-after-nine-goes-to-extra-innings",
+        "run-rule-home-ahead-after-top-of-seventh",
+        "run-rule-visitors-ahead-after-seven",
+    ]
+
+    @Test("The league-rule scenarios are there", arguments: leagueRuleScenarios)
+    func leagueRuleScenarioExists(name: String) throws {
+        let scenario = try Scenarios.load(name)
+        #expect(scenario.expected.situation != nil)
+    }
+
+    @Test("A batting hole and the time limit are events; keep playing answers the question")
+    func leagueRuleEvents() throws {
+        let hole = try Scenarios.load("batting-hole-automatic-out")
+        #expect(hole.events.first?.kind == .battingHole(BattingHole(team: .away, spotIndex: 1)))
+        let keep = try Scenarios.load("keep-playing-past-time-limit")
+        #expect(keep.events.contains { $0.kind == .keepPlaying(KeepPlaying(reason: .timeLimit)) })
+        #expect(keep.events.contains { if case .timeLimitChange = $0.kind { true } else { false } })
+    }
+
     @Test("Every scenario file decodes, with a setup and at least one event")
     func everyScenarioDecodes() throws {
         let names = Scenarios.names()

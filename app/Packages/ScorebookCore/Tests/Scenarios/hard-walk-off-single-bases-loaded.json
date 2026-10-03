@@ -79,7 +79,7 @@
       "expected": {
         "situation": {
           "batter": "d5",
-          "isRegulationComplete": false,
+          "isGameOverQuestionOpen": false,
           "runners": [
             {
               "base": "first",
@@ -108,7 +108,7 @@
             "away": 3,
             "home": 4
           },
-          "isRegulationComplete": true,
+          "gameOverQuestion": "regulation",
           "isFinal": false
         }
       }
@@ -120,6 +120,7 @@
         "away": 3,
         "home": 4
       },
+      "gameOverQuestion": "regulation",
       "isRegulationComplete": true,
       "isFinal": true
     },

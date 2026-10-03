@@ -34,7 +34,7 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
         case id, enteredAt
         case pitch, intentionalWalk, ballInPlay, runnerAction, errorWithNoAdvance
         case substitution, defenseConfirmed, runnerForNonRunner, pitchingChange, addHitter
-        case battingHole, automaticOut, timeLimitChange, manualAdjustment, endOfGame
+        case battingHole, automaticOut, timeLimitChange, keepPlaying, manualAdjustment, endOfGame
     }
 
     public init(from decoder: Decoder) throws {
@@ -69,6 +69,8 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
             kind = .automaticOut(v)
         } else if let v = try c.decodeIfPresent(TimeLimitChange.self, forKey: .timeLimitChange) {
             kind = .timeLimitChange(v)
+        } else if let v = try c.decodeIfPresent(KeepPlaying.self, forKey: .keepPlaying) {
+            kind = .keepPlaying(v)
         } else if let v = try c.decodeIfPresent(ManualAdjustment.self, forKey: .manualAdjustment) {
             kind = .manualAdjustment(v)
         } else if let v = try c.decodeIfPresent(EndOfGame.self, forKey: .endOfGame) {
@@ -99,6 +101,7 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
         case .battingHole(let v): try c.encode(v, forKey: .battingHole)
         case .automaticOut(let v): try c.encode(v, forKey: .automaticOut)
         case .timeLimitChange(let v): try c.encode(v, forKey: .timeLimitChange)
+        case .keepPlaying(let v): try c.encode(v, forKey: .keepPlaying)
         case .manualAdjustment(let v): try c.encode(v, forKey: .manualAdjustment)
         case .endOfGame(let v): try c.encode(v, forKey: .endOfGame)
         }
@@ -139,6 +142,8 @@ public enum EventKind: Equatable, Sendable {
     case automaticOut(AutomaticOut)
     /// The umpire's time limit: a new end time.
     case timeLimitChange(TimeLimitChange)
+    /// Asked whether the game is over, the scorer said to keep playing.
+    case keepPlaying(KeepPlaying)
     /// Sets outs, count, score, runners or the batter directly, when the field and the book disagree.
     case manualAdjustment(ManualAdjustment)
     /// The scorer ended the game.
@@ -160,6 +165,7 @@ public enum EventKind: Equatable, Sendable {
         case .battingHole: "batting hole"
         case .automaticOut: "automatic out"
         case .timeLimitChange: "time limit"
+        case .keepPlaying: "keep playing"
         case .manualAdjustment: "manual adjustment"
         case .endOfGame: "end of game"
         }
@@ -465,6 +471,18 @@ public struct AutomaticOut: Codable, Equatable, Hashable, Sendable {
     public init(team: TeamSide, spotIndex: Int) {
         self.team = team
         self.spotIndex = spotIndex
+    }
+}
+
+/// The scorer was asked whether the game is over (`Situation.gameOverQuestion`) and the teams
+/// kept playing. Recorded as an event so that undo and replay remember the answer: the same
+/// reason is not asked again in this game, and innings after it are ordinary innings.
+public struct KeepPlaying: Codable, Equatable, Hashable, Sendable {
+    /// The question that was answered.
+    public var reason: EndOfGame.Reason
+
+    public init(reason: EndOfGame.Reason) {
+        self.reason = reason
     }
 }
 

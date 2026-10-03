@@ -1,5 +1,5 @@
 {
-  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Mudcats go down in order. In the bottom of the first, Ortiz re-enters in center field in place of Moss, which our league allows.",
+  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Mudcats go down in order. Once Moss has batted, Ortiz may re-enter in their original spot (league rule 9.9), and does so in the bottom of the first. Moss, a substitute who has been removed, may not come back. Ortiz never left center field, since the pinch hitter changed only the batting order.",
   "setupFile": "standard",
   "events": [
     {
@@ -7,7 +7,7 @@
       "enteredAt": "2026-05-02T18:05:20Z",
       "substitution": {
         "team": "away",
-        "changes": [
+        "batting": [
           {
             "kind": "pinchHitter",
             "incoming": "m10",
@@ -93,12 +93,11 @@
       "enteredAt": "2026-05-02T18:06:40Z",
       "substitution": {
         "team": "away",
-        "changes": [
+        "batting": [
           {
-            "kind": "defensiveReplacement",
+            "kind": "replacement",
             "incoming": "m1",
-            "replacing": "m10",
-            "position": 8
+            "replacing": "m10"
           }
         ]
       }
@@ -117,6 +116,27 @@
               "players": [
                 "m1",
                 "m10"
+              ]
+            }
+          ],
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": [
+                "m1"
               ]
             }
           ]
@@ -152,7 +172,8 @@
       "lineups": [
         {
           "team": "away",
-          "nextBatterIndex": 3
+          "nextBatterIndex": 3,
+          "eligibleToReenter": []
         }
       ]
     },

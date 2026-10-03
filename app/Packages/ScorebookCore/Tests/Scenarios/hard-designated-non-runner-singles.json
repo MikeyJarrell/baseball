@@ -1,5 +1,5 @@
 {
-  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, singles; the app asks who runs (the Diamond Dogs have made no out yet, so nobody is offered first), and Cole runs for them. Tate doubles, Cole scores, and the run is Moreno's.",
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, singles. The app asks who runs and offers Barros, the last batter in the order, since the Diamond Dogs have made no out yet in the first inning (league rule 9.11 E). Barros runs, Tate doubles, Barros scores, and the run is Moreno's.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -92,7 +92,7 @@
       "id": "e5",
       "enteredAt": "2026-05-02T18:06:40Z",
       "runnerForNonRunner": {
-        "runner": "d10",
+        "runner": "d9",
         "replacing": "d1"
       }
     },
@@ -105,7 +105,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "d10",
+            "runner": "d9",
             "from": "first",
             "to": "scored"
           },
@@ -134,7 +134,7 @@
           ],
           "isRunnerChoiceOpen": true,
           "runnerChoiceFor": "d1",
-          "hasSuggestedRunner": false
+          "suggestedRunner": "d9"
         }
       }
     },
@@ -145,7 +145,7 @@
           "runners": [
             {
               "base": "first",
-              "runner": "d10",
+              "runner": "d9",
               "responsiblePitcher": "m9",
               "standingInFor": "d1"
             }
@@ -196,7 +196,7 @@
         "runsBattedIn": 1
       },
       {
-        "player": "d10",
+        "player": "d9",
         "runs": 0
       }
     ],

@@ -1,7 +1,7 @@
 {
   "description": "Pattern file. Leadoff hitter Luis Ortiz takes a ball and a called strike, then grounds out shortstop to first (6-3).",
   "setup": {
-    "date": "2026-05-02T18:00:00Z",
+    "scheduledStart": "2026-05-02T18:00:00Z",
     "away": {
       "teamID": "mudcats",
       "name": "Mudcats",
@@ -92,45 +92,73 @@
           "throwsWith": "left"
         }
       ],
-      "lineup": [
+      "battingOrder": [
         {
-          "player": "m1",
-          "position": 8
+          "player": "m1"
         },
         {
-          "player": "m2",
-          "position": 6
+          "player": "m2"
         },
         {
-          "player": "m3",
-          "position": 3
+          "player": "m3"
         },
         {
-          "player": "m4",
-          "position": 7
+          "player": "m4"
         },
         {
-          "player": "m5",
-          "position": 5
+          "player": "m5"
         },
         {
-          "player": "m6",
-          "position": 9
+          "player": "m6"
         },
         {
-          "player": "m7",
-          "position": 2
+          "player": "m7"
         },
         {
-          "player": "m8",
-          "position": 4
+          "player": "m8"
         },
         {
-          "player": "m9",
-          "position": 1
+          "player": "m9"
         }
       ],
-      "fieldersNotBatting": []
+      "defense": [
+        {
+          "position": 1,
+          "player": "m9"
+        },
+        {
+          "position": 2,
+          "player": "m7"
+        },
+        {
+          "position": 3,
+          "player": "m3"
+        },
+        {
+          "position": 4,
+          "player": "m8"
+        },
+        {
+          "position": 5,
+          "player": "m5"
+        },
+        {
+          "position": 6,
+          "player": "m2"
+        },
+        {
+          "position": 7,
+          "player": "m4"
+        },
+        {
+          "position": 8,
+          "player": "m1"
+        },
+        {
+          "position": 9,
+          "player": "m6"
+        }
+      ]
     },
     "home": {
       "teamID": "diamond-dogs",
@@ -222,47 +250,74 @@
           "throwsWith": "left"
         }
       ],
-      "lineup": [
+      "battingOrder": [
         {
-          "player": "d1",
-          "position": 4
+          "player": "d1"
         },
         {
-          "player": "d2",
-          "position": 6
+          "player": "d2"
         },
         {
-          "player": "d3",
-          "position": 8
+          "player": "d3"
         },
         {
-          "player": "d4",
-          "position": 3
+          "player": "d4"
         },
         {
-          "player": "d5",
-          "position": 5
+          "player": "d5"
         },
         {
-          "player": "d6",
-          "position": 7
+          "player": "d6"
         },
         {
-          "player": "d7",
-          "position": 9
+          "player": "d7"
         },
         {
-          "player": "d8",
-          "position": 2
+          "player": "d8"
         },
         {
-          "player": "d9",
-          "position": 1
+          "player": "d9"
         }
       ],
-      "fieldersNotBatting": []
-    },
-    "scheduledInnings": 9
+      "defense": [
+        {
+          "position": 1,
+          "player": "d9"
+        },
+        {
+          "position": 2,
+          "player": "d8"
+        },
+        {
+          "position": 3,
+          "player": "d4"
+        },
+        {
+          "position": 4,
+          "player": "d1"
+        },
+        {
+          "position": 5,
+          "player": "d5"
+        },
+        {
+          "position": 6,
+          "player": "d2"
+        },
+        {
+          "position": 7,
+          "player": "d6"
+        },
+        {
+          "position": 8,
+          "player": "d3"
+        },
+        {
+          "position": 9,
+          "player": "d7"
+        }
+      ]
+    }
   },
   "events": [
     {

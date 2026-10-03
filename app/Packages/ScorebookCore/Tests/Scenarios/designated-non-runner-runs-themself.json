@@ -1,5 +1,5 @@
 {
-  "description": "Moreno, the Diamond Dogs' designated non-runner, grounds out to lead off and Tate flies out. The scorer resets the order so Moreno bats again with two outs, and Moreno singles. The app asks who runs and offers Tate first, who made the last out. Moreno chooses to run, so nothing is recorded; the next pitch is a ball, and Moreno is still on first.",
+  "description": "Webb and Quinn make the Diamond Dogs' first two outs. The scorer resets the order so Moreno, the designated non-runner, bats with two outs, and Moreno singles. The app asks who runs and offers Quinn, the last recorded out. Moreno chooses to run, so nothing is recorded; the next pitch is a ball, and Moreno is still on first.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -74,6 +74,14 @@
     {
       "id": "e4",
       "enteredAt": "2026-05-02T18:06:20Z",
+      "manualAdjustment": {
+        "batterIndex": 2,
+        "note": "Start with Webb up so the scenario stays short."
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
       "ballInPlay": {
         "batterResult": "out",
         "battedBall": "groundBall",
@@ -83,7 +91,7 @@
         ],
         "runners": [
           {
-            "runner": "d1",
+            "runner": "d3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -97,8 +105,8 @@
       }
     },
     {
-      "id": "e5",
-      "enteredAt": "2026-05-02T18:06:40Z",
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
       "ballInPlay": {
         "batterResult": "out",
         "battedBall": "flyBall",
@@ -107,7 +115,7 @@
         ],
         "runners": [
           {
-            "runner": "d2",
+            "runner": "d4",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -119,16 +127,16 @@
       }
     },
     {
-      "id": "e6",
-      "enteredAt": "2026-05-02T18:07:00Z",
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
       "manualAdjustment": {
         "batterIndex": 0,
-        "note": "Moreno bats again so the scenario stays short."
+        "note": "Moreno bats next."
       }
     },
     {
-      "id": "e7",
-      "enteredAt": "2026-05-02T18:07:20Z",
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
       "ballInPlay": {
         "batterResult": "single",
         "battedBall": "lineDrive",
@@ -144,8 +152,8 @@
       }
     },
     {
-      "id": "e8",
-      "enteredAt": "2026-05-02T18:07:40Z",
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
       "pitch": {
         "result": "ball"
       }
@@ -153,11 +161,12 @@
   ],
   "checkpoints": [
     {
-      "afterEvent": "e7",
+      "afterEvent": "e8",
       "expected": {
         "situation": {
           "half": "bottom",
           "outs": 2,
+          "batter": "d2",
           "runners": [
             {
               "base": "first",
@@ -167,7 +176,7 @@
           ],
           "isRunnerChoiceOpen": true,
           "runnerChoiceFor": "d1",
-          "suggestedRunner": "d2"
+          "suggestedRunner": "d4"
         }
       }
     }

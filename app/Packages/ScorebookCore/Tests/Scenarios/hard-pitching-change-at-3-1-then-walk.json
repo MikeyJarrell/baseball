@@ -1,5 +1,5 @@
 {
-  "description": "Barros goes 3-1 on Ortiz and is replaced by Voss, who throws ball four. The walk is charged to Barros (Official Baseball Rules 9.16(h)); the pitch counts to Voss.",
+  "description": "Barros goes 3-1 on Ortiz and is replaced by Voss, who throws ball four. The walk is charged to Barros (Official Baseball Rules 9.16(h)); the pitch counts to Voss. The change is to the defense only: Barros keeps the ninth batting spot and may come back to pitch once.",
   "setupFile": "standard",
   "events": [
     {
@@ -62,10 +62,16 @@
               "team": "home",
               "index": 8,
               "players": [
-                "d9",
-                "d12"
+                "d9"
               ],
-              "position": 1
+              "isBattingOnly": true
+            }
+          ],
+          "fielders": [
+            {
+              "team": "home",
+              "position": 1,
+              "player": "d12"
             }
           ]
         }
@@ -107,10 +113,18 @@
           "team": "home",
           "index": 8,
           "players": [
-            "d9",
-            "d12"
+            "d9"
           ],
-          "position": 1
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToPitchAgain": [
+            "d9"
+          ],
+          "eligibleToReenter": []
         }
       ]
     },

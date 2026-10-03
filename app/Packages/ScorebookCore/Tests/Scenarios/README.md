@@ -18,7 +18,7 @@ let replay = engine.replay(scenario.game)
 [pattern-6-3-groundout.json](pattern-6-3-groundout.json) is the example to copy. A file holds:
 
 - `description`: what happens, in one line of plain English.
-- `setup` (the whole game setup written out) or `setupFile` (the name of a shared setup in [setups/](setups/), without `.json`).
+- `setup` (the whole game setup written out; its `rules` may be left out for the league’s rules) or `setupFile` (the name of a shared setup in [setups/](setups/), without `.json`).
 - `events`: the event list, each with an `id` (`"e1"`, `"e2"`, …), an `enteredAt` time, and one key naming its kind. `id` and `enteredAt` may be left out, but checkpoints and notation checks need the `id`.
 - `checkpoints` (optional): expected values part way through, each checked just after the event named in `afterEvent`.
 - `expected`: what should be true after the last event.
@@ -30,9 +30,9 @@ In `situation`, a `runners` list is the whole set of runners: a base it leaves o
 
 ## Shared setups
 
-- `standard`: Mudcats (visitors, `m1` to `m12`) at Diamond Dogs (home, our team, `d1` to `d12`). Nine-hitter orders; the pitchers, Ray Collins (`m9`) and Sky Barros (`d9`), bat ninth. The bench is `m10` to `m12` and `d10` to `d12`; `m12` and `d12` are relief pitchers.
+- `standard`: Mudcats (visitors, `m1` to `m12`) at Diamond Dogs (home, our team, `d1` to `d12`), under the league’s rules (nine innings, a three-hour limit, the 12-run rule after seven, two designated non-runners). Each team has a batting order and a separate defense. Nine-hitter orders; the pitchers, Ray Collins (`m9`) and Sky Barros (`d9`), bat ninth. The bench is `m10` to `m12` and `d10` to `d12`; `m12` and `d12` are relief pitchers.
 - `designated-non-runner`: the same, with the Diamond Dogs’ leadoff hitter, Alex Moreno (`d1`), a designated non-runner.
-- `unknown-opponent`: the Riverhawks, a team nobody knows, at the Diamond Dogs. Their hitters are placeholders `r1` to `r9` (“Batter 1” to “Batter 9”) with no positions, and their pitcher, `rp`, does not bat.
+- `unknown-opponent`: the Riverhawks, a team nobody knows, at the Diamond Dogs. Their hitters are placeholders `r1` to `r9` (“Batter 1” to “Batter 9”) whose fielding positions are unknown, and their pitcher, `rp`, fields without batting.
 
 ## Starting mid-game
 
@@ -40,4 +40,6 @@ To start a scenario in the ninth inning or with runners already on, make the fir
 
 ## The foundation job’s scenarios
 
-The `hard-` files are the twenty-two hard plays the foundation job used to test the vocabulary, with expected values worked out by hand.
+The `hard-` files are the twenty-two hard plays the foundation job used to test the vocabulary, with expected values worked out by hand. The files on the league’s own rules cover designated non-runners (`designated-non-runner-…`), a batting hole, the time limit (`time-limit-…`, `tie-…`, `keep-playing-past-time-limit`) and the run rule (`run-rule-…`). To make the time limit pass mid-game, a scenario sets the umpire’s time with a `timeLimitChange` event; events are 20 seconds apart.
+
+None of these rules ends a game by itself: when one says the game could be over, the situation’s `gameOverQuestion` is set, and the game goes on until an `endOfGame` event. A `keepPlaying` event answers the question, and the same reason is not asked again.

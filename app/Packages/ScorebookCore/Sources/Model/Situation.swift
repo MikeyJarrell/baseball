@@ -44,17 +44,26 @@ public struct Situation: Codable, Equatable, Sendable {
     /// True once enough has been played for the game to count if rain or darkness stops it:
     /// five innings, or four and a half with the home team ahead [9.1 E].
     public var isRegulationComplete: Bool
-    /// Set when the rules say the game is over, as of the latest event. The scorer still ends it.
+    /// Set when a rule says the game could be over, as of the latest event: the app asks the
+    /// scorer "Is the game over?". No rule ends a game by itself. The league is casual, and
+    /// teams sometimes agree to keep playing past the time limit or the run rule; the game ends
+    /// only with the scorer's `endOfGame` event. Answering "keep playing" records a
+    /// `keepPlaying` event, which clears the question, and the same reason is never asked
+    /// again in that game. Innings played after that are ordinary innings. Cleared once the
+    /// game is final.
     /// - `regulation`: the scheduled innings are done and the score is not tied, the home team
     ///   leads after the top of the last inning, or the home team went ahead in its last at-bat.
-    ///   A tie after the scheduled innings with time left goes to extra innings.
+    ///   A tie after the scheduled innings with time left goes to extra innings, with no question.
     /// - `timeLimit`: the inning in which the time limit passed has ended, or its top half has
     ///   ended with the home team ahead [9.1 G]. A tie stays a tie [9.1 H].
     /// - `runRule`: a lead of `GameRules.runRuleMargin` at the end of the run rule's inning or
     ///   any later one, or after its top half with the home team ahead [9.13].
-    public var gameOver: EndOfGame.Reason?
+    public var gameOverQuestion: EndOfGame.Reason?
+    /// The reasons the scorer has already answered "keep playing" to, so they are not asked again.
+    public var declinedEndings: [EndOfGame.Reason]
     /// True when the time limit has passed during this inning, which began before it: the last
-    /// inning [9.1 G]. As of the latest event; `clock(at:)` gives the live answer.
+    /// inning [9.1 G]. False once the scorer has chosen to keep playing past the limit. As of the
+    /// latest event; `clock(at:)` gives the live answer.
     public var isLastInning: Bool
     /// True once the scorer has ended the game.
     public var isFinal: Bool
@@ -87,7 +96,8 @@ public struct Situation: Codable, Equatable, Sendable {
         runnerChoice: RunnerChoice? = nil,
         droppedThirdStrikePossible: Bool = false,
         isRegulationComplete: Bool = false,
-        gameOver: EndOfGame.Reason? = nil,
+        gameOverQuestion: EndOfGame.Reason? = nil,
+        declinedEndings: [EndOfGame.Reason] = [],
         isLastInning: Bool = false,
         isFinal: Bool = false,
         gameStartedAt: Date? = nil,
@@ -111,7 +121,8 @@ public struct Situation: Codable, Equatable, Sendable {
         self.droppedThirdStrikePossible = droppedThirdStrikePossible
         self.isRegulationComplete = isRegulationComplete
         self.isFinal = isFinal
-        self.gameOver = gameOver
+        self.gameOverQuestion = gameOverQuestion
+        self.declinedEndings = declinedEndings
         self.isLastInning = isLastInning
         self.gameStartedAt = gameStartedAt
         self.currentInningStartedAt = currentInningStartedAt
@@ -157,25 +168,27 @@ public struct Situation: Codable, Equatable, Sendable {
     }
 
     /// The game clock at a given moment, for the batting screen: time left, whether this is
-    /// the last inning, and whether the game is over on time. Worked out from the stored times,
-    /// so it stays right between events while the clock runs.
+    /// the last inning, and whether to ask if the game is over on time. Worked out from the
+    /// stored times, so it stays right between events while the clock runs. Once the scorer has
+    /// chosen to keep playing past the limit, it reports only the time.
     public func clock(at now: Date) -> GameClock {
         guard let end = timeLimitEndsAt else {
-            return GameClock(timeLimitEndsAt: nil, timeRemaining: nil, isLastInning: false, isOverOnTime: false)
+            return GameClock(timeLimitEndsAt: nil, timeRemaining: nil, isLastInning: false, askIfOverOnTime: false)
         }
-        let passed = now >= end
+        // After "keep playing", innings past the limit are ordinary innings.
+        let passed = now >= end && !declinedEndings.contains(.timeLimit)
         // The inning began before the limit if its first pitch came first. Between a finished
         // inning and the next one's first pitch, nothing has begun yet.
         let startedBeforeLimit = currentInningStartedAt.map { $0 < end } ?? false
         let betweenInnings = half == .top && isBetweenHalfInnings
         let homeAheadAfterTop = half == .bottom && isBetweenHalfInnings && score.home > score.away
-        let overOnTime = gameOver == .timeLimit
+        let overOnTime = gameOverQuestion == .timeLimit
             || (passed && gameStartedAt != nil && (betweenInnings || (homeAheadAfterTop && startedBeforeLimit)))
         return GameClock(
             timeLimitEndsAt: end,
             timeRemaining: gameStartedAt == nil ? nil : end.timeIntervalSince(now),
             isLastInning: isLastInning || (passed && startedBeforeLimit && !betweenInnings),
-            isOverOnTime: overOnTime
+            askIfOverOnTime: overOnTime
         )
     }
 
@@ -193,14 +206,15 @@ public struct GameClock: Codable, Equatable, Hashable, Sendable {
     public var timeRemaining: TimeInterval?
     /// The time limit has passed during an inning that began before it: finish this inning.
     public var isLastInning: Bool
-    /// No new inning may begin, or the home team leads after the top of the last inning.
-    public var isOverOnTime: Bool
+    /// Time to ask "Is the game over?": no new inning should begin, or the home team leads
+    /// after the top of the last inning. Only a question; the scorer decides.
+    public var askIfOverOnTime: Bool
 
-    public init(timeLimitEndsAt: Date?, timeRemaining: TimeInterval?, isLastInning: Bool, isOverOnTime: Bool) {
+    public init(timeLimitEndsAt: Date?, timeRemaining: TimeInterval?, isLastInning: Bool, askIfOverOnTime: Bool) {
         self.timeLimitEndsAt = timeLimitEndsAt
         self.timeRemaining = timeRemaining
         self.isLastInning = isLastInning
-        self.isOverOnTime = isOverOnTime
+        self.askIfOverOnTime = askIfOverOnTime
     }
 }
 

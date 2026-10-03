@@ -1,5 +1,5 @@
 {
-  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, doubles; Cole runs for them. Cole steals third, then scores on Tate's sacrifice fly. The run is Moreno's and the stolen base is Cole's; the batting order does not change.",
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, doubles. With no Diamond Dogs out yet in the first inning, the runner is the last batter in the order, Barros (league rule 9.11 E). Barros steals third, then scores on Tate's sacrifice fly. The run is Moreno's and the stolen base is Barros's; the batting order does not change.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -92,7 +92,7 @@
       "id": "e5",
       "enteredAt": "2026-05-02T18:06:40Z",
       "runnerForNonRunner": {
-        "runner": "d10",
+        "runner": "d9",
         "replacing": "d1"
       }
     },
@@ -109,7 +109,7 @@
       "runnerAction": {
         "moves": [
           {
-            "runner": "d10",
+            "runner": "d9",
             "from": "second",
             "to": "third",
             "reason": "stolenBase"
@@ -136,7 +136,7 @@
             ]
           },
           {
-            "runner": "d10",
+            "runner": "d9",
             "from": "third",
             "to": "scored"
           }
@@ -147,13 +147,23 @@
   ],
   "checkpoints": [
     {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
+        }
+      }
+    },
+    {
       "afterEvent": "e5",
       "expected": {
         "situation": {
           "runners": [
             {
               "base": "second",
-              "runner": "d10",
+              "runner": "d9",
               "responsiblePitcher": "m9",
               "standingInFor": "d1"
             }
@@ -183,7 +193,7 @@
           "runners": [
             {
               "base": "third",
-              "runner": "d10",
+              "runner": "d9",
               "responsiblePitcher": "m9",
               "standingInFor": "d1"
             }
@@ -229,7 +239,7 @@
         "runsBattedIn": 1
       },
       {
-        "player": "d10",
+        "player": "d9",
         "plateAppearances": 0,
         "runs": 0,
         "stolenBases": 1

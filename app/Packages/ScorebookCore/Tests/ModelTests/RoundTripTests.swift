@@ -182,7 +182,7 @@ struct HelperTests {
         let setup = SampleSituations.topOfFirst.setup
         #expect(situation.timeLimitEndsAt == setup.scheduledStart.addingTimeInterval(3 * 3600))
         let clock = situation.clock(at: setup.scheduledStart)
-        #expect(clock.timeRemaining == nil && !clock.isLastInning && !clock.isOverOnTime)
+        #expect(clock.timeRemaining == nil && !clock.isLastInning && !clock.askIfOverOnTime)
     }
 
     @Test("The clock counts down from the first pitch and knows the last inning")
@@ -194,17 +194,17 @@ struct HelperTests {
         #expect(situation.clock(at: start.addingTimeInterval(30 * 60)).timeRemaining == TimeInterval(150 * 60))
         // The third inning began before the limit; once the limit passes, it is the last inning.
         let late = situation.clock(at: end.addingTimeInterval(60))
-        #expect(late.isLastInning && !late.isOverOnTime)
+        #expect(late.isLastInning && !late.askIfOverOnTime)
         // Between innings after the limit, no new inning may begin.
         situation.half = .top
         situation.isBetweenHalfInnings = true
         situation.outs = 0
         situation.runners = []
-        #expect(situation.clock(at: end.addingTimeInterval(60)).isOverOnTime)
+        #expect(situation.clock(at: end.addingTimeInterval(60)).askIfOverOnTime)
         // Between the halves, with the home team ahead: the home team does not bat.
         situation.half = .bottom
         situation.score = Score(away: 1, home: 3)
-        #expect(situation.clock(at: end.addingTimeInterval(60)).isOverOnTime)
+        #expect(situation.clock(at: end.addingTimeInterval(60)).askIfOverOnTime)
         situation.timeLimitEndsAt = nil
         #expect(situation.clock(at: end).timeRemaining == nil)
     }

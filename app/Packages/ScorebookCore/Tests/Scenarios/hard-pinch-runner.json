@@ -1,5 +1,5 @@
 {
-  "description": "Ortiz singles; Moss pinch-runs for them and takes their place in the order. Ruiz grounds out 4-3, Moss moving to second.",
+  "description": "Ortiz singles; Moss pinch-runs for them and takes their place in the batting order. The defense is a separate list, so Ortiz is still listed in center field until the Mudcats change it. Ruiz grounds out 4-3, Moss moving to second.",
   "setupFile": "standard",
   "events": [
     {
@@ -24,7 +24,7 @@
       "enteredAt": "2026-05-02T18:05:40Z",
       "substitution": {
         "team": "away",
-        "changes": [
+        "batting": [
           {
             "kind": "pinchRunner",
             "incoming": "m10",
@@ -83,7 +83,13 @@
             "m1",
             "m10"
           ],
-          "isExtraHitter": true
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "eligibleToReenter": []
         }
       ]
     },

@@ -130,7 +130,7 @@ public enum SampleSituations {
     // MARK: More situations screens need
 
     /// The changeover after the top of the 3rd: three outs made, nobody has pitched to the
-    /// Diamond Dogs yet. The between-innings music button shows.
+    /// Diamond Dogs yet. The Diamond Dogs are batting, so no warm-up song plays.
     public static let betweenHalfInnings: SampleSituation = {
         var s = make(
             "Between half-innings, middle of the 3rd",
@@ -214,12 +214,27 @@ public enum SampleSituations {
         return s
     }()
 
+    /// The changeover after the bottom of the 3rd: the Diamond Dogs take the field, so the
+    /// music button plays Sky Barros's warm-up song and the defense check is due.
+    public static let ourPitcherWarmingUp: SampleSituation = {
+        var s = make(
+            "Our team taking the field: warm-up song",
+            inning: 4, half: .top, outs: 0, score: Score(away: 2, home: 3),
+            awayUp: 4, homeUp: 5,
+            pitchers: [tally("d9", .home, 41, 25, 13), tally("m9", .away, 47, 30, 15)]
+        )
+        s.situation.isBetweenHalfInnings = true
+        s.situation.defenseCheckDue = true
+        s.situation.lastPlayNotation = "F9"
+        return s
+    }()
+
     /// Every sample situation, for preview lists.
     public static let all: [SampleSituation] = [
         topOfFirst, runnerOnFirstOneOut, basesLoadedTwoOutsFullCount, secondAndThirdNobodyOut,
         tenthHitterUpAfterAddingOne, newPitcherJustIn, lastInningHomeAhead, extraInnings,
         betweenHalfInnings, designatedNonRunnerOnFirst, ourHitterWithoutSong, theirHitterKnownByNumber,
-        rightAfterStrikeThree, lastInningOnTime,
+        rightAfterStrikeThree, lastInningOnTime, ourPitcherWarmingUp,
     ]
 
     // MARK: Building blocks

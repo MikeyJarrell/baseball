@@ -27,12 +27,11 @@ public enum SampleGame {
     public static var playLog: PlayLog { script.playLog(isFinal: true) }
 
     /// Where the game stood at the end. The time limit ran out during the fifth inning, which
-    /// had begun before it, so the game was over on time once the fifth was finished. Five
-    /// innings make it an official game. Collins may come back to pitch, and may re-enter the
+    /// had begun before it; when the fifth was finished the app asked whether the game was over
+    /// on time, and the scorer ended it. Five innings make it an official game. Collins may come back to pitch, and may re-enter the
     /// ninth spot since Moss, who batted for them, has batted; Barros may come back to pitch.
     public static var finalSituation: Situation {
         var s = script.situation(isFinal: true)
-        s.gameOver = .timeLimit
         s.isRegulationComplete = true
         s.away.eligibleToReenter = [ReentryOption(player: "m9", spotIndex: 8)]
         s.away.eligibleToPitchAgain = ["m9"]
@@ -57,8 +56,10 @@ public enum SampleGame {
 
     /// Writes the whole game. Built once, the first time it is used.
     static let script: GameScript = {
+        // One event every 76 seconds, so the three-hour limit runs out during the bottom
+        // of the fifth, an inning that began before it.
         var s = GameScript(gameID: id, setup: SampleSetups.mudcatsAtDiamondDogs,
-                           firstEventAt: SampleSetups.gameDay.addingTimeInterval(300))
+                           firstEventAt: SampleSetups.gameDay.addingTimeInterval(300), secondsBetweenEvents: 76)
 
         // MARK: Top of the 1st. Barros pitching.
         s.lineupChange(.defenseConfirmed(DefenseConfirmed(team: .home)), notation: "")

@@ -116,10 +116,11 @@ public struct ExpectedSituation: Codable, Sendable {
     /// Whether enough has been played for the game to count (five innings, or four and a half
     /// with the home team ahead).
     public var isRegulationComplete: Bool?
-    /// Why the rules say the game is over: "regulation", "timeLimit" or "runRule".
-    public var gameOver: EndOfGame.Reason?
-    /// Whether the rules say the game is over at all (false checks that it is not).
-    public var isGameOver: Bool?
+    /// The "Is the game over?" question the app should be asking: "regulation", "timeLimit"
+    /// or "runRule".
+    public var gameOverQuestion: EndOfGame.Reason?
+    /// Whether any such question is open (false checks that none is).
+    public var isGameOverQuestionOpen: Bool?
     /// Whether the time limit has passed during this inning.
     public var isLastInning: Bool?
     public var isFinal: Bool?

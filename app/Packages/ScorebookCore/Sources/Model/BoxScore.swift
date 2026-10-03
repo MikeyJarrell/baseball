@@ -1,5 +1,5 @@
 // Box scores: one game's batting lines, pitching lines, fielding, line score by inning,
-// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Cardinals 4.").
+// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Diamond Dogs 4.").
 //
 // The stats engine fills these in from the play log. The counting-stat bundles
 // (BattingCounts, PitchingCounts, FieldingCounts) are shared with season totals, and
