@@ -32,6 +32,9 @@ Cover, at least:
 - A pinch hitter, a pinch runner, a defensive switch.
 - A lineup of nine grown to eleven mid-inning, while the ninth hitter is batting; the order cycling through all eleven.
 - A walk-off in the bottom of the last inning; extra innings; a home team that does not bat in the last inning.
+- The time limit passing mid-inning (the inning is finished), during the top half with the home team ahead (game over after the top half), and with the score tied (a tie); the mercy rule.
+- A batting hole counting as an out each time it comes up.
+- The suggested runner for a designated non-runner in the first inning before any out, and when the last recorded out is now batting.
 - Undo after each kind of event.
 
 ## Real games

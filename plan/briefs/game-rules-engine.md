@@ -30,7 +30,12 @@ The real version of the rules-engine interface in `Model/`:
 - The engine always knows which of our players is at each fielding position, from the starting positions plus every substitution, so every out and error is tied to a player. The situation flags when a designated non-runner has just reached base, with a suggested runner: the batting team’s player who made the most recent out. The non-runner may also run themselves, which records nothing.
 - Runs come only from what the play says scored; the engine never decides on its own whether a run counted.
 - The manual adjustment event overrides whatever it sets.
-- Games often end early on the time limit; the scorer ends them, and the engine never assumes the game runs nine innings.
+- Time limit (league rule 9.1): no new inning begins once the limit passes. The limit is three hours after the first pitch unless the scorer sets it. The situation reports time left, “finish this inning” once the limit passes mid-inning, and “game over on time” when that inning ends, or after its top half if the home team leads. A tie at the limit stays a tie; a tie after nine with time left goes to extra innings. The scorer ends the game.
+- Mercy rule (9.13): a 12-run lead at the end of seven innings, or after six and a half with the home team ahead, is reported as game over (15 runs in a championship game).
+- A batting hole is an automatic out each time its spot comes up.
+- The suggested runner for a designated non-runner (9.11) is the last recorded out; in the first inning before any out, the last batter in the order; when the last recorded out is now batting, the last recorded out before them.
+- Re-entry eligibility (9.6, 9.9, 9.12): a starter may re-enter in the original spot once their substitute has batted; a removed substitute may not; a removed pitcher may pitch again once per game. The engine reports eligibility and blocks nothing.
+- See [notes/league-rules.md](../../notes/league-rules.md) for every league rule and its number.
 - Regulation is complete when the scheduled innings are done and the score is not tied, or when the home team leads after the top half of the last scheduled inning, or when the home team goes ahead in the bottom of the last inning or later. The engine reports it; the scorer ends the game.
 
 ## Suggested runner outcomes

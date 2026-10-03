@@ -30,9 +30,9 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 - A “Box score” button opens the game overview; a swipe does the same.
 - A menu holds the rest: manual adjustment, end game.
 
-**Game clock.** When the game has a time limit, the time left shows beside the inning.
+**Game clock.** The time limit and time left show beside the inning. When the limit passes, a banner says to finish the inning; when the game is over on time or on the mercy rule, the banner offers to end it.
 
-**The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. During a changeover, the same spot holds the between-innings music button. The song fades out by itself after 12 seconds of song (the length is a setting), with a small countdown on the button; tapping stops it early. A second setting, off by default, also fades it when the first pitch is recorded. For their hitters, the same spot is an empty gray bar.
+**The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. When our team takes the field, the same spot holds the pitcher’s warm-up music button. The song fades out by itself after 12 seconds of song (the length is a setting), with a small countdown on the button; tapping stops it early. A second setting, off by default, also fades it when the first pitch is recorded. For their hitters, the same spot is an empty gray bar.
 
 **Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Cardinals 4, Mudcats 2”) and the next team’s batter.
 
