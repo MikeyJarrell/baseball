@@ -1,0 +1,10 @@
+// GameOverview: the game-so-far screen and batter history.
+//
+// Placeholder written by the foundation job so the module exists and builds.
+// The screen builder replaces this file (see plan/briefs/screen-game-overview.md).
+// Screens here may use Model, SampleData and DesignSystem, and nothing else.
+
+import SwiftUI
+import Model
+import SampleData
+import DesignSystem

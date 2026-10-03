@@ -34,3 +34,7 @@ The session turned Mikey’s app vision into a plan the agent team can execute i
 ## [2026-10-03 14:02] No courtesy runners
 
 Mikey corrected the league rules: there are no courtesy runners. Runner replacements are a pinch runner (an ordinary substitution) or the runner for a designated non-runner, whose runs are credited to the designated non-runner. The plan and the running foundation and design jobs were updated.
+
+## [2026-10-03 15:13] League rules and lineup structure
+
+Read the SDABL rule book (April 21, 2026) and summarized the rules the app depends on in notes/league-rules.md. The plan now separates the batting order from the fielders, runs the time limit from the first pitch with “finish this inning” behavior, adds the mercy rule, batting holes, the rule-book non-runner replacement order and re-entry eligibility, and replaces between-innings music with pitcher warm-up songs. Our team is the Diamond Dogs.

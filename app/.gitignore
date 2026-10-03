@@ -1,0 +1,8 @@
+# Build output from `swift build`, `swift test` and Xcode.
+.build/
+.swiftpm/
+DerivedData/
+build/
+# Each person's own Xcode window layout and schemes.
+xcuserdata/
+*.xcuserstate

@@ -1,0 +1,386 @@
+{
+  "description": "Pattern file. Leadoff hitter Luis Ortiz takes a ball and a called strike, then grounds out shortstop to first (6-3).",
+  "setup": {
+    "date": "2026-05-02T18:00:00Z",
+    "away": {
+      "teamID": "cardinals",
+      "name": "Cardinals",
+      "isOurs": false,
+      "roster": [
+        {
+          "id": "c1",
+          "name": "Luis Ortiz",
+          "number": "1",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c2",
+          "name": "Danny Ruiz",
+          "number": "2",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c3",
+          "name": "Marcus Hale",
+          "number": "24",
+          "bats": "left",
+          "throwsWith": "left"
+        },
+        {
+          "id": "c4",
+          "name": "Tommy Diaz",
+          "number": "7",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c5",
+          "name": "Sam Kim",
+          "number": "5",
+          "bats": "switchHitter",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c6",
+          "name": "Eddie Park",
+          "number": "11",
+          "bats": "left",
+          "throwsWith": "left"
+        },
+        {
+          "id": "c7",
+          "name": "Joe Varga",
+          "number": "8",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c8",
+          "name": "Nate Bell",
+          "number": "4",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c9",
+          "name": "Ray Collins",
+          "number": "31",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c10",
+          "name": "Kyle Moss",
+          "number": "15",
+          "bats": "left",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c11",
+          "name": "Ben Ash",
+          "number": "19",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "c12",
+          "name": "Gus Reyes",
+          "number": "40",
+          "bats": "left",
+          "throwsWith": "left"
+        }
+      ],
+      "lineup": [
+        {
+          "player": "c1",
+          "position": 8
+        },
+        {
+          "player": "c2",
+          "position": 6
+        },
+        {
+          "player": "c3",
+          "position": 3
+        },
+        {
+          "player": "c4",
+          "position": 7
+        },
+        {
+          "player": "c5",
+          "position": 5
+        },
+        {
+          "player": "c6",
+          "position": 9
+        },
+        {
+          "player": "c7",
+          "position": 2
+        },
+        {
+          "player": "c8",
+          "position": 4
+        },
+        {
+          "player": "c9",
+          "position": 1
+        }
+      ],
+      "fieldersNotBatting": []
+    },
+    "home": {
+      "teamID": "mudcats",
+      "name": "Mudcats",
+      "isOurs": true,
+      "roster": [
+        {
+          "id": "m1",
+          "name": "Alex Moreno",
+          "number": "3",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m2",
+          "name": "Chris Tate",
+          "number": "6",
+          "bats": "left",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m3",
+          "name": "Jordan Webb",
+          "number": "22",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m4",
+          "name": "Pat Quinn",
+          "number": "33",
+          "bats": "left",
+          "throwsWith": "left"
+        },
+        {
+          "id": "m5",
+          "name": "Riley Shaw",
+          "number": "12",
+          "bats": "switchHitter",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m6",
+          "name": "Casey Ford",
+          "number": "9",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m7",
+          "name": "Drew Lang",
+          "number": "17",
+          "bats": "left",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m8",
+          "name": "Morgan Fisk",
+          "number": "10",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m9",
+          "name": "Sky Barros",
+          "number": "21",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m10",
+          "name": "Jamie Cole",
+          "number": "14",
+          "bats": "left",
+          "throwsWith": "left"
+        },
+        {
+          "id": "m11",
+          "name": "Robin Nash",
+          "number": "27",
+          "bats": "right",
+          "throwsWith": "right"
+        },
+        {
+          "id": "m12",
+          "name": "Taylor Voss",
+          "number": "44",
+          "bats": "left",
+          "throwsWith": "left"
+        }
+      ],
+      "lineup": [
+        {
+          "player": "m1",
+          "position": 4
+        },
+        {
+          "player": "m2",
+          "position": 6
+        },
+        {
+          "player": "m3",
+          "position": 8
+        },
+        {
+          "player": "m4",
+          "position": 3
+        },
+        {
+          "player": "m5",
+          "position": 5
+        },
+        {
+          "player": "m6",
+          "position": 7
+        },
+        {
+          "player": "m7",
+          "position": 9
+        },
+        {
+          "player": "m8",
+          "position": 2
+        },
+        {
+          "player": "m9",
+          "position": 1
+        }
+      ],
+      "fieldersNotBatting": []
+    },
+    "scheduledInnings": 9
+  },
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "c1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 1
+          },
+          "outs": 0,
+          "batter": "c1"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "score": {
+        "away": 0,
+        "home": 0
+      },
+      "runners": [],
+      "batter": "c2",
+      "onDeck": "c3",
+      "pitcher": "m9",
+      "pitchers": [
+        {
+          "pitcher": "m9",
+          "pitches": 3,
+          "strikes": 2,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e3",
+        "notation": "6-3"
+      }
+    ],
+    "batting": [
+      {
+        "player": "c1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "outsRecorded": 1,
+        "battersFaced": 1,
+        "pitches": 3,
+        "strikes": 2
+      }
+    ],
+    "fielding": [
+      {
+        "player": "m2",
+        "putouts": 0,
+        "assists": 1,
+        "errors": 0
+      },
+      {
+        "player": "m4",
+        "putouts": 1,
+        "assists": 0
+      }
+    ]
+  }
+}
