@@ -8,13 +8,117 @@
 		<data>
 		AAMI4SOmrlXBOERRNrBamWW8508=
 		</data>
-		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/temp.json</key>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/README.md</key>
 		<data>
-		Xzay6ikGRe402UMiChS1TuXqW+U=
+		tQilUmI+1IhE5QCzXaAZ2RxHZ3Q=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-5-4-3-double-play.json</key>
+		<data>
+		kQIppi8scZSatfjtunC2MsQc06k=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-6-3-double-play-shortstop-steps-on-second.json</key>
+		<data>
+		l3Ree51XdH/XqD2yLvVbtAg+G7w=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-bases-loaded-walk.json</key>
+		<data>
+		jqAQrqmXDUv4o4BKBQTm0PJ8MUA=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-designated-non-runner-singles.json</key>
+		<data>
+		xrG7kTAok4U+thzxyiDBt0tS4mo=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-double-steal-throwing-error.json</key>
+		<data>
+		sBa18rxCru2JP2MUKr5hnoSJGuQ=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-foul-pop-error.json</key>
+		<data>
+		D/U6w2GXFFpwAcw5+RnHvyYHBXs=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-third-strike-batter-reaches.json</key>
+		<data>
+		+X99mTT6zoUX3o8OxBqfaMVlUO8=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-third-strike-thrown-out.json</key>
+		<data>
+		e/W4a5VgcCwSR+uGeuUo6cE19Ks=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-error-on-fly-ball-batter-to-second.json</key>
+		<data>
+		whOOQUUxKqrBfTHKj7kx2rkYy6s=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-foul-tip-strike-three.json</key>
+		<data>
+		GPcsLo6L94bpCBIAUaChxTEjpuY=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-hitter-added-while-last-hitter-bats.json</key>
+		<data>
+		2L2ZuKmiNZ6fIGNTx+HAXXouI8o=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-inherited-runner-scores.json</key>
+		<data>
+		xYK/PcaS9fs9iFS4Y1GR0TNjLMM=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-manual-adjustment.json</key>
+		<data>
+		w4CZHtPkko0JPDO9wFwxYOD3Ei4=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-pinch-runner.json</key>
+		<data>
+		eCMxNDA9rJ5+yg3CFiLvU5g73+A=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-pitching-change-at-3-1-then-walk.json</key>
+		<data>
+		/s7onCWgp+NtV+DlW0HuXajcC8E=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-runner-for-non-runner-scores.json</key>
+		<data>
+		+XE8Ey942YFF9WlRc6SKHnqEsi8=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-sacrifice-fly-with-throwing-error.json</key>
+		<data>
+		ijxn7JkMh9B1Gnz4Z49FkAjAyU4=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-starter-re-enters.json</key>
+		<data>
+		kpAkTnpKMQzi+0ppT8Fq3mU63jI=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-third-out-on-bases-mid-at-bat.json</key>
+		<data>
+		jt7eHJ0fG1dnSiSmiIS0lKU7FMs=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-triple-play.json</key>
+		<data>
+		ZZFTdyZxHK8VtT7Sba9b0tmG2rM=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-unknown-lineup-cycles.json</key>
+		<data>
+		UgJFBcvNzZoKb1DW4vf6rgVnAdw=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-walk-off-single-bases-loaded.json</key>
+		<data>
+		XeeEDupGoqqlaKfHSrajF610aog=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/pattern-6-3-groundout.json</key>
+		<data>
+		Pz3PXzy+/fiehwKvVTBmklieGF0=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/designated-non-runner.json</key>
+		<data>
+		hd2sxytlKaAKr8NetaWfTlk3o+U=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/standard.json</key>
+		<data>
+		az7CAv7Jl/FmXF/Mcy9iqIHBQrs=
+		</data>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/unknown-opponent.json</key>
+		<data>
+		TWj6TCVUuVEi3XHbMxLOP6LQdvE=
 		</data>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeDirectory</key>
 		<data>
-		j2i+OB2diLmoYj5l9QKsypWyYSE=
+		+QF6S+o3JBmfKHYS9rv9oreSDTM=
 		</data>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeRequirements</key>
 		<data>
@@ -22,7 +126,7 @@
 		</data>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeResources</key>
 		<data>
-		HviasmHFmEyMH4WDIWuGd95koSM=
+		j1CYNO1i/kFWEeoOLegVePZ/TAg=
 		</data>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeSignature</key>
 		<data>
@@ -38,18 +142,200 @@
 			Hch4AAhkVuurcDKXG48etywlPzlnm9eVNujso/qpQTM=
 			</data>
 		</dict>
-		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/temp.json</key>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/README.md</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			yj0WO6sFU4GCciYUBWjzvvfqrBh869doeOC2Pp5EI1Y=
+			5pSiJZXzKGvMsvUzOCd+WMAqV5qQvyihQEgPm6dG5a4=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-5-4-3-double-play.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			sxCvosX3BXobonRb1DKsUPNFRW+8MtNRKc0ZW8DkWrI=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-6-3-double-play-shortstop-steps-on-second.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			bAWhttIv4QLOEd1AdFSlCigOxRFVO00xct2Q4DBBqiI=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-bases-loaded-walk.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			havimp+YK7mrL1bxm7PIBda1bXWOxiOtNRGOFD4Jbfc=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-designated-non-runner-singles.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			jCNooz5rVVEu48ZpHQbI/nUjilwajrF1oR/299d45Is=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-double-steal-throwing-error.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			9ga3Z1+zy8f/9vN/19a6f9iADXnNNLL1qbeyZnHoAmk=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-foul-pop-error.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			PB7F855RAeX5pLlczvLDz9uZ8Re1Ewz+syeyCR4h5pk=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-third-strike-batter-reaches.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			3vX797dc9KFe5GwZj/4oovA1nTNxXqHyh8lBlnTtzYo=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-dropped-third-strike-thrown-out.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			6ZPsOYCAMWzZdsmgo5SFM/s9mIRNE720NAaT+dSQWe0=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-error-on-fly-ball-batter-to-second.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			9XjDT6myadN35y8XRoxexK1Ky55Gy0dkYVNHJ/A4jfc=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-foul-tip-strike-three.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			CvyRNKAOT1EwZ97dKJrHP70/UnFwnIoBfkI8K2jKU+8=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-hitter-added-while-last-hitter-bats.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			+jvS2A/5ALwxvVY7l4ZFq+cL0JNyH95L378hkj8vPdY=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-inherited-runner-scores.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			OQqVAJH2oonjHcu8T6oOXXe1yOF7BccUhcQAOhz4g+I=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-manual-adjustment.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			PsxwdjR9DXBDkJ372ZGNImgyoyjuTfAiIemGqLtEILo=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-pinch-runner.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			Dmu763zjvPLw1Q4qnmYFH+dvIEmKtcippIEj3Hqt0x8=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-pitching-change-at-3-1-then-walk.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			j8xisEMOnT77BXRbfeTt4r84WBb1STMis5Wi3u2xlE0=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-runner-for-non-runner-scores.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			qOYjeo+cTvf8u6u0VvKtG3u9J11UYYsc1m3sartgGgg=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-sacrifice-fly-with-throwing-error.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			RIYfp2l00q+uTmw+Bmg0fS/9hX15/Q4ZYt27oRSdawA=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-starter-re-enters.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			qKso7D7MKIDbCFt3SwXhRl/pWBMb7JV54I32vDy+oeM=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-third-out-on-bases-mid-at-bat.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			SMCHW+xTnaJPmHzOYBb7G5HB3TYvn1bsjROufF1Ljdg=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-triple-play.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			voiKGJ2VjU044SQ/6lhPZ2E+Yh778FWHTT7eY6tMgqc=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-unknown-lineup-cycles.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			nNWnkT4PHcHk8Z9x1s29OE8Llei5hIfZpl/QXNVSHRI=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/hard-walk-off-single-bases-loaded.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			za2cQhOB37QCE+3Xy/XdenzC8rRauBz3g9kf+wMxbp0=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/pattern-6-3-groundout.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			sQ09X2XWqSHb1FiueJJhZQLR7GDA38jAeUfnKdrdn7w=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/designated-non-runner.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			1C784THnfhKQswhel96/MZ9ius/pukdCQ3pjW3I9SBE=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/standard.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			JRIqro3PKoGHY5j0W90W7iCJC2eWDGRPgsAE6Iou7fo=
+			</data>
+		</dict>
+		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/Resources/Scenarios/setups/unknown-opponent.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			jOQiMvtkmO4aUBi4ybEuNCi+KMpcuIynpTVsMwTaNGw=
 			</data>
 		</dict>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeDirectory</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			0aem+P/UxcRHDzFBdYMPixyVgt10wDB8TYEdDqI18Sc=
+			1YcMdGEcZBLK2TC5gArEUKOYlhk8a/KFUttkECASbe4=
 			</data>
 		</dict>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeRequirements</key>
@@ -63,7 +349,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			4IT/3n7jfVf6lkFEYYMV003FyJjF3uIjHlY08sKoYEM=
+			4Uz0iHoL4IlneGjjrZZMR/p7oIeE0LclYQnTx0gLz4Y=
 			</data>
 		</dict>
 		<key>Resources/ScorebookCore_TestSupport.bundle/Contents/_CodeSignature/CodeSignature</key>

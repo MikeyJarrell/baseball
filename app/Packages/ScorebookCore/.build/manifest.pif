@@ -5,11 +5,11 @@
       "name" : "ScorebookCore",
       "path" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore",
       "projects" : [
-        "bdf5202883697e0cbce043da05bebed4cbce3e4015129aaecd1386a870ea3102",
+        "c23a73e8cbca4c8170cba1befd8f46673cc6935ff68b1c75e9ecee6228b03f83",
         "938eb61e5ec9e902e1eb1e7ae9444ea0e353e3de220a811d9670a83d8213dcc3"
       ]
     },
-    "signature" : "6fc9ea69bbaffb4b175ccc1120f57953b615b49cdf4f06d015164ff0bc43c01b",
+    "signature" : "f1ad73688680da33f292575dd1174a1baaa0b077436f3c93879bc7523c58df31",
     "type" : "workspace"
   },
   {
@@ -550,6 +550,22 @@
               {
                 "fileType" : "sourcecode.swift",
                 "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_9::REF_0",
+                "name" : "GameScript.swift",
+                "path" : "GameScript.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_9::REF_1",
+                "name" : "SampleTeams.swift",
+                "path" : "SampleTeams.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_9::REF_2",
                 "name" : "Temp.swift",
                 "path" : "Temp.swift",
                 "sourceTree" : "<group>",
@@ -567,6 +583,22 @@
               {
                 "fileType" : "sourcecode.swift",
                 "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_10::REF_0",
+                "name" : "GameScript.swift",
+                "path" : "GameScript.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_10::REF_1",
+                "name" : "SampleTeams.swift",
+                "path" : "SampleTeams.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:scorebookcore::MAINGROUP::REF_10::REF_2",
                 "name" : "Temp.swift",
                 "path" : "Temp.swift",
                 "sourceTree" : "<group>",
@@ -804,8 +836,8 @@
         "05a5b66c86bc0ed26f3e45aaaa255316179a66b8314ced3300642ffe94e9cd31",
         "66d49538f670017ac89be1a716b6ce0125e85e5bc25de88b7986fbea33eb48a7",
         "8e5aae4922b2e460d524503f68ae19b7ce92fdd7f089b7751353758b4dc9fa31",
-        "0733ef5e65600d4a0f153e9b42b7944201e19dc93874f2fa36a67cbbd79afa97",
-        "383883a327257851658e56438ffad9815481202a6772d7402482fd4c32aaa098",
+        "6ae749ec9b48954b77264e1bf00a9aa2496c663fbda4bd3fcc7f088858275633",
+        "f4f45508eca5b604f7fc1843cb0006f135276a22c7217b6eee540b0503f783d1",
         "0cc5bdfa293602813773cf875d221c5d558b0f7d69b85e6ce02ec9c8f1222527",
         "4bd14ad19b700640489f5e8e341f695d73de5862642c7e7a2ef8ef1c072c9be7",
         "92f7e52b31a8e119045a519d8731f5d9f0daf8554f756ec29ba46ec7fb699625",
@@ -820,7 +852,7 @@
         "fff87dbe43eef15ef2d86fb7b8416bafb792c233e27c458dbad975753261f262"
       ]
     },
-    "signature" : "bdf5202883697e0cbce043da05bebed4cbce3e4015129aaecd1386a870ea3102",
+    "signature" : "c23a73e8cbca4c8170cba1befd8f46673cc6935ff68b1c75e9ecee6228b03f83",
     "type" : "project"
   },
   {
@@ -3752,6 +3784,24 @@
 
               ],
               "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:scorebookcore::MAINGROUP::REF_9::REF_1",
+              "guid" : "PACKAGE-TARGET:SampleData::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:scorebookcore::MAINGROUP::REF_9::REF_2",
+              "guid" : "PACKAGE-TARGET:SampleData::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
             }
           ],
           "guid" : "PACKAGE-TARGET:SampleData::BUILDPHASE_0",
@@ -3783,7 +3833,7 @@
       "productTypeIdentifier" : "org.swift.product-type.library.static",
       "type" : "standard"
     },
-    "signature" : "0733ef5e65600d4a0f153e9b42b7944201e19dc93874f2fa36a67cbbd79afa97",
+    "signature" : "6ae749ec9b48954b77264e1bf00a9aa2496c663fbda4bd3fcc7f088858275633",
     "type" : "target"
   },
   {
@@ -5187,6 +5237,24 @@
 
               ],
               "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:scorebookcore::MAINGROUP::REF_10::REF_1",
+              "guid" : "PACKAGE-TARGET:SampleData--4A84909C7700C01A-dynamic::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:scorebookcore::MAINGROUP::REF_10::REF_2",
+              "guid" : "PACKAGE-TARGET:SampleData--4A84909C7700C01A-dynamic::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
             }
           ],
           "guid" : "PACKAGE-TARGET:SampleData--4A84909C7700C01A-dynamic::BUILDPHASE_0",
@@ -5230,7 +5298,7 @@
       "productTypeIdentifier" : "com.apple.product-type.library.dynamic",
       "type" : "standard"
     },
-    "signature" : "383883a327257851658e56438ffad9815481202a6772d7402482fd4c32aaa098",
+    "signature" : "f4f45508eca5b604f7fc1843cb0006f135276a22c7217b6eee540b0503f783d1",
     "type" : "target"
   },
   {

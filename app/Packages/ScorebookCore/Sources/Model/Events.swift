@@ -33,7 +33,7 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
     private enum CodingKeys: String, CodingKey {
         case id, enteredAt
         case pitch, intentionalWalk, ballInPlay, runnerAction, errorWithNoAdvance
-        case substitution, defenseConfirmed, courtesyRunner, pitchingChange, addHitter
+        case substitution, defenseConfirmed, runnerForNonRunner, pitchingChange, addHitter
         case manualAdjustment, endOfGame
     }
 
@@ -57,8 +57,8 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
             kind = .substitution(v)
         } else if let v = try c.decodeIfPresent(DefenseConfirmed.self, forKey: .defenseConfirmed) {
             kind = .defenseConfirmed(v)
-        } else if let v = try c.decodeIfPresent(CourtesyRunner.self, forKey: .courtesyRunner) {
-            kind = .courtesyRunner(v)
+        } else if let v = try c.decodeIfPresent(RunnerForNonRunner.self, forKey: .runnerForNonRunner) {
+            kind = .runnerForNonRunner(v)
         } else if let v = try c.decodeIfPresent(PitchingChange.self, forKey: .pitchingChange) {
             kind = .pitchingChange(v)
         } else if let v = try c.decodeIfPresent(AddHitter.self, forKey: .addHitter) {
@@ -87,7 +87,7 @@ public struct GameEvent: Identifiable, Codable, Equatable, Sendable {
         case .errorWithNoAdvance(let v): try c.encode(v, forKey: .errorWithNoAdvance)
         case .substitution(let v): try c.encode(v, forKey: .substitution)
         case .defenseConfirmed(let v): try c.encode(v, forKey: .defenseConfirmed)
-        case .courtesyRunner(let v): try c.encode(v, forKey: .courtesyRunner)
+        case .runnerForNonRunner(let v): try c.encode(v, forKey: .runnerForNonRunner)
         case .pitchingChange(let v): try c.encode(v, forKey: .pitchingChange)
         case .addHitter(let v): try c.encode(v, forKey: .addHitter)
         case .manualAdjustment(let v): try c.encode(v, forKey: .manualAdjustment)
@@ -115,8 +115,9 @@ public enum EventKind: Equatable, Sendable {
     case substitution(Substitution)
     /// The scorer checked a team's fielders at the start of a half-inning and nothing had changed.
     case defenseConfirmed(DefenseConfirmed)
-    /// A runner who takes a player's place on base without a substitution.
-    case courtesyRunner(CourtesyRunner)
+    /// Someone runs for a designated non-runner who has just reached base, without changing
+    /// the batting order.
+    case runnerForNonRunner(RunnerForNonRunner)
     /// A new pitcher for the fielding team.
     case pitchingChange(PitchingChange)
     /// A hitter added to the bottom of a team's batting order.
@@ -136,7 +137,7 @@ public enum EventKind: Equatable, Sendable {
         case .errorWithNoAdvance: "error"
         case .substitution: "substitution"
         case .defenseConfirmed: "defense check"
-        case .courtesyRunner: "courtesy runner"
+        case .runnerForNonRunner: "runner for designated non-runner"
         case .pitchingChange: "pitching change"
         case .addHitter: "added hitter"
         case .manualAdjustment: "manual adjustment"
@@ -251,7 +252,7 @@ public struct RunnerAction: Codable, Equatable, Hashable, Sendable {
 /// earlier event is edited. `from` records where the scorer saw them start; the rules
 /// engine flags the event for review if the runner is no longer there.
 public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
-    /// Who ran. For a courtesy runner, the courtesy runner themself.
+    /// Who ran. For the runner for a designated non-runner, the runner themself.
     public var runner: PlayerID
     /// Where they started. `.home` means this is the batter.
     public var from: Base
@@ -403,29 +404,22 @@ public struct DefenseConfirmed: Codable, Equatable, Hashable, Sendable {
     public init(team: TeamSide) { self.team = team }
 }
 
-/// A runner who takes a player's place on base without a substitution: a courtesy runner,
-/// or the runner for a designated non-runner. The player they replace stays in the batting
-/// order and is credited with the run if the runner scores. Stolen bases and caught stealing
-/// go to whoever actually ran.
-public struct CourtesyRunner: Codable, Equatable, Hashable, Sendable {
-    /// Why the runner went in.
-    public enum Reason: String, Codable, Sendable, CaseIterable {
-        /// A courtesy runner, such as for the catcher or pitcher.
-        case courtesy
-        /// Running for a designated non-runner, which happens every time they reach.
-        case designatedNonRunner
-    }
-
+/// Someone running for a designated non-runner who has just reached base. Our league has
+/// designated non-runners: players who bat but are replaced on the bases every time they
+/// reach. The runner takes the base without changing the batting order; the designated
+/// non-runner stays in their spot and is credited with the run if the runner scores.
+/// Stolen bases and caught stealing go to the runner, who actually ran.
+///
+/// An ordinary pinch runner, who replaces a player for good, is a `Substitution` instead.
+public struct RunnerForNonRunner: Codable, Equatable, Hashable, Sendable {
     /// Who runs.
     public var runner: PlayerID
-    /// The player on base now, who comes off the bases but stays in the order.
+    /// The designated non-runner on base now, who comes off the bases but stays in the order.
     public var replacing: PlayerID
-    public var reason: Reason
 
-    public init(runner: PlayerID, replacing: PlayerID, reason: Reason) {
+    public init(runner: PlayerID, replacing: PlayerID) {
         self.runner = runner
         self.replacing = replacing
-        self.reason = reason
     }
 }
 

@@ -114,7 +114,7 @@ public struct ExpectedRunner: Codable, Sendable {
     public var runner: PlayerID
     /// The pitcher who should be charged if this runner scores.
     public var responsiblePitcher: PlayerID?
-    /// For a courtesy runner: the player they run for.
+    /// For the runner for a designated non-runner: the designated non-runner.
     public var standingInFor: PlayerID?
 }
 

@@ -91,10 +91,9 @@
     {
       "id": "e5",
       "enteredAt": "2026-05-02T18:06:40Z",
-      "courtesyRunner": {
+      "runnerForNonRunner": {
         "runner": "m10",
-        "replacing": "m1",
-        "reason": "designatedNonRunner"
+        "replacing": "m1"
       }
     },
     {

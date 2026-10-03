@@ -1,0 +1,264 @@
+{
+  "date": "2026-05-02T18:00:00Z",
+  "away": {
+    "teamID": "cardinals",
+    "name": "Cardinals",
+    "isOurs": false,
+    "roster": [
+      {
+        "id": "c1",
+        "name": "Luis Ortiz",
+        "number": "1",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c2",
+        "name": "Danny Ruiz",
+        "number": "2",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c3",
+        "name": "Marcus Hale",
+        "number": "24",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "c4",
+        "name": "Tommy Diaz",
+        "number": "7",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c5",
+        "name": "Sam Kim",
+        "number": "5",
+        "bats": "switchHitter",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c6",
+        "name": "Eddie Park",
+        "number": "11",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "c7",
+        "name": "Joe Varga",
+        "number": "8",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c8",
+        "name": "Nate Bell",
+        "number": "4",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c9",
+        "name": "Ray Collins",
+        "number": "31",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c10",
+        "name": "Kyle Moss",
+        "number": "15",
+        "bats": "left",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c11",
+        "name": "Ben Ash",
+        "number": "19",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "c12",
+        "name": "Gus Reyes",
+        "number": "40",
+        "bats": "left",
+        "throwsWith": "left"
+      }
+    ],
+    "lineup": [
+      {
+        "player": "c1",
+        "position": 8
+      },
+      {
+        "player": "c2",
+        "position": 6
+      },
+      {
+        "player": "c3",
+        "position": 3
+      },
+      {
+        "player": "c4",
+        "position": 7
+      },
+      {
+        "player": "c5",
+        "position": 5
+      },
+      {
+        "player": "c6",
+        "position": 9
+      },
+      {
+        "player": "c7",
+        "position": 2
+      },
+      {
+        "player": "c8",
+        "position": 4
+      },
+      {
+        "player": "c9",
+        "position": 1
+      }
+    ],
+    "fieldersNotBatting": []
+  },
+  "home": {
+    "teamID": "mudcats",
+    "name": "Mudcats",
+    "isOurs": true,
+    "roster": [
+      {
+        "id": "m1",
+        "name": "Alex Moreno",
+        "number": "3",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m2",
+        "name": "Chris Tate",
+        "number": "6",
+        "bats": "left",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m3",
+        "name": "Jordan Webb",
+        "number": "22",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m4",
+        "name": "Pat Quinn",
+        "number": "33",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "m5",
+        "name": "Riley Shaw",
+        "number": "12",
+        "bats": "switchHitter",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m6",
+        "name": "Casey Ford",
+        "number": "9",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m7",
+        "name": "Drew Lang",
+        "number": "17",
+        "bats": "left",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m8",
+        "name": "Morgan Fisk",
+        "number": "10",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m9",
+        "name": "Sky Barros",
+        "number": "21",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m10",
+        "name": "Jamie Cole",
+        "number": "14",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "m11",
+        "name": "Robin Nash",
+        "number": "27",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "m12",
+        "name": "Taylor Voss",
+        "number": "44",
+        "bats": "left",
+        "throwsWith": "left"
+      }
+    ],
+    "lineup": [
+      {
+        "player": "m1",
+        "position": 4
+      },
+      {
+        "player": "m2",
+        "position": 6
+      },
+      {
+        "player": "m3",
+        "position": 8
+      },
+      {
+        "player": "m4",
+        "position": 3
+      },
+      {
+        "player": "m5",
+        "position": 5
+      },
+      {
+        "player": "m6",
+        "position": 7
+      },
+      {
+        "player": "m7",
+        "position": 9
+      },
+      {
+        "player": "m8",
+        "position": 2
+      },
+      {
+        "player": "m9",
+        "position": 1
+      }
+    ],
+    "fieldersNotBatting": []
+  },
+  "scheduledInnings": 9
+}

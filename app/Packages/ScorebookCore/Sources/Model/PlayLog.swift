@@ -155,7 +155,7 @@ public struct BasesAndOuts: Codable, Equatable, Hashable, Sendable {
 public struct RunScored: Codable, Equatable, Hashable, Sendable {
     /// Who crossed the plate.
     public var runner: PlayerID
-    /// Who gets credit for the run in the box score: the runner, or the player a courtesy
+    /// Who gets credit for the run in the box score: the runner, or the designated non-runner a
     /// runner was running for.
     public var creditedTo: PlayerID
     /// The pitcher charged with the run: the one who put this runner on base.

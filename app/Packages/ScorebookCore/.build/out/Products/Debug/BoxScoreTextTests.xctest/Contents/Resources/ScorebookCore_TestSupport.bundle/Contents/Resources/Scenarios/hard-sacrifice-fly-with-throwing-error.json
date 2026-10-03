@@ -1,0 +1,134 @@
+{
+  "description": "Ortiz singles and goes to third on Ruiz's single. Hale flies to center; Ortiz tags and scores, and the center fielder's throw home gets away, letting Ruiz go from first to third. A sacrifice fly, a run batted in, and a throwing error.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "c1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "c1",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "c2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "sacrificeFly",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "c3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          },
+          {
+            "runner": "c1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "c2",
+            "from": "first",
+            "to": "third",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 8,
+            "type": "throwing"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "third",
+          "runner": "c2",
+          "responsiblePitcher": "m9"
+        }
+      ],
+      "batter": "c4"
+    },
+    "batting": [
+      {
+        "player": "c3",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "sacrificeFlies": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "c1",
+        "runs": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 1,
+        "outsRecorded": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "m3",
+        "putouts": 1,
+        "errors": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      }
+    ]
+  }
+}

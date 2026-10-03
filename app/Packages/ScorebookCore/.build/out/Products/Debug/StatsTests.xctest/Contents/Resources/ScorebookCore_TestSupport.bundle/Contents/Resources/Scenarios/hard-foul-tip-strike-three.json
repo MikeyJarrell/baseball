@@ -1,0 +1,101 @@
+{
+  "description": "Ortiz falls behind 0-2, fouls off two pitches with the count staying 0-2, then tips the next one into the catcher's glove: strike three.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "foulTip"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 0,
+            "strikes": 2
+          },
+          "outs": 0,
+          "batter": "c1"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "c2",
+      "pitchers": [
+        {
+          "pitcher": "m9",
+          "pitches": 5,
+          "strikes": 5,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e5",
+        "notation": "K"
+      }
+    ],
+    "batting": [
+      {
+        "player": "c1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "strikeouts": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "strikeouts": 1,
+        "outsRecorded": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "m8",
+        "putouts": 1
+      }
+    ]
+  }
+}

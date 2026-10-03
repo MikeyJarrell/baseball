@@ -1,0 +1,245 @@
+{
+  "description": "Three quick Cardinals outs. Moreno, the Mudcats' designated non-runner, doubles; Cole runs for him. Cole steals third, then scores on Tate's sacrifice fly. The run is Moreno's and the stolen base is Cole's; the batting order does not change.",
+  "setupFile": "designated-non-runner",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "c1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "c2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "popUp",
+        "fielders": [
+          2
+        ],
+        "runners": [
+          {
+            "runner": "c3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              2
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "runnerForNonRunner": {
+        "runner": "m10",
+        "replacing": "m1"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m10",
+            "from": "second",
+            "to": "third",
+            "reason": "stolenBase"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "sacrificeFly",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          },
+          {
+            "runner": "m10",
+            "from": "third",
+            "to": "scored"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m10",
+              "responsiblePitcher": "c9",
+              "standingInFor": "m1"
+            }
+          ],
+          "isRunnerNeeded": false,
+          "battingSlots": [
+            {
+              "team": "home",
+              "index": 0,
+              "players": [
+                "m1"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e7",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 0
+          },
+          "batter": "m2",
+          "runners": [
+            {
+              "base": "third",
+              "runner": "m10",
+              "responsiblePitcher": "c9",
+              "standingInFor": "m1"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 1,
+      "score": {
+        "away": 0,
+        "home": 1
+      },
+      "runners": [],
+      "batter": "m3",
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 0,
+          "players": [
+            "m1"
+          ]
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "runs": 1,
+        "hits": 1,
+        "doubles": 1,
+        "stolenBases": 0
+      },
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "sacrificeFlies": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m10",
+        "plateAppearances": 0,
+        "runs": 0,
+        "stolenBases": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "c9",
+        "runs": 1
+      }
+    ]
+  }
+}

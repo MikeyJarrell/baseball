@@ -1,0 +1,73 @@
+{
+  "description": "Ortiz lofts a fly to left that the left fielder drops; Ortiz reaches second on the error.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "reachedOnError",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "c1",
+            "from": "home",
+            "to": "second",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 7,
+            "type": "fielding"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "runners": [
+        {
+          "base": "second",
+          "runner": "c1",
+          "responsiblePitcher": "m9"
+        }
+      ],
+      "batter": "c2"
+    },
+    "notation": [
+      {
+        "event": "e1",
+        "notation": "E7"
+      }
+    ],
+    "batting": [
+      {
+        "player": "c1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "hits": 0,
+        "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "m6",
+        "errors": 1,
+        "putouts": 0
+      }
+    ]
+  }
+}

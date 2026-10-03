@@ -6,6 +6,26 @@
     "pch" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleData-primary-Bridging-header.pch",
     "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleData-primary.swiftdeps"
   },
+  "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/Sources/SampleData/GameScript.swift" : {
+    "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.swiftconstvalues",
+    "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.d",
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.dia",
+    "index-unit-output-path" : "/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.o",
+    "llvm-bc" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.bc",
+    "object" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.o",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript.swiftdeps",
+    "swiftmodule" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/GameScript~partial.swiftmodule"
+  },
+  "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/Sources/SampleData/SampleTeams.swift" : {
+    "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.swiftconstvalues",
+    "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.d",
+    "diagnostics" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.dia",
+    "index-unit-output-path" : "/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.o",
+    "llvm-bc" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.bc",
+    "object" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.o",
+    "swift-dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams.swiftdeps",
+    "swiftmodule" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/SampleTeams~partial.swiftmodule"
+  },
   "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/Sources/SampleData/Temp.swift" : {
     "const-values" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/Temp.swiftconstvalues",
     "dependencies" : "/Users/mikey/projects/.worktrees/baseball/foundation/app/Packages/ScorebookCore/.build/out/Intermediates.noindex/ScorebookCore.build/Debug/SampleData-t.build/Objects-normal/arm64/Temp.d",

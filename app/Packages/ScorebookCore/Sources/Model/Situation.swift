@@ -136,12 +136,12 @@ public struct Situation: Codable, Equatable, Sendable {
 
 /// A runner standing on a base.
 public struct BaseRunner: Codable, Equatable, Hashable, Sendable {
-    /// Who is standing there. For a courtesy runner, the courtesy runner.
+    /// Who is standing there. For a designated non-runner's runner, the runner.
     public var runner: PlayerID
     public var base: Base
     /// The pitcher charged if this runner scores: the one who put them on base.
     public var responsiblePitcher: PlayerID?
-    /// For a courtesy runner, or the runner for a designated non-runner: the player they are
+    /// For the runner for a designated non-runner: the designated non-runner they are
     /// running for, who stays in the batting order and is credited with the run.
     public var standingInFor: PlayerID?
 
