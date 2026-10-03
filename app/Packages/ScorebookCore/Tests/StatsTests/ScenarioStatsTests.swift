@@ -44,7 +44,11 @@ struct ScenarioStatsTests {
         let engine = try #require(ScenarioEngine.engine)
         let scenario = try Scenarios.load(name)
 
-        let box = stats.boxScore(for: engine.replay(scenario.game).log)
+        let log = engine.replay(scenario.game).log
+        // One play log entry per event: an engine that drops or adds entries fails here.
+        #expect(log.entries.count == scenario.events.count, "\(name): play log entries")
+        #expect(log.entries.map(\.event.id) == scenario.events.map(\.id), "\(name): play log events")
+        let box = stats.boxScore(for: log)
         #expect(scenario.expected.mismatches(box: box) == [], "\(name), after the last event")
 
         for checkpoint in scenario.checkpoints ?? [] where checkpoint.expected.checksStats {

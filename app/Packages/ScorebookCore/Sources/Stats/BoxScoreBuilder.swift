@@ -188,6 +188,10 @@ private struct GameTally {
 
         // Putouts and assists. A fielder gets at most one assist on any one out, even if they
         // handled the ball twice in a rundown (rule 9.10).
+        //
+        // A batting hole's automatic out is not a real play, so nobody gets its putout (the
+        // play log leaves `putout` empty). A team's putouts can therefore add up to fewer than
+        // the outs its pitchers recorded.
         for out in entry.outs {
             if let putout = out.putout {
                 noteFielder(putout, side: fieldingTeam)

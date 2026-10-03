@@ -13,21 +13,16 @@
 
 import Model
 import GameEngine
-import TestSupport
 import Testing
 
 enum ScenarioEngine {
     /// The rules engine, once there is one.
     static let engine: (any RulesEngine)? = nil
 
-    /// True when a real rules engine is plugged in. A stand-in that does nothing (an empty play
-    /// log for a game with events) does not count, so plugging one in skips the tests rather
-    /// than failing them.
-    static let isReady: Bool = {
-        guard let engine, let pattern = try? Scenarios.load("pattern-6-3-groundout") else { return false }
-        let log = engine.replay(pattern.game).log
-        return !log.entries.isEmpty && log.entries.count == pattern.events.count
-    }()
+    /// True once a rules engine is plugged in. The tests skip only while there is none; with
+    /// an engine in place they always run, so a broken engine (a play log with the wrong
+    /// number of entries, say) fails them instead of quietly switching them off.
+    static let isReady: Bool = engine != nil
 
     /// The reason shown beside each skipped test.
     static let notReadyReason: Comment = "Skipped until the rules engine lands: see ScenarioEngine.swift"
