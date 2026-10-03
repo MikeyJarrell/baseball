@@ -149,8 +149,8 @@ struct Scoreboard: View {
             Text(batting ? "▸" : " ").font(ScorebookFont.caption.weight(.heavy))
             Text(AtBatWording.shortTeamName(info.setup[side].name))
                 .font(ScorebookFont.chip)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                // Always whole ("DOGS", never "DO…"): the count beside it shrinks instead.
+                .fixedSize()
                 .opacity(batting ? 1 : 0.75)
             Spacer(minLength: Spacing.extraSmall)
             Text("\(info.situation.score[side])")

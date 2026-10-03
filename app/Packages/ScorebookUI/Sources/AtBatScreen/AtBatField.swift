@@ -64,27 +64,31 @@ struct AtBatFieldArea: View {
                 detail: info.clock.timeLimitEndsAt.map { "No new inning after \(AtBatWording.clockTime($0))" },
                 fill: ScorebookColor.out,
                 text: .white
-            )
+            ) { defenseButton }
         } else if info.situation.isBetweenHalfInnings {
             BannerCard(
                 title: AtBatWording.changeoverTitle(info.situation),
                 detail: AtBatWording.scoreLine(info.setup, info.situation.score),
                 fill: ScorebookColor.foul,
                 text: .white
-            ) {
-                if info.situation.defenseCheckDue {
-                    Button { onAction(.openDefenseCheck) } label: {
-                        Label("Defense", systemImage: "shield")
-                            .font(ScorebookFont.chip)
-                            .foregroundStyle(ScorebookColor.textPrimary)
-                            .padding(.horizontal, Spacing.medium)
-                            .frame(minHeight: Spacing.minimumTapSize)
-                            .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: Spacing.cornerRadius - 2, style: .continuous))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityHint(Text("Check who is at each position"))
-                }
+            ) { defenseButton }
+        }
+    }
+
+    /// The Defense button, on whichever banner shows, when our defense check is due at a
+    /// changeover.
+    @ViewBuilder private var defenseButton: some View {
+        if info.situation.isBetweenHalfInnings && info.situation.defenseCheckDue {
+            Button { onAction(.openDefenseCheck) } label: {
+                Label("Defense", systemImage: "shield")
+                    .font(ScorebookFont.chip)
+                    .foregroundStyle(ScorebookColor.textPrimary)
+                    .padding(.horizontal, Spacing.medium)
+                    .frame(minHeight: Spacing.minimumTapSize)
+                    .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: Spacing.cornerRadius - 2, style: .continuous))
             }
+            .buttonStyle(.plain)
+            .accessibilityHint(Text("Check who is at each position"))
         }
     }
 

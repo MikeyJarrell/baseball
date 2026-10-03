@@ -26,7 +26,8 @@ enum AtBatWording {
     // MARK: Teams and players
 
     /// A team's short name for the scoreboard: the last word if it is four letters or fewer
-    /// ("DOGS"), else its first three letters ("MUD" for Mudcats).
+    /// ("DOGS"), else its first three letters ("MUD" for Mudcats). Never more than four letters,
+    /// so it always fits whole. A stand-in until the team's own short name arrives in Model.
     static func shortTeamName(_ name: String) -> String {
         let last = name.split(separator: " ").last.map(String.init) ?? name
         return (last.count <= 4 ? last : String(last.prefix(3))).uppercased()
@@ -106,6 +107,13 @@ enum AtBatWording {
     /// The batter's plate appearances so far today: "6-3, BB, 1B 7", or "first time up".
     static func today(_ history: [PlateAppearanceSummary]) -> String {
         history.isEmpty ? "first time up" : history.map(\.notation).joined(separator: ", ")
+    }
+
+    /// The same, with only the latest few and "…" in front when some are left out:
+    /// "… HR 9, K", for a long day that does not fit on one line.
+    static func today(_ history: [PlateAppearanceSummary], latest: Int) -> String {
+        guard history.count > latest else { return today(history) }
+        return "… " + history.suffix(latest).map(\.notation).joined(separator: ", ")
     }
 
     // MARK: The changeover banner
@@ -194,9 +202,12 @@ enum AtBatWording {
         count.strikes >= 2 ? "strikeout" : "makes it \(count.balls)–\(count.strikes + 1)"
     }
 
-    /// Under Foul: "makes it 1–2", or "stays 1–2" with two strikes, since a foul is never strike three.
+    /// Under Foul: "makes it 1–2", or with two strikes "stays 2–2 · hold for bunt", since a foul
+    /// is never strike three but a foul bunt is, and holding the button down records one.
     static func foulHint(_ count: Count) -> String {
-        count.strikes >= 2 ? "stays \(count.balls)–\(count.strikes)" : "makes it \(count.balls)–\(count.strikes + 1)"
+        count.strikes >= 2
+            ? "stays \(count.balls)–\(count.strikes) · hold for bunt"
+            : "makes it \(count.balls)–\(count.strikes + 1)"
     }
 
     /// Under In play.
