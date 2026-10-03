@@ -1,0 +1,82 @@
+{
+  "description": "Ortiz singles to left, and left fielder Ford lets the ball roll past, so Ortiz takes second. Ortiz keeps the single; the extra base is Ford's error, not a double.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "groundBall",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "second",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 7,
+            "type": "fielding"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2"
+    },
+    "notation": [
+      {
+        "event": "e1",
+        "notation": "1B 7, E7"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 1,
+        "doubles": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "hits": 1,
+        "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d6",
+        "errors": 1,
+        "putouts": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      },
+      {
+        "team": "away",
+        "hits": 1
+      }
+    ]
+  }
+}
