@@ -56,7 +56,9 @@ extension SampleGame {
                 line("m1", "Alex Moreno", "3", 0, [.secondBase], BattingCounts(plateAppearances: 3, atBats: 2, runs: 1, hits: 1, runsBattedIn: 1, walks: 1)),
                 line("m2", "Chris Tate", "6", 1, [.ss], BattingCounts(plateAppearances: 3, atBats: 2, runs: 1, hits: 1, homeRuns: 1, runsBattedIn: 1, sacrificeBunts: 1)),
                 line("m3", "Jordan Webb", "22", 2, [.cf], BattingCounts(plateAppearances: 3, atBats: 3, runs: 1, hits: 1, doubles: 1, runsBattedIn: 1, strikeouts: 1)),
-                line("m4", "Pat Quinn", "33", 3, [.firstBase], BattingCounts(plateAppearances: 3, atBats: 3, hits: 1, caughtStealing: 1)),
+                line("m4", "Pat Quinn", "33", 3, [.firstBase], BattingCounts(plateAppearances: 3, atBats: 3, hits: 1)),
+                // Ran for Quinn, a designated non-runner, and was caught stealing.
+                line("m11", "Robin Nash", "27", 3, [.pr], BattingCounts(caughtStealing: 1), sub: true),
                 line("m5", "Riley Shaw", "12", 4, [.thirdBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1, runsBattedIn: 1)),
                 line("m6", "Casey Ford", "9", 5, [.lf], BattingCounts(plateAppearances: 2, atBats: 1, runs: 1, strikeouts: 1, hitByPitch: 1)),
                 line("m7", "Drew Lang", "17", 6, [.rf], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
@@ -97,7 +99,7 @@ extension SampleGame {
                 tally("m5", "Riley Shaw", .home), tally("m8", "Morgan Fisk", .home),
             ],
             stolenBases: [tally("c6", "Eddie Park", .away), tally("m10", "Jamie Cole", .home)],
-            caughtStealing: [tally("m4", "Pat Quinn", .home)],
+            caughtStealing: [tally("m11", "Robin Nash", .home)],
             sacrificeFlies: [tally("c2", "Danny Ruiz", .away), tally("m8", "Morgan Fisk", .home)],
             sacrificeBunts: [tally("m2", "Chris Tate", .home)],
             hitByPitch: [tally("m6", "Casey Ford", .home)],
@@ -109,18 +111,18 @@ extension SampleGame {
     )
 
     /// A batting line. `spot` counts from 0 for the leadoff spot.
-    private static func line(_ id: PlayerID, _ name: String, _ number: String, _ spot: Int, _ positions: [BoxPosition],
+    static func line(_ id: PlayerID, _ name: String, _ number: String, _ spot: Int, _ positions: [BoxPosition],
                              _ stats: BattingCounts, sub: Bool = false) -> BattingLine {
         BattingLine(player: id, name: name, number: number, batterIndex: spot, positions: positions, isSubstitute: sub, stats: stats)
     }
 
     /// A fielding line.
-    private static func field(_ id: PlayerID, _ name: String, _ stats: FieldingCounts) -> FieldingLine {
+    static func field(_ id: PlayerID, _ name: String, _ stats: FieldingCounts) -> FieldingLine {
         FieldingLine(player: id, name: name, stats: stats)
     }
 
     /// One player's entry in a box score note, once.
-    private static func tally(_ id: PlayerID, _ name: String, _ team: TeamSide, _ count: Int = 1) -> PlayerTally {
+    static func tally(_ id: PlayerID, _ name: String, _ team: TeamSide, _ count: Int = 1) -> PlayerTally {
         PlayerTally(player: id, name: name, team: team, count: count)
     }
 }

@@ -45,8 +45,10 @@ public struct Situation: Codable, Equatable, Sendable {
     public var isRegulationComplete: Bool
     /// True once the scorer has ended the game.
     public var isFinal: Bool
-    /// When the first event was entered, for the game clock.
+    /// When the first event was entered: the game clock starts here.
     public var gameStartedAt: Date?
+    /// The league's time limit in minutes, copied from the setup, for the game clock.
+    public var timeLimitMinutes: Int?
     /// Innings in a full game, copied from the setup, so suggestions can tell when a hit
     /// in the bottom of the last inning ends the game.
     public var scheduledInnings: Int
@@ -69,6 +71,7 @@ public struct Situation: Codable, Equatable, Sendable {
         isRegulationComplete: Bool = false,
         isFinal: Bool = false,
         gameStartedAt: Date? = nil,
+        timeLimitMinutes: Int? = nil,
         scheduledInnings: Int = 9
     ) {
         self.inning = inning
@@ -88,6 +91,7 @@ public struct Situation: Codable, Equatable, Sendable {
         self.isRegulationComplete = isRegulationComplete
         self.isFinal = isFinal
         self.gameStartedAt = gameStartedAt
+        self.timeLimitMinutes = timeLimitMinutes
         self.scheduledInnings = scheduledInnings
     }
 
@@ -126,6 +130,13 @@ public struct Situation: Codable, Equatable, Sendable {
             second: runner(on: .second)?.runner,
             third: runner(on: .third)?.runner
         )
+    }
+
+    /// Seconds left on the game clock at a given moment, or nothing if there is no time limit
+    /// or the game has not started. Goes below zero once time is up.
+    public func timeRemaining(at now: Date) -> TimeInterval? {
+        guard let limit = timeLimitMinutes, let start = gameStartedAt else { return nil }
+        return Double(limit * 60) - now.timeIntervalSince(start)
     }
 
     /// Today's pitches and strikes for one pitcher.

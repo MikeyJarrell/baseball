@@ -85,8 +85,12 @@ public enum SampleSituations {
             awayUp: 1, homeUp: 4,
             pitchers: [tally("m9", .home, 57, 35, 19), tally("m12", .home, 0, 0, 0), tally("c9", .away, 47, 30, 15), tally("c12", .away, 12, 7, 4)]
         )
+        // Voss replaces Barros for the Mudcats; Reyes already replaced Collins (after Moss
+        // pinch-hit) for the Cardinals.
         s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"], position: .pitcher)
         s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "m12")
+        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["c9", "c10", "c12"], position: .pitcher)
+        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "c12")
         s.situation.lastPlayNotation = "6-4-3 DP"
         return s
     }()
@@ -100,13 +104,21 @@ public enum SampleSituations {
         pitchers: [tally("m9", .home, 112, 71, 33), tally("c9", .away, 98, 60, 30)]
     )
 
-    /// Top of the 10th, tied 4-4: extra innings.
-    public static let extraInnings = make(
-        "Extra innings, top of the 10th",
-        inning: 10, half: .top, outs: 0, score: Score(away: 4, home: 4),
-        awayUp: 2, homeUp: 7,
-        pitchers: [tally("m12", .home, 18, 12, 5), tally("c12", .away, 30, 19, 9)]
-    )
+    /// Top of the 10th, tied 4-4: extra innings, with both relievers pitching.
+    public static let extraInnings: SampleSituation = {
+        var s = make(
+            "Extra innings, top of the 10th",
+            inning: 10, half: .top, outs: 0, score: Score(away: 4, home: 4),
+            awayUp: 2, homeUp: 7,
+            pitchers: [tally("m9", .home, 98, 61, 30), tally("m12", .home, 18, 12, 5),
+                       tally("c9", .away, 90, 55, 29), tally("c12", .away, 30, 19, 9)]
+        )
+        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"], position: .pitcher)
+        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "m12")
+        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["c9", "c12"], position: .pitcher)
+        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "c12")
+        return s
+    }()
 
     // MARK: More situations screens need
 
@@ -124,18 +136,17 @@ public enum SampleSituations {
         return s
     }()
 
-    /// Bottom of the 1st: Alex Moreno, a designated non-runner, has just singled. The app
+    /// Bottom of the 1st: Pat Quinn, a designated non-runner, has just singled. The app
     /// asks who will run for them.
     public static let designatedNonRunnerOnFirst: SampleSituation = {
         var s = make(
             "Designated non-runner on first",
-            setup: SampleSetups.cardinalsAtMudcatsWithNonRunner,
-            inning: 1, half: .bottom, outs: 0,
-            runners: [BaseRunner(runner: "m1", base: .first, responsiblePitcher: "c9")],
-            awayUp: 3, homeUp: 1,
-            pitchers: [tally("m9", .home, 10, 6, 3), tally("c9", .away, 1, 1, 1)]
+            inning: 1, half: .bottom, outs: 1,
+            runners: [BaseRunner(runner: "m4", base: .first, responsiblePitcher: "c9")],
+            awayUp: 3, homeUp: 4,
+            pitchers: [tally("m9", .home, 10, 6, 3), tally("c9", .away, 9, 6, 4)]
         )
-        s.situation.runnerNeededFor = "m1"
+        s.situation.runnerNeededFor = "m4"
         s.situation.lastPlayNotation = "1B 9"
         return s
     }()

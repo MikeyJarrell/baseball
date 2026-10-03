@@ -258,8 +258,15 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
     public var from: Base
     /// Where they ended up: a base, scored, or out.
     public var to: RunnerEnd
-    /// Why they moved, for moves between pitches (stolen base, wild pitch).
-    /// Left out for runners who simply moved on a ball in play.
+    /// Why they moved. Always given for moves between pitches (stolen base, wild pitch).
+    /// On a ball in play it is usually left out, meaning they moved on the play; it can be
+    /// given when something else moved them, such as a wild pitch or passed ball that let the
+    /// batter reach first on a dropped third strike.
+    ///
+    /// A stolen base is always one base. Any bases past it came from an error, marked with
+    /// `advancedOnError`: a runner who steals third and scores when the throw gets away is
+    /// `from: second, to: scored, reason: stolenBase, advancedOnError: true`, a steal of third
+    /// and an error. A steal of home is `from: third, to: scored, reason: stolenBase`.
     public var reason: RunnerMoveReason?
     /// For a runner put out: the fielders who handled the ball, in order. The last one
     /// made the putout; each one before gets an assist. A force at second on a 5-4-3 is `[5, 4]`.
@@ -471,6 +478,12 @@ public struct AddHitter: Codable, Equatable, Hashable, Sendable {
 /// Sets parts of the situation directly, for when the field and the book disagree and
 /// nobody can say why. Whatever is filled in replaces what the rules engine had worked
 /// out; whatever is left out stays as it was.
+///
+/// Runs added or taken away by changing the score belong to that team in the inning the
+/// adjustment leaves the game in (the inning it was entered in, unless the adjustment also
+/// moves the inning). Stats put them in that team's cell of the line score and in its runs,
+/// so the box score always adds up to the final score. No player is credited with them and
+/// no pitcher is charged with them.
 public struct ManualAdjustment: Codable, Equatable, Hashable, Sendable {
     public var inning: Int?
     public var half: HalfInning?

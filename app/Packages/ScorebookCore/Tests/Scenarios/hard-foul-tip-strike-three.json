@@ -1,5 +1,5 @@
 {
-  "description": "Ortiz falls behind 0-2, fouls off two pitches with the count staying 0-2, then tips the next one into the catcher's glove: strike three.",
+  "description": "Ortiz falls behind 0-2, fouls off two pitches with the count staying 0-2, then tips the next one into the catcher's glove: strike three. A foul tip is caught by definition, so there is no dropped third strike to offer.",
   "setupFile": "standard",
   "events": [
     {
@@ -61,6 +61,7 @@
         "strikes": 0
       },
       "batter": "c2",
+      "droppedThirdStrikePossible": false,
       "pitchers": [
         {
           "pitcher": "m9",

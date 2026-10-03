@@ -1,5 +1,5 @@
 {
-  "description": "Bottom of the ninth, tied 3-3, one out, bases loaded. Shaw singles to right on a 1-0 pitch. Only the winning run scores; the batter is credited with a single and one run batted in. The scorer ends the game.",
+  "description": "Bottom of the ninth, tied 3-3, one out, bases loaded. Shaw singles to right on a 1-0 pitch. Only the winning run scores; the batter is credited with a single and one run batted in. The scorer ends the game. The three runs each team was given by the manual adjustment count in the ninth inning of the line score, credited to nobody, and the three runners still on base count as left on base.",
   "setupFile": "standard",
   "events": [
     {
@@ -142,6 +142,40 @@
         "hits": 1,
         "pitches": 2,
         "strikes": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      },
+      {
+        "team": "home",
+        "runs": 4,
+        "hits": 1,
+        "leftOnBase": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
       }
     ]
   }

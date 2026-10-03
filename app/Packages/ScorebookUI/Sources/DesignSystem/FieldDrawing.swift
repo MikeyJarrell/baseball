@@ -15,6 +15,10 @@ public enum FieldTap: Equatable, Sendable {
     case position(Position)
     /// A base, such as second.
     case base(Base)
+    /// A runner's marker, by who the runner is. Used in the in-play sequence's runner step,
+    /// where two markers can sit on the same base (the batter and a runner who scored both
+    /// end at home), so the base alone cannot say which runner was meant.
+    case runner(PlayerID)
     /// Somewhere else on the field, such as where a hit landed. `nearest` is the fielding
     /// area it is closest to, for notation like "1B 7".
     case spot(FieldPoint, nearest: Position)
@@ -29,12 +33,29 @@ public struct FieldRunnerMarker: Equatable, Sendable, Identifiable {
     public var label: String
     public var from: Base
     public var to: RunnerEnd
+    /// For a runner put out: the base they were put out at, where the marker is drawn.
+    /// Copy it from `RunnerMove.outAt`. Missing means the next base along.
+    public var outAt: Base?
 
-    public init(runner: PlayerID, label: String, from: Base, to: RunnerEnd) {
+    public init(runner: PlayerID, label: String, from: Base, to: RunnerEnd, outAt: Base? = nil) {
         self.runner = runner
         self.label = label
         self.from = from
         self.to = to
+        self.outAt = outAt
+    }
+
+    /// Makes a marker from a runner's move on a play.
+    public init(_ move: RunnerMove, label: String) {
+        self.init(runner: move.runner, label: label, from: move.from, to: move.to, outAt: move.outAt)
+    }
+
+    /// The base the marker is drawn at: where they ended up, home plate if they scored, or
+    /// where they were put out.
+    public var endBase: Base {
+        if let base = to.base { return base }
+        if to == .scored { return .home }
+        return outAt ?? Base.allCases.first { $0.order == (from.order + 1) % 4 } ?? .second
     }
 }
 
@@ -45,6 +66,7 @@ public struct FieldRunnerMarker: Equatable, Sendable, Identifiable {
 /// - `tapSequence`: fielders in the order the scorer tapped them; each shows its number in the
 ///   sequence (6 then 3 shows "1" on the shortstop and "2" on the first baseman).
 /// - `runnerMarkers`: runners with arrows from where they started to where they ended up.
+///   Tapping a marker hands back `.runner` with that runner's id.
 /// - `onTap`: called with whatever the scorer taps. Leave it out for a drawing that only shows.
 public struct FieldDrawing: View {
     public var occupiedBases: Set<Base>
@@ -86,18 +108,27 @@ public struct FieldDrawing: View {
                 }
                 .stroke(ScorebookColor.fieldDirt, lineWidth: size * 0.02)
 
-                // Runner arrows.
+                // Runner arrows, each ending in a tappable marker. Markers that end on the same
+                // base are spread out side by side so each one can be tapped.
                 ForEach(runnerMarkers) { marker in
+                    let end = point(Self.spot(for: marker.endBase), size)
+                    let sameBase = runnerMarkers.filter { $0.endBase == marker.endBase }
+                    let offset = CGFloat((sameBase.firstIndex(of: marker) ?? 0)) * Spacing.minimumTapSize * 0.8
                     Path { path in
                         path.move(to: point(Self.spot(for: marker.from), size))
-                        path.addLine(to: point(Self.spot(for: marker.to), size))
+                        path.addLine(to: end)
                     }
                     .stroke(ScorebookColor.highlight, style: StrokeStyle(lineWidth: 2, dash: [4, 3]))
-                    Text(marker.label)
+                    Text(marker.to == .out ? "\(marker.label) out" : marker.label)
                         .font(ScorebookFont.caption)
-                        .padding(2)
-                        .background(ScorebookColor.surface, in: Capsule())
-                        .position(point(Self.spot(for: marker.to), size))
+                        .padding(4)
+                        .frame(minWidth: Spacing.minimumTapSize, minHeight: Spacing.minimumTapSize)
+                        .background(marker.to == .out ? ScorebookColor.out.opacity(0.3) : ScorebookColor.surface, in: Capsule())
+                        .contentShape(Capsule())
+                        .onTapGesture { onTap?(.runner(marker.runner)) }
+                        .position(x: end.x + offset, y: end.y - Spacing.minimumTapSize * 0.6)
+                        .accessibilityLabel(Text("Runner \(marker.label)"))
+                        .accessibilityAddTraits(onTap == nil ? [] : .isButton)
                 }
 
                 // The bases.
@@ -174,12 +205,6 @@ public struct FieldDrawing: View {
         }
     }
 
-    /// Where a runner's arrow ends: their base, home plate if they scored, or where they
-    /// were heading if they were put out (drawn at second as a placeholder).
-    static func spot(for end: RunnerEnd) -> FieldPoint {
-        spot(for: end.base ?? (end == .scored ? .home : .second))
-    }
-
     /// The fielding area closest to a spot on the field, for hit locations.
     public static func nearestPosition(to point: FieldPoint) -> Position {
         Position.allCases.min { a, b in
@@ -198,6 +223,27 @@ public struct FieldDrawing: View {
 
 #Preview("5-4-3 with a runner on first") {
     FieldDrawing(occupiedBases: [.first], tapSequence: [.thirdBase, .secondBase, .firstBase]).padding()
+}
+
+#Preview("Runner step: single, runner from second scores") {
+    FieldDrawing(
+        occupiedBases: [.first, .second],
+        runnerMarkers: [
+            FieldRunnerMarker(runner: "m3", label: "22", from: .second, to: .scored),
+            FieldRunnerMarker(runner: "m4", label: "33", from: .first, to: .second),
+            FieldRunnerMarker(runner: "m5", label: "12", from: .home, to: .first),
+        ]
+    ).padding()
+}
+
+#Preview("Runner step: 5-4-3 double play") {
+    FieldDrawing(
+        tapSequence: [.thirdBase, .secondBase, .firstBase],
+        runnerMarkers: [
+            FieldRunnerMarker(runner: "c1", label: "1", from: .first, to: .out, outAt: .second),
+            FieldRunnerMarker(runner: "c2", label: "2", from: .home, to: .out, outAt: .first),
+        ]
+    ).padding()
 }
 
 #Preview("Bases loaded, dark") {

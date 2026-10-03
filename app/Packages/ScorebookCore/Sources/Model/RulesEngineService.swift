@@ -21,6 +21,12 @@ public protocol RulesEngine: Sendable {
     /// it would produce.
     func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview
 
+    /// For the runner-action sheet: where the chosen runners most likely ended up after a
+    /// steal, pickoff, wild pitch, balk and so on, for the scorer to confirm or change.
+    /// `runners` are the runners the scorer picked; for a wild pitch, passed ball or balk the
+    /// sheet passes every runner on base, since those move everyone. Returns one move per runner.
+    func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove]
+
     /// Scorebook notation for one event, given the situation just before it:
     /// "6-3", "F8", "E6", "1B 7", "K", "ꓘ", "BB".
     func notation(for event: GameEvent, in situation: Situation) -> String
@@ -159,6 +165,7 @@ extension Situation {
             away: state(for: setup.away),
             home: state(for: setup.home),
             defenseCheckDue: setup.home.isOurs,
+            timeLimitMinutes: setup.timeLimitMinutes,
             scheduledInnings: setup.scheduledInnings
         )
     }
@@ -189,6 +196,15 @@ public struct DoNothingRulesEngine: RulesEngine {
 
     public func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview {
         PlayPreview(notation: draft.fielders.map(\.description).joined(separator: "-"), outsAfter: situation.outs)
+    }
+
+    /// Leaves every chosen runner where they are.
+    public func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove] {
+        runners.compactMap { id in
+            situation.runners.first { $0.runner == id }.map {
+                RunnerMove(runner: id, from: $0.base, to: .safe(at: $0.base), reason: reason)
+            }
+        }
     }
 
     public func notation(for event: GameEvent, in situation: Situation) -> String {

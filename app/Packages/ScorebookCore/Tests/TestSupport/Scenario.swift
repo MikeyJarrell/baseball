@@ -104,6 +104,11 @@ public struct ExpectedSituation: Codable, Sendable {
     /// Which designated non-runner is waiting for a runner.
     public var runnerNeededFor: PlayerID?
     public var isBetweenHalfInnings: Bool?
+    /// Whether the app should open the defense check: our team has just taken the field and
+    /// the scorer has not confirmed the fielders yet.
+    public var defenseCheckDue: Bool?
+    /// Whether the batting screen should offer the dropped third strike button.
+    public var droppedThirdStrikePossible: Bool?
     public var isRegulationComplete: Bool?
     public var isFinal: Bool?
 }
@@ -210,6 +215,9 @@ public struct ExpectedTeam: Codable, Sendable {
     public var hits: Int?
     public var errors: Int?
     public var leftOnBase: Int?
+    /// Runs in each inning, first inning first, as the line score shows them. `null` is an
+    /// inning the team did not bat.
+    public var lineScore: [Int?]?
     /// Double plays this team turned in the field.
     public var doublePlays: Int?
     /// Triple plays this team turned in the field.

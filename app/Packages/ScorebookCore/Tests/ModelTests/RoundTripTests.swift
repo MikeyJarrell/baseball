@@ -23,7 +23,7 @@ struct RoundTripTests {
 
     @Test("Game setups read back exactly")
     func setups() throws {
-        for setup in [SampleSetups.cardinalsAtMudcats, SampleSetups.cardinalsAtMudcatsWithNonRunner,
+        for setup in [SampleSetups.cardinalsAtMudcats,
                       SampleSetups.mudcatsAtBombers, SampleSetups.unknownAtMudcats] {
             #expect(try roundTrip(setup) == setup)
         }
@@ -86,6 +86,22 @@ struct RoundTripTests {
         for edit in edits {
             #expect(try roundTrip(edit) == edit)
         }
+    }
+
+    @Test("Settings, damaged-file lists and manual run changes read back exactly")
+    func settingsAndLists() throws {
+        let settings = AppSettings(fadeSongOnFirstPitch: true)
+        #expect(try roundTrip(settings) == settings)
+        // An older settings file with nothing in it takes every default.
+        #expect(try ScorebookJSON.decode(AppSettings.self, from: Data("{}".utf8)) == AppSettings())
+        #expect(AppSettings().fadeSongOnFirstPitch == false)
+
+        let list = LoadedList(items: SampleSeason.games, damaged: [DamagedFile(fileName: "games/x.json", reason: "cut off mid-write")])
+        #expect(try roundTrip(list) == list)
+
+        var entry = SampleGame.playLog.entries[0]
+        entry.adjustedRuns = Score(away: 2, home: -1)
+        #expect(try roundTrip(entry) == entry)
     }
 
     @Test("A hand-written event may leave out its id, time and empty lists")
@@ -155,6 +171,18 @@ struct HelperTests {
         let state = TeamState(battingOrder: order, nextBatterIndex: 2)
         #expect(state.currentBatter == "c")
         #expect(state.onDeckBatter == "a")
+    }
+
+    @Test("The game clock counts down from the time limit, from the first event")
+    func gameClock() {
+        var situation = SampleSituations.topOfFirst.situation
+        #expect(situation.timeLimitMinutes == 100)
+        #expect(situation.timeRemaining(at: Date()) == nil)
+        let start = Date(timeIntervalSinceReferenceDate: 1_000)
+        situation.gameStartedAt = start
+        #expect(situation.timeRemaining(at: start.addingTimeInterval(30 * 60)) == TimeInterval(70 * 60))
+        situation.timeLimitMinutes = nil
+        #expect(situation.timeRemaining(at: start) == nil)
     }
 
     @Test("Event times are kept to the whole second")

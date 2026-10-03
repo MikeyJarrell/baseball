@@ -1,18 +1,25 @@
 // Walk-up audio's promise: what the WalkUpAudio module provides to the rest of the app.
 //
-// Everything here runs on the main thread (marked `@MainActor`), the same thread that
-// draws the screen, so the play button and the player always agree about what is playing.
+// Almost everything here runs on the main thread (marked `@MainActor`), the same thread
+// that draws the screen, so the play button and the player always agree about what is
+// playing. Copying files in is the exception: it runs in the background (marked
+// `@concurrent`) so a long song or a slow iCloud download never freezes the screen.
 // The silent stand-in at the bottom is for previews and tests.
 
 import Foundation
+import Observation
 
 /// Plays walk-up songs, announcer introductions and between-innings music, and manages
 /// the song library.
 ///
-/// The player keeps the library it was given. Whenever it changes (an import, a new start
-/// point), the app reads `library` back and saves it through storage.
+/// The player keeps the library it was given. Whenever it changes (new songs added, a new
+/// start point), the app reads `library` back and saves it through storage.
+///
+/// The player is `Observable`: a screen that shows `isPlaying` or `nowPlaying` redraws by
+/// itself when they change, including when a clip fades out on its own after its play length
+/// or the speaker disconnects. `onPlaybackEnded` tells the app the same thing in code.
 @MainActor
-public protocol WalkUpAudioPlayer: AnyObject {
+public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// The song library as the player has it now.
     var library: SongLibrary { get }
     /// True while a song, introduction or between-innings track is playing.
@@ -21,15 +28,21 @@ public protocol WalkUpAudioPlayer: AnyObject {
     var nowPlaying: SongID? { get }
     /// Seconds into the playing track, for setting a start point by listening.
     var playbackPosition: TimeInterval? { get }
+    /// Called whenever something stops playing for any reason (stopped, faded, reached its
+    /// play length, the end of the track, an interruption), with the song that was playing.
+    var onPlaybackEnded: ((SongID?) -> Void)? { get set }
 
     /// Hands the player the saved library when the app opens.
     func load(_ library: SongLibrary)
 
     // Library
 
-    /// Copies sound files the scorer picked into the app and adds them to the library,
-    /// named after their files. Returns the new songs.
-    func importSongs(from files: [URL]) async throws -> [Song]
+    /// Copies sound files the scorer picked into the app's audio folder, in the background,
+    /// and returns a new song for each, named after its file. It does not touch the library;
+    /// hand the songs to `addSongs` afterward.
+    @concurrent nonisolated func importSongs(from files: [URL]) async throws -> [Song]
+    /// Adds imported songs to the library.
+    func addSongs(_ songs: [Song])
     func rename(_ song: SongID, to title: String)
     /// Sets where the walk-up clip starts, in seconds into the track.
     func setStartPoint(_ seconds: TimeInterval, for song: SongID)
@@ -66,8 +79,8 @@ public protocol WalkUpAudioPlayer: AnyObject {
     func startRecordingIntroduction() throws
     /// Stops recording and returns the new introduction, ready to keep or throw away.
     func stopRecordingIntroduction() -> AnnouncerIntroduction?
-    /// Imports an introduction recorded elsewhere.
-    func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction
+    /// Copies an introduction recorded elsewhere into the app, in the background.
+    @concurrent nonisolated func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction
     /// Plays a player's introduction on its own, to check it.
     func playIntroduction(for player: Player)
 }
@@ -85,11 +98,13 @@ public enum WalkUpAudioError: Error, Equatable, Sendable {
 /// An audio player that makes no sound but keeps track of what it was asked to do.
 /// For previews and tests.
 @MainActor
+@Observable
 public final class SilentAudioPlayer: WalkUpAudioPlayer {
     public private(set) var library: SongLibrary
     public private(set) var isPlaying = false
     public private(set) var nowPlaying: SongID?
     public private(set) var playbackPosition: TimeInterval?
+    public var onPlaybackEnded: ((SongID?) -> Void)?
 
     public init(library: SongLibrary = SongLibrary()) {
         self.library = library
@@ -97,11 +112,11 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
 
     public func load(_ library: SongLibrary) { self.library = library }
 
-    public func importSongs(from files: [URL]) async throws -> [Song] {
-        let new = files.map { Song(title: $0.deletingPathExtension().lastPathComponent, fileName: $0.lastPathComponent) }
-        library.songs.append(contentsOf: new)
-        return new
+    @concurrent nonisolated public func importSongs(from files: [URL]) async throws -> [Song] {
+        files.map { Song(title: $0.deletingPathExtension().lastPathComponent, fileName: $0.lastPathComponent) }
     }
+
+    public func addSongs(_ songs: [Song]) { library.songs.append(contentsOf: songs) }
 
     public func rename(_ song: SongID, to title: String) {
         update(song) { $0.title = title }
@@ -144,9 +159,11 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
     public func fadeOut() { stop() }
 
     public func stop() {
+        let ended = nowPlaying
         isPlaying = false
         nowPlaying = nil
         playbackPosition = nil
+        onPlaybackEnded?(ended)
     }
 
     public func playBetweenInnings() {
@@ -158,7 +175,7 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
 
     public func stopRecordingIntroduction() -> AnnouncerIntroduction? { nil }
 
-    public func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction {
+    @concurrent nonisolated public func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction {
         AnnouncerIntroduction(source: .imported, fileName: file.lastPathComponent)
     }
 
