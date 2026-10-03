@@ -103,6 +103,8 @@ struct Scoreboard: View {
             }
             .padding(.horizontal, Spacing.small)
             .frame(maxWidth: .infinity)
+            // The score gets its room first; the count and the outs shrink to fit beside it.
+            .layoutPriority(1)
             divider
             // The count, big.
             VStack(spacing: 0) {
@@ -148,6 +150,7 @@ struct Scoreboard: View {
             Spacer(minLength: Spacing.extraSmall)
             Text("\(info.situation.score[side])")
                 .font(ScorebookFont.scoreboardSmall)
+                .fixedSize()
         }
     }
 
