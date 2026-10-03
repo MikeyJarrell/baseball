@@ -1,5 +1,5 @@
 {
-  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Cardinals go down in order. In the bottom of the first, Ortiz re-enters in center field in place of Moss, which our league allows.",
+  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Mudcats go down in order. Once Moss has batted, Ortiz may re-enter in their original spot (league rule 9.9), and does so in the bottom of the first. Moss, a substitute who has been removed, may not come back. Ortiz never left center field, since the pinch hitter changed only the batting order.",
   "setupFile": "standard",
   "events": [
     {
@@ -7,11 +7,11 @@
       "enteredAt": "2026-05-02T18:05:20Z",
       "substitution": {
         "team": "away",
-        "changes": [
+        "batting": [
           {
             "kind": "pinchHitter",
-            "incoming": "c10",
-            "replacing": "c1"
+            "incoming": "m10",
+            "replacing": "m1"
           }
         ]
       }
@@ -28,7 +28,7 @@
         ],
         "runners": [
           {
-            "runner": "c10",
+            "runner": "m10",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -52,7 +52,7 @@
         ],
         "runners": [
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -75,7 +75,7 @@
         ],
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -93,12 +93,11 @@
       "enteredAt": "2026-05-02T18:06:40Z",
       "substitution": {
         "team": "away",
-        "changes": [
+        "batting": [
           {
-            "kind": "defensiveReplacement",
-            "incoming": "c1",
-            "replacing": "c10",
-            "position": 8
+            "kind": "replacement",
+            "incoming": "m1",
+            "replacing": "m10"
           }
         ]
       }
@@ -109,14 +108,35 @@
       "afterEvent": "e1",
       "expected": {
         "situation": {
-          "batter": "c10",
+          "batter": "m10",
           "battingSlots": [
             {
               "team": "away",
               "index": 0,
               "players": [
-                "c1",
-                "c10"
+                "m1",
+                "m10"
+              ]
+            }
+          ],
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": [
+                "m1"
               ]
             }
           ]
@@ -129,15 +149,15 @@
       "inning": 1,
       "half": "bottom",
       "outs": 0,
-      "batter": "m1",
+      "batter": "d1",
       "battingSlots": [
         {
           "team": "away",
           "index": 0,
           "players": [
-            "c1",
-            "c10",
-            "c1"
+            "m1",
+            "m10",
+            "m1"
           ],
           "position": 8
         }
@@ -146,24 +166,25 @@
         {
           "team": "away",
           "position": 8,
-          "player": "c1"
+          "player": "m1"
         }
       ],
       "lineups": [
         {
           "team": "away",
-          "nextBatterIndex": 3
+          "nextBatterIndex": 3,
+          "eligibleToReenter": []
         }
       ]
     },
     "batting": [
       {
-        "player": "c10",
+        "player": "m10",
         "plateAppearances": 1,
         "atBats": 1
       },
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 0
       }
     ]

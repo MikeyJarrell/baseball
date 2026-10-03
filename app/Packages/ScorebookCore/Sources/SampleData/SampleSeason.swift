@@ -1,19 +1,19 @@
 // Season totals for a season of one game: the sample game. Every one of our twelve
-// players is listed. Robin Nash only ran for a designated non-runner and Taylor Voss only
-// pitched, so neither has an at-bat and their rate stats show as dashes. The numbers are
-// copied from the sample box score.
+// players is listed. Robin Nash did not play and Taylor Voss only pitched, so neither has
+// an at-bat and their rate stats show as dashes. The numbers are copied from the sample
+// box score.
 
 import Foundation
 import Model
 
 public enum SampleSeason {
-    /// The Mudcats' season so far: the one sample game.
+    /// The Diamond Dogs' season so far: the one sample game.
     public static let totals: SeasonTotals = {
         let box = SampleGame.boxScore
         let date = SampleSetups.gameDay
-        let opponent = "Cardinals"
+        let opponent = "Mudcats"
 
-        let batting = SampleTeams.mudcats.roster.map { player -> SeasonBattingLine in
+        let batting = SampleTeams.diamondDogs.roster.map { player -> SeasonBattingLine in
             let lines = box.home.batting.filter { $0.player == player.id }
             let stats = lines.reduce(BattingCounts()) { $0 + $1.stats }
             let played = !lines.isEmpty
@@ -33,7 +33,7 @@ public enum SampleSeason {
 
         let fielding = box.home.fielding.map { SeasonFieldingLine(player: $0.player, name: $0.name, stats: $0.stats) }
 
-        return SeasonTotals(teamID: "mudcats", teamName: "Mudcats", games: 1,
+        return SeasonTotals(teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 1,
                             batting: batting, pitching: pitching, fielding: fielding)
     }()
 

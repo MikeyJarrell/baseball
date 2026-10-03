@@ -1,5 +1,5 @@
 {
-  "date": "2026-05-02T18:00:00Z",
+  "scheduledStart": "2026-05-02T18:00:00Z",
   "away": {
     "teamID": "riverhawks",
     "name": "Riverhawks",
@@ -46,7 +46,7 @@
         "placeholder": "Pitcher"
       }
     ],
-    "lineup": [
+    "battingOrder": [
       {
         "player": "r1"
       },
@@ -75,7 +75,7 @@
         "player": "r9"
       }
     ],
-    "fieldersNotBatting": [
+    "defense": [
       {
         "position": 1,
         "player": "rp"
@@ -83,134 +83,161 @@
     ]
   },
   "home": {
-    "teamID": "mudcats",
-    "name": "Mudcats",
+    "teamID": "diamond-dogs",
+    "name": "Diamond Dogs",
     "isOurs": true,
     "roster": [
       {
-        "id": "m1",
+        "id": "d1",
         "name": "Alex Moreno",
         "number": "3",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m2",
+        "id": "d2",
         "name": "Chris Tate",
         "number": "6",
         "bats": "left",
         "throwsWith": "right"
       },
       {
-        "id": "m3",
+        "id": "d3",
         "name": "Jordan Webb",
         "number": "22",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m4",
+        "id": "d4",
         "name": "Pat Quinn",
         "number": "33",
         "bats": "left",
         "throwsWith": "left"
       },
       {
-        "id": "m5",
+        "id": "d5",
         "name": "Riley Shaw",
         "number": "12",
         "bats": "switchHitter",
         "throwsWith": "right"
       },
       {
-        "id": "m6",
+        "id": "d6",
         "name": "Casey Ford",
         "number": "9",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m7",
+        "id": "d7",
         "name": "Drew Lang",
         "number": "17",
         "bats": "left",
         "throwsWith": "right"
       },
       {
-        "id": "m8",
+        "id": "d8",
         "name": "Morgan Fisk",
         "number": "10",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m9",
+        "id": "d9",
         "name": "Sky Barros",
         "number": "21",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m10",
+        "id": "d10",
         "name": "Jamie Cole",
         "number": "14",
         "bats": "left",
         "throwsWith": "left"
       },
       {
-        "id": "m11",
+        "id": "d11",
         "name": "Robin Nash",
         "number": "27",
         "bats": "right",
         "throwsWith": "right"
       },
       {
-        "id": "m12",
+        "id": "d12",
         "name": "Taylor Voss",
         "number": "44",
         "bats": "left",
         "throwsWith": "left"
       }
     ],
-    "lineup": [
+    "battingOrder": [
       {
-        "player": "m1",
-        "position": 4
+        "player": "d1"
       },
       {
-        "player": "m2",
-        "position": 6
+        "player": "d2"
       },
       {
-        "player": "m3",
-        "position": 8
+        "player": "d3"
       },
       {
-        "player": "m4",
-        "position": 3
+        "player": "d4"
       },
       {
-        "player": "m5",
-        "position": 5
+        "player": "d5"
       },
       {
-        "player": "m6",
-        "position": 7
+        "player": "d6"
       },
       {
-        "player": "m7",
-        "position": 9
+        "player": "d7"
       },
       {
-        "player": "m8",
-        "position": 2
+        "player": "d8"
       },
       {
-        "player": "m9",
-        "position": 1
+        "player": "d9"
       }
     ],
-    "fieldersNotBatting": []
-  },
-  "scheduledInnings": 9
+    "defense": [
+      {
+        "position": 1,
+        "player": "d9"
+      },
+      {
+        "position": 2,
+        "player": "d8"
+      },
+      {
+        "position": 3,
+        "player": "d4"
+      },
+      {
+        "position": 4,
+        "player": "d1"
+      },
+      {
+        "position": 5,
+        "player": "d5"
+      },
+      {
+        "position": 6,
+        "player": "d2"
+      },
+      {
+        "position": 7,
+        "player": "d6"
+      },
+      {
+        "position": 8,
+        "player": "d3"
+      },
+      {
+        "position": 9,
+        "player": "d7"
+      }
+    ]
+  }
 }

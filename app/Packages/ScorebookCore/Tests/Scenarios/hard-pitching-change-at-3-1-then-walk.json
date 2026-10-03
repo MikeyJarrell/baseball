@@ -1,5 +1,5 @@
 {
-  "description": "Barros goes 3-1 on Ortiz and is replaced by Voss, who throws ball four. The walk is charged to Barros (Official Baseball Rules 9.16(h)); the pitch counts to Voss.",
+  "description": "Barros goes 3-1 on Ortiz and is replaced by Voss, who throws ball four. The walk is charged to Barros (Official Baseball Rules 9.16(h)); the pitch counts to Voss. The change is to the defense only: Barros keeps the ninth batting spot and may come back to pitch once.",
   "setupFile": "standard",
   "events": [
     {
@@ -35,7 +35,7 @@
       "enteredAt": "2026-05-02T18:06:40Z",
       "pitchingChange": {
         "team": "home",
-        "newPitcher": "m12"
+        "newPitcher": "d12"
       }
     },
     {
@@ -55,17 +55,23 @@
             "balls": 3,
             "strikes": 1
           },
-          "pitcher": "m12",
-          "batter": "c1",
+          "pitcher": "d12",
+          "batter": "m1",
           "battingSlots": [
             {
               "team": "home",
               "index": 8,
               "players": [
-                "m9",
-                "m12"
+                "d9"
               ],
-              "position": 1
+              "isBattingOnly": true
+            }
+          ],
+          "fielders": [
+            {
+              "team": "home",
+              "position": 1,
+              "player": "d12"
             }
           ]
         }
@@ -82,21 +88,21 @@
       "runners": [
         {
           "base": "first",
-          "runner": "c1",
-          "responsiblePitcher": "m9"
+          "runner": "m1",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c2",
-      "pitcher": "m12",
+      "batter": "m2",
+      "pitcher": "d12",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 4,
           "strikes": 1,
           "battersFaced": 1
         },
         {
-          "pitcher": "m12",
+          "pitcher": "d12",
           "pitches": 1,
           "strikes": 0,
           "battersFaced": 0
@@ -107,23 +113,31 @@
           "team": "home",
           "index": 8,
           "players": [
-            "m9",
-            "m12"
+            "d9"
           ],
-          "position": 1
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToPitchAgain": [
+            "d9"
+          ],
+          "eligibleToReenter": []
         }
       ]
     },
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "walks": 1,
         "battersFaced": 1,
         "pitches": 4,
         "strikes": 1
       },
       {
-        "pitcher": "m12",
+        "pitcher": "d12",
         "walks": 0,
         "battersFaced": 0,
         "pitches": 1,

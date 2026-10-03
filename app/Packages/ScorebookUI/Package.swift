@@ -51,7 +51,7 @@ let package = Package(
             resources: [.process("Resources")]
         ),
 
-        // Song library, walk-up songs, the announcer and between-innings music.
+        // Song library, walk-up songs, the announcer and pitchers' warm-up songs.
         // The Resources folder holds any sound the module itself ships with.
         .target(
             name: "WalkUpAudio",

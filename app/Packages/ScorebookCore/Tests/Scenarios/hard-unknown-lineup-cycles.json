@@ -1,5 +1,5 @@
 {
-  "description": "The Riverhawks' hitters are unknown, so their order is Batter 1 to Batter 9. Six intentional walks and three fly outs bring all nine to the plate and score three. After the Mudcats go down in order, Batter 1 leads off the second.",
+  "description": "The Riverhawks' hitters are unknown, so their order is Batter 1 to Batter 9. Six intentional walks and three fly outs bring all nine to the plate and score three. After the Diamond Dogs go down in order, Batter 1 leads off the second.",
   "setupFile": "unknown-opponent",
   "events": [
     {
@@ -110,7 +110,7 @@
         ],
         "runners": [
           {
-            "runner": "m1",
+            "runner": "d1",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -134,7 +134,7 @@
         ],
         "runners": [
           {
-            "runner": "m2",
+            "runner": "d2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -157,7 +157,7 @@
         ],
         "runners": [
           {
-            "runner": "m3",
+            "runner": "d3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -205,7 +205,7 @@
       "onDeck": "r2",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 3,
           "strikes": 3,
           "battersFaced": 9
@@ -240,7 +240,7 @@
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "walks": 6,
         "runs": 3,
         "pitches": 3,

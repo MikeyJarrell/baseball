@@ -48,7 +48,7 @@
             "strikes": 2
           },
           "outs": 0,
-          "batter": "c1"
+          "batter": "m1"
         }
       }
     }
@@ -60,11 +60,11 @@
         "balls": 0,
         "strikes": 0
       },
-      "batter": "c2",
+      "batter": "m2",
       "droppedThirdStrikePossible": false,
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 5,
           "strikes": 5,
           "battersFaced": 1
@@ -79,7 +79,7 @@
     ],
     "batting": [
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 1,
         "atBats": 1,
         "strikeouts": 1
@@ -87,14 +87,14 @@
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "strikeouts": 1,
         "outsRecorded": 1
       }
     ],
     "fielding": [
       {
-        "player": "m8",
+        "player": "d8",
         "putouts": 1
       }
     ]

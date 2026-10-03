@@ -1,5 +1,5 @@
 {
-  "description": "Three quick Cardinals outs. Moreno, the Mudcats' designated non-runner, singles; the app asks who runs (the Mudcats have made no out yet, so nobody is offered first), and Cole runs for them. Tate doubles, Cole scores, and the run is Moreno's.",
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, singles. The app asks who runs and offers Barros, the last batter in the order, since the Diamond Dogs have made no out yet in the first inning (league rule 9.11 E). Barros runs, Tate doubles, Barros scores, and the run is Moreno's.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -13,7 +13,7 @@
         ],
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -36,7 +36,7 @@
         ],
         "runners": [
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -60,7 +60,7 @@
         ],
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -80,7 +80,7 @@
         "hitLocation": 9,
         "runners": [
           {
-            "runner": "m1",
+            "runner": "d1",
             "from": "home",
             "to": "first"
           }
@@ -92,8 +92,8 @@
       "id": "e5",
       "enteredAt": "2026-05-02T18:06:40Z",
       "runnerForNonRunner": {
-        "runner": "m10",
-        "replacing": "m1"
+        "runner": "d9",
+        "replacing": "d1"
       }
     },
     {
@@ -105,12 +105,12 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "m10",
+            "runner": "d9",
             "from": "first",
             "to": "scored"
           },
           {
-            "runner": "m2",
+            "runner": "d2",
             "from": "home",
             "to": "second"
           }
@@ -128,13 +128,13 @@
           "runners": [
             {
               "base": "first",
-              "runner": "m1",
-              "responsiblePitcher": "c9"
+              "runner": "d1",
+              "responsiblePitcher": "m9"
             }
           ],
           "isRunnerChoiceOpen": true,
-          "runnerChoiceFor": "m1",
-          "hasSuggestedRunner": false
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
         }
       }
     },
@@ -145,9 +145,9 @@
           "runners": [
             {
               "base": "first",
-              "runner": "m10",
-              "responsiblePitcher": "c9",
-              "standingInFor": "m1"
+              "runner": "d9",
+              "responsiblePitcher": "m9",
+              "standingInFor": "d1"
             }
           ],
           "isRunnerChoiceOpen": false
@@ -167,42 +167,42 @@
       "runners": [
         {
           "base": "second",
-          "runner": "m2",
-          "responsiblePitcher": "c9"
+          "runner": "d2",
+          "responsiblePitcher": "m9"
         }
       ],
-      "batter": "m3",
+      "batter": "d3",
       "isRunnerChoiceOpen": false,
       "battingSlots": [
         {
           "team": "home",
           "index": 0,
           "players": [
-            "m1"
+            "d1"
           ]
         }
       ]
     },
     "batting": [
       {
-        "player": "m1",
+        "player": "d1",
         "plateAppearances": 1,
         "hits": 1,
         "runs": 1
       },
       {
-        "player": "m2",
+        "player": "d2",
         "doubles": 1,
         "runsBattedIn": 1
       },
       {
-        "player": "m10",
+        "player": "d9",
         "runs": 0
       }
     ],
     "pitching": [
       {
-        "pitcher": "c9",
+        "pitcher": "m9",
         "runs": 1
       }
     ]

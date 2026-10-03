@@ -27,11 +27,13 @@ public protocol RulesEngine: Sendable {
     /// sheet passes every runner on base, since those move everyone. Returns one move per runner.
     func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove]
 
-    /// The runner to offer first when a designated non-runner reaches base: the batting
-    /// team's player who made that team's most recent out (league rule: the last out runs),
-    /// or nothing if the team has not made an out yet. The same answer the situation carries
+    /// The runner to offer first when a designated non-runner reaches base, by the league's
+    /// rule (see `RunnerChoice.suggestedRunner`): the team's last recorded out; if that player
+    /// is now at bat, the last recorded out before them; in the first inning before any out,
+    /// the last batter in the batting order. `situation` is the one just after the non-runner
+    /// reached, so its batter is the one now at bat. The same answer the situation carries
     /// in `runnerChoice`.
-    func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID?
+    func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID?
 
     /// Scorebook notation for one event, given the situation just before it:
     /// "6-3", "F8", "E6", "1B 7", "K", "ꓘ", "BB".
@@ -159,19 +161,20 @@ public struct PlayPreview: Codable, Equatable, Hashable, Sendable {
 
 extension Situation {
     /// The situation before the first pitch: top of the first, nobody out, both teams'
-    /// starting orders and fielders from the setup, leadoff hitters due up.
+    /// starting orders and defenses from the setup, leadoff hitters due up, and the clock
+    /// showing the scheduled start plus the time limit.
     public init(startOf setup: GameSetup) {
         func state(for team: GameTeam) -> TeamState {
-            let slots = team.lineup.map {
-                BattingSlot(players: [$0.player], position: $0.position, isDesignatedNonRunner: $0.isDesignatedNonRunner)
+            let slots = team.battingOrder.map {
+                BattingSlot(players: [$0.player], isDesignatedNonRunner: $0.isDesignatedNonRunner)
             }
-            return TeamState(battingOrder: BattingOrder(slots: slots), nextBatterIndex: 0, fielders: team.startingFielders)
+            return TeamState(battingOrder: BattingOrder(slots: slots), nextBatterIndex: 0, fielders: team.defense)
         }
         self.init(
             away: state(for: setup.away),
             home: state(for: setup.home),
             defenseCheckDue: setup.home.isOurs,
-            timeLimitMinutes: setup.timeLimitMinutes,
+            timeLimitEndsAt: setup.scheduledEnd,
             scheduledInnings: setup.scheduledInnings
         )
     }
@@ -205,7 +208,7 @@ public struct DoNothingRulesEngine: RulesEngine {
     }
 
     /// Never suggests anyone.
-    public func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID? { nil }
+    public func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID? { nil }
 
     /// Leaves every chosen runner where they are.
     public func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove] {
