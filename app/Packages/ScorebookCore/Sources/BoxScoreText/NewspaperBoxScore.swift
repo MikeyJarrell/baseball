@@ -9,7 +9,7 @@ import Foundation
 
 /// A whole box score as a newspaper sports page printed it, top to bottom.
 public struct NewspaperBoxScore: Equatable, Sendable {
-    /// The small line above the headline: the game's date, "Saturday, May 2, 2026".
+    /// The small line above the headline: the game's date, "Saturday, May 2".
     public var dateLine: String
     /// The big line: the leader first, "Diamond Dogs 5, Mudcats 3".
     public var headline: String

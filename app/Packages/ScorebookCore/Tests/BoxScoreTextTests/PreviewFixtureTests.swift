@@ -33,7 +33,10 @@ struct PreviewFixtureTests {
         for (file, box) in Self.copies {
             let url = Self.folder.appendingPathComponent(file)
             if rewrite {
-                try ScorebookJSON.encode(box).write(to: url)
+                // Saved without indenting, to keep the copies small inside the app.
+                let encoder = ScorebookJSON.encoder()
+                encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+                try encoder.encode(box).write(to: url)
             }
             let saved = try ScorebookJSON.decode(BoxScore.self, from: Data(contentsOf: url))
             #expect(saved == box, "\(file) is out of date; see the comment at the top of this file")

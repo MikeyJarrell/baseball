@@ -76,6 +76,10 @@ public enum BoxScorePrinter {
 
     /// The positions a batter played, joined by dashes: "ss", "ph-2b". A starter who only
     /// batted is printed "dh"; a substitute who only batted, "ph".
+    ///
+    /// "dh" is used for every hitter who bats without fielding, even when the pitcher bats
+    /// too (strictly an extra hitter): newspaper readers know "dh", and the league makes no
+    /// difference between the two.
     static func positionText(_ line: BattingLine) -> String {
         if line.positions.isEmpty {
             return line.isSubstitute ? BoxPosition.ph.rawValue : "dh"
@@ -175,8 +179,9 @@ public enum BoxScorePrinter {
         return NewspaperTable(title: team.name, columns: pitchingColumns, rows: rows)
     }
 
-    /// Innings pitched the way a newspaper prints them: "5", "4⅓", "⅔", "0". Three outs
-    /// make an inning.
+    /// Innings pitched the way an old-time newspaper printed them: "5", "4⅓", "⅔", "0",
+    /// rather than today's "4.1" (Mikey's choice, for the old-school look). Three outs make
+    /// an inning.
     public static func inningsPitchedText(_ outs: Int) -> String {
         let whole = outs / 3
         let thirds = ["", "⅓", "⅔"][outs % 3]
@@ -185,16 +190,20 @@ public enum BoxScorePrinter {
     }
 
     /// The notes under the pitching lines: batters hit by a pitch, then each pitcher's
-    /// pitches and strikes.
+    /// pitches and strikes. A pitcher whose pitches were not counted still appears, with a
+    /// dash, so nobody reads them as not having pitched; if no pitches were counted for
+    /// anybody, the note is left out.
     static func pitchingNotes(_ box: BoxScore, _ names: ShortNames) -> [String] {
         var result: [String] = []
         if let hitByPitch = hitByPitchNote(box, names) {
             result.append("HBP—\(hitByPitch).")
         }
-        let pitchers = (box.away.pitching + box.home.pitching).filter { $0.stats.pitches > 0 }
-        if !pitchers.isEmpty {
+        let pitchers = box.away.pitching + box.home.pitching
+        if pitchers.contains(where: { $0.stats.pitches > 0 }) {
             let list = pitchers.map { line in
-                "\(names.name(for: line.player, fallback: line.name)) \(line.stats.pitches)-\(line.stats.strikes)"
+                let name = names.name(for: line.player, fallback: line.name)
+                let count = line.stats.pitches > 0 ? "\(line.stats.pitches)-\(line.stats.strikes)" : "—"
+                return "\(name) \(count)"
             }
             result.append("Pitches-strikes—\(list.joined(separator: ", ")).")
         }

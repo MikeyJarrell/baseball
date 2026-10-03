@@ -178,10 +178,12 @@ struct LineScoreView: View {
                             .frame(width: CGFloat(width) * Newsprint.inningCharacterWidth, alignment: .center)
                             .padding(.leading, inning > 0 && inning % 3 == 0 ? 6 : 0)
                     }
-                    Text("—").frame(width: 24, alignment: .center)
+                    // The dash and the totals use the batting columns' width, so the dash
+                    // sits under "ab" and runs, hits and errors under "r", "h" and "bi".
+                    Text("—").frame(width: Newsprint.columnWidth, alignment: .trailing)
                     // Runs, hits, errors. Counted by place, since two can be the same number.
                     ForEach(Array([row.runs, row.hits, row.errors].enumerated()), id: \.offset) { _, number in
-                        Text("\(number)").frame(width: 24, alignment: .trailing)
+                        Text("\(number)").frame(width: Newsprint.columnWidth, alignment: .trailing)
                     }
                 }
                 .font(Newsprint.font(Newsprint.bodySize))

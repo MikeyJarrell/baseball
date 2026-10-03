@@ -4,7 +4,8 @@
 // "Danny Ruiz" prints as "Ruiz". If both teams have an Ortiz, Luis Ortiz prints as
 // "L. Ortiz" and Ana Ortiz as "A. Ortiz". If even the initials match (Luis and Leo Ortiz),
 // both print in full. A name that is only a number or a stand-in ("#22", "Batter 4")
-// is printed whole, since its last word alone would mean nothing.
+// is printed whole, since its last word alone would mean nothing. A last name of more
+// than one word keeps all of it: "Elly De La Cruz" is "De La Cruz".
 
 import Foundation
 import Model
@@ -87,6 +88,13 @@ struct NameParts {
     /// Words that follow a last name rather than being one.
     static let suffixes: Set<String> = ["jr", "jr.", "sr", "sr.", "ii", "iii", "iv", "v"]
 
+    /// Small words that belong to the last name after them: the "De La" in "De La Cruz",
+    /// the "Van" in "Van Buren", the "St." in "St. Clair".
+    static let particles: Set<String> = [
+        "de", "la", "le", "del", "della", "der", "den", "di", "da", "das", "do", "dos", "du",
+        "van", "von", "ter", "ten", "st", "st.", "san", "santa", "mc", "bin", "ibn", "al", "el",
+    ]
+
     init(_ name: String) {
         let words = name.split(whereSeparator: \.isWhitespace).map(String.init)
         fullName = words.joined(separator: " ")
@@ -108,6 +116,12 @@ struct NameParts {
         var lastWordCount = 1
         if words.count >= 3, NameParts.suffixes.contains(words.last!.lowercased()) {
             lastWordCount = 2
+        }
+        // Keep small words like "De La" or "Van" in front of the last name, but never the
+        // first word, which is the first name.
+        while words.count - lastWordCount > 1,
+              NameParts.particles.contains(words[words.count - lastWordCount - 1].lowercased()) {
+            lastWordCount += 1
         }
         lastName = words.suffix(lastWordCount).joined(separator: " ")
         initialed = "\(words[0].prefix(1)). \(lastName)"
