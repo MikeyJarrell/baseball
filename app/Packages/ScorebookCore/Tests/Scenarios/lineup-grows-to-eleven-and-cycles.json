@@ -1,0 +1,596 @@
+{
+  "description": "The first two innings go three up, three down. In the third, with Collins, the ninth and last Mudcats hitter, batting 1-0, the Mudcats add Moss and Ash to the bottom of the order, making eleven. Collins makes the third out. In the fourth Moss and Ash single, and Ortiz is up again: the order ran through all eleven spots and wrapped to the top.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m5",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m6",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e10",
+      "enteredAt": "2026-05-02T18:08:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e11",
+      "enteredAt": "2026-05-02T18:08:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d5",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e12",
+      "enteredAt": "2026-05-02T18:09:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "d6",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e13",
+      "enteredAt": "2026-05-02T18:09:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m7",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e14",
+      "enteredAt": "2026-05-02T18:09:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m8",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e15",
+      "enteredAt": "2026-05-02T18:10:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e16",
+      "enteredAt": "2026-05-02T18:10:20Z",
+      "addHitter": {
+        "team": "away",
+        "player": "m10"
+      }
+    },
+    {
+      "id": "e17",
+      "enteredAt": "2026-05-02T18:10:40Z",
+      "addHitter": {
+        "team": "away",
+        "player": "m11"
+      }
+    },
+    {
+      "id": "e18",
+      "enteredAt": "2026-05-02T18:11:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m9",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e19",
+      "enteredAt": "2026-05-02T18:11:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d7",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e20",
+      "enteredAt": "2026-05-02T18:11:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d8",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e21",
+      "enteredAt": "2026-05-02T18:12:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "d9",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e22",
+      "enteredAt": "2026-05-02T18:12:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m10",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e23",
+      "enteredAt": "2026-05-02T18:12:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "m10",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m11",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e17",
+      "expected": {
+        "situation": {
+          "inning": 3,
+          "half": "top",
+          "outs": 2,
+          "batter": "m9",
+          "onDeck": "m10",
+          "count": {
+            "balls": 1,
+            "strikes": 0
+          },
+          "lineups": [
+            {
+              "team": "away",
+              "length": 11
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e18",
+      "expected": {
+        "situation": {
+          "inning": 3,
+          "half": "bottom",
+          "lineups": [
+            {
+              "team": "away",
+              "nextBatterIndex": 9
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e21",
+      "expected": {
+        "situation": {
+          "inning": 4,
+          "half": "top",
+          "batter": "m10",
+          "onDeck": "m11"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 4,
+      "half": "top",
+      "outs": 0,
+      "batter": "m1",
+      "onDeck": "m2",
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m11",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "second",
+          "runner": "m10",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "length": 11,
+          "nextBatterIndex": 0
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 9,
+          "players": [
+            "m10"
+          ],
+          "isBattingOnly": true
+        },
+        {
+          "team": "away",
+          "index": 10,
+          "players": [
+            "m11"
+          ],
+          "isBattingOnly": true
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m10",
+        "plateAppearances": 1,
+        "hits": 1
+      },
+      {
+        "player": "m11",
+        "plateAppearances": 1,
+        "hits": 1
+      },
+      {
+        "player": "m9",
+        "plateAppearances": 1,
+        "atBats": 1
+      },
+      {
+        "player": "m1",
+        "plateAppearances": 1
+      }
+    ]
+  }
+}

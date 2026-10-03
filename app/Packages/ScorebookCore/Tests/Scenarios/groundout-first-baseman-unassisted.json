@@ -1,0 +1,61 @@
+{
+  "description": "Ortiz grounds to first baseman Quinn, who steps on the bag himself: 3 unassisted.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "runners": [],
+      "batter": "m2"
+    },
+    "notation": [
+      {
+        "event": "e1",
+        "notation": "3U"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d4",
+        "putouts": 1,
+        "assists": 0
+      },
+      {
+        "player": "d9",
+        "putouts": 0,
+        "assists": 0
+      }
+    ]
+  }
+}

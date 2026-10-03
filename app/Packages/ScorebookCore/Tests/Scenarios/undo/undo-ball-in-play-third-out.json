@@ -1,0 +1,159 @@
+{
+  "description": "Undo a ball in play that made the third out. Ortiz flies out, Ruiz doubles, Hale flies out, and Diaz grounds out to end the inning. Undoing Diaz's groundout brings back the top of the first: two out, Ruiz on second, Diaz up, and no runner left on base yet.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "inning": 1,
+          "half": "top",
+          "outs": 2,
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m2",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "batter": "m4",
+          "isBetweenHalfInnings": false,
+          "lineups": [
+            {
+              "team": "away",
+              "nextBatterIndex": 3
+            }
+          ]
+        },
+        "teams": [
+          {
+            "team": "away",
+            "leftOnBase": 0
+          }
+        ],
+        "pitching": [
+          {
+            "pitcher": "d9",
+            "outsRecorded": 2
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "runners": [],
+      "batter": "d1",
+      "isBetweenHalfInnings": true,
+      "lineups": [
+        {
+          "team": "away",
+          "nextBatterIndex": 4
+        }
+      ]
+    },
+    "teams": [
+      {
+        "team": "away",
+        "leftOnBase": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 3
+      }
+    ]
+  }
+}

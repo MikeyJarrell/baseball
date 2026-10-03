@@ -1,0 +1,92 @@
+{
+  "description": "Ortiz singles to left. Ruiz takes a called strike, then is hit by a pitch: Ruiz to first, Ortiz forced to second. A pitch but not a strike.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "hitByPitch"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 2,
+          "battersFaced": 2
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e3",
+        "notation": "HBP"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "hitByPitch": 1,
+        "runsBattedIn": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "hitBatters": 1,
+        "battersFaced": 2,
+        "walks": 0,
+        "pitches": 3,
+        "strikes": 2
+      }
+    ]
+  }
+}
