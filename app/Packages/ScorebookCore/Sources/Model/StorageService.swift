@@ -127,11 +127,11 @@ public actor InMemoryStorage: ScorebookStorage {
     public func deleteGame(_ id: GameID) async throws { games[id] = nil }
 
     public func gameInProgress() async throws -> Game? {
-        games.values.filter { !$0.isFinished }.max { $0.setup.date < $1.setup.date }
+        games.values.filter { !$0.isFinished }.max { $0.setup.scheduledStart < $1.setup.scheduledStart }
     }
 
     public func finishedGames() async throws -> LoadedList<Game> {
-        LoadedList(items: games.values.filter(\.isFinished).sorted { $0.setup.date < $1.setup.date })
+        LoadedList(items: games.values.filter(\.isFinished).sorted { $0.setup.scheduledStart < $1.setup.scheduledStart })
     }
 
     public func loadSongLibrary() async throws -> SongLibrary { library }

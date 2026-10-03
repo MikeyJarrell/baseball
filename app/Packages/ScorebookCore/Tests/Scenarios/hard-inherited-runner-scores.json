@@ -11,7 +11,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -24,7 +24,7 @@
       "enteredAt": "2026-05-02T18:05:40Z",
       "pitchingChange": {
         "team": "home",
-        "newPitcher": "m12"
+        "newPitcher": "d12"
       }
     },
     {
@@ -36,12 +36,12 @@
         "hitLocation": 8,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "first",
             "to": "scored"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "second"
           }
@@ -58,11 +58,11 @@
           "runners": [
             {
               "base": "first",
-              "runner": "c1",
-              "responsiblePitcher": "m9"
+              "runner": "m1",
+              "responsiblePitcher": "d9"
             }
           ],
-          "pitcher": "m12"
+          "pitcher": "d12"
         }
       }
     }
@@ -77,20 +77,20 @@
       "runners": [
         {
           "base": "second",
-          "runner": "c2",
-          "responsiblePitcher": "m12"
+          "runner": "m2",
+          "responsiblePitcher": "d12"
         }
       ],
-      "batter": "c3",
+      "batter": "m3",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 1,
           "strikes": 1,
           "battersFaced": 1
         },
         {
-          "pitcher": "m12",
+          "pitcher": "d12",
           "pitches": 1,
           "strikes": 1,
           "battersFaced": 1
@@ -99,11 +99,11 @@
     },
     "batting": [
       {
-        "player": "c1",
+        "player": "m1",
         "runs": 1
       },
       {
-        "player": "c2",
+        "player": "m2",
         "hits": 1,
         "doubles": 1,
         "runsBattedIn": 1
@@ -111,14 +111,14 @@
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "runs": 1,
         "hits": 1,
         "battersFaced": 1,
         "outsRecorded": 0
       },
       {
-        "pitcher": "m12",
+        "pitcher": "d12",
         "runs": 0,
         "hits": 1,
         "battersFaced": 1
