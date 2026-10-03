@@ -1,0 +1,74 @@
+{
+  "description": "Ortiz singles and breaks for second on the pitcher's move; the pitcher throws to first, and the first baseman throws to the shortstop covering second. Picked off while trying to steal, which official scoring counts as caught stealing (Official Baseball Rules 9.07(h)).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "reason": "pickoff",
+            "outBy": [
+              1,
+              3,
+              6
+            ],
+            "outAt": "second",
+            "wasStealing": true
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 1,
+      "runners": [],
+      "batter": "m2"
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "caughtStealing": 1,
+        "stolenBases": 0
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d9",
+        "assists": 1
+      },
+      {
+        "player": "d4",
+        "assists": 1
+      },
+      {
+        "player": "d2",
+        "putouts": 1
+      }
+    ]
+  }
+}

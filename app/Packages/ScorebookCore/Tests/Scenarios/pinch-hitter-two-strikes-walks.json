@@ -1,0 +1,91 @@
+{
+  "description": "Ortiz falls behind 0-2 and Moss pinch-hits, then walks on four balls. Only a strikeout goes back to the batter replaced (Official Baseball Rules 9.15(b)); the walk is Moss's.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "pinchHitter",
+            "incoming": "m10",
+            "replacing": "m1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 0,
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m10",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2"
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 0,
+        "atBats": 0,
+        "strikeouts": 0
+      },
+      {
+        "player": "m10",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "walks": 1
+      }
+    ]
+  }
+}

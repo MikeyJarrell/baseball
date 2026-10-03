@@ -51,6 +51,9 @@ struct Replay {
     private var moundTrips: [TeamSide: [(pitcher: PlayerID, times: Int)]] = [:]
     /// The pitcher each team had on the mound after the previous event, to spot a change.
     private var lastPitcher: [TeamSide: PlayerID?] = [:]
+    /// The batter who left with two strikes when a pinch hitter took over mid-count. If the
+    /// pinch hitter strikes out, the strikeout and the at-bat are theirs (rule 9.15(b)).
+    private var twoStrikeBatter: PlayerID?
 
     init(game: Game) {
         self.game = game
@@ -162,6 +165,7 @@ struct Replay {
         s.isRegulationComplete = Self.isOfficial(s)
 
         if s.isFinal { s.gameOverQuestion = nil }
+        if !s.defenseCheckDue { s.suggestedDefense = nil }
 
         let notation = Notation.event(event, before: before, name: name(of:))
         var entry = PlayLogEntry(
@@ -353,6 +357,7 @@ struct Replay {
         if play.batterResult == .catchersInterference, play.runners.isEmpty {
             _ = forceBatterToFirst(batter, responsible: pitcher, &fx)
             for error in play.errors { fx.errors.append(charge(error)) }
+            chargeCatchersInterference(play, &fx)
             endPlateAppearance(batter, outcome: outcome, rbi: play.rbi, reached: true, chargedTo: pitcher, &fx)
             return
         }
@@ -362,11 +367,23 @@ struct Replay {
             moves.append(RunnerMove(runner: batter, from: .home, to: Self.defaultBatterEnd(play.batterResult),
                                     outBy: Self.defaultBatterEnd(play.batterResult) == .out ? play.fielders : []))
         }
+        // On a game-ending hit the batter is credited only with the bases the winning run
+        // needed (rule 9.06(f)), whatever hit the scorer saved.
+        let credited = Self.outcome(of: Suggestions.creditedHit(play.batterResult, moves: moves, in: s))
         let end = applyMoves(moves, batter: batter, batterPitcher: pitcher, batterFielders: play.fielders,
                              inheritsFromRetired: play.batterResult == .fieldersChoice, &fx)
         for error in play.errors { fx.errors.append(charge(error)) }
-        endPlateAppearance(batter, outcome: outcome, rbi: play.rbi,
+        chargeCatchersInterference(play, &fx)
+        endPlateAppearance(batter, outcome: credited, rbi: play.rbi,
                            reached: end.map { $0 != .out } ?? false, chargedTo: pitcher, &fx)
+    }
+
+    /// Catcher's interference charges the catcher with an error (rule 9.12(a)(3)), unless the
+    /// play already lists one for the catcher.
+    private mutating func chargeCatchersInterference(_ play: Play, _ fx: inout Effects) {
+        guard play.batterResult == .catchersInterference,
+              !play.errors.contains(where: { $0.fielder == .catcher }) else { return }
+        fx.errors.append(charge(ErrorCharge(fielder: .catcher)))
     }
 
     /// Runners moving between pitches: steals, pickoffs, wild pitches. The batter's count stays.
@@ -391,7 +408,8 @@ struct Replay {
         chargedTo pitcher: PlayerID?, _ fx: inout Effects
     ) {
         fx.plateAppearance = PlateAppearanceResult(batter: batter, pitcher: pitcher, outcome: outcome,
-                                                   rbi: rbi, batterReachedBase: reached)
+                                                   rbi: rbi, batterReachedBase: reached,
+                                                   chargedBatter: outcome == .strikeout ? twoStrikeBatter : nil)
         let side = s.battingSide
         let spot = s[side].nextBatterIndex
         if spotAppearances[side]?.indices.contains(spot) == true { spotAppearances[side]![spot] += 1 }
@@ -407,6 +425,7 @@ struct Replay {
         s[side].nextBatterIndex = count == 0 ? 0 : (spot + 1) % count
         s.count = .fresh
         walkChargedTo = nil
+        twoStrikeBatter = nil
     }
 
     // MARK: - Runner moves
@@ -527,6 +546,10 @@ struct Replay {
             guard let spot = s[side].battingOrder.index(of: change.replacing) else {
                 fx.problems.append("\(name(of: change.replacing)) is not in the batting order.")
                 continue
+            }
+            // A pinch hitter taking over a batter who already has two strikes [9.15(b)].
+            if change.kind == .pinchHitter, side == s.battingSide, change.replacing == s.batter, s.count.strikes >= 2 {
+                twoStrikeBatter = twoStrikeBatter ?? change.replacing
             }
             putInSpot(change.incoming, spot: spot, side: side)
             if change.kind == .pinchRunner { pinchRun(change, &fx) }
@@ -749,6 +772,7 @@ struct Replay {
         s.runners = []
         s.runnerChoice = nil
         walkChargedTo = nil
+        twoStrikeBatter = nil
         if s.half == .top {
             s.half = .bottom
         } else {
@@ -758,6 +782,10 @@ struct Replay {
         }
         s.isBetweenHalfInnings = true
         s.defenseCheckDue = setup[s.fieldingSide].isOurs
+        // The defense check starts from today's fielders with any rotation turns applied.
+        if s.defenseCheckDue {
+            s.suggestedDefense = setup[s.fieldingSide].defense(forInning: s.inning, from: s[s.fieldingSide].fielders)
+        }
         if let question = GameEndRules.questionAtEndOfHalf(
             inning: endedInning, half: endedHalf, situation: s, rules: setup.rules,
             timeIsUp: timeIsUp(at: now)

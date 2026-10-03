@@ -1,5 +1,5 @@
 {
-  "description": "A complete Major League game from Retrosheet (game SDN201905080): New York Mets at San Diego Padres, 2019-05-08, final New York Mets 2, San Diego Padres 3. Every pitch and play, converted by retrosheet/convert.py; the expected stats are the official box score. No designated hitter: pitchers bat, with pinch hitters for pitchers and a double switch by each team. The Padres lead after the top of the ninth and do not bat in it. The Mets' fifth-inning double play is a strikeout and a pickoff on the same pitch (Retrosheet K+PO1(23)/DP); our events record the strike-three pitch and then the pickoff, and cannot mark the two as one double play, so the official box's one Mets double play will not come out of these events until the vocabulary can say so (see plan/handoffs/test-scenarios.md).",
+  "description": "A complete Major League game from Retrosheet (game SDN201905080): New York Mets at San Diego Padres, 2019-05-08, final New York Mets 2, San Diego Padres 3. Every pitch and play, converted by retrosheet/convert.py; the expected stats are the official box score. No designated hitter: pitchers bat, with pinch hitters for pitchers and a double switch by each team. The Padres lead after the top of the ninth and do not bat in it. The Mets' fifth-inning double play is a strikeout and a pickoff on the same pitch (Retrosheet K+PO1(23)/DP): the strike-three pitch and then the pickoff, marked as completing a double play with the strikeout.",
   "source": "Retrosheet event file for game SDN201905080, with the box score at https://www.retrosheet.org/boxesetc/2019/B05080SDN2019.htm. The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at \"www.retrosheet.org\".",
   "setup": {
     "scheduledStart": "2019-05-08T12:41:00Z",
@@ -1606,7 +1606,8 @@
             ],
             "outAt": "first"
           }
-        ]
+        ],
+        "completesStrikeoutDoublePlay": true
       }
     },
     {
