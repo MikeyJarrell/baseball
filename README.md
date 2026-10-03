@@ -5,6 +5,7 @@ Mikey Jarrell’s personal baseball project.
 ## Contents
 
 - [Project dashboard](PROJECT_INDEX.md) — current status.
+- [Scorebook app plan](plan/README.md) — the iPhone scorebook and walk-up song app: design, build order, and one brief per job.
 - [Agent instructions](AGENTS.md) — working conventions for Claude and Codex.
 - [Working notes](notes/README.md) — project ideas and decisions.
 - [Research](deep-research/README.md) — saved research reports.
