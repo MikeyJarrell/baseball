@@ -83,6 +83,7 @@ input{font:inherit;color:inherit}
 .mockbar{display:none}
 .panel{flex:none;width:290px;max-height:min(852px,calc(100vh - 40px));overflow:auto;background:var(--panel);border-radius:18px;padding:18px 18px 22px;font-size:14px;line-height:1.4;box-shadow:var(--sh)}
 @media (max-width:1150px){.panel.right{display:none}}
+@media (max-width:384px){.band-title span{display:none}}
 /* Phones and small windows: the app fills the screen, and a thin mockup bar replaces the side panels */
 @media (max-width:760px){
   :root{--top:calc(32px + env(safe-area-inset-top));--sb:max(env(safe-area-inset-bottom),8px)}
@@ -224,7 +225,7 @@ g.coach .fc{stroke:var(--amber)!important;stroke-width:5!important}
 .band-row{display:flex;align-items:center;gap:6px;height:46px}
 .icbtn{width:44px;height:44px;display:grid;place-items:center;border-radius:12px}
 .band .icbtn{color:#fff}
-.band-title{flex:1;font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.band-title{flex:1;min-width:0;font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bandbtn{display:flex;align-items:center;gap:4px;height:36px;padding:0 10px;border-radius:10px;background:rgba(255,255,255,.18);font-weight:700;font-size:14px;color:#fff;white-space:nowrap}
 .board{display:grid;grid-template-columns:66px 1fr 100px 70px;align-items:center;background:rgba(0,0,0,.2);border-radius:14px;height:64px;padding:0 4px}
 .board>div{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;border-right:1px solid rgba(255,255,255,.18)}
@@ -358,7 +359,7 @@ g.coach .fc{stroke:var(--amber)!important;stroke-width:5!important}
 .steps i{width:22px;height:5px;border-radius:3px;background:currentColor;opacity:.25;display:block}
 .steps i.on{opacity:1}
 .resgrid{flex:1;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(64px,1fr);gap:10px;padding:12px 12px calc(var(--sb) + 8px);overflow:auto}
-.resgrid .rb{border-radius:16px;font-weight:800;font-size:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--play);color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.resgrid .rb{text-align:center;padding:4px 8px;border-radius:16px;font-weight:800;font-size:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:var(--play);color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
 .resgrid .rb small{font-size:13px;font-weight:600;opacity:.85}
 .resgrid .rb.wide{grid-column:1/-1;font-size:28px}
 .resgrid .rb.dark{background:var(--foul)}
@@ -370,7 +371,7 @@ g.coach .fc{stroke:var(--amber)!important;stroke-width:5!important}
 .notebar .nt b{font-size:40px;font-weight:800;letter-spacing:-.01em;font-variant-numeric:tabular-nums;line-height:1;display:block;white-space:nowrap}
 .notebar .nt b.ph{color:var(--ink3);font-size:19px;font-weight:700;line-height:1.2;white-space:normal;min-height:40px;display:flex;align-items:center}
 .notebar .nt span{font-size:14px;color:var(--ink3)}
-.kinds{flex:none;display:flex;gap:6px;padding:8px 12px 0;overflow-x:auto;scrollbar-width:none}
+.kinds{flex:none;display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0}
 .kinds::-webkit-scrollbar{display:none}
 .kinds .chipbtn{flex:none;padding:0 12px}
 .kinds .sep{width:1px;background:var(--line);flex:none;margin:4px 2px}
@@ -531,11 +532,11 @@ input[type=range]{width:100%;accent-color:var(--us);height:32px}
 :root[data-theme="dark"] .nchip.hit{background:#163b22;color:#9be2b1}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .nchip.hit{background:#163b22;color:#9be2b1}}
 .ph{font-size:13px;font-weight:800;color:var(--ink3);text-transform:uppercase;letter-spacing:.05em;padding:14px 4px 6px;display:flex;justify-content:space-between}
-.play{display:flex;gap:10px;align-items:flex-start;width:100%;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--line);text-align:left}
-.play .pn{flex:none;min-width:58px;text-align:center}
-.play .grow{flex:1;min-width:0;font-size:15px;line-height:1.3}
-.play .grow small{display:block;color:var(--ink3);font-size:13px}
-.play.cur{background:var(--us-soft)}
+.prow{display:flex;gap:10px;align-items:flex-start;width:100%;padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--line);text-align:left}
+.prow .pn{flex:none;min-width:58px;text-align:center}
+.prow .grow{flex:1;min-width:0;font-size:15px;line-height:1.3}
+.prow .grow small{display:block;color:var(--ink3);font-size:13px}
+.prow.cur{background:var(--us-soft)}
 .finalhead{text-align:center;padding:4px 16px 8px}
 .finalhead .fs{display:flex;justify-content:center;align-items:center;gap:18px;font-weight:800}
 .finalhead .fs div{text-align:center}
@@ -818,7 +819,7 @@ function describe(){
     if(!sq.length) return 'Tap the fielders in the order they handled it';
     const k={ground:'Ground out',fly:'Fly out',line:'Line out',pop:'Pop out',bunt:'Bunt out'}[P.kind];
     if(sq.length===1) return `${k} to ${WHERE[sq[0]]}`;
-    return `${k}, ${sq.map(n=>POSLONG[n].toLowerCase()).join(' to ')}`;
+    return `${k}, ${sq.map(n=>POSLONG[n].toLowerCase()).join(' to ')}${P.dp?', double play':''}${P.tp?', triple play':''}`;
   }
   if(HITS[r]) return ({'1B':'Single','2B':'Double','3B':'Triple','HR':'Home run'}[r]) + (P.locPos ? ` to ${WHERE[P.locPos]}` : '');
   if(r==='E') return P.err ? `Error on the ${POSLONG[P.err].toLowerCase()}`+(P.errType?` (${P.errType})`:'') : 'Tap the fielder who made the error';
@@ -1016,8 +1017,6 @@ SCREENS.roster = () => `<div class="screen">${nav(backBtn('teams','Teams'),'',`<
 
 SCREENS.player = () => {
   const p = findP(ui.player) || findP('kow'), s = p.song ? SONGS[p.song] : null;
-  const words = ['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty','twenty-one','twenty-two','twenty-three','twenty-four','twenty-five'];
-  const say = n => n<words.length ? words[n] : n>=40&&n<50 ? 'forty'+(n>40?'-'+words[n-40]:'') : n>=30&&n<40 ? 'thirty'+(n>30?'-'+words[n-30]:'') : String(n);
   return `<div class="screen">${nav(backBtn('roster','Cardinals'),'',`<button class="navbtn">Edit</button>`)}
   <div class="scroll">
     <div class="plhead"><div class="num lg">${p.n}</div><div><h1>${esc(p.name)}</h1><p>${POSLONG[p.pos]||'Bench'} · Bats ${p.bats} · Throws ${p.thr}</p></div></div>
@@ -1028,7 +1027,7 @@ SCREENS.player = () => {
       <div class="btnrow"><button class="btn sec2">${ic('play',18)} Preview</button><button class="btn sec2" data-a="sheet" data-v="songpick">Change song</button></div></div>
     <div class="sec">Announcer introduction</div>
     <div class="card cardpad">
-      <div class="script-q">“Now batting, number ${say(p.n)}, ${esc(p.name)}. Number ${say(p.n)}.”</div>
+      <div class="script-q">“Now batting, number ${sayNum(p.n)}, ${esc(p.name)}. Number ${sayNum(p.n)}.”</div>
       <div style="font-size:14px;color:var(--ink3);margin-bottom:10px">${p.intro==='rec'?'Recorded in your voice · 6 seconds · stadium echo on':p.intro==='voice'?'Using the iPhone voice, slowed to stadium pace':'Nothing yet. Until there is, the song plays alone.'}</div>
       <button class="btn rec" data-a="sheet" data-v="record">${ic('mic',20)} ${p.intro==='rec'?'Record again':'Record introduction'}</button>
       <div class="btnrow"><button class="btn sec2">${ic('play',18)} Listen</button><button class="btn sec2">${ic('folder',18)} Import</button></div>
@@ -1038,6 +1037,8 @@ SCREENS.player = () => {
     </div>
   </div></div>`;
 };
+// Jersey numbers in words, the way the announcer says them
+function sayNum(n){ const w=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen']; const t={2:'twenty',3:'thirty',4:'forty',5:'fifty',6:'sixty',7:'seventy',8:'eighty',9:'ninety'}; if(n<20) return w[n]; const d=Math.floor(n/10), u=n%10; return t[d]+(u?'-'+w[u]:''); }
 function fmtT(sec){ const m=Math.floor(sec/60), s=sec-m*60; return `${m}:${String(Math.floor(s)).padStart(2,'0')}`; }
 
 SCREENS.songs = () => {
@@ -1115,7 +1116,7 @@ SCREENS['pg-theirs'] = () => {
   if(m==='numbers') body = `<div class="card">${THEM.map((p,i)=>`<div class="lrow"><span class="ord">${i+1}</span><span class="grip">${ic('grip',20)}</span><div class="grow"><div class="t1">#${p.n}</div></div></div>`).join('')}</div>`;
   if(m==='unknown') body = `<div class="card"><div class="kv"><span class="k">How many hitters?</span><div class="stepper"><button data-a="theirN" data-v="-1">−</button><b>${ui.theirN}</b><button data-a="theirN" data-v="1">+</button></div></div></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${Array.from({length:ui.theirN},(_,i)=>`<span class="nchip">Batter ${i+1}</span>`).join('')}</div>
-    <div class="info">Each one gets a name or number when he comes up, so the order knows when to go back to the top.</div>`;
+    <div class="info">Each one gets a name or number when they come up, so the order knows when to go back to the top.</div>`;
   return `<div class="screen">${pgNav(3, backBtn('pg-ours','Back'), 'Mudcats lineup')}
   <div class="scroll pad"><div style="height:6px"></div>
     ${ch('names','Names and numbers','From the saved Mudcats roster')}${ch('numbers','Numbers only','Type the numbers in batting order')}${ch('unknown','Unknown','Fill them in as they come up')}
@@ -1173,7 +1174,7 @@ function batA(){
   <div class="band">
     <div class="band-row">
       <button class="icbtn" data-a="sheet" data-v="menu" aria-label="Game menu">${ic('menu')}</button>
-      <div class="band-title">${us?'Cardinals':'Mudcats'} batting</div>
+      <div class="band-title">${us?'Cardinals':'Mudcats'}<span> batting</span></div>
       <button class="bandbtn" data-a="sheet" data-v="subs" aria-label="Substitutions">${ic('swap',18)}Subs</button>
       <button class="bandbtn" data-go="overview">Game${ic('chevr',15)}</button>
     </div>
@@ -1216,7 +1217,7 @@ function batB(){
     <button class="bug-dia" data-a="runners" aria-label="Runners">${mini(S.bases)}${dots(S.outs,3)}</button>
     <div class="bug-count"><b>${S.b}–${S.s}</b><span>${S.outs} out${S.outs===1?'':'s'}</span></div>
   </div>
-  <button class="bug-pitch" data-a="sheet" data-v="pitch">${ic('ball',18)}<span class="grow">Pitching: <b>${esc(pit.name)} (${pit.hand})</b> · ${pit.p} pitches, ${pit.st} strikes</span>${ic('chevr',16)}</button>
+  <button class="bug-pitch" data-a="sheet" data-v="pitch">${ic('ball',18)}<span class="grow"><b>${esc(pit.name)} (${pit.hand})</b> pitching · ${pit.p} pitches, ${pit.st} strikes</span>${ic('chevr',16)}</button>
   ${S.banner?`<div style="position:relative;height:0">${bannerHTML().replace('class="cobanner"','class="cobanner" style="top:8px;left:12px;right:12px"')}</div>`:''}
   <button class="hero" data-a="sheet" data-v="batter"><div class="hl"><small>Now batting · ${us?'Cardinals':'Mudcats'}</small>
     <div class="hn"><em>${p.n}</em><b>${us?esc(p.name):(p.name?esc(p.name):'<span class="addname">Add name</span>')}</b></div>
@@ -1268,7 +1269,7 @@ SCREENS['play-fielders'] = () => {
   const proj = S.outs + 1 + (P.dp?1:0) + (P.tp?2:0);
   const runnersNext = needRunners();
   const kinds = r==='out' ? `<div class="kinds">${['ground','fly','line','pop','bunt'].map(k=>`<button class="chipbtn ${P.kind===k?(P.guessed&&seqOn?'guess':(P.guessed?'':'on')):''}" data-a="kind" data-v="${k}">${k==='pop'?'Pop-up':k[0].toUpperCase()+k.slice(1)}</button>`).join('')}
-    <span class="sep"></span><button class="chipbtn ${P.dp?'on':''}" data-a="dp" data-k="dp">Double play</button><button class="chipbtn ${P.tp?'on':''}" data-a="tp">Triple play</button></div>` : '';
+    <span style="flex-basis:100%;height:0"></span><button class="chipbtn ${P.dp?'on':''}" data-a="dp" data-k="dp">Double play</button><button class="chipbtn ${P.tp?'on':''}" data-a="tp">Triple play</button></div>` : '';
   return `<div class="screen">${flowHead(titles[r])}${ctxStrip(2,3)}${kinds}
   <div class="notebar"><div class="nt">${n?`<b>${esc(n)}</b>`:`<b class="ph">${esc(hint)}</b>`}<span>${seqOn?esc(describe())+(P.guessed&&r==='out'?' · kind guessed, tap to change':''):'&nbsp;'}</span></div>
     ${seqOn?`<button class="icbtn" data-a="untap" aria-label="Untap last fielder" style="background:var(--surface2)">${ic('undo',20)}</button>`:''}</div>
@@ -1298,7 +1299,7 @@ SCREENS['play-runners'] = () => {
     const key = isB ? 'batter' : x.p.id;
     return `<div class="rrow"><div class="rwho"><b>${esc(nm(x.p))}</b><small>${isB?'Batter':'Was on '+BASEN[x.from]}</small></div><div class="seg rseg">${opts.map(t=>`<button class="${x.to===t?'on':''} ${t==='out'?'o':''}" data-a="run" data-v="${i}:${t}" data-k="run-${key}-${t}">${t==='out'?'Out':t===4?'Home':BASEN[t]}${x.sugg===t?'<i class="sg"></i>':''}</button>`).join('')}</div></div>`;
   }).join('');
-  return `<div class="screen">${flowHead('Where did everyone end up?')}${ctxStrip(3,3)}
+  return `<div class="screen">${flowHead('Runners')}${ctxStrip(3,3)}
   <div class="runsum"><div class="nt"><b>${esc(notation())}</b><span>${outs} out${outs===1?'':'s'} and ${runs} run${runs===1?'':'s'} on the play${total>=3?' · <span class="inningover">Inning over</span>':''}</span></div>
     <div class="rbi">Runs batted in<div class="stepper"><button data-a="rbi" data-v="-1" aria-label="Fewer">−</button><b>${rbi}</b><button data-a="rbi" data-v="1" aria-label="More">+</button></div></div></div>
   <div class="runfield">${field({mode:'runners',out:o,team:batTeam(),fly:isFly})}</div>
@@ -1341,7 +1342,7 @@ SCREENS.overview = () => {
       ['▲ 3rd',[['','4-3','Hale grounded out','3 outs'],['','F7','Kim flied out to left','2 outs'],['','2B 9','Vega doubled to right','Grant scored · Cardinals 3, Mudcats 2'],['','K','Little struck out','1 out'],['','6-3','Grant grounded out… then E6 on the next play','']]],
       ['▼ 2nd',[['','6-4-3 DP','Brooks grounded into a double play','3 outs'],['','BB','Nakamura walked','']]],
     ];
-    body = items.map(([h,list])=>`<div class="ph"><span>${h}</span><span>${list.length} events</span></div><div class="card">${list.map(([c,n,t,s])=>`<button class="play ${c}" data-a="sheet" data-v="playedit"><span class="pn">${n?`<span class="nchip ${/^(1B|2B|3B|HR)/.test(n)?'hit':''}">${esc(n)}</span>`:''}</span><span class="grow">${esc(t)}${s?`<small>${esc(s)}</small>`:''}</span><span style="color:var(--ink3)">${ic('chevr',16)}</span></button>`).join('')}</div>`).join('')
+    body = items.map(([h,list])=>`<div class="ph"><span>${h}</span><span>${list.length} events</span></div><div class="card">${list.map(([c,n,t,s])=>`<button class="prow ${c}" data-a="sheet" data-v="playedit"><span class="pn">${n?`<span class="nchip ${/^(1B|2B|3B|HR)/.test(n)?'hit':''}">${esc(n)}</span>`:''}</span><span class="grow">${esc(t)}${s?`<small>${esc(s)}</small>`:''}</span><span style="color:var(--ink3)">${ic('chevr',16)}</span></button>`).join('')}</div>`).join('')
       + `<div style="font-size:13px;color:var(--ink3);margin:10px 4px">Newest first. Tap any play to fix it; everything after it recalculates.</div>`;
   }
   return `<div class="screen">${nav(`<button class="navbtn" data-go="bat">${ic('chevl',20)}At bat</button>`,'Cardinals 4, Mudcats 2<small>Bottom 3rd · live</small>','')}${tabs}<div class="scroll pad">${body}</div></div>`;
@@ -1452,7 +1453,7 @@ SHEETS.ph = () => {
   const p=batter(), us=batTeam()==='us';
   if(!us) return sheetWrap('Pinch hitter', `<div class="field-in"><label>New hitter’s number</label><input inputmode="numeric" placeholder="#"></div><div class="field-in"><label>Name (optional)</label><input></div>`, {foot:`<button class="btn pri" data-a="closeSheet">Bats for #${p.n}</button>`});
   const opt = (q,note) => `<button class="opt ${ui.phPick===q.id?'on':''}" data-a="phPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}${note?` <span class="tag re">${note}</span>`:''}</div><div class="t2">Bats ${q.bats} · ${q.song?'♪ '+esc(SONGS[q.song][0]):'no song'}</div></div><span class="radio">${ui.phPick===q.id?ic('check',16):''}</span></button>`;
-  return sheetWrap('Pinch hitter', `<div class="info">Batting for <b>${esc(p.name)}</b>, ${ord(S.idx.us%OURS.length+1)} in the order. ${esc(p.short)} leaves the game; our league lets him come back in later.</div>
+  return sheetWrap('Pinch hitter', `<div class="info">Batting for <b>${esc(p.name)}</b>, ${ord(S.idx.us%OURS.length+1)} in the order. ${esc(p.short)} leaves the game; our league lets them come back in later.</div>
     <div class="sec">Bench</div><div class="card">${BENCH.map(q=>opt(q)).join('')}</div>
     <div class="sec">Out of the game, can re-enter</div><div class="card"><div class="empty">Players taken out show up here.</div></div>`,
     {foot:`<button class="btn pri" data-a="doPH" ${ui.phPick?'':'disabled'}>${ui.phPick?esc(findP(ui.phPick).short)+' bats':'Pick a hitter'}</button>`});
@@ -1470,7 +1471,7 @@ SHEETS.nr = () => {
   const b=ui.nrBase, r=S.bases[b];
   if(!r) return sheetWrap('Runner for a non-runner', `<div class="empty">No designated non-runner is on base right now. This sheet opens by itself when one reaches.</div>`);
   const cands = [...BENCH.map(q=>[q,'Bench']), [OURS.find(q=>q.id==='fisch'),'Pitcher, made the last out'], ...OURS.filter(q=>!['fisch','sull'].includes(q.id) && ![1,2,3].some(i=>S.bases[i]&&S.bases[i].id===q.id) && q.id!==batter().id).slice(0,4).map(q=>[q,'In the lineup'])];
-  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. He stays in the batting order, and if his runner scores, the run is his.</div>
+  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. They stay in the batting order, and if their runner scores, the run is theirs.</div>
     <div class="card">${cands.map(([q,why])=>`<button class="opt ${ui.nrPick===q.id?'on':''}" data-a="nrPick" data-v="${q.id}" data-k="nr-${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${why}</div></div><span class="radio">${ui.nrPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>`,
     {foot:`<button class="btn pri" data-a="doNR" data-k="nr-ok" ${ui.nrPick?'':'disabled'}>${ui.nrPick?esc(findP(ui.nrPick).short)+' runs':'Pick a runner'}</button>`, modal:true, noCancel:true, sub:'Asked automatically'});
 };
@@ -1479,7 +1480,7 @@ SHEETS.add = () => {
   const opts=[...BENCH,{id:'new',n:'',name:'New player',short:'New player'}];
   return sheetWrap('Add a hitter', `<div class="card">${opts.map(q=>`<button class="opt ${ui.addPick===q.id?'on':''}" data-a="addPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n||ic('plus',18)}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${q.id==='new'?'Name and number':'Bench · bats '+q.bats}</div></div><span class="radio">${ui.addPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>
     <div class="sec">Position</div><div style="display:flex;flex-wrap:wrap;gap:6px">${['EH',1,2,3,4,5,6,7,8,9].map(p=>`<button class="chipbtn ${String(ui.addPos)===String(p)?'on':''}" data-a="addPos" data-v="${p}" style="min-width:52px;justify-content:center">${POSN[p]}</button>`).join('')}</div>
-    <div class="info">Bats <b>${ord(len+1)}</b>, after ${esc(OURS[len-1].short)}. ${batTeam()==='us'?`With ${esc(batter().short)} up now, he hits in <b>${until} batter${until===1?'':'s'}</b>.`:'He leads off the next time through if it gets there.'}</div>`,
+    <div class="info">Bats <b>${ord(len+1)}</b>, after ${esc(OURS[len-1].short)}. ${batTeam()==='us'?`With ${esc(batter().short)} up now, they hit in <b>${until} batter${until===1?'':'s'}</b>.`:'They lead off the next time through if it gets there.'}</div>`,
     {foot:`<button class="btn pri" data-a="doAdd">Add to the order</button>`});
 };
 function defaultDefense(){ const d={}; roster().forEach(p=>{ if(typeof p.pos==='number') d[p.pos]=p.id; }); return d; }
@@ -1519,7 +1520,7 @@ SHEETS.batter = () => {
 SHEETS.record = () => {
   const p=findP(ui.player)||findP('kow'), st=ui.rec;
   const bars=Array.from({length:44},(_,i)=>`<i style="height:${st==='idle'?6:10+Math.abs(Math.sin(i*1.7))*40}px"></i>`).join('');
-  return sheetWrap('Announcer introduction', `<div class="script-q" style="margin-top:0">“Now batting, number ${p.n}, ${esc(p.name)}. Number ${p.n}.”</div>
+  return sheetWrap('Announcer introduction', `<div class="script-q" style="margin-top:0">“Now batting, number ${sayNum(p.n)}, ${esc(p.name)}. Number ${sayNum(p.n)}.”</div>
     <div class="wave ${st==='rec'?'live':''}">${bars}</div>
     <div class="rectime" id="recT">0:0${Math.min(9,ui.recT)}</div>
     ${st==='done'?`<div class="btnrow"><button class="btn sec2">${ic('play',18)} Listen</button><button class="btn sec2" data-a="recRedo">Redo</button></div>`
@@ -1632,7 +1633,7 @@ ACT.doPitch = () => { const ft=fieldTeam(), id=ui.pitchPick; let name='New pitch
 ACT.phPick = v => ui.phPick=v;
 ACT.doPH = () => { const q=findP(ui.phPick), i=S.idx.us%OURS.length, old=OURS[i]; pushUndo('pinch hitter'); const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); BENCH.push(Object.assign(old,{pos:'BN'})); OURS[i]=Object.assign(q,{pos:old.pos==='BN'?'EH':old.pos}); sheet=null; ui.phPick=null; toast(`${q.short} bats for ${old.short}`); };
 ACT.prBase = v => ui.prBase=+v; ACT.prPick = v => ui.prPick=v;
-ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the order, the player he replaces leaves
+ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the order, the player they replace leaves
   const q=findP(ui.prPick), old=S.bases[ui.prBase]; pushUndo('pinch runner');
   const i=OURS.findIndex(x=>x.id===old.id); if(i>=0){ const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); const gone=OURS[i]; q.pos=gone.pos; OURS[i]=q; BENCH.push(Object.assign(gone,{pos:'BN'})); }
   S.bases[ui.prBase]=clone(q); sheet=null; ui.prPick=null; toast(`${q.short} pinch-runs for ${nm(old)}`); };
