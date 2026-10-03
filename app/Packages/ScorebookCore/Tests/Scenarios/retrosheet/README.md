@@ -24,9 +24,9 @@ The stats come from the official box score: each batter’s plate appearances (a
 
 A batter gets expected numbers only if they held a spot in the batting order, and a fielder only if they played a position, because those are the players our box score has lines for. A designated hitter has no fielding line, and a pitcher who did not bat has no batting line.
 
-## One known difference
+## A strikeout and a runner out on the same pitch
 
-In the Mets game, the Mets’ only double play is a strikeout and a pickoff on the same pitch (Retrosheet `K+PO1(23)/DP`). Our events record that as the strike-three pitch and then a pickoff, two separate events, and nothing in the vocabulary can mark them together as one double play. The official box says one double play, so the scenario expects one, and a box score built from these events will show none until the vocabulary can say so. Every other number in all three games matches the official box score when the converted events are tallied by a separate count that shares no code with the converter.
+In the Mets game, the Mets’ only double play is a strikeout and a pickoff on the same pitch (Retrosheet `K+PO1(23)/DP`). The converter writes the strike-three pitch and then the pickoff as two events, and marks the pickoff `completesStrikeoutDoublePlay`, which the box score counts as one double play, as the official box does. Every number in all three games matches the official box score, and a separate count that shares no code with the converter agrees.
 
 ## What the converter does not handle yet
 

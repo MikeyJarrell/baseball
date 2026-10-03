@@ -40,6 +40,10 @@ public struct Situation: Codable, Equatable, Sendable {
     /// on the next pitch, ball in play or intentional walk (they ran themselves), on a
     /// `runnerForNonRunner` event, or on a substitution that puts a pinch runner in for them.
     public var runnerChoice: RunnerChoice?
+    /// While the defense check is due: the defense the rules engine suggests for this
+    /// half-inning, with any fielding rotations in the setup applied for this inning
+    /// (`GameTeam.fieldingRotations`). The defense check starts from it. Missing at other times.
+    public var suggestedDefense: [FielderAssignment]?
     /// True right after a strike three that ended a plate appearance, until the next event.
     /// The batting screen offers the "dropped third strike" button.
     public var droppedThirdStrikePossible: Bool
@@ -111,7 +115,8 @@ public struct Situation: Codable, Equatable, Sendable {
         gameStartedAt: Date? = nil,
         currentInningStartedAt: Date? = nil,
         timeLimitEndsAt: Date? = nil,
-        scheduledInnings: Int = 9
+        scheduledInnings: Int = 9,
+        suggestedDefense: [FielderAssignment]? = nil
     ) {
         self.inning = inning
         self.half = half
@@ -136,6 +141,7 @@ public struct Situation: Codable, Equatable, Sendable {
         self.currentInningStartedAt = currentInningStartedAt
         self.timeLimitEndsAt = timeLimitEndsAt
         self.scheduledInnings = scheduledInnings
+        self.suggestedDefense = suggestedDefense
     }
 
     // MARK: Handy lookups (no baseball worked out here, only reading what is stored)

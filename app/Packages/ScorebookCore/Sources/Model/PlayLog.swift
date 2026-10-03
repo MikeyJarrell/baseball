@@ -40,6 +40,15 @@ public struct PlayLog: Codable, Equatable, Sendable {
         self.isFinal = isFinal
     }
 
+    /// True when the entry before `index` is a strikeout in the given half-inning: the only
+    /// place a runner action's `completesStrikeoutDoublePlay` counts. Used by the rules engine
+    /// (which flags the mark anywhere else) and by stats (which ignores it there).
+    public static func isStrikeoutJustBefore(_ index: Int, in entries: [PlayLogEntry], half: HalfInning, inning: Int) -> Bool {
+        guard index > 0, entries.indices.contains(index - 1) else { return false }
+        let previous = entries[index - 1]
+        return previous.plateAppearance?.outcome == .strikeout && previous.half == half && previous.inning == inning
+    }
+
     /// One team's final batting order, by side.
     public func battingOrder(_ side: TeamSide) -> BattingOrder {
         side == .away ? awayOrder : homeOrder
@@ -227,14 +236,24 @@ public struct PlateAppearanceResult: Codable, Equatable, Hashable, Sendable {
     /// True when the batter ended up safe on base or scored (a hit, a walk, an error,
     /// a dropped third strike).
     public var batterReachedBase: Bool
+    /// The batter the box score charges with this plate appearance, when it is not the one who
+    /// finished it. A pinch hitter who comes in with two strikes and strikes out: the strikeout
+    /// and the at-bat go to the batter they replaced (Official Baseball Rules 9.15(b)). Missing
+    /// almost always, meaning `batter`. The rules engine fills it in.
+    public var chargedBatter: PlayerID?
 
-    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0, batterReachedBase: Bool) {
+    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0,
+                batterReachedBase: Bool, chargedBatter: PlayerID? = nil) {
         self.batter = batter
         self.pitcher = pitcher
         self.outcome = outcome
         self.rbi = rbi
         self.batterReachedBase = batterReachedBase
+        self.chargedBatter = chargedBatter
     }
+
+    /// The batter whose line in the box score gets this plate appearance.
+    public var batterCharged: PlayerID { chargedBatter ?? batter }
 }
 
 /// The ways a plate appearance can end.
