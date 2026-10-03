@@ -75,8 +75,10 @@ struct LineupTests {
         let names = ["Alex Moreno", "Chris Tate", "Jordan Webb", "Pat Quinn", "Riley Shaw", "Casey Ford",
                      "Drew Lang", "Morgan Fisk", "Sky Barros", "Jamie Cole", "Robin Nash",
                      "Christopher Montgomery-Wallace", "Taylor Voss", "Batter 14"]
+        // The sample roster’s own ids, so each player is the same person everywhere in the box score.
+        let ids: [PlayerID] = ["d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "d10", "d11", "x12", "d12", "x14"]
         box.home.batting = names.enumerated().map { index, name in
-            BattingLine(player: PlayerID(rawValue: "x\(index)"), name: name, batterIndex: index,
+            BattingLine(player: ids[index], name: name, batterIndex: index,
                         positions: index < 9 ? [BoxPosition.allCases[index]] : [],
                         stats: BattingCounts(plateAppearances: 2, atBats: 2, runs: index % 2, hits: 1,
                                              runsBattedIn: index % 3 == 0 ? 1 : 0))
