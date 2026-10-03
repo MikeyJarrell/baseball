@@ -30,7 +30,9 @@ let package = Package(
         .target(name: "Model"),
 
         // Made-up teams, situations and one complete game, for building, previews and tests.
-        .target(name: "SampleData", dependencies: ["Model"]),
+        // It also hands screens the real rules engine for previews (`SampleRulesEngine`), so
+        // screens never import GameEngine themselves.
+        .target(name: "SampleData", dependencies: ["Model", "GameEngine"]),
 
         // The rules engine: events in, situation and play log out.
         .target(name: "GameEngine", dependencies: ["Model"]),

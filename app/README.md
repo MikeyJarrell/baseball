@@ -7,7 +7,7 @@ The iPhone scorebook. The plan is in [../plan/README.md](../plan/README.md); bui
 - `Scorebook.xcodeproj` and `Scorebook/`: the thin app shell (entry point, home screen, app icon, settings). Files added to `Scorebook/` join the app automatically.
 - `Packages/ScorebookCore/`: everything with no screen and no sound. Builds and tests on the Mac without Xcode.
   - `Sources/Model/`: the shared vocabulary (players, events, plays, the situation, the play log, box scores) and the service promises (`RulesEngine`, `StatsCalculator`, `ScorebookStorage`, `WalkUpAudioPlayer`) with stand-ins.
-  - `Sources/SampleData/`: made-up teams, songs, situations, one complete game with its play log and box score, and a canned rules engine for screens.
+  - `Sources/SampleData/`: made-up teams, songs, situations, one complete game with its play log and box score, and `SampleRulesEngine`, the real rules engine handed to screens for their previews.
   - `Sources/GameEngine/`, `Stats/`, `BoxScoreText/`, `Storage/`: one module per job.
   - `Tests/Scenarios/`: game situations with known right answers, as JSON. Its README explains the format.
   - `Tests/TestSupport/`: loads a scenario in one line and checks answers against it.

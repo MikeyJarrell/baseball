@@ -192,6 +192,9 @@ public struct GameTeam: Codable, Equatable, Sendable {
     public var teamID: TeamID
     /// "Mudcats".
     public var name: String
+    /// The short name for the scoreboard, copied from the saved team: "MUD". Missing means the
+    /// app makes one with `ShortTeamName.make(from:)`.
+    public var shortName: String?
     /// True for our team.
     public var isOurs: Bool
     /// Everyone at the field for this game, including players added during it.
@@ -223,7 +226,8 @@ public struct GameTeam: Codable, Equatable, Sendable {
         battingOrder: [PlayerID],
         defense: [FielderAssignment],
         designatedNonRunners: [PlayerID] = [],
-        fieldingRotations: [FieldingRotation] = []
+        fieldingRotations: [FieldingRotation] = [],
+        shortName: String? = nil
     ) {
         self.teamID = teamID
         self.name = name
@@ -233,16 +237,21 @@ public struct GameTeam: Codable, Equatable, Sendable {
         self.defense = defense
         self.designatedNonRunners = designatedNonRunners
         self.fieldingRotations = fieldingRotations
+        self.shortName = shortName
     }
+
+    /// The short name to show: the chosen one, or one made from the name.
+    public var displayShortName: String { shortName ?? ShortTeamName.make(from: name) }
 
     // Reading from JSON: `designatedNonRunners` may be left out and means none.
     private enum CodingKeys: String, CodingKey {
-        case teamID, name, isOurs, roster, battingOrder, defense, designatedNonRunners, fieldingRotations
+        case teamID, name, shortName, isOurs, roster, battingOrder, defense, designatedNonRunners, fieldingRotations
     }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         teamID = try c.decode(TeamID.self, forKey: .teamID)
         name = try c.decode(String.self, forKey: .name)
+        shortName = try c.decodeIfPresent(String.self, forKey: .shortName)
         isOurs = try c.decode(Bool.self, forKey: .isOurs)
         roster = try c.decode([Player].self, forKey: .roster)
         battingOrder = try c.decode([PlayerID].self, forKey: .battingOrder)
