@@ -38,7 +38,7 @@ public struct GameMenuSheet: View {
 
     public var body: some View {
         SheetFrame(title: "Game", onCancel: { onFinish(.cancel) }) {
-            Group {
+            VStack(alignment: .leading, spacing: 0) {
                 Card {
                     row(.adjustment, icon: "slider.horizontal.3", title: "Manual adjustment", detail: "Set outs, count, score or runners")
                     RowDivider()
@@ -88,25 +88,24 @@ public struct GameMenuSheet: View {
 
     /// The walk-up song length: how much song plays before it fades by itself.
     private func songLengthRow(_ seconds: Binding<Double>) -> some View {
-        HStack(spacing: Spacing.medium) {
-            IconBadge(systemName: "speaker.wave.2")
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Walk-up song length").font(ScorebookFont.headline)
-                Text("Fades by itself after the introduction and this much song")
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            HStack(spacing: Spacing.medium) {
+                IconBadge(systemName: "speaker.wave.2")
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Walk-up song length").font(ScorebookFont.headline)
+                    Text("Fades by itself after the introduction and this much song")
+                        .font(ScorebookFont.caption)
+                        .foregroundStyle(ScorebookColor.textSecondary)
+                }
             }
-            Spacer(minLength: 0)
             Stepper(value: seconds, in: 4...60, step: 1) {
-                Text("\(Int(seconds.wrappedValue)) s").font(ScorebookFont.headline).monospacedDigit()
+                Text("\(Int(seconds.wrappedValue)) seconds").font(ScorebookFont.headline).monospacedDigit()
             }
-            .fixedSize()
             .accessibilityLabel("Walk-up song length")
             .accessibilityValue("\(Int(seconds.wrappedValue)) seconds")
         }
         .padding(.horizontal, Spacing.large - 2)
-        .padding(.vertical, Spacing.small)
-        .frame(minHeight: 58)
+        .padding(.vertical, Spacing.small + 2)
     }
 
     /// "12:05 PM · 1 hr 12 min left".

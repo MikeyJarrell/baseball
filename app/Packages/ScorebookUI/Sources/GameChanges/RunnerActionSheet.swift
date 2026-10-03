@@ -52,7 +52,7 @@ public struct RunnerActionSheet: View {
 
     public var body: some View {
         SheetFrame(title: title, subtitle: "Between pitches", onCancel: { onFinish(.cancel) }) {
-            Group {
+            VStack(alignment: .leading, spacing: 0) {
             if context.situation.runners.isEmpty {
                 EmptyNote("Nobody is on base.")
             } else {

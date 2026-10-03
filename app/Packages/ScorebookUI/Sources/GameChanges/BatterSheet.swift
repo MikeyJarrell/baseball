@@ -62,7 +62,7 @@ public struct BatterSheet: View {
     public var body: some View {
         SheetFrame(title: isOurs ? context.name(playerID) : "\(context.teamName(side)) hitter",
                    subtitle: subtitle, onCancel: { onFinish(.cancel) }) {
-            Group {
+            VStack(alignment: .leading, spacing: 0) {
                 if player == nil {
                     EmptyNote("Nobody is at bat.")
                 } else {
