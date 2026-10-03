@@ -1,7 +1,8 @@
 // The app's button styles, plus the player-number badge and the team logo.
 //
 // Use a style as `.buttonStyle(CountButtonStyle.ball)` or
-// `.buttonStyle(CountButtonStyle(color: ScorebookColor.ball))`; both give the same button.
+// `.buttonStyle(CountButtonStyle(color: ScorebookColor.ball))`; both give the same button,
+// including for Strike, whose words are dark on its amber fill either way.
 // The looks match the approved mockups in plan/mockups/index.html.
 
 import SwiftUI
@@ -12,16 +13,18 @@ import UIKit
 /// button you can press, and it sinks slightly while pressed.
 ///
 /// The button fills whatever space its parent gives it (a 2×2 grid on the batting screen),
-/// but never shrinks below `Spacing.countButtonMinimumHeight`.
+/// but is never shorter than `Spacing.countButtonHeight` (84 points), even in a scroll view.
 public struct CountButtonStyle: ButtonStyle {
     /// The button's fill color, such as `ScorebookColor.ball`.
     public var color: Color
-    /// The color of the words on it: white, except black on the amber Strike button.
+    /// The color of the words on it: white, except dark on the amber Strike button.
     public var textColor: Color
 
-    public init(color: Color, textColor: Color = .white) {
+    /// - Parameter textColor: Leave it out for the usual choice: dark words on
+    ///   `ScorebookColor.strike`, white on every other fill.
+    public init(color: Color, textColor: Color? = nil) {
         self.color = color
-        self.textColor = textColor
+        self.textColor = textColor ?? (color == ScorebookColor.strike ? ScorebookColor.onStrike : .white)
     }
 
     /// The four count buttons, ready to use.
@@ -36,8 +39,9 @@ public struct CountButtonStyle: ButtonStyle {
             .font(ScorebookFont.countButton)
             .foregroundStyle(textColor)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .frame(minHeight: Spacing.countButtonMinimumHeight)
-            // The fill, with a dark strip along the bottom drawn as an inner shadow.
+            .frame(minHeight: Spacing.countButtonHeight)
+            // The fill, with a dark strip along the bottom edge: a shadow drawn inside the
+            // button, so it looks like a key you can press.
             .background(shape.fill(color.shadow(.inner(color: .black.opacity(0.18), radius: 0, x: 0, y: -4))))
             .contentShape(shape)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)

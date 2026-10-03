@@ -34,8 +34,13 @@ public enum ScorebookFont {
     public static let countButton = Font.system(.title, design: .default, weight: .heavy)
     /// The small line under a count button's word, saying what it will do ("makes it 2–1").
     public static let countButtonHint = Font.system(.footnote, design: .default, weight: .semibold)
-    /// Scorebook notation ("6-3", "1B 7") in chips and lists, with same-width digits.
+    /// Scorebook notation ("6-3", "1B 7") in chips and lists. Only the digits are the same
+    /// width; letters are not, so "BB" and "F8" do not line up in columns. For columns, use
+    /// `notationColumns`.
     public static let notation = Font.system(.body, design: .default, weight: .bold).monospacedDigit()
+    /// Scorebook notation where every character is the same width, for lining up in columns
+    /// (the box score so far, the play-by-play).
+    public static let notationColumns = Font.system(.body, design: .monospaced, weight: .bold)
     /// The notation building up on the in-play screens, big enough to read at arm's length.
     public static let notationLarge = Font.system(.largeTitle, design: .default, weight: .heavy).monospacedDigit()
 
@@ -69,7 +74,8 @@ public enum Spacing {
 
     /// How tall a count button is on a full-size phone.
     public static let countButtonHeight: CGFloat = 84
-    /// The least a count button may shrink to on a short screen.
+    /// A smaller count button height, for a compact layout a screen builds itself.
+    /// `CountButtonStyle` never goes below `countButtonHeight`.
     public static let countButtonMinimumHeight: CGFloat = 64
     /// The song button along the bottom edge of the batting screen.
     public static let songButtonHeight: CGFloat = 64

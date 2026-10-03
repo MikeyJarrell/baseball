@@ -25,13 +25,13 @@ Every color has a light and a dark value. Light mode is the outdoor default and 
 ## Type and spacing (`Typography.swift`)
 
 - **Fonts:** San Francisco throughout and New York (the system serif) for the newspaper, both built into iOS. Every style follows the phone’s text size setting. Scoreboard numbers and notation use same-width digits so a changing count does not jiggle.
-- **New text styles:** `scoreboardSmall`, `largeTitle`, `batterName`, `chip`, `sectionLabel`, `countButtonHint`, `notationLarge`, `newspaperHeadline`, `newspaperHeading`, `newspaperBody`.
-- **Changed text style:** `notation` is now bold San Francisco with same-width digits, matching the mockups, where the stub had a typewriter-style font.
-- **New spacing values:** `bigButtonCornerRadius` (18), `screenEdge` (12), `countButtonHeight` (84), `countButtonMinimumHeight` (64), `songButtonHeight` (64), `primaryButtonHeight` (56).
+- **New text styles:** `scoreboardSmall`, `largeTitle`, `batterName`, `chip`, `sectionLabel`, `countButtonHint`, `notationLarge`, `notationColumns`, `newspaperHeadline`, `newspaperHeading`, `newspaperBody`.
+- **Changed text style:** `notation` is now bold San Francisco, matching the mockups, where the stub had a typewriter-style font. Only its digits are the same width; letters are not, so “BB” and “F8” do not line up in a column. For columns (the box score so far, the play-by-play, the box score printer), use the new `notationColumns`, where every character is the same width.
+- **New spacing values:** `bigButtonCornerRadius` (18), `screenEdge` (12), `countButtonHeight` (84), `countButtonMinimumHeight` (64, for a compact layout a screen builds itself; the count-button style never goes below 84), `songButtonHeight` (64), `primaryButtonHeight` (56).
 
 ## Buttons and pieces (`Buttons.swift`)
 
-- **`CountButtonStyle`.** `CountButtonStyle(color:)` still works, with an optional `textColor`. Ready-made versions: `CountButtonStyle.ball`, `.strike` (black text), `.foul`, `.inPlay`. Each fills the space its parent gives it, has a darker strip along its bottom edge, and sinks slightly when pressed.
+- **`CountButtonStyle`.** `CountButtonStyle(color:)` still works, with an optional `textColor`. Left out, the words are dark on `ScorebookColor.strike` (which is now amber, where the stub’s was red) and white on every other fill, so `CountButtonStyle(color: ScorebookColor.strike)` and `CountButtonStyle.strike` give the same readable button. Ready-made versions: `CountButtonStyle.ball`, `.strike`, `.foul`, `.inPlay`. Each fills the space its parent gives it but is never shorter than 84 points (`Spacing.countButtonHeight`), has a darker strip along its bottom edge, and sinks slightly when pressed. Anyone drawing a strike symbol in `ScorebookColor.strike` on white should use `onStrike` text on an amber fill instead, since amber text on white is hard to read.
 - **`CountButtonLabel("Ball", hint: "makes it 2–1")`.** The two-line label from the mockup; each line stays on one line and its words shrink to fit.
 - **`PlainActionButtonStyle`.** Now the gray chip from the mockup: Undo, HBP, IBB, Foul tip, Subs, menu items.
 - **New styles:**
@@ -49,15 +49,19 @@ Every color has a light and a dark value. Light mode is the outdoor default and 
 **What it draws:**
 
 - grass, dirt and foul lines;
-- lit bases in the batting team’s color;
+- the bases: an empty base is an outline only, and an occupied base is filled in the batting team’s color with a thick dark outline (white in dark mode). Every base outline is at least 5.5 to 1 against the dirt behind it in light mode and 6.5 to 1 in dark mode, so occupied and empty differ by fill as well as color in sun. On the runner step, the base where each runner ends up safely lights by itself;
 - the nine fielders as tappable numbered circles; a tapped fielder turns blue with an amber order badge;
 - dashed blue throw arrows between tapped fielders;
-- runner markers with solid arrows round the base paths, or a red dashed path and a red cross at the base where a runner was put out;
+- runner markers with solid arrows round the base paths, or a red dashed path and a red cross at the base where a runner was put out. A runner put out with no base recorded (the batter on a fly out) gets no path and no cross: the “out” tag sits at the base they started from, home for the batter, as in the mockup. `endBase` itself is unchanged;
 - a tappable name tag for each runner.
 
 Two tags ending on the same base (two runners scoring) sit side by side, so each can be tapped; a tag hands back `.runner(id)`. Every tap target is at least 44 points, and every tappable part is a real button VoiceOver can reach. With no `onTap`, the drawing only shows.
 
-**Options added as modifier-style methods,** so no existing call changes:
+**Hit locations:** only a tap in fair territory on the whole field, between the foul lines and inside the fence, hands back `.spot`. Taps behind home, in foul ground or past the fence give nothing, and the batting screen’s infield view never gives a `.spot`, so tapping its grass does nothing.
+
+**Text in the drawing** (fielder numbers and names, runner tags) is sized to the drawing, and grows and shrinks with it, not with the phone’s text size setting; the largest-text preview looks the same as the ordinary one. Every tag and fielder has a VoiceOver label.
+
+**Options added as methods you add on the end,** the way SwiftUI’s own `.padding()` works, so no existing call changes:
 
 - `.zoom(.infield)`: the batting screen’s larger infield-only view, with no fielders.
 - `.showsFielders(_:)`.
@@ -82,11 +86,16 @@ Every file has previews in light and dark mode and at the largest accessibility 
   - bases loaded on the batting screen, ours in light and theirs in dark;
   - runner outcomes: a single with the runner from second scoring, the 5-4-3 double play with both runners out, and two runners scoring on a hit (dark);
   - an error by the shortstop, and where a single landed;
+  - a fly out to center with the runner holding at second (rendered for checking; see Evidence);
   - the largest text size.
 
 ## Not done
 
 - **The newspaper box score picture** belongs to the box score printer. The fonts and colors it needs are here (`newspaper*`, `TeamLogo.image`), and the approved layout is the end-of-game screen in the mockups.
+
+## The field drawing’s baseball logic, and its tests
+
+The baseball decisions behind the drawing are plain functions in `FieldLogic.swift`, separate from the drawing: which bases light, where a runner’s tag goes, which bases an arrow passes through, whether to draw an out cross, and whether a tap counts as a hit location. ScorebookUI has no test target, and adding one means editing `Package.swift`, which this job does not own. Six tests for these functions, and for the Strike button’s words, are ready in `plan/handoffs/design-and-mockups-field-logic-tests.swift`: the fly-out batter tagged at home with no path or cross, the 5-4-3 double play, a single with the runner from second scoring, a runner who stays put, fair and foul hit locations, and dark words on Strike. They passed in a scratch package outside the repository that imported the design system. When the lead builder adds a ScorebookUI test target, move that file into it.
 
 ## Vocabulary requests
 
@@ -134,3 +143,5 @@ Xcode turns the 1024-pixel picture into every size the phone needs.
 - `xcodebuild -scheme ScorebookUI-Package -destination 'platform=iOS Simulator,name=iPhone 17' build` in `app/Packages/ScorebookUI`: succeeded with no warnings.
 - `xcodebuild -project Scorebook.xcodeproj -scheme Scorebook -destination 'platform=iOS Simulator,name=iPhone 17' build` in `app`: succeeded.
 - The views were rendered to pictures on the iPhone 17 simulator and checked by eye in light, dark and the largest text size: the field drawing’s 6-3, 5-4-3, bases loaded, runner outcomes, error and hit location, and the buttons. The rendering harness was a throwaway package outside the repository; the same views are the previews in each file.
+
+- After the review (`feedback/ai/design-system-review.md`): the six field-logic tests passed, and the field drawing was rendered again on the simulator to check the new bases, the lit bases on the runner step, the fly-out tag at home and the home tag clear of the catcher.

@@ -5,8 +5,10 @@
 //
 // The interface (what the drawing is given, what it hands back) is the contract the
 // foundation job wrote: `FieldTap`, `FieldRunnerMarker`, and `FieldDrawing`'s initializer and
-// properties. Extra options are added as modifier-style methods at the bottom of
-// `FieldDrawing` (`.zoom(_:)`, `.battingTeam(_:)` and so on), so existing calls never change.
+// properties. Extra options are methods you add on the end, the way SwiftUI's own `.padding()`
+// works: `FieldDrawing(...).zoom(.infield).battingTeam(.ours)`. Each returns a changed copy, so
+// existing calls never change. The baseball decisions (which bases light, where tags go) are
+// in FieldLogic.swift.
 //
 // How the drawing is laid out: everything is placed in "drawing units", a 320 by 322 square
 // with home plate near the bottom middle, the same layout as the approved mockup. The view
@@ -187,7 +189,7 @@ public struct FieldDrawing: View {
             Path { p in
                 p.move(to: map.point(Layout.home))
                 p.addLine(to: map.point(Layout.leftFoulPole))
-                p.addQuadCurve(to: map.point(Layout.rightFoulPole), control: map.point(CGPoint(x: 160, y: -92)))
+                p.addQuadCurve(to: map.point(Layout.rightFoulPole), control: map.point(Layout.fenceControl))
                 p.closeSubpath()
             }
             .fill(ScorebookColor.fieldGrass)
@@ -223,8 +225,8 @@ public struct FieldDrawing: View {
         }
         .contentShape(Rectangle())
         .gesture(SpatialTapGesture().onEnded { tap in
-            guard let onTap else { return }
-            let spot = Layout.fieldPoint(map.unit(tap.location))
+            // Only a tap in fair territory on the whole field counts as where a hit landed.
+            guard let onTap, let spot = FieldLogic.hitSpot(forTapAt: map.unit(tap.location), zoom: zoomLevel) else { return }
             onTap(.spot(spot, nearest: FieldDrawing.nearestPosition(to: spot)))
         })
         .accessibilityHidden(true)
@@ -234,7 +236,7 @@ public struct FieldDrawing: View {
 
     /// The three bases and home plate. A lit base takes the batting team's color.
     private func bases(_ map: Mapper) -> some View {
-        let lit = occupiedBases.union(runnersOnBases.keys)
+        let lit = FieldLogic.litBases(occupied: occupiedBases, baseRunners: runnersOnBases, markers: runnerMarkers)
         let side = 16 * map.scale
         return ZStack(alignment: .topLeading) {
             // Home plate, drawn as the five-sided plate.
@@ -251,8 +253,11 @@ public struct FieldDrawing: View {
                 let isLit = lit.contains(base)
                 let square = RoundedRectangle(cornerRadius: 2 * map.scale)
                 Button { onTap?(.base(base)) } label: {
-                    square.fill(isLit ? runnerFill : ScorebookColor.baseEmpty)
-                        .overlay(square.stroke(isLit ? Color.black : ScorebookColor.fieldOutline, lineWidth: isLit ? 2.5 : 1.5))
+                    // An occupied base is filled in the batting team's color with a thick dark
+                    // outline; an empty base is only an outline, so the two differ in sun.
+                    square.fill(isLit ? runnerFill : Color.clear)
+                        .overlay(square.stroke(isLit ? ScorebookColor.baseOccupiedOutline : ScorebookColor.baseEmptyOutline,
+                                               lineWidth: isLit ? max(2.5, 3.5 * map.scale) : max(1.5, 2 * map.scale)))
                         .frame(width: side, height: side)
                         .rotationEffect(.degrees(45))
                         .frame(width: max(Spacing.minimumTapSize, side * 2), height: max(Spacing.minimumTapSize, side * 2))
@@ -343,14 +348,16 @@ public struct FieldDrawing: View {
     private func runnerPaths(_ map: Mapper) -> some View {
         ZStack {
             ForEach(runnerMarkers) { marker in
-                let points = Layout.pathAroundBases(from: marker.from.order, to: marker.endOrder)
+                let points = FieldLogic.pathOrders(for: marker).map(Layout.base(order:))
                 if marker.to == .out {
                     if points.count > 1 {
                         Path { p in p.addLines(points.map(map.point)) }
                             .stroke(ScorebookColor.out, style: StrokeStyle(lineWidth: max(2, 4 * map.scale), lineCap: .round, dash: [3 * map.scale, 7 * map.scale]))
                     }
-                    OutCross(center: map.point(Layout.base(marker.endBase)), size: 9 * map.scale)
-                        .stroke(ScorebookColor.out, style: StrokeStyle(lineWidth: max(2.5, 4 * map.scale), lineCap: .round))
+                    if FieldLogic.outAtKnownBase(marker) {
+                        OutCross(center: map.point(Layout.base(marker.endBase)), size: 9 * map.scale)
+                            .stroke(ScorebookColor.out, style: StrokeStyle(lineWidth: max(2.5, 4 * map.scale), lineCap: .round))
+                    }
                 } else if points.count > 1 {
                     Path { p in p.addLines(points.map(map.point)) }
                         .stroke(runnerFill, style: StrokeStyle(lineWidth: max(2.5, 5 * map.scale), lineCap: .round, lineJoin: .round))
@@ -368,7 +375,7 @@ public struct FieldDrawing: View {
     private func runnerTags(_ map: Mapper) -> some View {
         // Every tag to draw: who, what it says, where, and whether it is a runner put out.
         let tags: [(id: PlayerID, label: String, base: Base, isOut: Bool)] =
-            runnerMarkers.map { ($0.runner, $0.to == .out ? "\($0.label) out" : $0.label, $0.endBase, $0.to == .out) }
+            runnerMarkers.map { ($0.runner, $0.to == .out ? "\($0.label) out" : $0.label, FieldLogic.tagBase(for: $0), $0.to == .out) }
             + runnersOnBases.sorted { $0.key.order < $1.key.order }.map { ($0.value.runner, $0.value.label, $0.key, false) }
         let fontSize = max(12, 14 * map.scale)
         return ZStack(alignment: .topLeading) {
@@ -498,6 +505,8 @@ enum Layout {
     static let mound = CGPoint(x: 160, y: 207)
     static let leftFoulPole = CGPoint(x: 10, y: 126)
     static let rightFoulPole = CGPoint(x: 310, y: 126)
+    /// The point that bends the outfield fence into its curve between the two foul poles.
+    static let fenceControl = CGPoint(x: 160, y: -92)
 
     /// The part of the drawing shown for each zoom level.
     static let wholeFieldArea = CGRect(x: 0, y: 0, width: 320, height: 322)
@@ -529,23 +538,21 @@ enum Layout {
     }
 
     /// Where a runner's name tag sits for each base: beside it, out of the base paths' way.
-    /// With the fielders drawn, the tag for second sits higher, above the shortstop and second baseman.
+    /// With the fielders drawn, the tag for second sits higher, above the shortstop and second
+    /// baseman, and the tag for home sits in front of the plate, clear of the catcher.
     static func tagSpot(_ base: Base, fieldersShown: Bool = false) -> CGPoint {
         switch base {
         case .first: CGPoint(x: 244, y: 240)
         case .second: CGPoint(x: 160, y: fieldersShown ? 94 : 110)
         case .third: CGPoint(x: 76, y: 240)
-        case .home: CGPoint(x: 160, y: 297)
+        // With the fielders drawn, the catcher stands behind the plate, so the tag sits in front of it.
+        case .home: CGPoint(x: 160, y: fieldersShown ? 252 : 297)
         }
     }
 
-    /// The corners of a runner's path, base by base: from second (2) to scoring (4) passes
-    /// third. Base number 4 means home plate again.
-    static func pathAroundBases(from start: Int, to end: Int) -> [CGPoint] {
-        guard end > start else { return [] }
-        return (start...end).map { order in
-            base(Base.allCases.first { $0.order == order % 4 } ?? .home)
-        }
+    /// A base by how far round it is from home: 0 and 4 are home plate, 1 first, 2 second, 3 third.
+    static func base(order: Int) -> CGPoint {
+        base(Base.allCases.first { $0.order == order % 4 } ?? .home)
     }
 
     /// A line from one spot to another, shortened at both ends so it starts and stops at the
@@ -561,7 +568,7 @@ enum Layout {
     /// A drawing-unit point as a field point: 0 to 1 across from the left-field side, and
     /// 0 at home plate to 1 at the deepest part of center field.
     static func fieldPoint(_ p: CGPoint) -> FieldPoint {
-        FieldPoint(x: Double(p.x / 320), y: Double((home.y - p.y) / (home.y - 20)))
+        FieldPoint(x: Double(min(1, max(0, p.x / 320))), y: Double(min(1, max(0, (home.y - p.y) / (home.y - 20)))))
     }
 
     /// The reverse: a field point as a drawing-unit point.
@@ -570,8 +577,8 @@ enum Layout {
     }
 }
 
-/// Turns drawing units into points on screen for a given view size, keeping the drawing's
-/// shape and centering it.
+/// The mapper: turns drawing units into points on screen for a given view size, keeping the
+/// drawing's shape and centering it.
 struct Mapper {
     let area: CGRect
     let size: CGSize
