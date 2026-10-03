@@ -6,6 +6,7 @@ Builders may not edit `Model/` or `SampleData/`. They write requests in their ha
 
 - **Box score printer:** print the new box score data: the winning and losing pitcher on their pitching lines, “HBP—by Reyes (Ford)” from `notes.hitBatters`, “Webb ran for Quinn in the 3rd.” from `notes.ranForNonRunners`, “T—3:12” from `gameLength`, and pinch-hitter footnotes (“a-popped out for Collins in the 4th”) from each substitute’s `BattingLine.entered`. The data is in `BoxScore`; the printer does not print it yet. Won-lost records and saves are not kept.
 - **In-play sequence:** delete `DemoRulesEngine.swift` and point `PlayEntryRules.demo` at `SampleRulesEngine`, which is now the real rules engine; take the batted-ball default from `RulesEngine.suggestedBattedBall(for:)`.
+- **In-game changes:** the runner-action sheet must offer “same pitch as the strikeout” (sets `RunnerAction.completesStrikeoutDoublePlay`, for a runner thrown out stealing or picked off on strike three) and “picked off while stealing” (sets `RunnerMove.wasStealing` on a pickoff). Without them real games undercount double plays and caught stealing. The rules engine accepts the double-play mark only on a runner action right after a strikeout in the same half-inning; anywhere else it is ignored and the event is flagged for review.
 - **Batting screen:** take the count hints from `RulesEngine.countAfter(_:in:)`, the song countdown from `WalkUpAudioPlayer.playback.fadesAt`, and short team names from `Team.displayShortName` and `GameTeam.displayShortName`.
 
 ## Done

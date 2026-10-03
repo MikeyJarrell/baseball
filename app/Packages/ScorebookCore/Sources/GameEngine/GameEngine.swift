@@ -55,8 +55,6 @@ public struct ScorebookRulesEngine: RulesEngine {
         GameEndRules.clock(for: situation, at: now)
     }
 
-    /// Scorebook notation for one event. Lineup changes name players by id here, since the
-    /// situation carries no names; the play log from `replay` uses their last names.
     /// One outfielder alone is a fly ball, a throw is a ground ball, a sacrifice fly a fly ball
     /// and a sacrifice bunt a bunt; anything else is left for the scorer.
     public func suggestedBattedBall(for draft: PlayDraft) -> BattedBallType? {
@@ -71,6 +69,8 @@ public struct ScorebookRulesEngine: RulesEngine {
         return nil
     }
 
+    /// Scorebook notation for one event. Lineup changes name players by id here, since the
+    /// situation carries no names; the play log from `replay` uses their last names.
     public func notation(for event: GameEvent, in situation: Situation) -> String {
         Notation.event(event, before: situation, name: { $0.rawValue })
     }

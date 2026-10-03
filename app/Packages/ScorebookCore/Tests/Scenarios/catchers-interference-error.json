@@ -1,5 +1,5 @@
 {
-  "description": "Ortiz and then Ruiz reach on catcher's interference. Official scoring charges the catcher with an error each time (Official Baseball Rules 9.12(a)(3)): the first play lists no error and the rules engine charges it by itself; the second lists the catcher's error, which is counted once. Neither is an at-bat.",
+  "description": "Ortiz and then Ruiz reach on catcher's interference. Official scoring charges the catcher with an error each time (Official Baseball Rules 9.12(c)): the first play lists no error and the rules engine charges it by itself; the second lists the catcher's error, which is counted once. Neither is an at-bat.",
   "setupFile": "standard",
   "events": [
     {

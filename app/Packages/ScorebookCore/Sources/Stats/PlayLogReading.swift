@@ -133,11 +133,8 @@ extension PlayLogEntry {
     /// automatic out is never part of one.
     var multiOutTurned: MultiOutPlay? {
         if case .automaticOut = event.kind { return nil }
-        // A runner put out on the same pitch as the strikeout before: the strikeout is the
-        // first out of the double play.
-        if case .runnerAction(let action) = event.kind, action.completesStrikeoutDoublePlay, !outs.isEmpty {
-            return outs.count >= 2 ? .triplePlay : .doublePlay
-        }
+        // A runner put out on the same pitch as the strikeout before is counted by the box
+        // score builder, which can see the entry before (`strikeoutDoublePlay`).
         if markedMultiOut == .triplePlay || outs.count >= 3 { return .triplePlay }
         if markedMultiOut == .doublePlay || outs.count == 2 { return .doublePlay }
         return nil

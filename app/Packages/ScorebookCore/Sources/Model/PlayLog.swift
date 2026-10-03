@@ -40,6 +40,15 @@ public struct PlayLog: Codable, Equatable, Sendable {
         self.isFinal = isFinal
     }
 
+    /// True when the entry before `index` is a strikeout in the given half-inning: the only
+    /// place a runner action's `completesStrikeoutDoublePlay` counts. Used by the rules engine
+    /// (which flags the mark anywhere else) and by stats (which ignores it there).
+    public static func isStrikeoutJustBefore(_ index: Int, in entries: [PlayLogEntry], half: HalfInning, inning: Int) -> Bool {
+        guard index > 0, entries.indices.contains(index - 1) else { return false }
+        let previous = entries[index - 1]
+        return previous.plateAppearance?.outcome == .strikeout && previous.half == half && previous.inning == inning
+    }
+
     /// One team's final batting order, by side.
     public func battingOrder(_ side: TeamSide) -> BattingOrder {
         side == .away ? awayOrder : homeOrder
