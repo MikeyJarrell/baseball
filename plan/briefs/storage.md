@@ -16,6 +16,7 @@ The real version of the storage interface in `Model/`, saving JSON files in a fo
 teams/<team id>.json
 games/<game id>.json        setup and every event
 songs/library.json          song names, start points, file names
+settings.json               app settings, such as fading the song on the first pitch
 songs/audio/                the audio files themselves (written by the audio builder’s import)
 backups/
 ```

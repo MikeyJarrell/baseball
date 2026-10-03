@@ -1,0 +1,411 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9BDF2142D95EF1164D12F0BA /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = CC89CC60197ABE4B8DAA1F0A /* Model */; };
+		67F48B20D992E7CC21640133 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 8CB2AC0EEEBAB22A22251243 /* SampleData */; };
+		E6B2682416F97A324CEF719D /* GameEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 622CB478C0FD8441CA74378B /* GameEngine */; };
+		6CF67A8F9864168243E880CB /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 328DC2C6A5667AE3C2898FEB /* Stats */; };
+		9E6ED0139D2AA734F660E7E6 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */; };
+		7AC57166B0081561163F49B8 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 662BE0BD463F7EAF3EB7635F /* Storage */; };
+		92D7AC0E8D896641D9F5CBBE /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 223BD1BB5891A21BF2DA2BF7 /* DesignSystem */; };
+		8FED08182EE376D3A709949B /* WalkUpAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B7B376ED18E0447125424568 /* WalkUpAudio */; };
+		DC048E4653BD05939F11935C /* BoxScorePicture in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */; };
+		373B0E68AC5FBF13CE44F5C0 /* TeamScreens in Frameworks */ = {isa = PBXBuildFile; productRef = 44C43781EE93736D19D97407 /* TeamScreens */; };
+		140548D1B3290A4BB4FB3C14 /* PregameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = E005FA8C0AF41DB2945D4130 /* PregameScreens */; };
+		E31E8E6A35117BC91BFF048F /* AtBatScreen in Frameworks */ = {isa = PBXBuildFile; productRef = 3738290C16A704D6D03AA7DA /* AtBatScreen */; };
+		2B70A26A9038151A6F062F0E /* PlayEntry in Frameworks */ = {isa = PBXBuildFile; productRef = 760347CAC3A9DEAA351E9E3E /* PlayEntry */; };
+		66F6F025F23E59807C51B867 /* GameChanges in Frameworks */ = {isa = PBXBuildFile; productRef = D584782B09732B49596F2964 /* GameChanges */; };
+		AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */ = {isa = PBXBuildFile; productRef = C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */; };
+		928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = F1776B435852E7A7A42C154E /* PostgameScreens */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		7F6D01D6546BCD07518D8398 /* Scorebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scorebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		74C61EEF9C048939045A3EDA /* Scorebook */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Scorebook;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		059DB2086B49B680F85B3555 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9BDF2142D95EF1164D12F0BA /* Model in Frameworks */,
+				67F48B20D992E7CC21640133 /* SampleData in Frameworks */,
+				E6B2682416F97A324CEF719D /* GameEngine in Frameworks */,
+				6CF67A8F9864168243E880CB /* Stats in Frameworks */,
+				9E6ED0139D2AA734F660E7E6 /* BoxScoreText in Frameworks */,
+				7AC57166B0081561163F49B8 /* Storage in Frameworks */,
+				92D7AC0E8D896641D9F5CBBE /* DesignSystem in Frameworks */,
+				8FED08182EE376D3A709949B /* WalkUpAudio in Frameworks */,
+				DC048E4653BD05939F11935C /* BoxScorePicture in Frameworks */,
+				373B0E68AC5FBF13CE44F5C0 /* TeamScreens in Frameworks */,
+				140548D1B3290A4BB4FB3C14 /* PregameScreens in Frameworks */,
+				E31E8E6A35117BC91BFF048F /* AtBatScreen in Frameworks */,
+				2B70A26A9038151A6F062F0E /* PlayEntry in Frameworks */,
+				66F6F025F23E59807C51B867 /* GameChanges in Frameworks */,
+				AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */,
+				928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				74C61EEF9C048939045A3EDA /* Scorebook */,
+				0A2C978E52A76F0AA9F68BB5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		0A2C978E52A76F0AA9F68BB5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7F6D01D6546BCD07518D8398 /* Scorebook.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		42AEFBAE01D2DFD981F7DA7D /* Scorebook */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D2F3F0C466A0EC0B2062AA7 /* Build configuration list for PBXNativeTarget "Scorebook" */;
+			buildPhases = (
+				FCA229C23F166EBB0BA5029E /* Sources */,
+				059DB2086B49B680F85B3555 /* Frameworks */,
+				B9C6EB6F79FC54535ACB3053 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				74C61EEF9C048939045A3EDA /* Scorebook */,
+			);
+			name = Scorebook;
+			packageProductDependencies = (
+				CC89CC60197ABE4B8DAA1F0A /* Model */,
+				8CB2AC0EEEBAB22A22251243 /* SampleData */,
+				622CB478C0FD8441CA74378B /* GameEngine */,
+				328DC2C6A5667AE3C2898FEB /* Stats */,
+				5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */,
+				662BE0BD463F7EAF3EB7635F /* Storage */,
+				223BD1BB5891A21BF2DA2BF7 /* DesignSystem */,
+				B7B376ED18E0447125424568 /* WalkUpAudio */,
+				D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */,
+				44C43781EE93736D19D97407 /* TeamScreens */,
+				E005FA8C0AF41DB2945D4130 /* PregameScreens */,
+				3738290C16A704D6D03AA7DA /* AtBatScreen */,
+				760347CAC3A9DEAA351E9E3E /* PlayEntry */,
+				D584782B09732B49596F2964 /* GameChanges */,
+				C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */,
+				F1776B435852E7A7A42C154E /* PostgameScreens */,
+			);
+			productName = Scorebook;
+			productReference = 7F6D01D6546BCD07518D8398 /* Scorebook.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		46F86FAA6BBF9AC94A7E4595 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					42AEFBAE01D2DFD981F7DA7D = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = CDC8A1029C4F3E06784CCFF1 /* Build configuration list for PBXProject "Scorebook" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2B731CEFC6751AAE0EC69B98;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */,
+				D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 0A2C978E52A76F0AA9F68BB5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				42AEFBAE01D2DFD981F7DA7D /* Scorebook */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B9C6EB6F79FC54535ACB3053 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		FCA229C23F166EBB0BA5029E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F25EF7827B5210B4D9103995 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		B7DFA010494D99B3247DD1DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		9551FA205EEDB822C0C0C876 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B13417540F0CA686AB156AEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CDC8A1029C4F3E06784CCFF1 /* Build configuration list for PBXProject "Scorebook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F25EF7827B5210B4D9103995 /* Debug */,
+				B7DFA010494D99B3247DD1DF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6D2F3F0C466A0EC0B2062AA7 /* Build configuration list for PBXNativeTarget "Scorebook" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9551FA205EEDB822C0C0C876 /* Debug */,
+				B13417540F0CA686AB156AEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ScorebookCore;
+		};
+		D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/ScorebookUI;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CC89CC60197ABE4B8DAA1F0A /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Model;
+		};
+		8CB2AC0EEEBAB22A22251243 /* SampleData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = SampleData;
+		};
+		622CB478C0FD8441CA74378B /* GameEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = GameEngine;
+		};
+		328DC2C6A5667AE3C2898FEB /* Stats */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Stats;
+		};
+		5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = BoxScoreText;
+		};
+		662BE0BD463F7EAF3EB7635F /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Storage;
+		};
+		223BD1BB5891A21BF2DA2BF7 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = DesignSystem;
+		};
+		B7B376ED18E0447125424568 /* WalkUpAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = WalkUpAudio;
+		};
+		D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = BoxScorePicture;
+		};
+		44C43781EE93736D19D97407 /* TeamScreens */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = TeamScreens;
+		};
+		E005FA8C0AF41DB2945D4130 /* PregameScreens */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PregameScreens;
+		};
+		3738290C16A704D6D03AA7DA /* AtBatScreen */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = AtBatScreen;
+		};
+		760347CAC3A9DEAA351E9E3E /* PlayEntry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PlayEntry;
+		};
+		D584782B09732B49596F2964 /* GameChanges */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = GameChanges;
+		};
+		C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = GameOverview;
+		};
+		F1776B435852E7A7A42C154E /* PostgameScreens */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PostgameScreens;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+}
