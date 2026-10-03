@@ -111,7 +111,7 @@ During the build, each screen runs with the made-up data in `SampleData`. During
 
 ## Saving
 
-Each game is a JSON file of its setup and events, rewritten after every event so a dead battery loses nothing. Teams and the song list are JSON files; song audio is copied into the app’s own storage on import. The app’s files show up in the iPhone Files app so a backup can be copied off the phone. Song files never go into Git.
+Each game is a JSON file of its setup and events, rewritten after every event so a dead battery loses nothing. Teams and the song list are JSON files; song audio is copied into the app’s own storage on import. Games, teams, settings and songs live in a private app folder; only the backups folder shows in the iPhone Files app, so a backup can be copied off the phone without exposing the live files to accidental edits. Song files never go into Git.
 
 ## Rules the app follows
 
