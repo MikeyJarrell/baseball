@@ -18,9 +18,12 @@ final class TemporaryFolder {
 
     deinit { try? FileManager.default.removeItem(at: url) }
 
-    /// A new storage on this folder. Making a second one is how a test checks that something
-    /// really reached the disk rather than only the first storage's memory.
-    func storage() throws -> FileStorage { try FileStorage(folder: url) }
+    /// A new storage on this folder, with its backups in a "backups" folder inside it. Making
+    /// a second one is how a test checks that something really reached the disk, and is not
+    /// only in the first storage's memory.
+    func storage() throws -> FileStorage {
+        try FileStorage(dataFolder: url, backupsFolder: url.appendingPathComponent("backups", isDirectory: true))
+    }
 
     /// The bytes of a file inside the folder, such as "games/sample-game.json".
     func contents(of fileName: String) throws -> Data {
@@ -92,11 +95,15 @@ let oneOfEveryEvent: [GameEvent] = {
     }
 }()
 
-/// A copy of a game under a new id, starting at a new time, keeping only some of its events.
+/// A copy of a game under a new id, moved to a new start time with every event moved by the
+/// same amount, keeping only some of its events.
 func copy(of game: Game, id: GameID, startingAt start: Date, eventCount: Int? = nil) -> Game {
+    let shift = start.timeIntervalSince(game.setup.scheduledStart)
     var copy = game
     copy.id = id
     copy.setup.scheduledStart = start
-    if let eventCount { copy.events = Array(game.events.prefix(eventCount)) }
+    copy.events = game.events.prefix(eventCount ?? game.events.count).map { event in
+        GameEvent(id: event.id, enteredAt: event.enteredAt.addingTimeInterval(shift), kind: event.kind)
+    }
     return copy
 }

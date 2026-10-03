@@ -134,15 +134,49 @@ struct BackupTests {
         #expect(try await storage.loadTeams().items.count == original.teams.count)
     }
 
-    @Test("Two backups in the same second get different names, and the list is newest first")
-    func backupNames() async throws {
+    @Test("Backups are listed newest first by when they were made, whatever their names")
+    func backupOrder() async throws {
         let folder = try TemporaryFolder()
         let storage = try folder.storage()
+        _ = try await fill(storage)
+        // A backup, then a restore (which makes a "before-restore" backup), then two more
+        // backups in quick succession, usually within the same second.
         let first = try await storage.makeBackup()
-        let second = try await storage.makeBackup()
-        #expect(first != second)
-        let listed = try await storage.listBackups()
-        #expect(Set(listed) == Set([first, second]))
-        #expect(listed.map(\.lastPathComponent) == listed.map(\.lastPathComponent).sorted(by: >))
+        try await storage.restoreBackup(from: first)
+        let safety = try #require(try await storage.listBackups().first)
+        let third = try await storage.makeBackup()
+        let fourth = try await storage.makeBackup()
+
+        #expect(safety.lastPathComponent.hasPrefix("before-restore-"))
+        #expect(third != fourth)
+        // Sorting by name would put "before-restore-..." on top, and "backup-<time>-2.json"
+        // below "backup-<time>.json"; the list must follow the order the backups were made.
+        #expect(try await storage.listBackups() == [fourth, third, safety, first])
+    }
+
+    @Test("A leftover scrap from a backup cut off mid-write is cleared on the next start")
+    func leftoverInBackups() async throws {
+        let folder = try TemporaryFolder()
+        let storage = try folder.storage()
+        let backup = try await storage.makeBackup()
+        try folder.overwrite("backups/.backup-x.json.1234\(SafeFileWriter.temporarySuffix)", with: Data("{".utf8))
+        #expect(try await storage.listBackups() == [backup])
+        _ = try folder.storage()
+        #expect(try folder.names(in: "backups") == [backup.lastPathComponent])
+    }
+
+    @Test("Live files and backups go in the two separate folders the app gives")
+    func twoFolders() async throws {
+        let folder = try TemporaryFolder()
+        let live = folder.url.appendingPathComponent("Application Support", isDirectory: true)
+        let shown = folder.url.appendingPathComponent("Documents/backups", isDirectory: true)
+        let storage = try FileStorage(dataFolder: live, backupsFolder: shown)
+        _ = try await fill(storage)
+        let backup = try await storage.makeBackup()
+
+        #expect(backup.deletingLastPathComponent().standardizedFileURL == shown.standardizedFileURL)
+        #expect(try folder.names(in: "Documents/backups") == [backup.lastPathComponent])
+        #expect(try folder.names(in: "Application Support") == ["games", "settings.json", "songs", "teams"])
+        #expect(storage.audioFolder.standardizedFileURL == live.appendingPathComponent("songs/audio").standardizedFileURL)
     }
 }
