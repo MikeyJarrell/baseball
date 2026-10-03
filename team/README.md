@@ -10,6 +10,6 @@ To add a song, fill in `song`, `artist`, `hook` and `source` (a YouTube Music or
 python3 tools/walkup_songs.py
 ```
 
-It only cuts players who have no clip yet; `--redo` cuts them all again. Each clip runs from 20 seconds before the hook to 30 seconds after it, so the song can fade in under the announcer and play about 12 seconds past the hook before fading out. A hook near the start of a track leaves less room before it.
+It only cuts players who have no clip yet; `--redo` cuts them all again. Each clip runs from 20 seconds before the hook to 30 seconds after it, so the song can fade in under the announcer and play about 12 seconds past the hook before fading out. A hook near the start of a track leaves less room before it; the app still gives that song the same fade-in as the rest, so it reaches full volume a few seconds after its hook.
 
 Prefer the album audio on YouTube Music over a music video: video intros shift the timings players read off Spotify.
