@@ -4,10 +4,12 @@
 
 | Item | Status |
 |---|---|
-| Repository and project notes | Ready |
-| Scorebook iPhone app: plan, roles and task briefs | Drafted in [plan/](plan/README.md) |
-| Scorebook app: league rules and scope questions | Answered and written into the plan |
-| Scorebook app: Xcode and iPhone simulator on the Mac | Installed (Xcode 27, iOS 27 simulator) |
-| Scorebook app: foundation and design jobs | Not started |
+| Plan, roles and job briefs | Accepted, in [plan/](plan/README.md); league rules in [notes/league-rules.md](notes/league-rules.md) |
+| Xcode and iPhone simulator | Installed (Xcode 27, iOS 27 simulator) |
+| Foundation: shared vocabulary, sample data, app shell | Accepted |
+| Clickable mockups | Approved and accepted ([plan/mockups/](plan/mockups/README.md)) |
+| Rules engine, test scenarios, stats, storage, box score printer, design system code | In progress |
+| Walk-up audio and the screens | Not started |
+| Full-size Diamond Dogs logo for the app icon | Waiting on Mikey |
 
 No deadlines have been assigned.
