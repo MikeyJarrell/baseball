@@ -25,7 +25,7 @@ enum Suggestions {
                 moves.append(chosen)
             }
         }
-        let rbi = draft.batterResult.map { runsBattedIn(result: $0, draft: draft, moves: moves) } ?? 0
+        let rbi = draft.batterResult.map { runsBattedIn(result: $0, draft: draft, moves: moves, in: s) } ?? 0
         return RunnerSuggestion(runners: moves, rbi: rbi)
     }
 
@@ -59,7 +59,7 @@ enum Suggestions {
         }
 
         let batterOutAtFirst = RunnerMove(runner: batter, from: .home, to: .out, outBy: fielders, outAt: .first)
-        let isAirBall = [.flyBall, .lineDrive, .popUp].contains(draft.battedBall)
+        let airBall = Self.isAirBall(draft.battedBall)
 
         switch result {
         case .single: everyoneUp(1)
@@ -101,7 +101,7 @@ enum Suggestions {
             moves.append(batterOutAtFirst)
 
         case .out:
-            moves = outMoves(draft: draft, batter: batter, onBase: onBase, forced: forced, isAirBall: isAirBall)
+            moves = outMoves(draft: draft, batter: batter, onBase: onBase, forced: forced, isAirBall: airBall)
         }
 
         // A play that makes the third out: nobody else moves and no run is suggested.
@@ -131,10 +131,13 @@ enum Suggestions {
         let fielders = draft.fielders
         var moves: [RunnerMove] = []
         if isAirBall {
-            let doubledOff = draft.multiOut != nil ? onBase.first : nil
+            let doubledOff = draft.multiOut != nil ? doubledOffRunner(fielders: fielders, onBase: onBase) : nil
             for r in onBase {
                 if r.runner == doubledOff?.runner {
-                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: .out, outBy: fielders, outAt: r.base))
+                    // A runner put out by the catcher was trying to score; anyone else is doubled
+                    // off their own base.
+                    let at: Base = fielders.last == .catcher ? .home : r.base
+                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: .out, outBy: fielders, outAt: at))
                 } else {
                     moves.append(RunnerMove(runner: r.runner, from: r.base, to: .safe(at: r.base)))
                 }
@@ -145,8 +148,7 @@ enum Suggestions {
         }
 
         let runnerOnFirst = onBase.first { $0.base == .first }
-        let isDoublePlay = draft.multiOut != nil || (fielders.count >= 3 && runnerOnFirst != nil)
-        if isDoublePlay, let forcedAtSecond = runnerOnFirst ?? onBase.first(where: { forced.contains($0.base) }) ?? onBase.first {
+        if isGroundDoublePlay(draft, runners: onBase), let forcedAtSecond = runnerOnFirst ?? onBase.first(where: { forced.contains($0.base) }) ?? onBase.first {
             // 5-4-3: the runner is out 5-4 at second, the batter 4-3 at first.
             let runnerOutBy = fielders.count >= 2 ? Array(fielders.dropLast()) : fielders
             let batterOutBy = Array(fielders.suffix(2))
@@ -172,6 +174,37 @@ enum Suggestions {
         return moves
     }
 
+    /// True when a ground out is taken to be a double play: the scorer marked it one, or three
+    /// or more fielders handled the ball with a runner on first (a 6-4-3). The runner suggestion
+    /// and the runs-batted-in default use this same test.
+    static func isGroundDoublePlay(_ draft: PlayDraft, runners: [BaseRunner]) -> Bool {
+        guard draft.batterResult == .out, !isAirBall(draft.battedBall) else { return false }
+        return draft.multiOut != nil || (draft.fielders.count >= 3 && runners.contains { $0.base == .first })
+    }
+
+    /// True for a fly ball, line drive or pop-up.
+    static func isAirBall(_ type: BattedBallType?) -> Bool {
+        [.flyBall, .lineDrive, .popUp].contains(type)
+    }
+
+    /// On a double play off a ball caught in the air, the runner put out is the one at the base
+    /// the last fielder covers: first base for the first baseman, second for the second baseman
+    /// or shortstop, third for the third baseman, and the runner from third, trying to score,
+    /// for the catcher. Otherwise the runner on first, and failing that the lead runner.
+    static func doubledOffRunner(fielders: [Position], onBase: [BaseRunner]) -> BaseRunner? {
+        let covered: [Base]
+        switch fielders.last {
+        case .firstBase: covered = [.first]
+        case .secondBase, .shortstop: covered = [.second]
+        case .thirdBase, .catcher: covered = [.third]
+        default: covered = []
+        }
+        for base in covered + [.first] {
+            if let r = onBase.first(where: { $0.base == base }) { return r }
+        }
+        return onBase.first
+    }
+
     /// A game-ending hit in the bottom of the last inning or later: only the winning run scores,
     /// and nobody, batter included, moves more bases than that runner did (rule 9.06(f)).
     /// A home run is left alone.
@@ -192,16 +225,23 @@ enum Suggestions {
     }
 
     /// Runs batted in under the official scoring rules: every run that scores on the play,
-    /// except on an error, a dropped third strike, or a ground-ball double play, and except a
-    /// runner who scored because of an error.
-    static func runsBattedIn(result: BatterResult, draft: PlayDraft, moves: [RunnerMove]) -> Int {
+    /// except a runner marked as scoring because of an error, and except:
+    /// - none on a dropped third strike or a ground-ball double play [OBR 9.04(b)(1)];
+    /// - on an error, only the runner from third with fewer than two outs, when the scorer has
+    ///   not marked that runner's advance as caused by the error [OBR 9.04(a)(3)]. Whether the
+    ///   runner "would have scored anyway" (a fly ball deep enough, a slow roller) cannot be read
+    ///   from the play, so the scorer's error mark decides, and the scorer confirms the number.
+    static func runsBattedIn(result: BatterResult, draft: PlayDraft, moves: [RunnerMove], in s: Situation) -> Int {
+        let earned = moves.filter { $0.to == .scored && !$0.advancedOnError }
         switch result {
-        case .reachedOnError, .reachedOnDroppedThirdStrike:
+        case .reachedOnDroppedThirdStrike:
             return 0
-        case .out where draft.multiOut != nil && ![.flyBall, .lineDrive, .popUp].contains(draft.battedBall):
+        case .reachedOnError:
+            return s.outs < 2 ? earned.filter { $0.from == .third }.count : 0
+        case .out where isGroundDoublePlay(draft, runners: s.runners):
             return 0
         default:
-            return moves.filter { $0.to == .scored && !$0.advancedOnError }.count
+            return earned.count
         }
     }
 

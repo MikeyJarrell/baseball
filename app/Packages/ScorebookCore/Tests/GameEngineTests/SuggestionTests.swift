@@ -90,13 +90,51 @@ struct SuggestionTests {
         #expect(fc.runners.first { $0.runner == "m2" }?.outAt == .third)
     }
 
-    @Test("Error: batter safe at first on the error, runners up one, no run batted in")
+    @Test("Error: batter safe at first, runners up one; a run batted in only for the runner from third with fewer than two outs")
     func error() throws {
+        let draft = PlayDraft(batterResult: .reachedOnError, fielders: pos(6), errors: [ErrorCharge(fielder: .shortstop)])
+        // Nobody out: the runner from third would have scored anyway (rule 9.04(a)(3)).
         let s = try situation(ManualAdjustment(runners: BaseOccupants(first: "m1", third: "m2"), batterIndex: 2))
-        let e = engine.suggestRunners(for: PlayDraft(batterResult: .reachedOnError, fielders: pos(6), errors: [ErrorCharge(fielder: .shortstop)]), in: s)
+        let e = engine.suggestRunners(for: draft, in: s)
         #expect(ends(e) == ["m2": .scored, "m1": .second, "m3": .first])
         #expect(e.runners.first { $0.isBatter }?.advancedOnError == true)
-        #expect(e.rbi == 0)
+        #expect(e.rbi == 1)
+        // Two out: the error extended the inning, so no run batted in.
+        let twoOut = try situation(ManualAdjustment(outs: 2, runners: BaseOccupants(first: "m1", third: "m2"), batterIndex: 2))
+        #expect(engine.suggestRunners(for: draft, in: twoOut).rbi == 0)
+        // A runner from second who scores on the error is not one.
+        let second = try situation(ManualAdjustment(runners: BaseOccupants(second: "m1"), batterIndex: 1))
+        var moved = draft
+        moved.runners = [mv("m1", .second, .scored, onError: true)]
+        #expect(engine.suggestRunners(for: moved, in: second).rbi == 0)
+        // And the scorer marking the runner from third as scoring on the error takes it away.
+        var marked = draft
+        marked.runners = [mv("m2", .third, .scored, onError: true)]
+        #expect(engine.suggestRunners(for: marked, in: s).rbi == 0)
+    }
+
+    @Test("An unmarked 6-4-3 with the bases loaded is a double play for the runs batted in too: none")
+    func unmarkedDoublePlayRBI() throws {
+        let s = try situation(ManualAdjustment(runners: BaseOccupants(first: "m1", second: "m2", third: "m3"), batterIndex: 3))
+        let dp = engine.suggestRunners(for: PlayDraft(batterResult: .out, battedBall: .groundBall, fielders: pos(6, 4, 3)), in: s)
+        #expect(ends(dp) == ["m3": .scored, "m2": .third, "m1": .out, "m4": .out])
+        #expect(dp.rbi == 0)
+        // With the scorer's mark, the same answer.
+        let marked = engine.suggestRunners(for: PlayDraft(batterResult: .out, battedBall: .groundBall, fielders: pos(6, 4, 3), multiOut: .doublePlay), in: s)
+        #expect(marked.rbi == 0)
+    }
+
+    @Test("A fly-ball double play puts out the runner at the base the last fielder covers")
+    func flyBallDoublePlayRunner() throws {
+        let s = try situation(ManualAdjustment(runners: BaseOccupants(first: "m1", third: "m2"), batterIndex: 2))
+        // 8-3: caught in center, thrown to first: the runner from first is doubled off.
+        let toFirst = engine.suggestRunners(for: PlayDraft(batterResult: .out, battedBall: .flyBall, fielders: pos(8, 3), multiOut: .doublePlay), in: s)
+        #expect(ends(toFirst) == ["m2": .third, "m1": .out, "m3": .out])
+        #expect(toFirst.runners.first { $0.runner == "m1" }?.outAt == .first)
+        // 8-2: thrown home: the runner from third, trying to score.
+        let toHome = engine.suggestRunners(for: PlayDraft(batterResult: .out, battedBall: .flyBall, fielders: pos(8, 2), multiOut: .doublePlay), in: s)
+        #expect(ends(toHome) == ["m2": .out, "m1": .first, "m3": .out])
+        #expect(toHome.runners.first { $0.runner == "m2" }?.outAt == .home)
     }
 
     @Test("Walk-like results push only forced runners; a sacrifice bunt moves the runners up")

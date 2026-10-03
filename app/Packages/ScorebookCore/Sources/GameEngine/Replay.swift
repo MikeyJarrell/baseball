@@ -198,9 +198,13 @@ struct Replay {
     /// True for the events that are part of the action on the field, as opposed to lineup
     /// changes and bookkeeping. Each one ends the changeover between half-innings and lets an
     /// unanswered "is the game over?" question lapse, since play went on.
+    ///
+    /// The automatic out at a batting hole is not one of them: the app records it by itself the
+    /// moment the hole comes up, often right after a third out, before the scorer has seen the
+    /// question or done the defense check.
     private static func isPlay(_ kind: EventKind) -> Bool {
         switch kind {
-        case .pitch, .intentionalWalk, .ballInPlay, .runnerAction, .errorWithNoAdvance, .automaticOut: true
+        case .pitch, .intentionalWalk, .ballInPlay, .runnerAction, .errorWithNoAdvance: true
         default: false
         }
     }

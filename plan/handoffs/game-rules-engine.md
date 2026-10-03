@@ -19,7 +19,7 @@ The engine reproduces the hand-written sample game in `SampleData` exactly: ever
 
 These are the engine’s answers where `Model/` and the plan were silent. Each can change if Mikey or the lead builder wants it otherwise.
 
-- **An unanswered “Is the game over?” lapses when play goes on.** The question stays open through lineup changes and other bookkeeping, and closes without being recorded as declined at the next pitch, ball in play, intentional walk, runner move, error or automatic out. It is asked again at the next point where a rule applies. Only a `keepPlaying` event stops a reason for good.
+- **An unanswered “Is the game over?” lapses when play goes on.** The question stays open through lineup changes and other bookkeeping, and closes without being recorded as declined at the next pitch, ball in play, intentional walk, runner move or error. The automatic out at a batting hole does not close it, end the changeover, or clear the defense check, since the app records that out by itself, often right after a third out. It is asked again at the next point where a rule applies. Only a `keepPlaying` event stops a reason for good.
 - **An inning started after the time limit with no answer is a last inning.** Its walk-off works as in the ninth, and the time-limit question comes back when it ends. Between innings after the limit, `isLastInning` is false and `clock(for:at:)` sets `askIfOverOnTime`.
 - **When several reasons apply at once**, regulation is asked first, then the run rule, then the time limit.
 - **The defense check stops being due** when our team confirms its defense, when our team makes a fielding change during the check, or at the first piece of play in the half-inning, so a skipped check does not reopen on every pitch.
@@ -28,15 +28,20 @@ These are the engine’s answers where `Model/` and the plan were silent. Each c
 - **The runner suggested for a designated non-runner** skips the batter now at bat and anyone already on base.
 - **Batters faced** are counted when a plate appearance ends, so a batter who was up when a runner made the third out is not counted until they finish next inning.
 - **The walk-off limit** (only the winning run scores, nobody moves further than that runner) is applied to singles, doubles and triples. Home runs, errors and the rest get their ordinary suggestion.
-- **Default runs batted in** count every run that scores on the play, except none on an error, a dropped third strike or a ground-ball double play, and none for a runner marked as advancing on an error. The scorer confirms the number.
+- **Default runs batted in** count every run that scores on the play, except none for a runner marked as advancing on an error, none on a dropped third strike, and none on a ground-ball double play, whether the scorer marked it or the engine took it as one (three or more fielders with a runner on first, the same test the runner suggestion uses). On an error, the runner from third counts when there were fewer than two outs (rule 9.04(a)(3)). Whether that runner “would have scored anyway” cannot be read from the play, so the scorer’s mark that the runner advanced on the error decides. The scorer confirms the number.
+- **A double play off a ball caught in the air** puts out the runner at the base the last fielder covers (the first baseman means the runner from first; the catcher means the runner from third, out at home), otherwise the runner on first.
 - **Notation**, beyond what the sample game fixes: a foul tip is `T` and a foul bunt `L` mid-count; a dropped third strike reads `K 2-3`, `K WP`, `K PB`, `K E2` or `K, safe`; runner moves read `SB2`, `SBH`, `CS2 2-6`, `PO1 1-3`, `WP`, `PB`, `BK`, `DI`, and a double steal on a throwing error `SB3, SB2, E2`; an out with no batted-ball type and one fielder is just the number (`8`); lineup changes read `PH Moss for Ortiz`, `PR …`, `Ortiz for Moss`, `Moss to cf`, `P Voss`, `R Webb for Quinn`, `Added Moss`, `Hole in spot 2`, `Auto out`, `Final`, and the defense check is blank.
 
 ## Scenario the engine disagrees with
+
+The reviewer agreed with the engine here, and the lead builder is changing the scenario.
+
 
 `hard-walk-off-single-bases-loaded` expects `gameOverQuestion: "regulation"` after the `endOfGame` event. `Model/Situation.swift` says the question is “cleared once the game is final,” and the wiring shows the question whenever it is set, so a set question would ask “Is the game over?” about a finished game. The engine clears it. The scenario’s final check should be `isGameOverQuestionOpen: false`; its checkpoint after `e3` covers the question while the game is open. `ScenarioTests.knownDisagreements` lists this one mismatch, and a separate test fails when the scenario stops disagreeing, as a reminder to delete the entry. Every other expected value in all 39 scenario files passes.
 
 ## Vocabulary change requests
 
+- **The hit on a game-ending double or triple.** When only the winning run is needed, the suggestion moves the batter back to the base that run took, but the play still says double or triple, while rule 9.06(f) credits only as many bases as the winning run took (a single when it scored from third). `RunnerSuggestion` has no place to return a corrected hit. Either add one (for example, a suggested `batterResult`) for the in-play screen to apply, or have the replay credit the hit to match the batter’s base when it ends the game. The lead builder decides; until then the scorer picks the hit.
 - **Names for lineup notation.** `RulesEngine.notation(for:in:)` gets only a situation, which has no rosters, so it names players by id in lineup changes (`P d12`). The play log from `replay` uses last names (`P Voss`), and screens that show history read the play log, so nothing needs it now. If a screen ever needs lineup notation outside the play log, the function needs the game setup or a name lookup.
 - **A pinch hitter who takes over with two strikes.** Official Baseball Rules 9.15(b) charges a strikeout to the original batter in that case. The vocabulary has no place to say so, and the engine credits the plate appearance to whoever is batting when it ends. Worth a field on `PlateAppearanceResult` only if Mikey wants that rule.
 
@@ -62,7 +67,7 @@ These are the engine’s answers where `Model/` and the plan were silent. Each c
 
 ## Evidence
 
-`swift test` in `app/Packages/ScorebookCore`: 106 tests, all passing (41 from the foundation, 65 for the engine; the three scenario tests run once per scenario file, 39 files each). The engine’s tests, in `Tests/GameEngineTests/`:
+`swift test` in `app/Packages/ScorebookCore`: 109 tests, all passing (41 from the foundation, 68 for the engine; the three scenario tests run once per scenario file, 39 files each). The engine’s tests, in `Tests/GameEngineTests/`:
 
 - `ScenarioTests`: every scenario’s expected situation, notation and checkpoints, and nothing flagged for review.
 - `SampleGameReplayTests`: the hand-written sample game, entry by entry.
