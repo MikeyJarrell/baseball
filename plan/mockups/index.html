@@ -1116,7 +1116,7 @@ SCREENS['pg-theirs'] = () => {
   if(m==='numbers') body = `<div class="card">${THEM.map((p,i)=>`<div class="lrow"><span class="ord">${i+1}</span><span class="grip">${ic('grip',20)}</span><div class="grow"><div class="t1">#${p.n}</div></div></div>`).join('')}</div>`;
   if(m==='unknown') body = `<div class="card"><div class="kv"><span class="k">How many hitters?</span><div class="stepper"><button data-a="theirN" data-v="-1">−</button><b>${ui.theirN}</b><button data-a="theirN" data-v="1">+</button></div></div></div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${Array.from({length:ui.theirN},(_,i)=>`<span class="nchip">Batter ${i+1}</span>`).join('')}</div>
-    <div class="info">Each one gets a name or number when he comes up, so the order knows when to go back to the top.</div>`;
+    <div class="info">Each one gets a name or number when they come up, so the order knows when to go back to the top.</div>`;
   return `<div class="screen">${pgNav(3, backBtn('pg-ours','Back'), 'Mudcats lineup')}
   <div class="scroll pad"><div style="height:6px"></div>
     ${ch('names','Names and numbers','From the saved Mudcats roster')}${ch('numbers','Numbers only','Type the numbers in batting order')}${ch('unknown','Unknown','Fill them in as they come up')}
@@ -1453,7 +1453,7 @@ SHEETS.ph = () => {
   const p=batter(), us=batTeam()==='us';
   if(!us) return sheetWrap('Pinch hitter', `<div class="field-in"><label>New hitter’s number</label><input inputmode="numeric" placeholder="#"></div><div class="field-in"><label>Name (optional)</label><input></div>`, {foot:`<button class="btn pri" data-a="closeSheet">Bats for #${p.n}</button>`});
   const opt = (q,note) => `<button class="opt ${ui.phPick===q.id?'on':''}" data-a="phPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}${note?` <span class="tag re">${note}</span>`:''}</div><div class="t2">Bats ${q.bats} · ${q.song?'♪ '+esc(SONGS[q.song][0]):'no song'}</div></div><span class="radio">${ui.phPick===q.id?ic('check',16):''}</span></button>`;
-  return sheetWrap('Pinch hitter', `<div class="info">Batting for <b>${esc(p.name)}</b>, ${ord(S.idx.us%OURS.length+1)} in the order. ${esc(p.short)} leaves the game; our league lets him come back in later.</div>
+  return sheetWrap('Pinch hitter', `<div class="info">Batting for <b>${esc(p.name)}</b>, ${ord(S.idx.us%OURS.length+1)} in the order. ${esc(p.short)} leaves the game; our league lets them come back in later.</div>
     <div class="sec">Bench</div><div class="card">${BENCH.map(q=>opt(q)).join('')}</div>
     <div class="sec">Out of the game, can re-enter</div><div class="card"><div class="empty">Players taken out show up here.</div></div>`,
     {foot:`<button class="btn pri" data-a="doPH" ${ui.phPick?'':'disabled'}>${ui.phPick?esc(findP(ui.phPick).short)+' bats':'Pick a hitter'}</button>`});
@@ -1471,7 +1471,7 @@ SHEETS.nr = () => {
   const b=ui.nrBase, r=S.bases[b];
   if(!r) return sheetWrap('Runner for a non-runner', `<div class="empty">No designated non-runner is on base right now. This sheet opens by itself when one reaches.</div>`);
   const cands = [...BENCH.map(q=>[q,'Bench']), [OURS.find(q=>q.id==='fisch'),'Pitcher, made the last out'], ...OURS.filter(q=>!['fisch','sull'].includes(q.id) && ![1,2,3].some(i=>S.bases[i]&&S.bases[i].id===q.id) && q.id!==batter().id).slice(0,4).map(q=>[q,'In the lineup'])];
-  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. He stays in the batting order, and if his runner scores, the run is his.</div>
+  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. They stay in the batting order, and if their runner scores, the run is theirs.</div>
     <div class="card">${cands.map(([q,why])=>`<button class="opt ${ui.nrPick===q.id?'on':''}" data-a="nrPick" data-v="${q.id}" data-k="nr-${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${why}</div></div><span class="radio">${ui.nrPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>`,
     {foot:`<button class="btn pri" data-a="doNR" data-k="nr-ok" ${ui.nrPick?'':'disabled'}>${ui.nrPick?esc(findP(ui.nrPick).short)+' runs':'Pick a runner'}</button>`, modal:true, noCancel:true, sub:'Asked automatically'});
 };
@@ -1480,7 +1480,7 @@ SHEETS.add = () => {
   const opts=[...BENCH,{id:'new',n:'',name:'New player',short:'New player'}];
   return sheetWrap('Add a hitter', `<div class="card">${opts.map(q=>`<button class="opt ${ui.addPick===q.id?'on':''}" data-a="addPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n||ic('plus',18)}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${q.id==='new'?'Name and number':'Bench · bats '+q.bats}</div></div><span class="radio">${ui.addPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>
     <div class="sec">Position</div><div style="display:flex;flex-wrap:wrap;gap:6px">${['EH',1,2,3,4,5,6,7,8,9].map(p=>`<button class="chipbtn ${String(ui.addPos)===String(p)?'on':''}" data-a="addPos" data-v="${p}" style="min-width:52px;justify-content:center">${POSN[p]}</button>`).join('')}</div>
-    <div class="info">Bats <b>${ord(len+1)}</b>, after ${esc(OURS[len-1].short)}. ${batTeam()==='us'?`With ${esc(batter().short)} up now, he hits in <b>${until} batter${until===1?'':'s'}</b>.`:'He leads off the next time through if it gets there.'}</div>`,
+    <div class="info">Bats <b>${ord(len+1)}</b>, after ${esc(OURS[len-1].short)}. ${batTeam()==='us'?`With ${esc(batter().short)} up now, they hit in <b>${until} batter${until===1?'':'s'}</b>.`:'They lead off the next time through if it gets there.'}</div>`,
     {foot:`<button class="btn pri" data-a="doAdd">Add to the order</button>`});
 };
 function defaultDefense(){ const d={}; roster().forEach(p=>{ if(typeof p.pos==='number') d[p.pos]=p.id; }); return d; }
@@ -1633,7 +1633,7 @@ ACT.doPitch = () => { const ft=fieldTeam(), id=ui.pitchPick; let name='New pitch
 ACT.phPick = v => ui.phPick=v;
 ACT.doPH = () => { const q=findP(ui.phPick), i=S.idx.us%OURS.length, old=OURS[i]; pushUndo('pinch hitter'); const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); BENCH.push(Object.assign(old,{pos:'BN'})); OURS[i]=Object.assign(q,{pos:old.pos==='BN'?'EH':old.pos}); sheet=null; ui.phPick=null; toast(`${q.short} bats for ${old.short}`); };
 ACT.prBase = v => ui.prBase=+v; ACT.prPick = v => ui.prPick=v;
-ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the order, the player he replaces leaves
+ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the order, the player they replace leaves
   const q=findP(ui.prPick), old=S.bases[ui.prBase]; pushUndo('pinch runner');
   const i=OURS.findIndex(x=>x.id===old.id); if(i>=0){ const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); const gone=OURS[i]; q.pos=gone.pos; OURS[i]=q; BENCH.push(Object.assign(gone,{pos:'BN'})); }
   S.bases[ui.prBase]=clone(q); sheet=null; ui.prPick=null; toast(`${q.short} pinch-runs for ${nm(old)}`); };
