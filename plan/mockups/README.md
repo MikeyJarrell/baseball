@@ -8,6 +8,8 @@ Our team is the Diamond Dogs (San Diego Adult Baseball League, 18A), playing the
 
 The Diamond Dogs logo (the chihuahua) sits on home, the team page and the end-of-game box score. Our color comes from the logo: powder blue with black text, which stays readable in sun, with black player-number badges and tan as an accent. Their hitters get striped slate with white text, so the two teams look different at a glance, in color and in pattern.
 
+The app icon is the dog on the logo’s powder blue, with a near-black version for dark mode; the artwork and a cleaned 1024-pixel logo are in [icon/](icon/).
+
 ## Walkthroughs
 
 The index lists nine scripted walkthroughs. Each one starts from the right situation, outlines the next tap in yellow, and counts the taps.
