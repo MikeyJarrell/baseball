@@ -1,0 +1,3400 @@
+{
+  "description": "A complete Major League game from Retrosheet (game NYA201906230): Houston Astros at New York Yankees, 2019-06-23, final Houston Astros 9, New York Yankees 4. Every pitch and play, converted by retrosheet/convert.py; the expected stats are the official box score. A pitching change in the middle of the fifth inning, four double plays, defensive indifference, and a triple.",
+  "source": "Retrosheet event file for game NYA201906230, with the box score at https://www.retrosheet.org/boxesetc/2019/B06230NYA2019.htm. The information used here was obtained free of charge from and is copyrighted by Retrosheet. Interested parties may contact Retrosheet at \"www.retrosheet.org\".",
+  "setup": {
+    "scheduledStart": "2019-06-23T14:08:00Z",
+    "away": {
+      "teamID": "HOU",
+      "name": "Houston Astros",
+      "isOurs": false,
+      "roster": [
+        {
+          "id": "altuj001",
+          "name": "Jose Altuve"
+        },
+        {
+          "id": "brega001",
+          "name": "Alex Bregman"
+        },
+        {
+          "id": "branm003",
+          "name": "Michael Brantley"
+        },
+        {
+          "id": "alvay001",
+          "name": "Yordan Alvarez"
+        },
+        {
+          "id": "gurry001",
+          "name": "Yulieski Gurriel"
+        },
+        {
+          "id": "chirr001",
+          "name": "Robinson Chirinos"
+        },
+        {
+          "id": "reddj001",
+          "name": "Josh Reddick"
+        },
+        {
+          "id": "whitt002",
+          "name": "Tyler White"
+        },
+        {
+          "id": "marij002",
+          "name": "Jake Marisnick"
+        },
+        {
+          "id": "verlj001",
+          "name": "Justin Verlander"
+        },
+        {
+          "id": "devec001",
+          "name": "Chris Devenski"
+        },
+        {
+          "id": "osunr001",
+          "name": "Roberto Osuna"
+        }
+      ],
+      "battingOrder": [
+        "altuj001",
+        "brega001",
+        "branm003",
+        "alvay001",
+        "gurry001",
+        "chirr001",
+        "reddj001",
+        "whitt002",
+        "marij002"
+      ],
+      "defense": [
+        {
+          "position": 1,
+          "player": "verlj001"
+        },
+        {
+          "position": 2,
+          "player": "chirr001"
+        },
+        {
+          "position": 3,
+          "player": "whitt002"
+        },
+        {
+          "position": 4,
+          "player": "altuj001"
+        },
+        {
+          "position": 5,
+          "player": "gurry001"
+        },
+        {
+          "position": 6,
+          "player": "brega001"
+        },
+        {
+          "position": 7,
+          "player": "branm003"
+        },
+        {
+          "position": 8,
+          "player": "marij002"
+        },
+        {
+          "position": 9,
+          "player": "reddj001"
+        }
+      ]
+    },
+    "home": {
+      "teamID": "NYA",
+      "name": "New York Yankees",
+      "isOurs": false,
+      "roster": [
+        {
+          "id": "lemad001",
+          "name": "DJ LeMahieu"
+        },
+        {
+          "id": "judga001",
+          "name": "Aaron Judge"
+        },
+        {
+          "id": "voitl001",
+          "name": "Luke Voit"
+        },
+        {
+          "id": "sancg002",
+          "name": "Gary Sanchez"
+        },
+        {
+          "id": "encae001",
+          "name": "Edwin Encarnacion"
+        },
+        {
+          "id": "gregd001",
+          "name": "Didi Gregorius"
+        },
+        {
+          "id": "torrg001",
+          "name": "Gleyber Torres"
+        },
+        {
+          "id": "hicka001",
+          "name": "Aaron Hicks"
+        },
+        {
+          "id": "gardb001",
+          "name": "Brett Gardner"
+        },
+        {
+          "id": "happj001",
+          "name": "J.A. Happ"
+        },
+        {
+          "id": "cessl001",
+          "name": "Luis Cessa"
+        },
+        {
+          "id": "haled001",
+          "name": "David Hale"
+        }
+      ],
+      "battingOrder": [
+        "lemad001",
+        "judga001",
+        "voitl001",
+        "sancg002",
+        "encae001",
+        "gregd001",
+        "torrg001",
+        "hicka001",
+        "gardb001"
+      ],
+      "defense": [
+        {
+          "position": 1,
+          "player": "happj001"
+        },
+        {
+          "position": 2,
+          "player": "sancg002"
+        },
+        {
+          "position": 3,
+          "player": "voitl001"
+        },
+        {
+          "position": 4,
+          "player": "torrg001"
+        },
+        {
+          "position": 5,
+          "player": "lemad001"
+        },
+        {
+          "position": 6,
+          "player": "gregd001"
+        },
+        {
+          "position": 7,
+          "player": "gardb001"
+        },
+        {
+          "position": 8,
+          "player": "hicka001"
+        },
+        {
+          "position": 9,
+          "player": "judga001"
+        }
+      ]
+    },
+    "rules": {
+      "scheduledInnings": 9,
+      "timeLimitMinutes": null,
+      "runRuleMargin": null
+    }
+  },
+  "events": [
+    {
+      "id": "e1",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e2",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "runners": [
+          {
+            "runner": "altuj001",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e4",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "brega001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e7",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "branm003",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e9",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "groundBall",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "alvay001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e10",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e11",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e12",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          3
+        ],
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e13",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e14",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "lemad001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e15",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e16",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e17",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e18",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e19",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e20",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "judga001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e21",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e22",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e23",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e24",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "lemad001",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              6,
+              4
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "voitl001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e25",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e26",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e27",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e28",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e29",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e30",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e31",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "reddj001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e32",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e33",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e34",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "whitt002",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e35",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e36",
+      "pitch": {
+        "result": "foulTip"
+      }
+    },
+    {
+      "id": "e37",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e38",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e39",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e40",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "encae001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e41",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e42",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e43",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e44",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e45",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e46",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e47",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e48",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e49",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e50",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "groundBall",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "altuj001",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e51",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e52",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e53",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e54",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "brega001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e55",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e56",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e57",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "altuj001",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "branm003",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e58",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e59",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e60",
+      "ballInPlay": {
+        "batterResult": "fieldersChoice",
+        "battedBall": "groundBall",
+        "fielders": [
+          3,
+          6
+        ],
+        "runners": [
+          {
+            "runner": "branm003",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              3,
+              6
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "alvay001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e61",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e62",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e63",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e64",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e65",
+      "pitch": {
+        "result": "foulTip"
+      }
+    },
+    {
+      "id": "e66",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e67",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e68",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e69",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "hicka001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e70",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e71",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e72",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e73",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e74",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e75",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e76",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e77",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "lemad001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e78",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e79",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e80",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e81",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e82",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e83",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e84",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e85",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e86",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e87",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "chirr001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e88",
+      "pitch": {
+        "result": "foulBunt"
+      }
+    },
+    {
+      "id": "e89",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e90",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "second",
+            "to": "third"
+          },
+          {
+            "runner": "chirr001",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "reddj001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e91",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e92",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "chirr001",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "reddj001",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "whitt002",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 4
+      }
+    },
+    {
+      "id": "e93",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e94",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e95",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e96",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e97",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e98",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "groundBall",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "marij002",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e99",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e100",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e101",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e102",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e103",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "marij002",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              6,
+              4
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "altuj001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e104",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "brega001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e105",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "lineDrive",
+        "fielders": [
+          4
+        ],
+        "runners": [
+          {
+            "runner": "judga001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e106",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e107",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e108",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e109",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e110",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e111",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e112",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e113",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e114",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e115",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e116",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "sancg002",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e117",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "lineDrive",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "encae001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e118",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "branm003",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e119",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e120",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e121",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "runners": [
+          {
+            "runner": "branm003",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "alvay001",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 2
+      }
+    },
+    {
+      "id": "e122",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "cessl001"
+      }
+    },
+    {
+      "id": "e123",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e124",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e125",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e126",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e127",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e128",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          3
+        ],
+        "runners": [
+          {
+            "runner": "chirr001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e129",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e130",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "lineDrive",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "reddj001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e131",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e132",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e133",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e134",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e135",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e136",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e137",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e138",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e139",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e140",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e141",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e142",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e143",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e144",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e145",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "torrg001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e146",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e147",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e148",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e149",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e150",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e151",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "hicka001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e152",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e153",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e154",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e155",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "hicka001",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "gardb001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e156",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e157",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e158",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "runners": [
+          {
+            "runner": "hicka001",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "gardb001",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "lemad001",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 3
+      }
+    },
+    {
+      "id": "e159",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e160",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e161",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e162",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e163",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e164",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e165",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "marij002",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e166",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "marij002",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              5,
+              4
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "altuj001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e167",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e168",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e169",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e170",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e171",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e172",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e173",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e174",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e175",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e176",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e177",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e178",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e179",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e180",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e181",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e182",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e183",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e184",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e185",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e186",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e187",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e188",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          3,
+          1
+        ],
+        "runners": [
+          {
+            "runner": "sancg002",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              3,
+              1
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e189",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e190",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e191",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e192",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e193",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e194",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e195",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e196",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e197",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e198",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e199",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "gurry001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e200",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e201",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e202",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e203",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e204",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e205",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e206",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e207",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          5
+        ],
+        "runners": [
+          {
+            "runner": "gregd001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e208",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e209",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e210",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e211",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e212",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e213",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e214",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e215",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e216",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e217",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e218",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e219",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "reddj001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e220",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e221",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e222",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "reddj001",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              4,
+              6
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "whitt002",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e223",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e224",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e225",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e226",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "marij002",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e227",
+      "pitchingChange": {
+        "team": "away",
+        "newPitcher": "devec001"
+      }
+    },
+    {
+      "id": "e228",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e229",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e230",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e231",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          5
+        ],
+        "runners": [
+          {
+            "runner": "gardb001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e232",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e233",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e234",
+      "ballInPlay": {
+        "batterResult": "triple",
+        "battedBall": "flyBall",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "lemad001",
+            "from": "home",
+            "to": "third"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e235",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e236",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e237",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e238",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e239",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e240",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "judga001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          },
+          {
+            "runner": "lemad001",
+            "from": "third",
+            "to": "scored"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e241",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e242",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e243",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e244",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e245",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e246",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e247",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "haled001"
+      }
+    },
+    {
+      "id": "e248",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e249",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e250",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e251",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e252",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e253",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e254",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e255",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e256",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "brega001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e257",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e258",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e259",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e260",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e261",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e262",
+      "ballInPlay": {
+        "batterResult": "out",
+        "fielders": [
+          1,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "alvay001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              1,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e263",
+      "pitchingChange": {
+        "team": "away",
+        "newPitcher": "osunr001"
+      }
+    },
+    {
+      "id": "e264",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e265",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e266",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e267",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e268",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e269",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "flyBall",
+        "hitLocation": 4,
+        "runners": [
+          {
+            "runner": "sancg002",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e270",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e271",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e272",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e273",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e274",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e275",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e276",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e277",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e278",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e279",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e280",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e281",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e282",
+      "ballInPlay": {
+        "batterResult": "fieldersChoice",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          6
+        ],
+        "runners": [
+          {
+            "runner": "sancg002",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              4,
+              6
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "gregd001",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e283",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e284",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e285",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e286",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "gregd001",
+            "from": "first",
+            "to": "second",
+            "reason": "defensiveIndifference"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e287",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e288",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e289",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e290",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "torrg001",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e291",
+      "endOfGame": {
+        "reason": "regulation",
+        "finalScore": {
+          "away": 9,
+          "home": 4
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "score": {
+        "away": 9,
+        "home": 4
+      },
+      "isFinal": true
+    },
+    "batting": [
+      {
+        "player": "altuj001",
+        "plateAppearances": 5,
+        "atBats": 5,
+        "runs": 2,
+        "hits": 2,
+        "doubles": 1,
+        "triples": 0,
+        "homeRuns": 1,
+        "runsBattedIn": 1,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "brega001",
+        "plateAppearances": 5,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 1,
+        "strikeouts": 0,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "branm003",
+        "plateAppearances": 5,
+        "atBats": 4,
+        "runs": 1,
+        "hits": 2,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 1,
+        "walks": 1,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "alvay001",
+        "plateAppearances": 5,
+        "atBats": 5,
+        "runs": 1,
+        "hits": 2,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 1,
+        "runsBattedIn": 2,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "gurry001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 2,
+        "hits": 2,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 1,
+        "runsBattedIn": 1,
+        "walks": 0,
+        "strikeouts": 0,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "chirr001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 1,
+        "hits": 1,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 2,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "reddj001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 1,
+        "hits": 2,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 0,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "whitt002",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 1,
+        "hits": 1,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 1,
+        "runsBattedIn": 4,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "marij002",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 2,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "lemad001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 2,
+        "hits": 3,
+        "doubles": 0,
+        "triples": 1,
+        "homeRuns": 1,
+        "runsBattedIn": 3,
+        "walks": 0,
+        "strikeouts": 0,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "judga001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 1,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "voitl001",
+        "plateAppearances": 4,
+        "atBats": 3,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 1,
+        "strikeouts": 2,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "sancg002",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 1,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "encae001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 2,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "gregd001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 2,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "torrg001",
+        "plateAppearances": 4,
+        "atBats": 4,
+        "runs": 0,
+        "hits": 0,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 2,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "hicka001",
+        "plateAppearances": 3,
+        "atBats": 3,
+        "runs": 1,
+        "hits": 1,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 0,
+        "strikeouts": 1,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      },
+      {
+        "player": "gardb001",
+        "plateAppearances": 3,
+        "atBats": 2,
+        "runs": 1,
+        "hits": 1,
+        "doubles": 0,
+        "triples": 0,
+        "homeRuns": 0,
+        "runsBattedIn": 0,
+        "walks": 1,
+        "strikeouts": 0,
+        "hitByPitch": 0,
+        "sacrificeFlies": 0,
+        "sacrificeBunts": 0,
+        "stolenBases": 0,
+        "caughtStealing": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "verlj001",
+        "outsRecorded": 21,
+        "battersFaced": 26,
+        "hits": 4,
+        "runs": 3,
+        "walks": 2,
+        "strikeouts": 9,
+        "homeRuns": 1,
+        "hitBatters": 0
+      },
+      {
+        "pitcher": "devec001",
+        "outsRecorded": 3,
+        "battersFaced": 4,
+        "hits": 1,
+        "runs": 1,
+        "walks": 0,
+        "strikeouts": 1,
+        "homeRuns": 0,
+        "hitBatters": 0
+      },
+      {
+        "pitcher": "osunr001",
+        "outsRecorded": 3,
+        "battersFaced": 4,
+        "hits": 1,
+        "runs": 0,
+        "walks": 0,
+        "strikeouts": 1,
+        "homeRuns": 0,
+        "hitBatters": 0
+      },
+      {
+        "pitcher": "happj001",
+        "outsRecorded": 12,
+        "battersFaced": 22,
+        "hits": 11,
+        "runs": 8,
+        "walks": 0,
+        "strikeouts": 2,
+        "homeRuns": 3,
+        "hitBatters": 0
+      },
+      {
+        "pitcher": "cessl001",
+        "outsRecorded": 12,
+        "battersFaced": 14,
+        "hits": 3,
+        "runs": 1,
+        "walks": 1,
+        "strikeouts": 4,
+        "homeRuns": 1,
+        "hitBatters": 0
+      },
+      {
+        "pitcher": "haled001",
+        "outsRecorded": 3,
+        "battersFaced": 4,
+        "hits": 0,
+        "runs": 0,
+        "walks": 1,
+        "strikeouts": 1,
+        "homeRuns": 0,
+        "hitBatters": 0
+      }
+    ],
+    "fielding": [
+      {
+        "player": "altuj001",
+        "putouts": 2,
+        "assists": 3,
+        "errors": 0
+      },
+      {
+        "player": "brega001",
+        "putouts": 1,
+        "assists": 1,
+        "errors": 0
+      },
+      {
+        "player": "branm003",
+        "putouts": 2,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "gurry001",
+        "putouts": 2,
+        "assists": 3,
+        "errors": 0
+      },
+      {
+        "player": "chirr001",
+        "putouts": 11,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "reddj001",
+        "putouts": 2,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "whitt002",
+        "putouts": 5,
+        "assists": 1,
+        "errors": 0
+      },
+      {
+        "player": "marij002",
+        "putouts": 1,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "verlj001",
+        "putouts": 1,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "devec001",
+        "putouts": 0,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "osunr001",
+        "putouts": 0,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "lemad001",
+        "putouts": 0,
+        "assists": 4,
+        "errors": 0
+      },
+      {
+        "player": "judga001",
+        "putouts": 2,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "voitl001",
+        "putouts": 10,
+        "assists": 1,
+        "errors": 0
+      },
+      {
+        "player": "sancg002",
+        "putouts": 7,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "gregd001",
+        "putouts": 2,
+        "assists": 2,
+        "errors": 0
+      },
+      {
+        "player": "torrg001",
+        "putouts": 2,
+        "assists": 4,
+        "errors": 0
+      },
+      {
+        "player": "hicka001",
+        "putouts": 1,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "gardb001",
+        "putouts": 3,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "happj001",
+        "putouts": 0,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "cessl001",
+        "putouts": 0,
+        "assists": 0,
+        "errors": 0
+      },
+      {
+        "player": "haled001",
+        "putouts": 0,
+        "assists": 1,
+        "errors": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 9,
+        "hits": 14,
+        "errors": 0,
+        "leftOnBase": 4,
+        "lineScore": [
+          1,
+          0,
+          1,
+          4,
+          3,
+          0,
+          0,
+          0,
+          0
+        ],
+        "doublePlays": 1
+      },
+      {
+        "team": "home",
+        "runs": 4,
+        "hits": 6,
+        "errors": 0,
+        "leftOnBase": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          3,
+          0,
+          0,
+          1,
+          0
+        ],
+        "doublePlays": 3
+      }
+    ]
+  }
+}

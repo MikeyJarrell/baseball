@@ -1,0 +1,88 @@
+{
+  "description": "Undo a substitution. Ortiz flies out, and Ash is sent up to pinch-hit for Ruiz. Undoing the substitution puts Ruiz back at the plate and in the second spot, and Ruiz is no longer someone who could re-enter.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "pinchHitter",
+            "incoming": "m11",
+            "replacing": "m2"
+          }
+        ]
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "batter": "m2",
+          "battingSlots": [
+            {
+              "team": "away",
+              "index": 1,
+              "players": [
+                "m2"
+              ]
+            }
+          ],
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "batter": "m11",
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 1,
+          "players": [
+            "m2",
+            "m11"
+          ]
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "eligibleToReenter": []
+        }
+      ]
+    }
+  }
+}
