@@ -13,7 +13,7 @@
 
 Every color has a light and a dark value. Light mode is the outdoor default and uses the strongest contrast.
 
-- **Our team** comes from the Diamond Dogs logo: `ourTeam` is powder blue with black text on it (`onOurTeam`), never white. Also `ourTeamDeep` (a playing song button), `ourTeamSoft` (pale backgrounds), `ourTeamText` (our blue as readable text), `ourTeamBadge` (the logo’s black, behind our player numbers) and `ourTeamAccent` (the logo’s tan, used sparingly).
+- **Our team** uses colors sampled from Mikey’s original logo artwork: `ourTeam` is the collar’s powder blue (#62B4E3), with the outline’s near-black (#2C2B2A) as the text on it (`onOurTeam`), never white. Also `ourTeamDeep` (a playing song button), `ourTeamSoft` (pale backgrounds), `ourTeamText` (our blue as readable text), `ourTeamBadge` (the near-black, behind our player numbers) and `ourTeamAccent` (the dog’s tan, #D8B887, used sparingly).
 - **Their team** is `theirTeam`, a slate gray with white text (`onTheirTeam`), plus `theirTeamSoft` and `theirTeamText`. Their backgrounds carry faint diagonal stripes, so the teams differ in pattern as well as color.
 - **`TeamLook`** (`.ours`, `.theirs`) hands a screen the right fill, text and tint for whichever team is batting, and **`TeamBackground(look)`** draws a team’s band, stripes included. Screens pass the batting team’s `TeamLook` and get the right colors back.
 - **Count buttons:** `ball` green, `strike` amber with black text (`onStrike`), `foul` near-black, `inPlay` deep blue. The deep blue is also the main action color (Save, Runners) and `highlight` (a tapped fielder).
@@ -39,7 +39,7 @@ Every color has a light and a dark value. Light mode is the outdoor default and 
   - `TeamButtonStyle(look, isActive:)`: the walk-up song button and Play ball; `isActive` is the playing state.
 - **New views:**
   - `PlayerNumberBadge("24", look: .ours)`: ours black with blue numbers, theirs slate.
-  - `TeamLogo(size:)`: the logo, with the picture itself at `TeamLogo.image` for the box score printer.
+  - `TeamLogo(size:)`: the dog on a clear background, drawn from the original artwork, with the picture itself at `TeamLogo.image` for the box score printer.
 - **Largest text sizes.** Count buttons, chips and the song button stop growing at a set text size, so the batting screen keeps its layout at the largest one: count buttons and the song button at the first accessibility size, chips at the largest ordinary size. Everything else keeps growing.
 
 ## The field drawing (`FieldDrawing.swift`)
@@ -86,16 +86,47 @@ Every file has previews in light and dark mode and at the largest accessibility 
 
 ## Not done
 
-- **The app icon** waits for Mikey’s full-size logo.
 - **The newspaper box score picture** belongs to the box score printer. The fonts and colors it needs are here (`newspaper*`, `TeamLogo.image`), and the approved layout is the end-of-game screen in the mockups.
 
 ## Vocabulary requests
 
 None.
 
+## The app icon
+
+The artwork is in `plan/mockups/icon/`:
+
+- `AppIcon-1024.png`: the dog on the logo’s powder blue, 1024 by 1024 pixels, with no transparency. Powder blue is the choice because the dog’s dark outline stays crisp against it on both light and dark wallpapers, and it is the app’s own team color. On black, the outline disappears into the background and the icon nearly vanishes on a dark wallpaper.
+- `AppIcon-1024-dark.png`: the dog on the logo’s near-black, for the phone’s dark mode, where iOS shows icons against dark backgrounds anyway.
+
+The dog fills about 78 percent of the height, centered, which keeps the ears clear of the rounded corners iOS cuts.
+
+To install it (lead builder, in the app shell). The app already has `app/Scorebook/Assets.xcassets/AppIcon.appiconset` with one empty 1024 slot:
+
+1. Copy `plan/mockups/icon/AppIcon-1024.png` and `AppIcon-1024-dark.png` into `app/Scorebook/Assets.xcassets/AppIcon.appiconset/`.
+2. Replace that folder’s `Contents.json` with:
+
+```json
+{
+  "images" : [
+    { "filename" : "AppIcon-1024.png", "idiom" : "universal", "platform" : "ios", "size" : "1024x1024" },
+    { "appearances" : [ { "appearance" : "luminosity", "value" : "dark" } ],
+      "filename" : "AppIcon-1024-dark.png", "idiom" : "universal", "platform" : "ios", "size" : "1024x1024" }
+  ],
+  "info" : { "author" : "xcode", "version" : 1 }
+}
+```
+
+3. In the `Scorebook` target’s **General** tab, check that **App Icon** under App Icons and Launch Screen says `AppIcon`.
+4. Build and run in the simulator, then look at the home screen in light and dark mode.
+
+The same result by hand in Xcode: select `AppIcon` in the asset catalog, set **Appearances** to **Any, Dark** in the Attributes inspector, and drag each picture into its slot.
+
+Xcode turns the 1024-pixel picture into every size the phone needs.
+
 ## For the wiring job and screen builders
 
-- The logo is bundled as `Resources/diamond-dogs-logo-150.jpg`, the 150-pixel version from Dropbox. When Mikey supplies the full-size logo, replace the file under the same name and nothing else changes.
+- The logo is bundled as `Resources/diamond-dogs-logo.png`: 512 pixels square, with a clear background, made from Mikey’s 2048-pixel export of the original artwork with the two stray white triangles in the artboard’s bottom corners removed. The same cleaned logo at 1024 pixels is in `plan/mockups/icon/diamond-dogs-logo-1024.png` for anything that needs it bigger.
 - On the batting screen use `FieldDrawing(onTap:).zoom(.infield).battingTeam(look).baseRunners(...)`. In the in-play steps use the whole field with `tapSequence`, and `fielderNames` when we are in the field. On the runners step add `runnerMarkers` from the suggested `RunnerMove`s.
 
 ## Evidence
