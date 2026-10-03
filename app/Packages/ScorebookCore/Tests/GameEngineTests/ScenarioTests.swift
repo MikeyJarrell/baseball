@@ -17,12 +17,7 @@ struct ScenarioTests {
 
     /// Expected values this engine disagrees with on purpose, by scenario name, with the reason.
     /// Each is written up in plan/handoffs/game-rules-engine.md for the test writer.
-    static let knownDisagreements: [String: (mismatch: String, reason: String)] = [
-        "hard-walk-off-single-bases-loaded": (
-            "situation gameOverQuestion: expected regulation, got nothing",
-            "Situation.gameOverQuestion is \"cleared once the game is final\" (Model/Situation.swift), so after the end-of-game event no question is open."
-        ),
-    ]
+    static let knownDisagreements: [String: (mismatch: String, reason: String)] = [:]
 
     @Test("Every scenario's expected situation and notation", arguments: Scenarios.names())
     func scenario(name: String) throws {
