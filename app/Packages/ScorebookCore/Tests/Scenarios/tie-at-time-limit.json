@@ -1,0 +1,188 @@
+{
+  "description": "Top of the fourth, tied 2-2. The time limit runs out during the inning, nobody scores, After the top half nothing is asked, since the home team still bats; when the inning ends tied the app asks whether the game is over on time. A tie at the time limit stays a tie (league rules 9.1 C, 9.1 H).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 4,
+        "half": "top",
+        "score": {
+          "away": 2,
+          "home": 2
+        },
+        "note": "Start in the fourth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "timeLimitChange": {
+        "endsAt": "2026-05-02T18:06:30Z"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "half": "bottom",
+          "isLastInning": true,
+          "isGameOverQuestionOpen": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 5,
+      "half": "top",
+      "score": {
+        "away": 2,
+        "home": 2
+      },
+      "gameOverQuestion": "timeLimit",
+      "isFinal": false
+    }
+  }
+}

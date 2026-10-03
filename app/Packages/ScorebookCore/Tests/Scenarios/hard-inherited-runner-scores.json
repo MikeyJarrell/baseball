@@ -1,0 +1,128 @@
+{
+  "description": "Ortiz singles off Barros. Voss relieves, and Ruiz doubles to center, scoring Ortiz. The run is charged to Barros, who put Ortiz on base.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "d12"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "pitcher": "d12"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m2",
+          "responsiblePitcher": "d12"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 1
+        },
+        {
+          "pitcher": "d12",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "runs": 1
+      },
+      {
+        "player": "m2",
+        "hits": 1,
+        "doubles": 1,
+        "runsBattedIn": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "runs": 1,
+        "hits": 1,
+        "battersFaced": 1,
+        "outsRecorded": 0
+      },
+      {
+        "pitcher": "d12",
+        "runs": 0,
+        "hits": 1,
+        "battersFaced": 1
+      }
+    ]
+  }
+}

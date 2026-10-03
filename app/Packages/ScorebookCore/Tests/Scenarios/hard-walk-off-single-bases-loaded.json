@@ -1,0 +1,183 @@
+{
+  "description": "Bottom of the ninth, tied 3-3, one out, bases loaded. Shaw singles to right on a 1-0 pitch. Only the winning run scores; the batter is credited with a single and one run batted in. The scorer ends the game. The three runs each team was given by the manual adjustment count in the ninth inning of the line score, credited to nobody, and the three runners still on base count as left on base.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 1,
+        "score": {
+          "away": 3,
+          "home": 3
+        },
+        "runners": {
+          "first": "d4",
+          "second": "d3",
+          "third": "d2"
+        },
+        "batterIndex": 4,
+        "note": "Start the scenario in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "d3",
+            "from": "second",
+            "to": "third"
+          },
+          {
+            "runner": "d4",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "d5",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "endOfGame": {
+        "reason": "regulation",
+        "finalScore": {
+          "away": 3,
+          "home": 4
+        }
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "batter": "d5",
+          "isGameOverQuestionOpen": false,
+          "runners": [
+            {
+              "base": "first",
+              "runner": "d4",
+              "responsiblePitcher": "m9"
+            },
+            {
+              "base": "second",
+              "runner": "d3",
+              "responsiblePitcher": "m9"
+            },
+            {
+              "base": "third",
+              "runner": "d2",
+              "responsiblePitcher": "m9"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "score": {
+            "away": 3,
+            "home": 4
+          },
+          "gameOverQuestion": "regulation",
+          "isFinal": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "score": {
+        "away": 3,
+        "home": 4
+      },
+      "gameOverQuestion": "regulation",
+      "isRegulationComplete": true,
+      "isFinal": true
+    },
+    "batting": [
+      {
+        "player": "d5",
+        "hits": 1,
+        "atBats": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "d2",
+        "runs": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 1,
+        "hits": 1,
+        "pitches": 2,
+        "strikes": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      },
+      {
+        "team": "home",
+        "runs": 4,
+        "hits": 1,
+        "leftOnBase": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4
+        ]
+      }
+    ]
+  }
+}

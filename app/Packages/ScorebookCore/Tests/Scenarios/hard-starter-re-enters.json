@@ -1,0 +1,192 @@
+{
+  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Mudcats go down in order. Once Moss has batted, Ortiz may re-enter in their original spot (league rule 9.9), and does so in the bottom of the first. Moss, a substitute who has been removed, may not come back. Ortiz never left center field, since the pinch hitter changed only the batting order.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "pinchHitter",
+            "incoming": "m10",
+            "replacing": "m1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m10",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "replacement",
+            "incoming": "m1",
+            "replacing": "m10"
+          }
+        ]
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "batter": "m10",
+          "battingSlots": [
+            {
+              "team": "away",
+              "index": 0,
+              "players": [
+                "m1",
+                "m10"
+              ]
+            }
+          ],
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": []
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "lineups": [
+            {
+              "team": "away",
+              "eligibleToReenter": [
+                "m1"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "batter": "d1",
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 0,
+          "players": [
+            "m1",
+            "m10",
+            "m1"
+          ],
+          "position": 8
+        }
+      ],
+      "fielders": [
+        {
+          "team": "away",
+          "position": 8,
+          "player": "m1"
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "nextBatterIndex": 3,
+          "eligibleToReenter": []
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m10",
+        "plateAppearances": 1,
+        "atBats": 1
+      },
+      {
+        "player": "m1",
+        "plateAppearances": 0
+      }
+    ]
+  }
+}

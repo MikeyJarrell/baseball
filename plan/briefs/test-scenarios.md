@@ -25,13 +25,16 @@ Cover, at least:
 - Pitching change mid-at-bat: pitches before and after go to the right pitchers; a walk after a change at 3-1 belongs to the first pitcher.
 - Inherited runners: a reliever comes in with a runner on second who later scores; the run is charged to the first pitcher.
 - Foul tip for strike three; dropped third strike with the batter thrown out and with the batter reaching.
-- A courtesy runner who scores (the run goes to the player they ran for) and one who steals second (the steal goes to the runner); a designated non-runner reaching base; a starter re-entering the game.
+- The runner for a designated non-runner who scores (the run goes to the designated non-runner) and one who steals second (the steal goes to the runner); a pinch runner who scores (the run goes to the pinch runner); a designated non-runner who chooses to run; the runner for a designated non-runner being the player who made the last out; a single with the batter taking second on an error (a hit, an error, no extra hit); a starter re-entering the game.
 - Fielders switching positions mid-game, with a later error charged to the right player.
 - An error with no runner moving.
 - An opponent with an unknown lineup cycling back to the top.
 - A pinch hitter, a pinch runner, a defensive switch.
 - A lineup of nine grown to eleven mid-inning, while the ninth hitter is batting; the order cycling through all eleven.
 - A walk-off in the bottom of the last inning; extra innings; a home team that does not bat in the last inning.
+- The time limit passing mid-inning (the inning is finished), during the top half with the home team ahead (game over after the top half), and with the score tied (a tie); the mercy rule.
+- A batting hole counting as an out each time it comes up.
+- The suggested runner for a designated non-runner in the first inning before any out, and when the last recorded out is now batting.
 - Undo after each kind of event.
 
 ## Real games

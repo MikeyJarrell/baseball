@@ -13,7 +13,7 @@
 The real version of the rules-engine interface in `Model/`:
 
 1. **Situation and play log from events.** Given a game’s setup and its events, return the situation after the last one and the play log (one record per event; see [architecture.md](../architecture.md)). It must be fast enough to replay a whole game after every tap; a nine-inning game is about 300 events. When an event no longer makes sense after an earlier one was edited (a runner who is no longer on base), mark it as needing review in the play log and carry on; never crash.
-2. **Suggested runner outcomes.** Given the situation and what happened to the batter, propose where every runner ends up and how many runs batted in, for the in-play screen to show the scorer.
+2. **Suggested runner outcomes.** Given the situation and what happened to the batter, propose where every runner ends up and how many runs batted in, for the in-play screen to show the scorer. A runner the scorer moves past the suggestion advanced on the throw or on an error; on a hit, the batter keeps the hit and the extra base is charged as an error (“1B 7, E7”).
 3. **Play preview.** For a play the scorer is still entering, its notation so far and the outs and runs it would produce, and whether it ends the inning or the game.
 4. **Scorebook notation** for any event, including the hit location when the scorer gave one (“1B 7” for a single to left).
 
@@ -26,11 +26,16 @@ The real version of the rules-engine interface in `Model/`:
 - The batting order wraps after its last slot, whatever the number of slots. When a hitter is added to the bottom mid-game, the order includes them from that point on; if the last hitter in the old order just batted, the new hitter is up next.
 - Pitches and strikes count against the pitcher on the mound at the moment. Fouls and balls in play count as strikes; a hit-by-pitch counts as a pitch and not a strike; an intentional walk counts no pitches.
 - Every runner carries the pitcher responsible for putting them on base. A runner who reaches on a fielder’s choice that retires a runner takes over the retired runner’s responsible pitcher (Official Baseball Rules 9.16(g)). A batter who walks after a pitching change made with the count at 2-0, 2-1, 3-0, 3-1 or 3-2 belongs to the earlier pitcher (rule 9.16(h)).
-- A courtesy runner, or the runner for a designated non-runner, takes the base without changing the batting order; the original player stays in the slot and is credited with the run if the runner scores.
-- The engine always knows which of our players is at each fielding position, from the starting positions plus every substitution, so every out and error is tied to a player. The situation flags when a designated non-runner has just reached base, so the app can ask who is running.
+- The runner for a designated non-runner takes the base without changing the batting order; the original player stays in the slot and is credited with the run if the runner scores.
+- The engine always knows which of our players is at each fielding position, from the starting positions plus every substitution, so every out and error is tied to a player. The situation flags when a designated non-runner has just reached base, with a suggested runner: the batting team’s player who made the most recent out. The non-runner may also run themselves, which records nothing.
 - Runs come only from what the play says scored; the engine never decides on its own whether a run counted.
 - The manual adjustment event overrides whatever it sets.
-- Games often end early on the time limit; the scorer ends them, and the engine never assumes the game runs nine innings.
+- Time limit (league rule 9.1): no new inning begins once the limit passes. The limit is three hours after the first pitch unless the scorer sets it. The situation reports time left, “finish this inning” once the limit passes mid-inning, and “game over on time” when that inning ends, or after its top half if the home team leads. A tie at the limit stays a tie; a tie after nine with time left goes to extra innings. The scorer ends the game. These are questions for the scorer, never enforcement: if the scorer keeps playing, later innings are ordinary innings, and the same question is not raised again for the same reason.
+- Mercy rule (9.13): a 12-run lead at the end of seven innings, or after six and a half with the home team ahead, is reported as game over (15 runs in a championship game).
+- A batting hole is an automatic out each time its spot comes up.
+- The suggested runner for a designated non-runner (9.11) is the last recorded out; in the first inning before any out, the last batter in the order; when the last recorded out is now batting, the last recorded out before them.
+- Re-entry eligibility (9.6, 9.9, 9.12): a starter may re-enter in the original spot once their substitute has batted; a removed substitute may not; a removed pitcher may pitch again once per game. The engine reports eligibility and blocks nothing.
+- See [notes/league-rules.md](../../notes/league-rules.md) for every league rule and its number.
 - Regulation is complete when the scheduled innings are done and the score is not tied, or when the home team leads after the top half of the last scheduled inning, or when the home team goes ahead in the bottom of the last inning or later. The engine reports it; the scorer ends the game.
 
 ## Suggested runner outcomes

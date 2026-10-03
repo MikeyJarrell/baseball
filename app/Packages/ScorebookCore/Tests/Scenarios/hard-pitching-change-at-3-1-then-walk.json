@@ -1,0 +1,148 @@
+{
+  "description": "Barros goes 3-1 on Ortiz and is hurt on the pitch, so Voss replaces them in the middle of the at-bat, which league rule 9.12 B 2 allows only for an injury. Voss throws ball four. The walk is charged to Barros (Official Baseball Rules 9.16(h)); the pitch counts to Voss. The change is to the defense only: Barros keeps the ninth batting spot and may come back to pitch once.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "d12"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 3,
+            "strikes": 1
+          },
+          "pitcher": "d12",
+          "batter": "m1",
+          "battingSlots": [
+            {
+              "team": "home",
+              "index": 8,
+              "players": [
+                "d9"
+              ],
+              "isBattingOnly": true
+            }
+          ],
+          "fielders": [
+            {
+              "team": "home",
+              "position": 1,
+              "player": "d12"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2",
+      "pitcher": "d12",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 4,
+          "strikes": 1,
+          "battersFaced": 1
+        },
+        {
+          "pitcher": "d12",
+          "pitches": 1,
+          "strikes": 0,
+          "battersFaced": 0
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 8,
+          "players": [
+            "d9"
+          ],
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToPitchAgain": [
+            "d9"
+          ],
+          "eligibleToReenter": []
+        }
+      ]
+    },
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "walks": 1,
+        "battersFaced": 1,
+        "pitches": 4,
+        "strikes": 1
+      },
+      {
+        "pitcher": "d12",
+        "walks": 0,
+        "battersFaced": 0,
+        "pitches": 1,
+        "strikes": 0
+      }
+    ]
+  }
+}

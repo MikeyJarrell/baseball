@@ -1,0 +1,117 @@
+{
+  "description": "Top of the sixth, Diamond Dogs ahead 3-1. The time limit runs out during the top half. The Diamond Dogs lead, so they do not need to bat: when the top half ends the app asks whether the game is over on time.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 6,
+        "half": "top",
+        "score": {
+          "away": 1,
+          "home": 3
+        },
+        "note": "Start in the sixth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "timeLimitChange": {
+        "endsAt": "2026-05-02T18:06:30Z"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isGameOverQuestionOpen": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 6,
+      "half": "bottom",
+      "score": {
+        "away": 1,
+        "home": 3
+      },
+      "gameOverQuestion": "timeLimit",
+      "isFinal": false
+    }
+  }
+}

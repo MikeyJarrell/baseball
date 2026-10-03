@@ -1,0 +1,110 @@
+{
+  "description": "Ortiz takes ball one, then pops one up in foul ground that the first baseman drops: a foul ball (1-1) and an error with nobody moving. Ortiz then grounds out 6-3.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "errorWithNoAdvance": {
+        "fielder": 3,
+        "type": "fielding"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 1
+          },
+          "outs": 0,
+          "runners": [],
+          "batter": "m1"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 2
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d4",
+        "errors": 1,
+        "putouts": 1
+      },
+      {
+        "player": "d2",
+        "assists": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      }
+    ]
+  }
+}

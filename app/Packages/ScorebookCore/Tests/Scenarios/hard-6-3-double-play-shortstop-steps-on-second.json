@@ -1,0 +1,83 @@
+{
+  "description": "Ortiz singles to center. Ruiz grounds to short; the shortstop steps on second to force Ortiz and throws to first to get Ruiz.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              6
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 2,
+      "runners": [],
+      "batter": "m3"
+    },
+    "fielding": [
+      {
+        "player": "d2",
+        "putouts": 1,
+        "assists": 1
+      },
+      {
+        "player": "d4",
+        "putouts": 1,
+        "assists": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "doublePlays": 1
+      }
+    ]
+  }
+}

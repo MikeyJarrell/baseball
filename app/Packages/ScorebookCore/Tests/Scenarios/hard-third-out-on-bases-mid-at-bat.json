@@ -1,0 +1,263 @@
+{
+  "description": "Two outs, then Hale singles. With Diaz up 1-1, Hale is caught stealing, catcher to shortstop: third out. Diaz leads off the second inning with a fresh count after the Diamond Dogs go down in order. The Diamond Dogs take the field again with nobody having checked their fielders, so the defense check is due.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m3",
+            "from": "first",
+            "to": "out",
+            "reason": "caughtStealing",
+            "outBy": [
+              2,
+              6
+            ],
+            "outAt": "second"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "popUp",
+        "fielders": [
+          4
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e6",
+      "expected": {
+        "situation": {
+          "inning": 1,
+          "half": "bottom",
+          "outs": 0,
+          "count": {
+            "balls": 0,
+            "strikes": 0
+          },
+          "runners": [],
+          "batter": "d1",
+          "defenseCheckDue": false,
+          "lineups": [
+            {
+              "team": "away",
+              "nextBatterIndex": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 2,
+      "half": "top",
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "m4",
+      "defenseCheckDue": true,
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 5,
+          "strikes": 4,
+          "battersFaced": 3
+        },
+        {
+          "pitcher": "m9",
+          "pitches": 3,
+          "strikes": 3,
+          "battersFaced": 3
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m3",
+        "hits": 1,
+        "caughtStealing": 1
+      },
+      {
+        "player": "m4",
+        "plateAppearances": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 3,
+        "battersFaced": 3,
+        "pitches": 5,
+        "strikes": 4
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d2",
+        "putouts": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "leftOnBase": 0
+      },
+      {
+        "team": "home",
+        "leftOnBase": 0
+      }
+    ]
+  }
+}

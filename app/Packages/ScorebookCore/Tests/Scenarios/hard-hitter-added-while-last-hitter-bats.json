@@ -1,0 +1,137 @@
+{
+  "description": "With Collins, the ninth and last Mudcats hitter, batting 1-0, the Mudcats add Moss to the bottom of the order as an extra hitter. Collins flies out, Moss is up next and singles, and the order goes back to Ortiz.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "batterIndex": 8,
+        "note": "Start the scenario with the ninth hitter up."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "addHitter": {
+        "team": "away",
+        "player": "m10"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m9",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m10",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "batter": "m9",
+          "onDeck": "m10",
+          "count": {
+            "balls": 1,
+            "strikes": 0
+          },
+          "lineups": [
+            {
+              "team": "away",
+              "length": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "batter": "m10",
+          "onDeck": "m1",
+          "outs": 1
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "batter": "m1",
+      "onDeck": "m2",
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m10",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "length": 10,
+          "nextBatterIndex": 0
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 9,
+          "players": [
+            "m10"
+          ],
+          "isBattingOnly": true
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m10",
+        "plateAppearances": 1,
+        "hits": 1
+      }
+    ]
+  }
+}

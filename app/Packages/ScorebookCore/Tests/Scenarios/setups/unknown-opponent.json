@@ -1,0 +1,207 @@
+{
+  "scheduledStart": "2026-05-02T18:00:00Z",
+  "away": {
+    "teamID": "riverhawks",
+    "name": "Riverhawks",
+    "isOurs": false,
+    "roster": [
+      {
+        "id": "r1",
+        "placeholder": "Batter 1"
+      },
+      {
+        "id": "r2",
+        "placeholder": "Batter 2"
+      },
+      {
+        "id": "r3",
+        "placeholder": "Batter 3"
+      },
+      {
+        "id": "r4",
+        "placeholder": "Batter 4"
+      },
+      {
+        "id": "r5",
+        "placeholder": "Batter 5"
+      },
+      {
+        "id": "r6",
+        "placeholder": "Batter 6"
+      },
+      {
+        "id": "r7",
+        "placeholder": "Batter 7"
+      },
+      {
+        "id": "r8",
+        "placeholder": "Batter 8"
+      },
+      {
+        "id": "r9",
+        "placeholder": "Batter 9"
+      },
+      {
+        "id": "rp",
+        "placeholder": "Pitcher"
+      }
+    ],
+    "battingOrder": [
+      "r1",
+      "r2",
+      "r3",
+      "r4",
+      "r5",
+      "r6",
+      "r7",
+      "r8",
+      "r9"
+    ],
+    "defense": [
+      {
+        "position": 1,
+        "player": "rp"
+      }
+    ]
+  },
+  "home": {
+    "teamID": "diamond-dogs",
+    "name": "Diamond Dogs",
+    "isOurs": true,
+    "roster": [
+      {
+        "id": "d1",
+        "name": "Alex Moreno",
+        "number": "3",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d2",
+        "name": "Chris Tate",
+        "number": "6",
+        "bats": "left",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d3",
+        "name": "Jordan Webb",
+        "number": "22",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d4",
+        "name": "Pat Quinn",
+        "number": "33",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "d5",
+        "name": "Riley Shaw",
+        "number": "12",
+        "bats": "switchHitter",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d6",
+        "name": "Casey Ford",
+        "number": "9",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d7",
+        "name": "Drew Lang",
+        "number": "17",
+        "bats": "left",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d8",
+        "name": "Morgan Fisk",
+        "number": "10",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d9",
+        "name": "Sky Barros",
+        "number": "21",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d10",
+        "name": "Jamie Cole",
+        "number": "14",
+        "bats": "left",
+        "throwsWith": "left"
+      },
+      {
+        "id": "d11",
+        "name": "Robin Nash",
+        "number": "27",
+        "bats": "right",
+        "throwsWith": "right"
+      },
+      {
+        "id": "d12",
+        "name": "Taylor Voss",
+        "number": "44",
+        "bats": "left",
+        "throwsWith": "left"
+      }
+    ],
+    "battingOrder": [
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "d7",
+      "d8",
+      "d9"
+    ],
+    "defense": [
+      {
+        "position": 1,
+        "player": "d9"
+      },
+      {
+        "position": 2,
+        "player": "d8"
+      },
+      {
+        "position": 3,
+        "player": "d4"
+      },
+      {
+        "position": 4,
+        "player": "d1"
+      },
+      {
+        "position": 5,
+        "player": "d5"
+      },
+      {
+        "position": 6,
+        "player": "d2"
+      },
+      {
+        "position": 7,
+        "player": "d6"
+      },
+      {
+        "position": 8,
+        "player": "d3"
+      },
+      {
+        "position": 9,
+        "player": "d7"
+      }
+    ]
+  }
+}

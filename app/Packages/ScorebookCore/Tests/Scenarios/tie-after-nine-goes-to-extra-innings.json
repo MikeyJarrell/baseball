@@ -1,0 +1,56 @@
+{
+  "description": "Bottom of the ninth, tied 3-3, two out, with time left. Moreno flies out: the game goes to the tenth inning, and nobody is asked whether it is over (league rule 9.1 H 2).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 2,
+        "score": {
+          "away": 3,
+          "home": 3
+        },
+        "batterIndex": 0,
+        "note": "Start with two out in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 10,
+      "half": "top",
+      "outs": 0,
+      "score": {
+        "away": 3,
+        "home": 3
+      },
+      "isGameOverQuestionOpen": false,
+      "isRegulationComplete": true
+    }
+  }
+}

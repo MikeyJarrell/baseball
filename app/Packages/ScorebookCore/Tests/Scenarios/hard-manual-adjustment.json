@@ -1,0 +1,94 @@
+{
+  "description": "Ortiz singles, but the umpire's view of the game differs from the book: the scorer sets one out, a 1-1 count on Ruiz, a 2-0 Mudcats lead and Ortiz on second. The next pitch is a ball. The two runs the adjustment adds go in the first inning of the line score, credited to nobody and charged to nobody.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "manualAdjustment": {
+        "outs": 1,
+        "count": {
+          "balls": 1,
+          "strikes": 1
+        },
+        "score": {
+          "away": 2,
+          "home": 0
+        },
+        "runners": {
+          "second": "m1"
+        },
+        "note": "Umpire had Ortiz on second with one out."
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 1,
+      "count": {
+        "balls": 2,
+        "strikes": 1
+      },
+      "score": {
+        "away": 2,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2"
+    },
+    "teams": [
+      {
+        "team": "away",
+        "runs": 2,
+        "hits": 1,
+        "lineScore": [
+          2
+        ]
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "runs": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "runs": 0
+      }
+    ]
+  }
+}

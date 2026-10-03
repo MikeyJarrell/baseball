@@ -1,0 +1,108 @@
+{
+  "description": "Ortiz singles; Moss pinch-runs for them and takes their place in the batting order. The defense is a separate list, so Ortiz is still listed in center field until the Mudcats change it. Ruiz grounds out 4-3, Moss moving to second.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "pinchRunner",
+            "incoming": "m10",
+            "replacing": "m1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m10",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m10",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 0,
+          "players": [
+            "m1",
+            "m10"
+          ],
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "eligibleToReenter": []
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "hits": 1
+      },
+      {
+        "player": "m10",
+        "plateAppearances": 0
+      }
+    ]
+  }
+}

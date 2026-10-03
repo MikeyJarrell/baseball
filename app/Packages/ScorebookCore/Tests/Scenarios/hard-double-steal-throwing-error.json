@@ -1,0 +1,146 @@
+{
+  "description": "Ortiz and Ruiz single. With Hale up 1-0, both runners steal. The catcher's throw to third sails into left: Ortiz scores, Ruiz goes to third. Two stolen bases and an error on the catcher.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "groundBall",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "scored",
+            "reason": "stolenBase",
+            "advancedOnError": true
+          },
+          {
+            "runner": "m2",
+            "from": "first",
+            "to": "third",
+            "reason": "stolenBase",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 2,
+            "type": "throwing"
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "third",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 2
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "stolenBases": 1,
+        "runs": 1
+      },
+      {
+        "player": "m2",
+        "stolenBases": 1,
+        "runs": 0
+      },
+      {
+        "player": "m3",
+        "plateAppearances": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "runs": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "errors": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      },
+      {
+        "team": "away",
+        "runs": 1
+      }
+    ]
+  }
+}
