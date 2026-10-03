@@ -6,6 +6,7 @@ import Foundation
 import Testing
 import Model
 import GameEngine
+import Stats
 import TestSupport
 
 @Suite("Vocabulary pass in the rules engine")
@@ -36,6 +37,8 @@ struct VocabularyPassEngineTests {
         let scenario = try Scenarios.load("walk-off-double-credited-as-single")
         let log = engine.replay(scenario.game).log
         #expect(log.entries.last?.plateAppearance?.outcome == .single)
+        // The notation is written from the credited hit, so the batter's history agrees.
+        #expect(log.entries.last?.notation == "1B 8")
     }
 
     @Test("A pinch hitter's strikeout after coming in with two strikes is charged to the batter replaced")
@@ -79,5 +82,39 @@ struct VocabularyPassEngineTests {
         #expect(engine.suggestedBattedBall(for: PlayDraft(batterResult: .sacrificeBunt, fielders: [.pitcher])) == .bunt)
         #expect(engine.suggestedBattedBall(for: PlayDraft(batterResult: .sacrificeFly, fielders: [.rightField])) == .flyBall)
         #expect(DoNothingRulesEngine().suggestedBattedBall(for: PlayDraft(fielders: [.centerField])) == nil)
+    }
+
+    @Test("A double play with the strikeout counts only right after a strikeout in the same half-inning")
+    func strikeoutDoublePlayCheck() throws {
+        let scenario = try Scenarios.load("strikeout-caught-stealing-double-play")
+        #expect(engine.replay(scenario.game).log.entries.allSatisfy { !$0.needsReview })
+
+        // The same mark on a steal after a ball, not a strikeout: flagged, and no double play.
+        var writer = try GameWriter.standard()
+        writer.add(.ballInPlay(Play(batterResult: .single, runners: [RunnerMove(runner: "m1", from: .home, to: .first)])))
+        writer.add(.pitch(Pitch(.ball)))
+        writer.add(.runnerAction(RunnerAction(moves: [RunnerMove(runner: "m1", from: .first, to: .out, reason: .caughtStealing,
+                                                                 outBy: [.catcher, .shortstop], outAt: .second)],
+                                              completesStrikeoutDoublePlay: true)))
+        let log = engine.replay(writer.game).log
+        #expect(log.entries.last?.needsReview == true)
+        #expect(StatsEngine().boxScore(for: log).notes.doublePlays.isEmpty)
+    }
+
+    @Test("In a short game nobody relieved, the starter of record gets the win")
+    func shortGameWin() throws {
+        var writer = try GameWriter.standard()
+        func out(_ batter: PlayerID) {
+            writer.add(.ballInPlay(Play(batterResult: .out, fielders: [.centerField],
+                                        runners: [RunnerMove(runner: batter, from: .home, to: .out, outBy: [.centerField])])))
+        }
+        for batter in ["m1", "m2", "m3"] as [PlayerID] { out(batter) }
+        writer.add(.ballInPlay(Play(batterResult: .homeRun, runners: [RunnerMove(runner: "d1", from: .home, to: .scored)], rbi: 1)))
+        for batter in ["d2", "d3", "d4"] as [PlayerID] { out(batter) }
+        for batter in ["m4", "m5", "m6"] as [PlayerID] { out(batter) }
+        writer.add(.endOfGame(EndOfGame(reason: .called, finalScore: Score(away: 0, home: 1))))
+        let box = StatsEngine().boxScore(for: engine.replay(writer.game).log)
+        #expect(box.home.pitching.first { $0.player == "d9" }?.decision == .win)
+        #expect(box.away.pitching.first { $0.player == "m9" }?.decision == .loss)
     }
 }

@@ -26,8 +26,8 @@ extension PlayLog {
     ///   ahead. Its pitcher of record then is the one who last pitched for it, or its starter
     ///   if nobody has yet.
     /// - That pitcher gets the win, unless they are the starter without five complete innings
-    ///   (four when the winning team played only five innings in the field). Then the win goes
-    ///   to a relief pitcher. The rule leaves which one to the scorer's judgment; this picks the
+    ///   (four when the winning team played only five innings in the field) and a reliever
+    ///   pitched. Then the win goes to a relief pitcher. A starter nobody relieved keeps it. The rule leaves which one to the scorer's judgment; this picks the
     ///   reliever with the most outs, then the fewest runs charged, then the earliest.
     /// - The loss goes to the pitcher charged with the run that gave the winners the lead for
     ///   good. A lead that came from a manual score change charges nobody.
@@ -59,11 +59,12 @@ extension PlayLog {
             .compactMap(\.pitcher)
         let starter = setup[winner].startingPitcher
         if let ofRecord = pitchedForWinner.last ?? starter {
-            if ofRecord == starter, outsRecorded(by: ofRecord) < outsNeededByStarter(winner) {
-                if let reliever = mostEffectiveReliever(for: winner, starter: starter) {
-                    decisions[reliever] = .win
-                }
+            if ofRecord == starter, outsRecorded(by: ofRecord) < outsNeededByStarter(winner),
+               let reliever = mostEffectiveReliever(for: winner, starter: starter) {
+                decisions[reliever] = .win
             } else {
+                // The pitcher of record, including a starter in a short game nobody relieved:
+                // rule 9.17(b) sets innings only for games of five or more innings in the field.
                 decisions[ofRecord] = .win
             }
         }

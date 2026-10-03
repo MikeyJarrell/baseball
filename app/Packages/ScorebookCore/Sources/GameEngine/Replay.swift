@@ -54,6 +54,9 @@ struct Replay {
     /// The batter who left with two strikes when a pinch hitter took over mid-count. If the
     /// pinch hitter strikes out, the strikeout and the at-bat are theirs (rule 9.15(b)).
     private var twoStrikeBatter: PlayerID?
+    /// On a game-ending hit cut down to the bases the winning run needed: the hit credited,
+    /// so the play log's notation matches it.
+    private var creditedHit: BatterResult?
 
     init(game: Game) {
         self.game = game
@@ -167,7 +170,14 @@ struct Replay {
         if s.isFinal { s.gameOverQuestion = nil }
         if !s.defenseCheckDue { s.suggestedDefense = nil }
 
-        let notation = Notation.event(event, before: before, name: name(of:))
+        // A game-ending hit is written as the hit it was credited as ("1B 8", not "2B 8").
+        var written = event
+        if let credited = creditedHit, case .ballInPlay(var play) = event.kind {
+            play.batterResult = credited
+            written.kind = .ballInPlay(play)
+        }
+        creditedHit = nil
+        let notation = Notation.event(written, before: before, name: name(of:))
         var entry = PlayLogEntry(
             event: event,
             inning: entryInning,
@@ -369,7 +379,9 @@ struct Replay {
         }
         // On a game-ending hit the batter is credited only with the bases the winning run
         // needed (rule 9.06(f)), whatever hit the scorer saved.
-        let credited = Self.outcome(of: Suggestions.creditedHit(play.batterResult, moves: moves, in: s))
+        let creditedResult = Suggestions.creditedHit(play.batterResult, moves: moves, in: s)
+        if creditedResult != play.batterResult { creditedHit = creditedResult }
+        let credited = Self.outcome(of: creditedResult)
         let end = applyMoves(moves, batter: batter, batterPitcher: pitcher, batterFielders: play.fielders,
                              inheritsFromRetired: play.batterResult == .fieldersChoice, &fx)
         for error in play.errors { fx.errors.append(charge(error)) }
@@ -378,7 +390,7 @@ struct Replay {
                            reached: end.map { $0 != .out } ?? false, chargedTo: pitcher, &fx)
     }
 
-    /// Catcher's interference charges the catcher with an error (rule 9.12(a)(3)), unless the
+    /// Catcher's interference charges the catcher with an error (rule 9.12(c)), unless the
     /// play already lists one for the catcher.
     private mutating func chargeCatchersInterference(_ play: Play, _ fx: inout Effects) {
         guard play.batterResult == .catchersInterference,
@@ -388,6 +400,12 @@ struct Replay {
 
     /// Runners moving between pitches: steals, pickoffs, wild pitches. The batter's count stays.
     private mutating func applyRunnerAction(_ action: RunnerAction, _ fx: inout Effects) {
+        // A double play with the strikeout needs a strikeout as the event just before, in this
+        // half-inning. Anywhere else the mark is ignored (stats apply the same test) and the
+        // event is flagged for the scorer.
+        if action.completesStrikeoutDoublePlay, !PlayLog.isStrikeoutJustBefore(entries.count, in: entries, half: s.half, inning: s.inning) {
+            fx.problems.append("Marked as a double play with the strikeout, but the event before is not a strikeout in this half-inning.")
+        }
         var moves = action.moves
         if moves.contains(where: \.isBatter) {
             fx.problems.append("A runner move between pitches starts at home plate.")

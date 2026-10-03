@@ -309,7 +309,9 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
     /// on the play or runner action, even when it helped several runners.
     public var advancedOnError: Bool
     /// For a pickoff: the runner was picked off while trying to steal, which official scoring
-    /// counts as caught stealing (Official Baseball Rules 9.07(h)).
+    /// counts as caught stealing (Official Baseball Rules 9.07(h)). It counts only when the
+    /// runner was put out; rule 9.07(h) also counts a runner who "would have been put out by
+    /// errorless play", which the scorer can record by marking the move caught stealing.
     public var wasStealing: Bool
 
     public init(

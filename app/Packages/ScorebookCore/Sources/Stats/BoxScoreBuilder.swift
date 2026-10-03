@@ -224,8 +224,14 @@ private struct GameTally {
             }
         }
 
-        // Double and triple plays turned by the fielding team.
-        switch entry.multiOutTurned {
+        // Double and triple plays turned by the fielding team. A runner put out on the same
+        // pitch as the strikeout just before makes one with the strikeout, which is the first out.
+        var turned = entry.multiOutTurned
+        if case .runnerAction(let action) = entry.event.kind, action.completesStrikeoutDoublePlay, !entry.outs.isEmpty,
+           PlayLog.isStrikeoutJustBefore(index, in: log.entries, half: entry.half, inning: entry.inning) {
+            turned = entry.outs.count >= 2 ? .triplePlay : .doublePlay
+        }
+        switch turned {
         case .doublePlay: doublePlays[fieldingTeam, default: 0] += 1
         case .triplePlay: triplePlays[fieldingTeam, default: 0] += 1
         case nil: break
