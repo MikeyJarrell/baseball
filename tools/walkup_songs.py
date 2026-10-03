@@ -1,10 +1,13 @@
-"""Download and cut every player's walk-up song.
+"""Download and cut every player's walk-up song and pitcher warm-up song.
 
 Reads team/roster.csv. For each player with a song source and a hook time, and no clip
 yet, it downloads the audio with the yt-dlp copy that Stacher installs, cuts a clip that
 runs from LEAD_IN seconds before the hook to TAIL seconds after it, evens out its loudness,
 and saves it to ~/Dropbox/baseball/songs/ as an M4A file named after the player. It then
 writes the clip's file name, and where the hook falls inside the clip, back into the roster.
+
+A pitcher's warm-up song plays until the first pitch, so it is kept whole: the full track,
+with its loudness evened out, saved as "<player>-warmup.m4a".
 
 Run from the repository root:
 
@@ -106,6 +109,22 @@ def cut(source, hook, out_path, row):
     return hook - start
 
 
+def keep_whole(source, out_path, title, artist):
+    """Save a whole track as M4A with its loudness evened out, for a warm-up song."""
+    subprocess.run(
+        [
+            FFMPEG, "-hide_banner", "-loglevel", "error", "-y",
+            "-i", str(source),
+            "-af", "loudnorm=I=-14:TP=-1.5:LRA=11",
+            "-ar", "44100", "-c:a", "aac", "-b:a", "256k",
+            "-metadata", f"title={title}",
+            "-metadata", f"artist={artist}",
+            str(out_path),
+        ],
+        check=True,
+    )
+
+
 def main():
     redo = "--redo" in sys.argv
     SONGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -136,7 +155,27 @@ def main():
         row["start_point_in_clip"] = clock(hook_in_clip)
         print(f"saved  {out_path.name}, hook at {clock(hook_in_clip)} in the clip")
 
-    # Write the clip names and start points back into the roster.
+    # Pitcher warm-up songs, kept whole.
+    for row in rows:
+        who = f"{row['goes_by']} {row['last_name']}"
+        if not row["warmup_source"]:
+            continue  # no warm-up song chosen
+        out_path = SONGS_DIR / file_name(row).replace(".m4a", "-warmup.m4a")
+        if out_path.exists() and row["warmup_file"] and not redo:
+            print(f"skip   {who}: {out_path.name} already saved")
+            continue
+        print(f"fetch  {who}: warm-up song {row['warmup_song']}")
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                source = download(row["warmup_source"], Path(tmp))
+                keep_whole(source, out_path, f"{who} warm-up: {row['warmup_song']}", row["warmup_artist"])
+        except (RuntimeError, subprocess.CalledProcessError) as problem:
+            print(f"FAILED {who}: {problem}")
+            continue
+        row["warmup_file"] = out_path.name
+        print(f"saved  {out_path.name}")
+
+    # Write the file names and start points back into the roster.
     with ROSTER.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()

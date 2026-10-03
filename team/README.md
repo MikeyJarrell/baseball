@@ -12,4 +12,6 @@ python3 tools/walkup_songs.py
 
 It only cuts players who have no clip yet; `--redo` cuts them all again. Each clip runs from 20 seconds before the hook to 30 seconds after it, so the song can fade in under the announcer and play about 12 seconds past the hook before fading out. A hook near the start of a track leaves less room before it; the app still gives that song the same fade-in as the rest, so it reaches full volume a few seconds after its hook.
 
+A pitcher’s warm-up song goes in the `warmup_` columns: the song, the artist and its source. It plays until the first pitch, so the script keeps the whole track rather than a clip, saved as `<player>-warmup.m4a`.
+
 Prefer the album audio on YouTube Music over a music video: video intros shift the timings players read off Spotify.
