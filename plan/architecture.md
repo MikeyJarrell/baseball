@@ -95,10 +95,10 @@ This is the agreement between builders. The foundation job writes it as real Swi
 
 **Service interfaces.** These are declared in `Model` as protocols (a list of functions a piece promises to provide), so screens and tests can use stand-ins while the real piece is being built:
 
-- Rules engine: situation and play log after a list of events; suggested runner outcomes and runs batted in for a play given the current situation; a preview of a play in progress (its notation so far, the outs and runs it would produce, whether it ends the inning); scorebook notation for an event (“6-3”, “F8”, “E6”, “1B 7” for a single to left, “K”, “ꓘ” for called strike three, “BB”).
+- Rules engine: situation and play log after a list of events; suggested runner outcomes and runs batted in for a play given the current situation; suggested runner outcomes for a runner action between pitches (a steal, a pickoff, a wild pitch or balk that moves every runner); the runner to offer first when a designated non-runner reaches base (the teammate who made the team’s most recent out); a preview of a play in progress (its notation so far, the outs and runs it would produce, whether it ends the inning); scorebook notation for an event (“6-3”, “F8”, “E6”, “1B 7” for a single to left, “K”, “ꓘ” for called strike three, “BB”).
 - Stats: box score for a game from its play log; season totals for a list of play logs; one player’s plate appearances in a game, in scorebook notation.
-- Storage: list, load and save teams, games and songs; save one new event; find the game in progress. Its functions are asynchronous (they finish in the background).
-- Walk-up audio, which runs on the main thread: import a file, list songs, set a start point, cue, play (with or without the announcer introduction first), fade out, stop, play and stop the between-innings playlist, and whether something is playing.
+- Storage: list, load and save teams, games, songs and app settings; save one new event; find the game in progress. Lists come back with the files that read cleanly plus any damaged files, so one broken game never hides the others. Its functions are asynchronous (they finish in the background).
+- Walk-up audio, which runs on the main thread except for copying files in, which runs in the background: import a file, list songs, set a start point, cue, play (with or without the announcer introduction first), fade out, stop, play and stop the between-innings playlist, whether something is playing, and a signal when playback ends on its own. Screens can watch it and redraw when it changes.
 
 ## How screens talk to the rest
 
