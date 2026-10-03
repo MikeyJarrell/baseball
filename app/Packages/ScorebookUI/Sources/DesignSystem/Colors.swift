@@ -1,9 +1,10 @@
 // The app's named colors. Screens use these names, never raw colors, so the look can change
 // in one place.
 //
-// The values match the approved mockups in plan/mockups/index.html. Our team's color comes
-// from the Diamond Dogs logo: powder blue with black text on it (black on light blue stays
-// readable in bright sun), black number badges, and tan as an accent. The other team is a
+// The values match the approved mockups in plan/mockups/index.html. Our team's colors are
+// sampled from the original Diamond Dogs logo artwork: collar blue #62B4E3, the dog's tan
+// #D8B887 and its near-black outline #2C2B2A. Text on our blue is that near-black (it stays
+// readable in bright sun), number badges are near-black, and tan is an accent. The other team is a
 // striped slate gray with white text, so the two teams never look alike.
 //
 // Every color has a light-mode and a dark-mode value. Light mode is the outdoor default, so
@@ -33,21 +34,21 @@ public enum ScorebookColor {
     // MARK: Teams
 
     /// Our team, the Diamond Dogs: the powder blue of the logo's collar. Text on it is
-    /// `onOurTeam` (black), never white.
-    public static let ourTeam = adaptive(light: 0x3BB6E6, dark: 0x45BFEE)
+    /// `onOurTeam` (the logo's near-black), never white.
+    public static let ourTeam = adaptive(light: 0x62B4E3, dark: 0x6CBDEA)
     /// Text and icons drawn on top of `ourTeam`.
-    public static let onOurTeam = adaptive(light: 0x08090B, dark: 0x000000)
+    public static let onOurTeam = adaptive(light: 0x2C2B2A, dark: 0x1A1918)
     /// A deeper blue for our team's pressed or playing state, such as the song button while
     /// a song plays. Text on it is still `onOurTeam`.
-    public static let ourTeamDeep = adaptive(light: 0x1E93C2, dark: 0x2A9BCB)
+    public static let ourTeamDeep = adaptive(light: 0x3E9ACF, dark: 0x4AA6DA)
     /// A pale tint of our blue, for backgrounds such as the in-play context strip.
-    public static let ourTeamSoft = adaptive(light: 0xDDF2FB, dark: 0x0D2A36)
+    public static let ourTeamSoft = adaptive(light: 0xE0F0FA, dark: 0x10283A)
     /// Our blue dark enough to read as text on a white or black surface.
-    public static let ourTeamText = adaptive(light: 0x0A6A90, dark: 0x7CD5F7)
-    /// The logo's black: the background of our player-number badges.
-    public static let ourTeamBadge = adaptive(light: 0x08090B, dark: 0x08090B)
+    public static let ourTeamText = adaptive(light: 0x1A6694, dark: 0x8CCDF0)
+    /// The logo's near-black outline: the background of our player-number badges.
+    public static let ourTeamBadge = adaptive(light: 0x2C2B2A, dark: 0x2C2B2A)
     /// The logo's tan (the chihuahua): an accent, used sparingly.
-    public static let ourTeamAccent = adaptive(light: 0xDFB57B, dark: 0xDFB57B)
+    public static let ourTeamAccent = adaptive(light: 0xD8B887, dark: 0xD8B887)
 
     /// The other team: a neutral slate gray, drawn with diagonal stripes (see `TeamBackground`)
     /// so it differs from ours in pattern as well as color. Text on it is `onTheirTeam`.
@@ -122,7 +123,7 @@ public enum ScorebookColor {
         Color(uiColor: UIColor { traits in traits.userInterfaceStyle == .dark ? dark : light })
     }
 
-    /// The same, from hex values written the way web colors are (0x3BB6E6 is powder blue).
+    /// The same, from hex values written the way web colors are (0x62B4E3 is the logo's powder blue).
     static func adaptive(light: UInt32, dark: UInt32) -> Color {
         adaptive(light: UIColor(hex: light), dark: UIColor(hex: dark))
     }
@@ -189,7 +190,7 @@ struct DiagonalStripes: Shape {
 }
 
 extension UIColor {
-    /// Makes a color from a hex value such as 0x3BB6E6.
+    /// Makes a color from a hex value such as 0x62B4E3.
     convenience init(hex: UInt32) {
         self.init(red: CGFloat((hex >> 16) & 0xFF) / 255,
                   green: CGFloat((hex >> 8) & 0xFF) / 255,

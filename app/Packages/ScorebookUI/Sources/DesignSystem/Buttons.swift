@@ -185,8 +185,10 @@ public struct PlayerNumberBadge: View {
     }
 }
 
-/// The Diamond Dogs logo (the chihuahua on black), bundled in this module's Resources folder.
-/// Used on the home screen, the team page and the end-of-game box score.
+/// The Diamond Dogs logo (the chihuahua), drawn from Mikey's original artwork with a clear
+/// background, bundled in this module's Resources folder as a 512-pixel picture. Used on the
+/// home screen, the team page and the end-of-game box score. Its dark outline reads on light
+/// and dark backgrounds alike.
 public struct TeamLogo: View {
     public var size: CGFloat
 
@@ -197,7 +199,7 @@ public struct TeamLogo: View {
     /// The logo as a picture, for screens that need it outside a `TeamLogo` view
     /// (the box score printer draws it into the newspaper picture). Empty if the file is missing.
     public static var image: UIImage {
-        UIImage(named: "diamond-dogs-logo-150.jpg", in: .module, with: nil) ?? UIImage()
+        UIImage(named: "diamond-dogs-logo", in: .module, with: nil) ?? UIImage()
     }
 
     public var body: some View {
@@ -206,8 +208,6 @@ public struct TeamLogo: View {
             .interpolation(.high)
             .scaledToFit()
             .frame(width: size, height: size)
-            .background(Color.black)
-            .clipShape(RoundedRectangle(cornerRadius: size * 0.25, style: .continuous))
             .accessibilityLabel(Text("Diamond Dogs"))
     }
 }
