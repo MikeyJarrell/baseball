@@ -121,6 +121,11 @@ public struct SampleRulesEngine: RulesEngine {
         }
     }
 
+    /// Reads the play log back to the batting team's most recent out.
+    public func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID? {
+        log.entries.last { $0.battingSide == side && !$0.outs.isEmpty }?.outs.last?.runner
+    }
+
     public func notation(for event: GameEvent, in situation: Situation) -> String {
         switch event.kind {
         case .pitch(let pitch):

@@ -136,8 +136,8 @@ public enum SampleSituations {
         return s
     }()
 
-    /// Bottom of the 1st: Pat Quinn, a designated non-runner, has just singled. The app
-    /// asks who will run for them.
+    /// Bottom of the 1st: Pat Quinn, a designated non-runner, has just singled with one out.
+    /// The app asks who runs, offering Chris Tate first, who made that out, or Quinn themself.
     public static let designatedNonRunnerOnFirst: SampleSituation = {
         var s = make(
             "Designated non-runner on first",
@@ -146,7 +146,7 @@ public enum SampleSituations {
             awayUp: 3, homeUp: 4,
             pitchers: [tally("m9", .home, 10, 6, 3), tally("c9", .away, 9, 6, 4)]
         )
-        s.situation.runnerNeededFor = "m4"
+        s.situation.runnerChoice = RunnerChoice(nonRunner: "m4", suggestedRunner: "m2")
         s.situation.lastPlayNotation = "1B 9"
         return s
     }()

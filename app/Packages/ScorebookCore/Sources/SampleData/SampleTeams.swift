@@ -94,7 +94,6 @@ public enum SampleSongs {
             title: title,
             fileName: "song-\(n).m4a",
             startTime: Double((i * 7) % 45),
-            playLength: i % 3 == 0 ? 20 : nil,
             volume: [1.0, 0.85, 0.7][i % 3],
             duration: Double(150 + i * 11)
         )

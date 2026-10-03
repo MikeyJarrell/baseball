@@ -158,7 +158,7 @@
               "standingInFor": "m1"
             }
           ],
-          "isRunnerNeeded": false,
+          "isRunnerChoiceOpen": false,
           "battingSlots": [
             {
               "team": "home",

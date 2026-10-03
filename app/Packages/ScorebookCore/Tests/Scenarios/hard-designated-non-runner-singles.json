@@ -1,5 +1,5 @@
 {
-  "description": "Three quick Cardinals outs. Moreno, the Mudcats' designated non-runner, singles; the app asks who runs, and Cole runs for them. Tate doubles, Cole scores, and the run is Moreno's.",
+  "description": "Three quick Cardinals outs. Moreno, the Mudcats' designated non-runner, singles; the app asks who runs (the Mudcats have made no out yet, so nobody is offered first), and Cole runs for them. Tate doubles, Cole scores, and the run is Moreno's.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -132,8 +132,9 @@
               "responsiblePitcher": "c9"
             }
           ],
-          "isRunnerNeeded": true,
-          "runnerNeededFor": "m1"
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "m1",
+          "hasSuggestedRunner": false
         }
       }
     },
@@ -149,7 +150,7 @@
               "standingInFor": "m1"
             }
           ],
-          "isRunnerNeeded": false
+          "isRunnerChoiceOpen": false
         }
       }
     }
@@ -171,7 +172,7 @@
         }
       ],
       "batter": "m3",
-      "isRunnerNeeded": false,
+      "isRunnerChoiceOpen": false,
       "battingSlots": [
         {
           "team": "home",
