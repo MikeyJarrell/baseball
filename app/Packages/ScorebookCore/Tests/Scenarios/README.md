@@ -30,9 +30,9 @@ In `situation`, a `runners` list is the whole set of runners: a base it leaves o
 
 ## Shared setups
 
-- `standard`: Cardinals (visitors, `c1` to `c12`) at Mudcats (home, our team, `m1` to `m12`). Nine-hitter orders; the pitchers, Ray Collins (`c9`) and Sky Barros (`m9`), bat ninth. The bench is `c10` to `c12` and `m10` to `m12`; `c12` and `m12` are relief pitchers.
-- `designated-non-runner`: the same, with the Mudcats’ leadoff hitter, Alex Moreno (`m1`), a designated non-runner.
-- `unknown-opponent`: the Riverhawks, a team nobody knows, at the Mudcats. Their hitters are placeholders `r1` to `r9` (“Batter 1” to “Batter 9”) with no positions, and their pitcher, `rp`, does not bat.
+- `standard`: Mudcats (visitors, `m1` to `m12`) at Diamond Dogs (home, our team, `d1` to `d12`). Nine-hitter orders; the pitchers, Ray Collins (`m9`) and Sky Barros (`d9`), bat ninth. The bench is `m10` to `m12` and `d10` to `d12`; `m12` and `d12` are relief pitchers.
+- `designated-non-runner`: the same, with the Diamond Dogs’ leadoff hitter, Alex Moreno (`d1`), a designated non-runner.
+- `unknown-opponent`: the Riverhawks, a team nobody knows, at the Diamond Dogs. Their hitters are placeholders `r1` to `r9` (“Batter 1” to “Batter 9”) with no positions, and their pitcher, `rp`, does not bat.
 
 ## Starting mid-game
 

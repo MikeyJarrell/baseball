@@ -11,7 +11,7 @@
         "hitLocation": 8,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -31,7 +31,7 @@
         ],
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "first",
             "to": "out",
             "outBy": [
@@ -40,7 +40,7 @@
             "outAt": "second"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -59,16 +59,16 @@
     "situation": {
       "outs": 2,
       "runners": [],
-      "batter": "c3"
+      "batter": "m3"
     },
     "fielding": [
       {
-        "player": "m2",
+        "player": "d2",
         "putouts": 1,
         "assists": 1
       },
       {
-        "player": "m4",
+        "player": "d4",
         "putouts": 1,
         "assists": 0
       }

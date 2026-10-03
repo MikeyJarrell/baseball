@@ -1,5 +1,5 @@
 {
-  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Cardinals go down in order. In the bottom of the first, Ortiz re-enters in center field in place of Moss, which our league allows.",
+  "description": "Moss pinch-hits for Ortiz to lead off and grounds out; the Mudcats go down in order. In the bottom of the first, Ortiz re-enters in center field in place of Moss, which our league allows.",
   "setupFile": "standard",
   "events": [
     {
@@ -10,8 +10,8 @@
         "changes": [
           {
             "kind": "pinchHitter",
-            "incoming": "c10",
-            "replacing": "c1"
+            "incoming": "m10",
+            "replacing": "m1"
           }
         ]
       }
@@ -28,7 +28,7 @@
         ],
         "runners": [
           {
-            "runner": "c10",
+            "runner": "m10",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -52,7 +52,7 @@
         ],
         "runners": [
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -75,7 +75,7 @@
         ],
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -96,8 +96,8 @@
         "changes": [
           {
             "kind": "defensiveReplacement",
-            "incoming": "c1",
-            "replacing": "c10",
+            "incoming": "m1",
+            "replacing": "m10",
             "position": 8
           }
         ]
@@ -109,14 +109,14 @@
       "afterEvent": "e1",
       "expected": {
         "situation": {
-          "batter": "c10",
+          "batter": "m10",
           "battingSlots": [
             {
               "team": "away",
               "index": 0,
               "players": [
-                "c1",
-                "c10"
+                "m1",
+                "m10"
               ]
             }
           ]
@@ -129,15 +129,15 @@
       "inning": 1,
       "half": "bottom",
       "outs": 0,
-      "batter": "m1",
+      "batter": "d1",
       "battingSlots": [
         {
           "team": "away",
           "index": 0,
           "players": [
-            "c1",
-            "c10",
-            "c1"
+            "m1",
+            "m10",
+            "m1"
           ],
           "position": 8
         }
@@ -146,7 +146,7 @@
         {
           "team": "away",
           "position": 8,
-          "player": "c1"
+          "player": "m1"
         }
       ],
       "lineups": [
@@ -158,12 +158,12 @@
     },
     "batting": [
       {
-        "player": "c10",
+        "player": "m10",
         "plateAppearances": 1,
         "atBats": 1
       },
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 0
       }
     ]

@@ -26,17 +26,17 @@ public enum SampleSituations {
     /// Top of the first, nobody on, nothing happened yet. Ortiz leads off against Barros.
     public static let topOfFirst = SampleSituation(
         title: "Top of the 1st, nobody on",
-        setup: SampleSetups.cardinalsAtMudcats,
-        situation: Situation(startOf: SampleSetups.cardinalsAtMudcats)
+        setup: SampleSetups.mudcatsAtDiamondDogs,
+        situation: Situation(startOf: SampleSetups.mudcatsAtDiamondDogs)
     )
 
     /// Top of the 3rd, runner on first, one out, 2-1 count on Diaz.
     public static let runnerOnFirstOneOut = make(
         "Runner on first, one out, 2-1 count",
         inning: 3, half: .top, outs: 1, count: Count(balls: 2, strikes: 1), score: Score(away: 1, home: 2),
-        runners: [BaseRunner(runner: "c3", base: .first, responsiblePitcher: "m9")],
+        runners: [BaseRunner(runner: "m3", base: .first, responsiblePitcher: "d9")],
         awayUp: 3, homeUp: 0,
-        pitchers: [tally("m9", .home, 32, 20, 11), tally("c9", .away, 35, 23, 11)]
+        pitchers: [tally("d9", .home, 32, 20, 11), tally("m9", .away, 35, 23, 11)]
     )
 
     /// Bottom of the 4th, bases loaded, two outs, full count on Quinn (who has a walk-up song).
@@ -44,12 +44,12 @@ public enum SampleSituations {
         "Bases loaded, two outs, full count",
         inning: 4, half: .bottom, outs: 2, count: Count(balls: 3, strikes: 2), score: Score(away: 3, home: 2),
         runners: [
-            BaseRunner(runner: "m1", base: .third, responsiblePitcher: "c9"),
-            BaseRunner(runner: "m2", base: .second, responsiblePitcher: "c9"),
-            BaseRunner(runner: "m3", base: .first, responsiblePitcher: "c9"),
+            BaseRunner(runner: "d1", base: .third, responsiblePitcher: "m9"),
+            BaseRunner(runner: "d2", base: .second, responsiblePitcher: "m9"),
+            BaseRunner(runner: "d3", base: .first, responsiblePitcher: "m9"),
         ],
         awayUp: 2, homeUp: 3,
-        pitchers: [tally("m9", .home, 55, 34, 18), tally("c9", .away, 61, 38, 19)]
+        pitchers: [tally("d9", .home, 55, 34, 18), tally("m9", .away, 61, 38, 19)]
     )
 
     /// Top of the 6th, runners on second and third, nobody out, Park up.
@@ -57,11 +57,11 @@ public enum SampleSituations {
         "Runners on second and third, nobody out",
         inning: 6, half: .top, outs: 0, score: Score(away: 2, home: 4),
         runners: [
-            BaseRunner(runner: "c4", base: .third, responsiblePitcher: "m9"),
-            BaseRunner(runner: "c5", base: .second, responsiblePitcher: "m9"),
+            BaseRunner(runner: "m4", base: .third, responsiblePitcher: "d9"),
+            BaseRunner(runner: "m5", base: .second, responsiblePitcher: "d9"),
         ],
         awayUp: 5, homeUp: 6,
-        pitchers: [tally("m9", .home, 81, 50, 25), tally("c9", .away, 74, 46, 22)]
+        pitchers: [tally("d9", .home, 81, 50, 25), tally("m9", .away, 74, 46, 22)]
     )
 
     /// Bottom of the 2nd. Our order started with ten and has been extended to eleven
@@ -71,9 +71,9 @@ public enum SampleSituations {
             "Our tenth hitter up, lineup extended to eleven",
             inning: 2, half: .bottom, outs: 1, score: Score(away: 1, home: 2),
             awayUp: 0, homeUp: 9,
-            pitchers: [tally("m9", .home, 29, 17, 9), tally("c9", .away, 24, 15, 8)]
+            pitchers: [tally("d9", .home, 29, 17, 9), tally("m9", .away, 24, 15, 8)]
         )
-        s.situation.home.battingOrder.slots.append(BattingSlot(players: ["m11"]))
+        s.situation.home.battingOrder.slots.append(BattingSlot(players: ["d11"]))
         return s
     }()
 
@@ -83,25 +83,30 @@ public enum SampleSituations {
             "New pitcher just in",
             inning: 5, half: .top, outs: 0, score: Score(away: 3, home: 4),
             awayUp: 1, homeUp: 4,
-            pitchers: [tally("m9", .home, 57, 35, 19), tally("m12", .home, 0, 0, 0), tally("c9", .away, 47, 30, 15), tally("c12", .away, 12, 7, 4)]
+            pitchers: [tally("d9", .home, 57, 35, 19), tally("d12", .home, 0, 0, 0), tally("m9", .away, 47, 30, 15), tally("m12", .away, 12, 7, 4)]
         )
-        // Voss replaces Barros for the Mudcats; Reyes already replaced Collins (after Moss
-        // pinch-hit) for the Cardinals.
-        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"], position: .pitcher)
-        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "m12")
-        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["c9", "c10", "c12"], position: .pitcher)
-        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "c12")
+        // Voss replaces Barros for the Diamond Dogs; Reyes already replaced Collins (after Moss
+        // pinch-hit) for the Mudcats.
+        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["d9", "d12"])
+        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "d12")
+        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["m9", "m10", "m12"])
+        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "m12")
+        // Barros and Collins may each come back to pitch once. Collins may also re-enter the
+        // batting order in the ninth spot, since Moss, who replaced them, has batted.
+        s.situation.home.eligibleToPitchAgain = ["d9"]
+        s.situation.away.eligibleToPitchAgain = ["m9"]
+        s.situation.away.eligibleToReenter = [ReentryOption(player: "m9", spotIndex: 8)]
         s.situation.lastPlayNotation = "6-4-3 DP"
         return s
     }()
 
     /// Top of the 9th, the last scheduled inning, home team ahead 5-3 with two outs.
-    /// One more out and the game is complete without the Mudcats batting.
+    /// One more out and the game is complete without the Diamond Dogs batting.
     public static let lastInningHomeAhead = make(
         "Top of the 9th, home team ahead",
         inning: 9, half: .top, outs: 2, count: Count(balls: 1, strikes: 1), score: Score(away: 3, home: 5),
         awayUp: 6, homeUp: 2,
-        pitchers: [tally("m9", .home, 112, 71, 33), tally("c9", .away, 98, 60, 30)]
+        pitchers: [tally("d9", .home, 112, 71, 33), tally("m9", .away, 98, 60, 30)]
     )
 
     /// Top of the 10th, tied 4-4: extra innings, with both relievers pitching.
@@ -110,26 +115,28 @@ public enum SampleSituations {
             "Extra innings, top of the 10th",
             inning: 10, half: .top, outs: 0, score: Score(away: 4, home: 4),
             awayUp: 2, homeUp: 7,
-            pitchers: [tally("m9", .home, 98, 61, 30), tally("m12", .home, 18, 12, 5),
-                       tally("c9", .away, 90, 55, 29), tally("c12", .away, 30, 19, 9)]
+            pitchers: [tally("d9", .home, 98, 61, 30), tally("d12", .home, 18, 12, 5),
+                       tally("m9", .away, 90, 55, 29), tally("m12", .away, 30, 19, 9)]
         )
-        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"], position: .pitcher)
-        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "m12")
-        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["c9", "c12"], position: .pitcher)
-        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "c12")
+        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["d9", "d12"])
+        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "d12")
+        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"])
+        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "m12")
+        s.situation.home.eligibleToPitchAgain = ["d9"]
+        s.situation.away.eligibleToPitchAgain = ["m9"]
         return s
     }()
 
     // MARK: More situations screens need
 
     /// The changeover after the top of the 3rd: three outs made, nobody has pitched to the
-    /// Mudcats yet. The between-innings music button shows.
+    /// Diamond Dogs yet. The between-innings music button shows.
     public static let betweenHalfInnings: SampleSituation = {
         var s = make(
             "Between half-innings, middle of the 3rd",
             inning: 3, half: .bottom, outs: 0, score: Score(away: 2, home: 2),
             awayUp: 4, homeUp: 1,
-            pitchers: [tally("m9", .home, 41, 25, 14), tally("c9", .away, 35, 23, 11)]
+            pitchers: [tally("d9", .home, 41, 25, 14), tally("m9", .away, 35, 23, 11)]
         )
         s.situation.isBetweenHalfInnings = true
         s.situation.lastPlayNotation = "L4-3 DP"
@@ -142,11 +149,11 @@ public enum SampleSituations {
         var s = make(
             "Designated non-runner on first",
             inning: 1, half: .bottom, outs: 1,
-            runners: [BaseRunner(runner: "m4", base: .first, responsiblePitcher: "c9")],
+            runners: [BaseRunner(runner: "d4", base: .first, responsiblePitcher: "m9")],
             awayUp: 3, homeUp: 4,
-            pitchers: [tally("m9", .home, 10, 6, 3), tally("c9", .away, 9, 6, 4)]
+            pitchers: [tally("d9", .home, 10, 6, 3), tally("m9", .away, 9, 6, 4)]
         )
-        s.situation.runnerChoice = RunnerChoice(nonRunner: "m4", suggestedRunner: "m2")
+        s.situation.runnerChoice = RunnerChoice(nonRunner: "d4", suggestedRunner: "d2")
         s.situation.lastPlayNotation = "1B 9"
         return s
     }()
@@ -156,18 +163,18 @@ public enum SampleSituations {
         "Our hitter with no song",
         inning: 3, half: .bottom, outs: 1, count: Count(balls: 0, strikes: 1), score: Score(away: 2, home: 3),
         awayUp: 4, homeUp: 7,
-        pitchers: [tally("m9", .home, 41, 25, 14), tally("c9", .away, 44, 28, 14)]
+        pitchers: [tally("d9", .home, 41, 25, 14), tally("m9", .away, 44, 28, 14)]
     )
 
     /// Bottom of the 1st at the Bombers: their hitter known only as number 2.
     public static let theirHitterKnownByNumber: SampleSituation = {
-        let setup = SampleSetups.mudcatsAtBombers
+        let setup = SampleSetups.diamondDogsAtBombers
         var situation = Situation(startOf: setup)
         situation.half = .bottom
         situation.outs = 1
         situation.away.nextBatterIndex = 4
         situation.home.nextBatterIndex = 1
-        situation.pitchers = [tally("m9", .away, 6, 4, 1), tally("b11", .home, 14, 8, 4)]
+        situation.pitchers = [tally("d9", .away, 6, 4, 1), tally("b11", .home, 14, 8, 4)]
         situation.defenseCheckDue = false
         return SampleSituation(title: "Their hitter known only by number", setup: setup, situation: situation)
     }()
@@ -178,10 +185,32 @@ public enum SampleSituations {
             "Right after strike three",
             inning: 3, half: .bottom, outs: 1, score: Score(away: 2, home: 3),
             awayUp: 4, homeUp: 3,
-            pitchers: [tally("m9", .home, 41, 25, 14), tally("c9", .away, 41, 26, 13)]
+            pitchers: [tally("d9", .home, 41, 25, 14), tally("m9", .away, 41, 26, 13)]
         )
         s.situation.droppedThirdStrikePossible = true
         s.situation.lastPlayNotation = "K"
+        return s
+    }()
+
+    /// Bottom of the 7th, Diamond Dogs trailing 4-5. The three-hour limit ran out during this
+    /// inning, which began before it, so this is the last inning: the batting screen's clock
+    /// says so.
+    public static let lastInningOnTime: SampleSituation = {
+        var s = make(
+            "Time limit passed: last inning",
+            inning: 7, half: .bottom, outs: 1, count: Count(balls: 1, strikes: 0), score: Score(away: 5, home: 4),
+            runners: [BaseRunner(runner: "d1", base: .second, responsiblePitcher: "m12")],
+            awayUp: 4, homeUp: 1,
+            pitchers: [tally("d9", .home, 88, 55, 26), tally("d12", .home, 31, 20, 9),
+                       tally("m9", .away, 61, 38, 19), tally("m12", .away, 44, 27, 13)]
+        )
+        let firstPitch = s.situation.gameStartedAt!
+        s.situation.currentInningStartedAt = firstPitch.addingTimeInterval(170 * 60)
+        s.situation.isLastInning = true
+        s.situation.home.battingOrder.slots[8] = BattingSlot(players: ["d9", "d12"])
+        s.situation.home.fielders = replacing(s.situation.home.fielders, at: .pitcher, with: "d12")
+        s.situation.away.battingOrder.slots[8] = BattingSlot(players: ["m9", "m12"])
+        s.situation.away.fielders = replacing(s.situation.away.fielders, at: .pitcher, with: "m12")
         return s
     }()
 
@@ -190,16 +219,16 @@ public enum SampleSituations {
         topOfFirst, runnerOnFirstOneOut, basesLoadedTwoOutsFullCount, secondAndThirdNobodyOut,
         tenthHitterUpAfterAddingOne, newPitcherJustIn, lastInningHomeAhead, extraInnings,
         betweenHalfInnings, designatedNonRunnerOnFirst, ourHitterWithoutSong, theirHitterKnownByNumber,
-        rightAfterStrikeThree,
+        rightAfterStrikeThree, lastInningOnTime,
     ]
 
     // MARK: Building blocks
 
-    /// A situation in the sample game (Cardinals at Mudcats) with the usual lineups and fielders.
+    /// A situation in the sample game (Mudcats at Diamond Dogs) with the usual lineups and fielders.
     /// `awayUp` and `homeUp` are the spots due up for each team, counting from 0.
     static func make(
         _ title: String,
-        setup: GameSetup = SampleSetups.cardinalsAtMudcats,
+        setup: GameSetup = SampleSetups.mudcatsAtDiamondDogs,
         inning: Int, half: HalfInning, outs: Int, count: Count = Count(), score: Score = Score(),
         runners: [BaseRunner] = [], awayUp: Int, homeUp: Int, pitchers: [PitcherTally]
     ) -> SampleSituation {
@@ -214,7 +243,13 @@ public enum SampleSituations {
         situation.home.nextBatterIndex = homeUp
         situation.pitchers = pitchers
         situation.defenseCheckDue = false
-        situation.gameStartedAt = setup.date.addingTimeInterval(300)
+        // The first pitch came five minutes after the scheduled start; this inning began
+        // twenty minutes per inning after that.
+        let firstPitch = setup.scheduledStart.addingTimeInterval(300)
+        situation.gameStartedAt = firstPitch
+        situation.currentInningStartedAt = firstPitch.addingTimeInterval(Double((inning - 1) * 20 * 60))
+        situation.timeLimitEndsAt = setup.timeLimitMinutes.map { firstPitch.addingTimeInterval(Double($0 * 60)) }
+        situation.isRegulationComplete = inning > 5 || (inning == 5 && half == .bottom && score.home > score.away)
         return SampleSituation(title: title, setup: setup, situation: situation)
     }
 
@@ -255,5 +290,5 @@ public enum SamplePlateAppearances {
     public static let none: [PlateAppearanceSummary] = []
 
     /// The histories above, by player.
-    public static let byPlayer: [PlayerID: [PlateAppearanceSummary]] = ["m3": webb, "m4": quinn, "c1": ortiz]
+    public static let byPlayer: [PlayerID: [PlateAppearanceSummary]] = ["d3": webb, "d4": quinn, "m1": ortiz]
 }

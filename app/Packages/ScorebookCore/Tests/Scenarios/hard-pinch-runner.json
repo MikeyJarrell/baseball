@@ -11,7 +11,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -27,8 +27,8 @@
         "changes": [
           {
             "kind": "pinchRunner",
-            "incoming": "c10",
-            "replacing": "c1"
+            "incoming": "m10",
+            "replacing": "m1"
           }
         ]
       }
@@ -45,12 +45,12 @@
         ],
         "runners": [
           {
-            "runner": "c10",
+            "runner": "m10",
             "from": "first",
             "to": "second"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -70,18 +70,18 @@
       "runners": [
         {
           "base": "second",
-          "runner": "c10",
-          "responsiblePitcher": "m9"
+          "runner": "m10",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c3",
+      "batter": "m3",
       "battingSlots": [
         {
           "team": "away",
           "index": 0,
           "players": [
-            "c1",
-            "c10"
+            "m1",
+            "m10"
           ],
           "isExtraHitter": true
         }
@@ -89,12 +89,12 @@
     },
     "batting": [
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 1,
         "hits": 1
       },
       {
-        "player": "c10",
+        "player": "m10",
         "plateAppearances": 0
       }
     ]

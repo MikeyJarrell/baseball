@@ -35,7 +35,7 @@
       "enteredAt": "2026-05-02T18:06:40Z",
       "pitchingChange": {
         "team": "home",
-        "newPitcher": "m12"
+        "newPitcher": "d12"
       }
     },
     {
@@ -55,15 +55,15 @@
             "balls": 3,
             "strikes": 1
           },
-          "pitcher": "m12",
-          "batter": "c1",
+          "pitcher": "d12",
+          "batter": "m1",
           "battingSlots": [
             {
               "team": "home",
               "index": 8,
               "players": [
-                "m9",
-                "m12"
+                "d9",
+                "d12"
               ],
               "position": 1
             }
@@ -82,21 +82,21 @@
       "runners": [
         {
           "base": "first",
-          "runner": "c1",
-          "responsiblePitcher": "m9"
+          "runner": "m1",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c2",
-      "pitcher": "m12",
+      "batter": "m2",
+      "pitcher": "d12",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 4,
           "strikes": 1,
           "battersFaced": 1
         },
         {
-          "pitcher": "m12",
+          "pitcher": "d12",
           "pitches": 1,
           "strikes": 0,
           "battersFaced": 0
@@ -107,8 +107,8 @@
           "team": "home",
           "index": 8,
           "players": [
-            "m9",
-            "m12"
+            "d9",
+            "d12"
           ],
           "position": 1
         }
@@ -116,14 +116,14 @@
     },
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "walks": 1,
         "battersFaced": 1,
         "pitches": 4,
         "strikes": 1
       },
       {
-        "pitcher": "m12",
+        "pitcher": "d12",
         "walks": 0,
         "battersFaced": 0,
         "pitches": 1,

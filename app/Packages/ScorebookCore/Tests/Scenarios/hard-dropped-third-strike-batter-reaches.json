@@ -35,7 +35,7 @@
           ],
           "runners": [
             {
-              "runner": "c1",
+              "runner": "m1",
               "from": "home",
               "to": "first"
             }
@@ -55,14 +55,14 @@
       "runners": [
         {
           "base": "first",
-          "runner": "c1",
-          "responsiblePitcher": "m9"
+          "runner": "m1",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c2",
+      "batter": "m2",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 4,
           "strikes": 3,
           "battersFaced": 1
@@ -71,7 +71,7 @@
     },
     "batting": [
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 1,
         "atBats": 1,
         "strikeouts": 1,
@@ -80,14 +80,14 @@
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "strikeouts": 1,
         "outsRecorded": 0
       }
     ],
     "fielding": [
       {
-        "player": "m8",
+        "player": "d8",
         "putouts": 0
       }
     ]

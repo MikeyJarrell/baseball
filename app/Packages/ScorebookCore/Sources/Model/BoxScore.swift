@@ -121,7 +121,8 @@ public struct BattingLine: Codable, Equatable, Sendable {
     public var number: String?
     /// The spot in the order they batted in (or ran for), counting from 0.
     public var batterIndex: Int
-    /// Every position they played today, in order: "ss", or "ph" then "2b".
+    /// Every position they played today, in order: "ss", or "ph" then "2b". A player who only
+    /// batted has none, or just "ph".
     public var positions: [BoxPosition]
     /// True for a player who came into the game after it started.
     public var isSubstitute: Bool
@@ -181,8 +182,6 @@ public enum BoxPosition: String, Codable, Sendable, CaseIterable {
     case secondBase = "2b"
     case thirdBase = "3b"
     case ss, lf, cf, rf
-    /// Extra hitter: bats, does not field.
-    case eh
     /// Pinch hitter.
     case ph
     /// Pinch runner.
@@ -190,7 +189,7 @@ public enum BoxPosition: String, Codable, Sendable, CaseIterable {
 
     /// The box score label for a fielding position: shortstop is "ss".
     public init(_ position: Position) {
-        self = BoxPosition(rawValue: position.abbreviation) ?? .eh
+        self = BoxPosition(rawValue: position.abbreviation)!
     }
 }
 
