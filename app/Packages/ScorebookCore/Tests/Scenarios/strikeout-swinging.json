@@ -1,0 +1,103 @@
+{
+  "description": "Ortiz swings at strike one, takes a ball, fouls one off for strike two, and swings through strike three.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 2
+          },
+          "outs": 0,
+          "batter": "m1",
+          "droppedThirdStrikePossible": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "m2",
+      "droppedThirdStrikePossible": true,
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 4,
+          "strikes": 3,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e4",
+        "notation": "K"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "strikeouts": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "strikeouts": 1,
+        "outsRecorded": 1,
+        "battersFaced": 1,
+        "pitches": 4,
+        "strikes": 3
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1,
+        "assists": 0,
+        "errors": 0
+      }
+    ]
+  }
+}
