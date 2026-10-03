@@ -1,0 +1,115 @@
+{
+  "description": "Ortiz singles to left. Ruiz walks on four pitches, forcing Ortiz to second.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "score": {
+        "away": 0,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 5,
+          "strikes": 1,
+          "battersFaced": 2
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e5",
+        "notation": "BB"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "walks": 1,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "walks": 1,
+        "hits": 1,
+        "battersFaced": 2,
+        "runs": 0
+      }
+    ]
+  }
+}
