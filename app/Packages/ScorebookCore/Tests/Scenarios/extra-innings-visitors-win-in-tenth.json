@@ -1,0 +1,343 @@
+{
+  "description": "Bottom of the ninth, tied 3-3, two out. Moreno flies out, so the game goes to the tenth with nothing asked. Ortiz doubles and scores on Ruiz's single; the Mudcats strand Ruiz. The Diamond Dogs go down in order, and the app asks whether the game is over: the Mudcats win 4-3 in ten. The runs the manual adjustment gave each team count in the ninth inning.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 2,
+        "score": {
+          "away": 3,
+          "home": 3
+        },
+        "batterIndex": 0,
+        "note": "Start with two out in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "popUp",
+        "fielders": [
+          6
+        ],
+        "runners": [
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m5",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e10",
+      "enteredAt": "2026-05-02T18:08:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e11",
+      "enteredAt": "2026-05-02T18:08:40Z",
+      "endOfGame": {
+        "reason": "regulation",
+        "finalScore": {
+          "away": 4,
+          "home": 3
+        }
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "inning": 10,
+          "half": "top",
+          "outs": 0,
+          "isGameOverQuestionOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e7",
+      "expected": {
+        "situation": {
+          "inning": 10,
+          "half": "bottom",
+          "score": {
+            "away": 4,
+            "home": 3
+          },
+          "isGameOverQuestionOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e10",
+      "expected": {
+        "situation": {
+          "score": {
+            "away": 4,
+            "home": 3
+          },
+          "gameOverQuestion": "regulation",
+          "isFinal": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "score": {
+        "away": 4,
+        "home": 3
+      },
+      "isFinal": true,
+      "isRegulationComplete": true
+    },
+    "notation": [
+      {
+        "event": "e6",
+        "notation": "P6"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "runs": 1,
+        "doubles": 1
+      },
+      {
+        "player": "m2",
+        "hits": 1,
+        "runsBattedIn": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 3,
+        "battersFaced": 5,
+        "hits": 2,
+        "runs": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 4,
+        "hits": 2,
+        "leftOnBase": 1,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          1
+        ]
+      },
+      {
+        "team": "home",
+        "runs": 3,
+        "hits": 0,
+        "leftOnBase": 0,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3,
+          0
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "description": "Ortiz triples to right. Ball one to Ruiz is a wild pitch and Ortiz scores. The run is charged to Barros; nobody gets a run batted in, and Ruiz is still batting at 1-0.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "triple",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "third"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored",
+            "reason": "wildPitch"
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [],
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 2,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "runs": 1,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m2",
+        "plateAppearances": 0,
+        "runsBattedIn": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "runs": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 1
+      },
+      {
+        "team": "home",
+        "errors": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "description": "Ortiz singles to left, and Barros picks them off first, pitcher to first baseman Quinn. A pickoff is an out but not a caught stealing.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "reason": "pickoff",
+            "outBy": [
+              1,
+              3
+            ],
+            "outAt": "first"
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "caughtStealing": 0,
+        "stolenBases": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d9",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d4",
+        "putouts": 1
+      }
+    ]
+  }
+}

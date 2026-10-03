@@ -1,0 +1,56 @@
+# Official box score, Houston Astros 9 at New York Yankees 4, June 23, 2019.
+# Transcribed by hand from https://www.retrosheet.org/boxesetc/2019/B06230NYA2019.htm
+# The information used here was obtained free of charge from and is copyrighted by Retrosheet.
+# Interested parties may contact Retrosheet at "www.retrosheet.org".
+#
+# Format: see NYA201904210-box.txt.
+line,away,1,0,1,4,3,0,0,0,0
+line,home,0,0,0,0,3,0,0,1,0
+team,away,R=9,H=14,E=0,LOB=4,DP=1
+team,home,R=4,H=6,E=0,LOB=3,DP=3
+bat,altuj001,AB=5,R=2,H=2,RBI=1,BB=0,SO=1,2B=1,HR=1
+bat,brega001,AB=4,R=0,H=0,RBI=0,BB=1,SO=0
+bat,branm003,AB=4,R=1,H=2,RBI=1,BB=1,SO=1
+bat,alvay001,AB=5,R=1,H=2,RBI=2,BB=0,SO=1,HR=1
+bat,gurry001,AB=4,R=2,H=2,RBI=1,BB=0,SO=0,HR=1
+bat,chirr001,AB=4,R=1,H=1,RBI=0,BB=0,SO=2
+bat,reddj001,AB=4,R=1,H=2,RBI=0,BB=0,SO=0
+bat,whitt002,AB=4,R=1,H=1,RBI=4,BB=0,SO=1,HR=1
+bat,marij002,AB=4,R=0,H=2,RBI=0,BB=0,SO=1
+bat,lemad001,AB=4,R=2,H=3,RBI=3,BB=0,SO=0,3B=1,HR=1
+bat,judga001,AB=4,R=0,H=0,RBI=1,BB=0,SO=1
+bat,voitl001,AB=3,R=0,H=0,RBI=0,BB=1,SO=2
+bat,sancg002,AB=4,R=0,H=1,RBI=0,BB=0,SO=1
+bat,encae001,AB=4,R=0,H=0,RBI=0,BB=0,SO=2
+bat,gregd001,AB=4,R=0,H=0,RBI=0,BB=0,SO=2
+bat,torrg001,AB=4,R=0,H=0,RBI=0,BB=0,SO=2
+bat,hicka001,AB=3,R=1,H=1,RBI=0,BB=0,SO=1
+bat,gardb001,AB=2,R=1,H=1,RBI=0,BB=1,SO=0
+pit,verlj001,IP=7,H=4,R=3,BB=2,SO=9,HR=1,BFP=26
+pit,devec001,IP=1,H=1,R=1,BB=0,SO=1,HR=0,BFP=4
+pit,osunr001,IP=1,H=1,R=0,BB=0,SO=1,HR=0,BFP=4
+pit,happj001,IP=4,H=11,R=8,BB=0,SO=2,HR=3,BFP=22
+pit,cessl001,IP=4,H=3,R=1,BB=1,SO=4,HR=1,BFP=14
+pit,haled001,IP=1,H=0,R=0,BB=1,SO=1,HR=0,BFP=4
+fld,altuj001,PO=2,A=3,E=0
+fld,brega001,PO=1,A=1,E=0
+fld,branm003,PO=2,A=0,E=0
+fld,gurry001,PO=2,A=3,E=0
+fld,chirr001,PO=11,A=0,E=0
+fld,reddj001,PO=2,A=0,E=0
+fld,whitt002,PO=5,A=1,E=0
+fld,marij002,PO=1,A=0,E=0
+fld,verlj001,PO=1,A=0,E=0
+fld,devec001,PO=0,A=0,E=0
+fld,osunr001,PO=0,A=0,E=0
+fld,lemad001,PO=0,A=4,E=0
+fld,judga001,PO=2,A=0,E=0
+fld,voitl001,PO=10,A=1,E=0
+fld,sancg002,PO=7,A=0,E=0
+fld,gregd001,PO=2,A=2,E=0
+fld,torrg001,PO=2,A=4,E=0
+fld,hicka001,PO=1,A=0,E=0
+fld,gardb001,PO=3,A=0,E=0
+fld,happj001,PO=0,A=0,E=0
+fld,cessl001,PO=0,A=0,E=0
+fld,haled001,PO=0,A=1,E=0

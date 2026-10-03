@@ -1,0 +1,97 @@
+{
+  "description": "Ortiz triples to center. Ruiz flies out to right and Ortiz tags up and scores: a sacrifice fly, with a run batted in and no at-bat for Ruiz.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "triple",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "third"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "sacrificeFly",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          },
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [],
+      "batter": "m3"
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "SF 9"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "sacrificeFlies": 1,
+        "runsBattedIn": 1,
+        "hits": 0
+      },
+      {
+        "player": "m1",
+        "runs": 1,
+        "triples": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 2,
+        "runs": 1,
+        "hits": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d7",
+        "putouts": 1
+      }
+    ]
+  }
+}

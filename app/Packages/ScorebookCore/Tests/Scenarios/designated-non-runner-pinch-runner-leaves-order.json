@@ -1,0 +1,214 @@
+{
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, singles. Instead of the runner the rule names, the Diamond Dogs send in Cole as an ordinary pinch runner, which takes Moreno out of the batting order (league rule 9.11 M). Tate doubles and Cole scores; the run is Cole's. Moreno may not re-enter yet, since Cole has not batted (league rule 9.9).",
+  "setupFile": "designated-non-runner",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "substitution": {
+        "team": "home",
+        "batting": [
+          {
+            "kind": "pinchRunner",
+            "incoming": "d10",
+            "replacing": "d1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "d10",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1"
+        }
+      }
+    },
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": false,
+          "runners": [
+            {
+              "base": "first",
+              "runner": "d10",
+              "responsiblePitcher": "m9"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "score": {
+        "away": 0,
+        "home": 1
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "d2",
+          "responsiblePitcher": "m9"
+        }
+      ],
+      "batter": "d3",
+      "isRunnerChoiceOpen": false,
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 0,
+          "players": [
+            "d1",
+            "d10"
+          ],
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToReenter": []
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "d10",
+        "runs": 1,
+        "plateAppearances": 0
+      },
+      {
+        "player": "d1",
+        "runs": 0,
+        "hits": 1
+      },
+      {
+        "player": "d2",
+        "doubles": 1,
+        "runsBattedIn": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 1
+      }
+    ]
+  }
+}
