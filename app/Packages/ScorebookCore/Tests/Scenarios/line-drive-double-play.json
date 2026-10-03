@@ -1,0 +1,103 @@
+{
+  "description": "Ortiz singles to center. Ruiz lines out to second baseman Moreno, who throws to Quinn at first before Ortiz can get back: a line-drive double play.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "lineDrive",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4
+            ]
+          },
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 2,
+      "runners": [],
+      "batter": "m3"
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "L4-3 DP"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 2,
+        "battersFaced": 2
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d1",
+        "putouts": 1,
+        "assists": 1
+      },
+      {
+        "player": "d4",
+        "putouts": 1,
+        "assists": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "doublePlays": 1
+      }
+    ]
+  }
+}

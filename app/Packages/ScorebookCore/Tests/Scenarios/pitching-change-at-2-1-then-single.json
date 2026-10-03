@@ -1,0 +1,95 @@
+{
+  "description": "Barros goes 2-1 on Ortiz and is hurt, so Voss comes in mid-at-bat (league rule 9.12 B 2). Ortiz singles on Voss's first pitch. Only a walk would stay with Barros (Official Baseball Rules 9.16(h)); the hit, the batter and the runner are Voss's.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "d12"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d12"
+        }
+      ],
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 1,
+          "battersFaced": 0
+        },
+        {
+          "pitcher": "d12",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "hits": 0,
+        "battersFaced": 0,
+        "pitches": 3,
+        "strikes": 1
+      },
+      {
+        "pitcher": "d12",
+        "hits": 1,
+        "battersFaced": 1,
+        "pitches": 1,
+        "strikes": 1
+      }
+    ]
+  }
+}

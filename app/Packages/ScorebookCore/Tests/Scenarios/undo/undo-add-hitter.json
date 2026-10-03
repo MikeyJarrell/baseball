@@ -1,0 +1,66 @@
+{
+  "description": "Undo an added hitter. With Collins, the ninth Mudcats hitter, batting 1-0, Moss is added to the bottom of the order. Undoing it leaves nine spots, with Ortiz on deck again.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "batterIndex": 8,
+        "note": "Start with the ninth hitter up."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "addHitter": {
+        "team": "away",
+        "player": "m10"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "batter": "m9",
+          "onDeck": "m1",
+          "count": {
+            "balls": 1,
+            "strikes": 0
+          },
+          "lineups": [
+            {
+              "team": "away",
+              "length": 9
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "batter": "m9",
+      "onDeck": "m10",
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "lineups": [
+        {
+          "team": "away",
+          "length": 10
+        }
+      ]
+    }
+  }
+}

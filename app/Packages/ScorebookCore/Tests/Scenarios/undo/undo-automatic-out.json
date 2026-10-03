@@ -1,0 +1,84 @@
+{
+  "description": "Undo an automatic out at a batting hole. The second Mudcats spot is a batting hole. Ortiz singles, and the app records the automatic out. Undoing it brings the hole back up with nobody out; the app would record it again.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "battingHole": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "automaticOut": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "outs": 0,
+          "batter": "m2",
+          "isBattingHoleUp": true,
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ]
+        },
+        "pitching": [
+          {
+            "pitcher": "d9",
+            "outsRecorded": 0
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "batter": "m3",
+      "isBattingHoleUp": false,
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ]
+    },
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1
+      }
+    ]
+  }
+}

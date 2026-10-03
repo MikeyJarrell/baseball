@@ -1,0 +1,122 @@
+{
+  "description": "Ortiz grounds out 5-3 to third baseman Shaw. Nash replaces Shaw at third and in the fifth batting spot. Ruiz grounds out 5-3 to Nash. Shaw may not re-enter yet: Nash has not batted (league rule 9.9).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "substitution": {
+        "team": "home",
+        "batting": [
+          {
+            "kind": "replacement",
+            "incoming": "d11",
+            "replacing": "d5"
+          }
+        ],
+        "defense": [
+          {
+            "position": 5,
+            "player": "d11"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 2,
+      "batter": "m3",
+      "fielders": [
+        {
+          "team": "home",
+          "position": 5,
+          "player": "d11"
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 4,
+          "players": [
+            "d5",
+            "d11"
+          ],
+          "position": 5
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToReenter": []
+        }
+      ]
+    },
+    "fielding": [
+      {
+        "player": "d5",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d11",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d4",
+        "putouts": 2
+      }
+    ]
+  }
+}
