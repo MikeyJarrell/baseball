@@ -29,7 +29,7 @@ Follow the official scoring rules of Major League Baseball (Official Baseball Ru
 
 Earned runs need judgment about which runs errors caused, so pitching lines carry runs only.
 
-A run scored by a courtesy runner, or by the runner for a designated non-runner, is credited to the player they ran for; stolen bases and caught stealing go to whoever ran.
+A run scored by the runner for a designated non-runner is credited to the designated non-runner; stolen bases and caught stealing go to whoever ran.
 
 Our players are matched across games by player id. Opponent players appear in single-game box scores and are left out of season totals.
 
