@@ -44,14 +44,14 @@ struct AtBatBand: View {
                 Text("\(info.setup[info.situation.battingSide].name) batting")
                     .font(ScorebookFont.headline)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
                 if let line = AtBatWording.limitLine(info.clock) {
                     // Tapping the time limit opens it, to match the umpire's clock.
                     Button { onAction(.openTimeLimit) } label: {
                         Label(line, systemImage: "clock")
                             .font(ScorebookFont.caption.weight(.semibold))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.7)
+                            .minimumScaleFactor(0.5)
                             .frame(minHeight: 24, alignment: .leading)
                             .contentShape(Rectangle())
                     }
@@ -134,6 +134,8 @@ struct Scoreboard: View {
         }
         .padding(.vertical, Spacing.small)
         .padding(.horizontal, Spacing.extraSmall)
+        // Only as tall as its words: the dividers would otherwise stretch it to fill the screen.
+        .fixedSize(horizontal: false, vertical: true)
         .background(info.look.onFill.opacity(0.10), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         // VoiceOver reads the whole scoreboard as one sentence.
         .accessibilityElement(children: .ignore)
@@ -148,6 +150,7 @@ struct Scoreboard: View {
             Text(AtBatWording.shortTeamName(info.setup[side].name))
                 .font(ScorebookFont.chip)
                 .lineLimit(1)
+                .minimumScaleFactor(0.6)
                 .opacity(batting ? 1 : 0.75)
             Spacer(minLength: Spacing.extraSmall)
             Text("\(info.situation.score[side])")

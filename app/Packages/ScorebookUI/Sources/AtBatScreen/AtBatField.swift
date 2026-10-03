@@ -14,16 +14,18 @@ struct AtBatFieldArea: View {
     var onAction: (AtBatAction) -> Void
 
     var body: some View {
-        ZStack {
-            // Grass behind the drawing, so the field fills the width whatever its height.
-            ScorebookColor.fieldGrass
+        // The banner sits above the drawing, not on it, so it never hides a runner on second.
+        VStack(spacing: 0) {
+            banner
             FieldDrawing(occupiedBases: info.situation.occupiedBases, onTap: handleTap)
                 .zoom(.infield)
                 .battingTeam(info.look)
                 .baseRunners(runnerTags)
                 .padding(.top, Spacing.small)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .overlay(alignment: .top) { banner }
+        // Grass behind everything, so the field fills the width whatever its height.
+        .background(ScorebookColor.fieldGrass)
         .overlay(alignment: .bottomLeading) { onDeckCard }
         .overlay(alignment: .bottomTrailing) { pitcherCard }
         .clipped()

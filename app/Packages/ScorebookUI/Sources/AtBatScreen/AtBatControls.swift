@@ -91,7 +91,7 @@ struct BatterRow: View {
         .padding(.vertical, Spacing.extraSmall + 2)
         .background(info.look.soft, in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         // The batter keeps one line at the largest text sizes, so the buttons below stay on screen.
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     /// "Batter: number 33, Pat Quinn, bats left, designated non-runner. Today: 4-3, 1B 7."
@@ -193,8 +193,13 @@ struct CountButtons: View {
                 .accessibilityHint(Text(AtBatWording.ballHint(count)))
 
                 Button { pitch(.swingingStrike) } label: {
-                    CountButtonLabel("Strike", hint: AtBatWording.strikeHint(count))
-                        .padding(.trailing, calledWidth - Spacing.small)
+                    // The words keep clear of the Called button: an empty space its width sits
+                    // beside them, so they shrink to fit the rest at large text sizes.
+                    HStack(spacing: 0) {
+                        CountButtonLabel("Strike", hint: AtBatWording.strikeHint(count))
+                            .frame(maxWidth: .infinity)
+                        Color.clear.frame(width: calledWidth + Spacing.small)
+                    }
                 }
                 .buttonStyle(CountButtonStyle.strike)
                 .accessibilityLabel(Text("Strike, swinging"))
@@ -277,7 +282,8 @@ struct SongButton: View {
                 SongButtonLabel(icon: playing ? "stop.fill" : "play.fill", title: title,
                                 detail: playing ? "Playing · stops on the first pitch"
                                                 : "Warm-up for \(AtBatWording.shortName(pitcher)), our pitcher",
-                                iconFill: ScorebookColor.onTheirTeam.opacity(0.25))
+                                iconFill: ScorebookColor.onTheirTeam.opacity(0.25),
+                                iconColor: ScorebookColor.onTheirTeam)
                     .foregroundStyle(ScorebookColor.onTheirTeam)
             }
             .buttonStyle(WarmUpButtonStyle(isActive: playing))
@@ -315,7 +321,8 @@ struct SongButton: View {
                     detail: playing
                         ? (info.songPlayback == .introduction ? "Introduction · song next" : "Tap to stop now")
                         : (withIntro ? "Introduction, then \(seconds) seconds of song" : "\(seconds) seconds, then fades"),
-                    iconFill: ScorebookColor.onOurTeam
+                    iconFill: ScorebookColor.onOurTeam,
+                    iconColor: ScorebookColor.ourTeam
                 )
                 if playing { SongCountdown(playback: info.songPlayback, length: length) }
             }
@@ -332,12 +339,14 @@ struct SongButtonLabel: View {
     var title: String
     var detail: String
     var iconFill: Color
+    /// The color of the symbol inside the circle.
+    var iconColor: Color = ScorebookColor.surface
 
     var body: some View {
         HStack(spacing: Spacing.medium) {
             Image(systemName: icon)
                 .font(.body.weight(.bold))
-                .foregroundStyle(ScorebookColor.surface)
+                .foregroundStyle(iconColor)
                 .frame(width: 38, height: 38)
                 .background(iconFill, in: Circle())
                 .accessibilityHidden(true)
