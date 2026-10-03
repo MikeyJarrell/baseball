@@ -1,0 +1,197 @@
+{
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, singles; with no Diamond Dogs out yet in the first inning, the app offers Barros, the last batter in the order (league rule 9.11 E), who runs. Ball one to Tate, then Barros steals second. The stolen base is Barros's, who actually ran; the batting order does not change.",
+  "setupFile": "designated-non-runner",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "runnerForNonRunner": {
+        "runner": "d9",
+        "replacing": "d1"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "d9",
+            "from": "first",
+            "to": "second",
+            "reason": "stolenBase"
+          }
+        ]
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9",
+          "hasSuggestedRunner": true,
+          "runners": [
+            {
+              "base": "first",
+              "runner": "d1",
+              "responsiblePitcher": "m9"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "d9",
+          "responsiblePitcher": "m9",
+          "standingInFor": "d1"
+        }
+      ],
+      "batter": "d2",
+      "isRunnerChoiceOpen": false,
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 0,
+          "players": [
+            "d1"
+          ]
+        },
+        {
+          "team": "home",
+          "index": 8,
+          "players": [
+            "d9"
+          ]
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e7",
+        "notation": "SB2"
+      }
+    ],
+    "batting": [
+      {
+        "player": "d9",
+        "stolenBases": 1,
+        "plateAppearances": 0
+      },
+      {
+        "player": "d1",
+        "stolenBases": 0,
+        "hits": 1,
+        "plateAppearances": 1
+      }
+    ]
+  }
+}

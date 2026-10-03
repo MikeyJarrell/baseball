@@ -1,0 +1,359 @@
+{
+  "description": "Ruiz's second spot is a batting hole from the start (league rules 9.2 B, 9.5 C). In the first, Ortiz flies out, the hole is an automatic out, and Hale flies out. In the second the next seven Mudcats are all walked intentionally, forcing in four runs, and the order comes round to the hole again: another automatic out. Hale flies out. Neither automatic out is anyone's plate appearance, and both count toward Barros's outs.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "battingHole": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "automaticOut": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e10",
+      "enteredAt": "2026-05-02T18:08:20Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e11",
+      "enteredAt": "2026-05-02T18:08:40Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e12",
+      "enteredAt": "2026-05-02T18:09:00Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e13",
+      "enteredAt": "2026-05-02T18:09:20Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e14",
+      "enteredAt": "2026-05-02T18:09:40Z",
+      "intentionalWalk": {}
+    },
+    {
+      "id": "e15",
+      "enteredAt": "2026-05-02T18:10:00Z",
+      "automaticOut": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    },
+    {
+      "id": "e16",
+      "enteredAt": "2026-05-02T18:10:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "outs": 1,
+          "batter": "m2",
+          "isBattingHoleUp": true
+        }
+      }
+    },
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "inning": 1,
+          "half": "bottom",
+          "lineups": [
+            {
+              "team": "away",
+              "nextBatterIndex": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "afterEvent": "e14",
+      "expected": {
+        "situation": {
+          "outs": 0,
+          "score": {
+            "away": 4,
+            "home": 0
+          },
+          "batter": "m2",
+          "isBattingHoleUp": true
+        }
+      }
+    },
+    {
+      "afterEvent": "e15",
+      "expected": {
+        "situation": {
+          "outs": 1,
+          "batter": "m3",
+          "isBattingHoleUp": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 2,
+      "half": "top",
+      "outs": 2,
+      "score": {
+        "away": 4,
+        "home": 0
+      },
+      "batter": "m4",
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "second",
+          "runner": "m9",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "third",
+          "runner": "m8",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "isBattingHoleUp": false,
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 1,
+          "players": [
+            "m2"
+          ],
+          "isHole": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "length": 9,
+          "nextBatterIndex": 3
+        }
+      ],
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 3,
+          "battersFaced": 10
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e8",
+        "notation": "IBB"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 0,
+        "atBats": 0
+      },
+      {
+        "player": "m3",
+        "plateAppearances": 2,
+        "atBats": 2
+      },
+      {
+        "player": "m1",
+        "plateAppearances": 2,
+        "atBats": 1,
+        "walks": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m4",
+        "runs": 1,
+        "walks": 1,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m7",
+        "runsBattedIn": 1,
+        "runs": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 5,
+        "battersFaced": 10,
+        "walks": 7,
+        "runs": 4,
+        "pitches": 3
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 4,
+        "hits": 0
+      }
+    ]
+  }
+}
