@@ -62,9 +62,11 @@ final class AudioGraph {
         hall.loadFactoryPreset(.largeHall2)
         setEcho(0.5)
 
-        // Listen to everything leaving the main mixer, to measure loudness.
+        // Listen to everything leaving the main mixer, to measure loudness. The audio system
+        // calls this from its own thread, so it is marked `@Sendable` (safe on any thread)
+        // instead of belonging to the main thread like the rest of this class.
         let meter = self.meter
-        main.installTap(onBus: 0, bufferSize: 2_048, format: nil) { buffer, _ in
+        main.installTap(onBus: 0, bufferSize: 2_048, format: nil) { @Sendable buffer, _ in
             meter.measure(buffer)
         }
     }

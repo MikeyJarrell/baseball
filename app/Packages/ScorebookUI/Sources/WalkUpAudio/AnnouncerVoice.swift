@@ -28,7 +28,7 @@ final class AnnouncerVoice {
     /// - Number and name: “Now batting, … number two, … Derek Jeter. … Number two.”
     /// - Name only: “Now batting, … Derek Jeter.”
     /// - Number only: “Now batting, … number twenty-two. … Number twenty-two.”
-    static func phrases(for player: Player) -> [AnnouncerPhrase]? {
+    nonisolated static func phrases(for player: Player) -> [AnnouncerPhrase]? {
         let name = player.name?.trimmingCharacters(in: .whitespaces)
         let number = player.number?.trimmingCharacters(in: .whitespaces)
         let hasName = !(name ?? "").isEmpty
@@ -51,7 +51,7 @@ final class AnnouncerVoice {
 
     /// Jersey numbers as an announcer says them: “00” is “double zero”, “07” is “oh seven”,
     /// anything else is read as an ordinary number.
-    static func spokenNumber(_ number: String) -> String {
+    nonisolated static func spokenNumber(_ number: String) -> String {
         if number == "00" { return "double zero" }
         if number.count == 2, number.hasPrefix("0") { return "oh \(number.dropFirst())" }
         return number
@@ -100,7 +100,8 @@ final class AnnouncerVoice {
         let collector = SpeechCollector()
         return await withCheckedContinuation { (continuation: CheckedContinuation<SpeechPieces, Never>) in
             collector.whenDone { continuation.resume(returning: $0) }
-            synthesizer.write(utterance) { buffer in
+            // The speech engine calls this from its own thread, hence `@Sendable`.
+            synthesizer.write(utterance) { @Sendable buffer in
                 collector.add(buffer)
             }
             // The safety net: finish with whatever arrived after six seconds.
@@ -112,7 +113,7 @@ final class AnnouncerVoice {
     }
 
     /// A stretch of silence the same shape as `buffer`.
-    static func silence(_ seconds: TimeInterval, like buffer: AVAudioPCMBuffer) -> AVAudioPCMBuffer? {
+    nonisolated static func silence(_ seconds: TimeInterval, like buffer: AVAudioPCMBuffer) -> AVAudioPCMBuffer? {
         let frames = AVAudioFrameCount(seconds * buffer.format.sampleRate)
         guard let silent = AVAudioPCMBuffer(pcmFormat: buffer.format, frameCapacity: frames) else { return nil }
         silent.frameLength = frames   // new buffers start out filled with zeros: silence
@@ -120,7 +121,7 @@ final class AnnouncerVoice {
     }
 
     /// Glues pieces of sound of the same shape end to end.
-    static func joined(_ pieces: [AVAudioPCMBuffer]) -> AVAudioPCMBuffer? {
+    nonisolated static func joined(_ pieces: [AVAudioPCMBuffer]) -> AVAudioPCMBuffer? {
         guard let format = pieces.first?.format else { return nil }
         let matching = pieces.filter { $0.format == format }
         let total = matching.reduce(AVAudioFrameCount(0)) { $0 + $1.frameLength }
