@@ -27,6 +27,12 @@ public protocol RulesEngine: Sendable {
     /// sheet passes every runner on base, since those move everyone. Returns one move per runner.
     func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove]
 
+    /// The runner to offer first when a designated non-runner reaches base: the batting
+    /// team's player who made that team's most recent out (league rule: the last out runs),
+    /// or nothing if the team has not made an out yet. The same answer the situation carries
+    /// in `runnerChoice`.
+    func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID?
+
     /// Scorebook notation for one event, given the situation just before it:
     /// "6-3", "F8", "E6", "1B 7", "K", "ꓘ", "BB".
     func notation(for event: GameEvent, in situation: Situation) -> String
@@ -197,6 +203,9 @@ public struct DoNothingRulesEngine: RulesEngine {
     public func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview {
         PlayPreview(notation: draft.fielders.map(\.description).joined(separator: "-"), outsAfter: situation.outs)
     }
+
+    /// Never suggests anyone.
+    public func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID? { nil }
 
     /// Leaves every chosen runner where they are.
     public func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove] {

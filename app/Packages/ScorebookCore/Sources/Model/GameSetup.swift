@@ -157,7 +157,9 @@ public struct LineupEntry: Codable, Equatable, Hashable, Sendable {
     /// Where they play in the field. Missing means extra hitter: in the order, not in the field.
     /// For an opponent whose fielders are unknown, it may also simply be missing.
     public var position: Position?
-    /// A designated non-runner bats, but someone else runs for them every time they reach base.
+    /// A designated non-runner is declared before the game. When they reach base, someone
+    /// else may run for them (by league rule, the teammate who made the team's most recent
+    /// out), or they may choose to run themselves. The scorer is asked each time.
     public var isDesignatedNonRunner: Bool
 
     public init(player: PlayerID, position: Position? = nil, isDesignatedNonRunner: Bool = false) {

@@ -121,7 +121,8 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var fileName: String
     /// Seconds into the track where the walk-up clip starts (the hook).
     public var startTime: TimeInterval
-    /// Seconds after the start point when the song fades out by itself. Missing means it plays until stopped.
+    /// Seconds of song before it fades out by itself, for this song only. Missing means the
+    /// walk-up length in the app settings (12 seconds unless changed).
     public var playLength: TimeInterval?
     /// Loudness for this song, from 0 (silent) to 1 (full), to even out the library.
     public var volume: Double
