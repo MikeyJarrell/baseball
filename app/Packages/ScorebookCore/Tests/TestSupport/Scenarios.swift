@@ -199,6 +199,7 @@ extension ExpectedSituation {
         check(&problems, "situation", "gameOverQuestion", gameOverQuestion, s.gameOverQuestion)
         check(&problems, "situation", "isGameOverQuestionOpen", isGameOverQuestionOpen, s.gameOverQuestion != nil)
         check(&problems, "situation", "isLastInning", isLastInning, s.isLastInning)
+        check(&problems, "situation", "isBattingHoleUp", isBattingHoleUp, s.isBattingHoleUp)
         check(&problems, "situation", "isFinal", isFinal, s.isFinal)
 
         if let runners {

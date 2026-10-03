@@ -218,6 +218,24 @@ func boxScoreProblems(log: PlayLog, box: BoxScore) -> [String] {
               moves.filter { $0.runner == line.player && $0.reason == .caughtStealing }.count, line.stats.caughtStealing)
     }
 
+    // Where each fielder played, by inning, from the fielders the play log lists for each pitch.
+    for (side, half) in [(TeamSide.away, HalfInning.bottom), (.home, .top)] {
+        var played: [PlayerID: [Position: Set<Int>]] = [:]
+        for entry in entries where entry.half == half && entry.pitches > 0 {
+            for f in entry.fielders { played[f.player, default: [:]][f.position, default: []].insert(entry.inning) }
+        }
+        let lines = box[side].fielding
+        check("\(side) fielders with lines", lines.count, played.count)
+        for line in lines {
+            for appearance in line.appearances {
+                let innings = (played[line.player]?[appearance.position] ?? []).sorted()
+                if innings != appearance.innings {
+                    problems.append("\(line.name) at \(appearance.position.abbreviation): play log says \(innings), box score says \(appearance.innings)")
+                }
+            }
+        }
+    }
+
     let outs = entries.flatMap(\.outs)
     let errors = entries.flatMap(\.errors)
     for line in box.away.fielding + box.home.fielding {

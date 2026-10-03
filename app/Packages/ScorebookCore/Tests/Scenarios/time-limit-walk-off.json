@@ -1,0 +1,245 @@
+{
+  "description": "Top of the fifth, Mudcats ahead 2-1, and the time limit runs out during the inning, so the fifth is the last inning. In the bottom half the Diamond Dogs tie it, then Quinn singles with runners on first and second. As in the bottom of the ninth, only the winning run scores and the app asks at once whether the game is over.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 5,
+        "half": "top",
+        "score": {
+          "away": 2,
+          "home": 1
+        },
+        "note": "Start in the fifth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "timeLimitChange": {
+        "endsAt": "2026-05-02T18:06:30Z",
+        "note": "Umpire's time."
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "groundBall",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "d2",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "d3",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "inning": 5,
+          "half": "bottom",
+          "isLastInning": true,
+          "isGameOverQuestionOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e8",
+      "expected": {
+        "situation": {
+          "score": {
+            "away": 2,
+            "home": 2
+          },
+          "isGameOverQuestionOpen": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 5,
+      "half": "bottom",
+      "outs": 0,
+      "score": {
+        "away": 2,
+        "home": 3
+      },
+      "gameOverQuestion": "timeLimit",
+      "isFinal": false,
+      "runners": [
+        {
+          "base": "first",
+          "runner": "d4",
+          "responsiblePitcher": "m9"
+        },
+        {
+          "base": "second",
+          "runner": "d3",
+          "responsiblePitcher": "m9"
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "d4",
+        "hits": 1,
+        "runsBattedIn": 1
+      }
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 {
-  "description": "Before the game the Mudcats lose Ruiz, their second hitter, with nobody to replace them, so the second spot is a batting hole (league rules 9.2 B, 9.5 C). Ortiz singles; when the second spot comes up the rules engine records an automatic out by itself, and Hale is up with one out.",
+  "description": "Before the game the Mudcats lose Ruiz, their second hitter, with nobody to replace them, so the second spot is a batting hole (league rules 9.2 B, 9.5 C). Ortiz singles; the second spot is up, so the app records an automatic out straight away, as an ordinary event. It is nobody's plate appearance, no fielder gets a putout, and it counts toward Barros's outs. Hale is up with one out.",
   "setupFile": "standard",
   "events": [
     {
@@ -25,6 +25,26 @@
           }
         ],
         "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "automaticOut": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "outs": 0,
+          "batter": "m2",
+          "isBattingHoleUp": true
+        }
       }
     }
   ],
@@ -83,6 +103,17 @@
         "pitcher": "d9",
         "outsRecorded": 1,
         "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 0,
+        "assists": 0
+      },
+      {
+        "player": "d4",
+        "putouts": 0
       }
     ]
   }

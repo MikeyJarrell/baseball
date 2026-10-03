@@ -11,9 +11,7 @@ public enum SampleSetups {
     public static let gameDay = Date(timeIntervalSince1970: 1_777_737_600)
 
     /// The Mudcats' batting order: nine hitters, pitcher Ray Collins batting ninth.
-    static let mudcatsBattingOrder: [BattingOrderEntry] = (1...9).map {
-        BattingOrderEntry(player: PlayerID(rawValue: "m\($0)"))
-    }
+    static let mudcatsBattingOrder: [PlayerID] = (1...9).map { PlayerID(rawValue: "m\($0)") }
 
     /// The Mudcats' defense.
     static let mudcatsDefense: [FielderAssignment] = [
@@ -30,12 +28,7 @@ public enum SampleSetups {
 
     /// Our batting order: ten hitters, pitcher Sky Barros ninth and Jamie Cole tenth, who
     /// bats only.
-    static func diamondDogsBattingOrder(designatedNonRunner: PlayerID? = nil) -> [BattingOrderEntry] {
-        (1...10).map {
-            let id = PlayerID(rawValue: "d\($0)")
-            return BattingOrderEntry(player: id, isDesignatedNonRunner: id == designatedNonRunner)
-        }
-    }
+    static let diamondDogsBattingOrder: [PlayerID] = (1...10).map { PlayerID(rawValue: "d\($0)") }
 
     /// Our defense.
     static let diamondDogsDefense: [FielderAssignment] = [
@@ -54,8 +47,9 @@ public enum SampleSetups {
     static func diamondDogs(designatedNonRunner: PlayerID? = nil) -> GameTeam {
         GameTeam(teamID: SampleTeams.diamondDogs.id, name: "Diamond Dogs", isOurs: true,
                  roster: SampleTeams.diamondDogs.roster,
-                 battingOrder: diamondDogsBattingOrder(designatedNonRunner: designatedNonRunner),
-                 defense: diamondDogsDefense)
+                 battingOrder: diamondDogsBattingOrder,
+                 defense: diamondDogsDefense,
+                 designatedNonRunners: designatedNonRunner.map { [$0] } ?? [])
     }
 
     /// The sample game: Mudcats at Diamond Dogs, under the league's rules (nine innings, a
@@ -75,7 +69,7 @@ public enum SampleSetups {
         away: diamondDogs(),
         home: GameTeam(teamID: SampleTeams.bombers.id, name: "Bombers", isOurs: false,
                        roster: SampleTeams.bombers.roster,
-                       battingOrder: (1...9).map { BattingOrderEntry(player: PlayerID(rawValue: "b\($0)")) },
+                       battingOrder: (1...9).map { PlayerID(rawValue: "b\($0)") },
                        defense: [FielderAssignment(position: .pitcher, player: "b11")])
     )
 
@@ -87,7 +81,7 @@ public enum SampleSetups {
         return GameSetup(
             scheduledStart: gameDay.addingTimeInterval(14 * 24 * 3600),
             away: GameTeam(teamID: riverhawks.id, name: riverhawks.name, isOurs: false, roster: riverhawks.roster,
-                           battingOrder: (1...9).map { BattingOrderEntry(player: PlayerID(rawValue: "r\($0)")) },
+                           battingOrder: (1...9).map { PlayerID(rawValue: "r\($0)") },
                            defense: [FielderAssignment(position: .pitcher, player: "rp")]),
             home: diamondDogs(),
             rules: .championship

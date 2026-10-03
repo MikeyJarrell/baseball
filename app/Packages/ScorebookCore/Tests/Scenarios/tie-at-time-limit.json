@@ -1,5 +1,5 @@
 {
-  "description": "Top of the fourth, tied 2-2. The time limit runs out during the inning, nobody scores, and when the inning ends tied the app asks whether the game is over on time. A tie at the time limit stays a tie (league rules 9.1 C, 9.1 H).",
+  "description": "Top of the fourth, tied 2-2. The time limit runs out during the inning, nobody scores, After the top half nothing is asked, since the home team still bats; when the inning ends tied the app asks whether the game is over on time. A tie at the time limit stays a tie (league rules 9.1 C, 9.1 H).",
   "setupFile": "standard",
   "events": [
     {
@@ -158,6 +158,18 @@
           }
         ],
         "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "half": "bottom",
+          "isLastInning": true,
+          "isGameOverQuestionOpen": false
+        }
       }
     }
   ],

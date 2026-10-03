@@ -48,6 +48,12 @@ struct ScenarioFileTests {
         "tie-after-nine-goes-to-extra-innings",
         "run-rule-home-ahead-after-top-of-seventh",
         "run-rule-visitors-ahead-after-seven",
+        "batting-hole-not-last-recorded-out",
+        "designated-non-runner-choice-waits-for-pitch",
+        "time-limit-walk-off",
+        "run-rule-visitors-up-after-top-of-seventh",
+        "run-rule-eleven-runs-after-seven",
+        "pitcher-returns-once",
     ]
 
     @Test("The league-rule scenarios are there", arguments: leagueRuleScenarios)
@@ -60,6 +66,8 @@ struct ScenarioFileTests {
     func leagueRuleEvents() throws {
         let hole = try Scenarios.load("batting-hole-automatic-out")
         #expect(hole.events.first?.kind == .battingHole(BattingHole(team: .away, spotIndex: 1)))
+        // The automatic out is an ordinary event in the saved game.
+        #expect(hole.events.last?.kind == .automaticOut(AutomaticOut(team: .away, spotIndex: 1)))
         let keep = try Scenarios.load("keep-playing-past-time-limit")
         #expect(keep.events.contains { $0.kind == .keepPlaying(KeepPlaying(reason: .timeLimit)) })
         #expect(keep.events.contains { if case .timeLimitChange = $0.kind { true } else { false } })

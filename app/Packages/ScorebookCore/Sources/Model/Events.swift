@@ -137,8 +137,7 @@ public enum EventKind: Equatable, Sendable {
     /// A batting spot whose player is lost with nobody to replace them: an automatic out each
     /// time it comes up.
     case battingHole(BattingHole)
-    /// The automatic out at a batting hole. Added to the play log by the rules engine, never
-    /// entered by the scorer.
+    /// The automatic out at a batting hole, recorded by the app when the hole comes up.
     case automaticOut(AutomaticOut)
     /// The umpire's time limit: a new end time.
     case timeLimitChange(TimeLimitChange)
@@ -393,20 +392,26 @@ public struct Substitution: Codable, Equatable, Hashable, Sendable {
     /// is not listed anywhere leaves the field, and keeps their batting spot if they have one.
     /// Positions not listed stay as they were.
     public var defense: [FielderAssignment]
+    /// Players who leave the field with nobody taking their position, which stays empty: a
+    /// team playing short-handed after losing a fielder. They keep their batting spot if they
+    /// have one.
+    public var leavesField: [PlayerID]
 
-    public init(team: TeamSide, batting: [BattingChange] = [], defense: [FielderAssignment] = []) {
+    public init(team: TeamSide, batting: [BattingChange] = [], defense: [FielderAssignment] = [], leavesField: [PlayerID] = []) {
         self.team = team
         self.batting = batting
         self.defense = defense
+        self.leavesField = leavesField
     }
 
-    // Reading from JSON: either list may be left out.
-    private enum CodingKeys: String, CodingKey { case team, batting, defense }
+    // Reading from JSON: any of the lists may be left out.
+    private enum CodingKeys: String, CodingKey { case team, batting, defense, leavesField }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         team = try c.decode(TeamSide.self, forKey: .team)
         batting = try c.decodeIfPresent([BattingChange].self, forKey: .batting) ?? []
         defense = try c.decodeIfPresent([FielderAssignment].self, forKey: .defense) ?? []
+        leavesField = try c.decodeIfPresent([PlayerID].self, forKey: .leavesField) ?? []
     }
 }
 
@@ -446,8 +451,9 @@ public enum BattingChangeKind: String, Codable, Sendable, CaseIterable {
 
 /// A spot in the batting order whose player is lost (injured, ejected, gone home) with nobody
 /// eligible to take it. The order is not shortened: each time the spot comes up, it is an
-/// automatic out [9.2 B, 9.5 C], which the rules engine records by itself. A later batting
-/// change into the spot fills it again.
+/// automatic out [9.2 B, 9.5 C]. The situation says when (`Situation.isBattingHoleUp`) and the
+/// app records an `automaticOut` event straight away. A later batting change into the spot
+/// fills it again.
 public struct BattingHole: Codable, Equatable, Hashable, Sendable {
     public var team: TeamSide
     /// The spot, counting from 0 for the leadoff spot.
@@ -459,10 +465,17 @@ public struct BattingHole: Codable, Equatable, Hashable, Sendable {
     }
 }
 
-/// The out recorded when a batting hole comes up. The scorer never enters this: the rules
-/// engine adds it to the play log by itself, as its own entry, so stats can see it. It counts
-/// as an out for the batting team and toward the pitcher's innings, and is nobody's plate
-/// appearance.
+/// The out recorded when a batting hole comes up. The app records it as soon as the situation
+/// says the hole is up, without the scorer tapping anything, and from then on it is an ordinary
+/// event: saved with the game, undone and edited like any other.
+///
+/// In the play log it is one out for the batting team:
+/// - nobody's plate appearance and nobody's at-bat;
+/// - no putout or assist for any fielder (the play log's `OutMade` names the player who last
+///   held the spot, with no putout);
+/// - counted toward the pitcher's outs and innings pitched;
+/// - not a "recorded out" for the designated non-runner rule [9.11 D]: that player has left
+///   the game, so the suggestion looks past it.
 public struct AutomaticOut: Codable, Equatable, Hashable, Sendable {
     public var team: TeamSide
     /// The batting hole's spot, counting from 0.
