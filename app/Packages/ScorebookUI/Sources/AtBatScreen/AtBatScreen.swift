@@ -272,7 +272,7 @@ struct AtBatLayout: View {
         .sheet(isPresented: $showingMenu) {
             GameMenuSheet(info: info) { action in
                 showingMenu = false
-                onAction(action)
+                if let action { onAction(action) }
             }
         }
         .sheet(isPresented: Binding(
