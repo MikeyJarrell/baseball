@@ -60,9 +60,12 @@ public struct PitchingChangeSheet: View {
         state.eligibleToPitchAgain.filter { $0 != outgoing }
     }
 
-    /// The roster, less the pitcher now and anyone who has pitched today.
+    /// The roster, less the pitcher now and anyone who has pitched today: the bench first,
+    /// where relievers usually wait, then players already in the game.
     private var freshArms: [Player] {
-        context.team(side).roster.filter { $0.id != outgoing && !pitchedToday.contains($0.id) }
+        let candidates = context.team(side).roster.filter { $0.id != outgoing && !pitchedToday.contains($0.id) }
+        let bench = Set(context.bench(side).map(\.id))
+        return candidates.filter { bench.contains($0.id) } + candidates.filter { !bench.contains($0.id) }
     }
 
     /// Players who pitched today and are not listed as able to come back: only under "Someone else".
@@ -96,7 +99,7 @@ public struct PitchingChangeSheet: View {
                 }
             }
 
-            SectionLabel(canPitchAgain.isEmpty ? "New pitcher" : "Everyone else")
+            SectionLabel(canPitchAgain.isEmpty ? "Who pitches next" : "Everyone else")
             Card {
                 ForEach(freshArms) { player in
                     row(for: player.id, detail: [throwsText(player), whereNow(player.id)])
