@@ -432,19 +432,28 @@ public struct CourtesyRunner: Codable, Equatable, Hashable, Sendable {
 /// A new pitcher for the fielding team.
 ///
 /// The new pitcher plays position 1. If they were already playing another position, they
-/// leave it. If the old pitcher was in the batting order and leaves the game, a new pitcher
-/// from the bench takes their spot in the order. If the old pitcher moves to another position,
-/// `previousPitcherMovesTo` says which, and they keep their spot in the order. Anything more
-/// tangled is recorded with a substitution alongside.
+/// leave it. Where the new pitcher bats:
+/// - `takesBattingSpotOf` given: they take that player's spot in the order, and that player
+///   leaves the game. The usual case after a pinch hitter batted for the old pitcher: the
+///   new pitcher takes the pinch hitter's spot.
+/// - Otherwise, if the old pitcher was in the order and leaves the game, the new pitcher
+///   takes the old pitcher's spot.
+/// - Otherwise the new pitcher keeps the spot they already had, or does not bat.
+///
+/// If the old pitcher stays in the game at another position, `previousPitcherMovesTo` says
+/// which, and they keep their spot in the order. Anything more tangled is recorded with a
+/// substitution alongside.
 public struct PitchingChange: Codable, Equatable, Hashable, Sendable {
     public var team: TeamSide
     public var newPitcher: PlayerID
     public var previousPitcherMovesTo: Position?
+    public var takesBattingSpotOf: PlayerID?
 
-    public init(team: TeamSide, newPitcher: PlayerID, previousPitcherMovesTo: Position? = nil) {
+    public init(team: TeamSide, newPitcher: PlayerID, previousPitcherMovesTo: Position? = nil, takesBattingSpotOf: PlayerID? = nil) {
         self.team = team
         self.newPitcher = newPitcher
         self.previousPitcherMovesTo = previousPitcherMovesTo
+        self.takesBattingSpotOf = takesBattingSpotOf
     }
 }
 
