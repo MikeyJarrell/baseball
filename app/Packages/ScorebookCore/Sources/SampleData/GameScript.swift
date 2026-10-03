@@ -131,6 +131,20 @@ struct GameScript {
         record(kind, batter: batter, pitches: 0, strikes: 0, before: before, after: before, outcome: nil, notation: notation)
     }
 
+    /// Someone runs for a designated non-runner who is on base. The runner takes the base,
+    /// keeps the same pitcher responsible, and runs for the designated non-runner.
+    mutating func runnerForNonRunner(_ runner: PlayerID, replacing original: PlayerID, notation: String) {
+        let before = BasesAndOuts(outs: outs, count: count, runners: runners)
+        runners = runners.map {
+            $0.runner == original ? BaseRunner(runner: runner, base: $0.base, responsiblePitcher: $0.responsiblePitcher,
+                                               standingInFor: original) : $0
+        }
+        let batter = (half.battingSide == .away ? away : home).currentBatter
+        record(.runnerForNonRunner(RunnerForNonRunner(runner: runner, replacing: original)), batter: batter,
+               pitches: 0, strikes: 0, before: before, after: BasesAndOuts(outs: outs, count: count, runners: runners),
+               outcome: nil, notation: notation)
+    }
+
     /// The scorer ends the game.
     mutating func endGame(_ ending: EndOfGame) {
         let state = BasesAndOuts(outs: outs, count: count, runners: runners)

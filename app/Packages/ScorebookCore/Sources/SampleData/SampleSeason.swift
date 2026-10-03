@@ -1,6 +1,7 @@
 // Season totals for a season of one game: the sample game. Every one of our twelve
-// players is listed; Robin Nash did not play, so their line is all zeros and their
-// rate stats show as dashes. The numbers are copied from the sample box score.
+// players is listed. Robin Nash only ran for a designated non-runner and Taylor Voss only
+// pitched, so neither has an at-bat and their rate stats show as dashes. The numbers are
+// copied from the sample box score.
 
 import Foundation
 import Model
@@ -15,7 +16,7 @@ public enum SampleSeason {
         let batting = SampleTeams.mudcats.roster.map { player -> SeasonBattingLine in
             let lines = box.home.batting.filter { $0.player == player.id }
             let stats = lines.reduce(BattingCounts()) { $0 + $1.stats }
-            let played = lines.contains { $0.stats.plateAppearances > 0 }
+            let played = !lines.isEmpty
             return SeasonBattingLine(
                 player: player.id, name: player.displayName, number: player.number,
                 games: played ? 1 : 0, stats: stats,

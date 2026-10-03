@@ -104,6 +104,23 @@ public struct SampleRulesEngine: RulesEngine {
                            outsAfter: after, endsHalfInning: after == 3, endsGame: false)
     }
 
+    /// Canned answers: a caught stealing, pickoff or appeal is an out at the next base (a
+    /// pickoff at the runner's own base); a balk, wild pitch or passed ball moves every runner
+    /// up one; anything else moves the chosen runners up one.
+    public func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove] {
+        let chosen = situation.runners.filter { runners.contains($0.runner) }.sorted { $0.base > $1.base }
+        return chosen.map { r in
+            switch reason {
+            case .caughtStealing, .outOnAppeal:
+                RunnerMove(runner: r.runner, from: r.base, to: .out, reason: reason, outAt: advanceBase(r.base))
+            case .pickoff:
+                RunnerMove(runner: r.runner, from: r.base, to: .out, reason: reason, outAt: r.base)
+            default:
+                RunnerMove(runner: r.runner, from: r.base, to: advance(r.base, by: 1), reason: reason)
+            }
+        }
+    }
+
     public func notation(for event: GameEvent, in situation: Situation) -> String {
         switch event.kind {
         case .pitch(let pitch):

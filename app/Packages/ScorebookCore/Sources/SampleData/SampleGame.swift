@@ -8,8 +8,9 @@
 //
 // Who is who: Cardinals c1 Ortiz cf, c2 Ruiz ss, c3 Hale 1b, c4 Diaz lf, c5 Kim 3b,
 // c6 Park rf, c7 Varga c, c8 Bell 2b, c9 Collins p; Moss (c10) pinch-hits and Reyes (c12)
-// relieves. Mudcats m1 Moreno 2b, m2 Tate ss, m3 Webb cf, m4 Quinn 1b, m5 Shaw 3b,
-// m6 Ford lf, m7 Lang rf, m8 Fisk c, m9 Barros p, m10 Cole extra hitter; Voss (m12) relieves.
+// relieves. Mudcats m1 Moreno 2b, m2 Tate ss, m3 Webb cf, m4 Quinn 1b (a designated
+// non-runner), m5 Shaw 3b, m6 Ford lf, m7 Lang rf, m8 Fisk c, m9 Barros p, m10 Cole extra
+// hitter; Nash (m11) runs for Quinn, and Voss (m12) relieves.
 
 import Foundation
 import Model
@@ -29,12 +30,17 @@ public enum SampleGame {
     public static var finalSituation: Situation { script.situation(isFinal: true) }
 
     /// The game cut off at the end of the third inning, for "game in progress" previews.
+    /// Its box score so far is `boxScoreThroughThree`.
     public static var throughThreeInnings: (game: Game, log: PlayLog) {
         let cut = script.entries.firstIndex { $0.inning == 4 } ?? script.entries.count
         var game = script.game
         game.events = Array(game.events[..<cut])
         var log = script.playLog(isFinal: false)
         log.entries = Array(log.entries[..<cut])
+        // Nobody had been substituted by then, so the batting orders are the starting ones.
+        let start = Situation(startOf: game.setup)
+        log.awayOrder = start.away.battingOrder
+        log.homeOrder = start.home.battingOrder
         return (game, log)
     }
 
@@ -186,11 +192,13 @@ public enum SampleGame {
                                                    runners: [move("m4", .home, .first)])),
             Outcome(outs: 1, runners: [on("m4", .first, by: "c9")], result: .single, reached: true, notation: "1B 7"))
 
-        // Quinn is caught stealing with Shaw up 1-0.
+        // Quinn is a designated non-runner, so Nash runs for them, and is caught stealing
+        // with Shaw up 1-0. The caught stealing is Nash's.
+        s.runnerForNonRunner("m11", replacing: "m4", notation: "R Nash for Quinn")
         s.pitches("B", to: "m5")
-        s.runnerAction(RunnerAction(moves: [move("m4", .first, .out, outBy: [.catcher, .shortstop], at: .second, reason: .caughtStealing)]),
+        s.runnerAction(RunnerAction(moves: [move("m11", .first, .out, outBy: [.catcher, .shortstop], at: .second, reason: .caughtStealing)]),
                        batter: "m5",
-            Outcome(outs: 2, outsMade: [out("m4", putout: "c2", assists: ["c7"], at: .second)], notation: "CS2 2-6"))
+            Outcome(outs: 2, outsMade: [out("m11", putout: "c2", assists: ["c7"], at: .second)], notation: "CS2 2-6"))
         s.plateAppearance("m5", "C", .inPlay(Play(batterResult: .out, battedBall: .flyBall, fielders: [.rightField],
                                                    runners: [move("m5", .home, .out, outBy: [.rightField])])),
             Outcome(outs: 3, outsMade: [out("m5", putout: "c6")], result: .out, notation: "F9"))

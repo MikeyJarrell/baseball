@@ -1,5 +1,5 @@
 {
-  "description": "Two outs, then Hale singles. With Diaz up 1-1, Hale is caught stealing, catcher to shortstop: third out. Diaz leads off the second inning with a fresh count after the Mudcats go down in order.",
+  "description": "Two outs, then Hale singles. With Diaz up 1-1, Hale is caught stealing, catcher to shortstop: third out. Diaz leads off the second inning with a fresh count after the Mudcats go down in order. The Mudcats take the field again with nobody having checked their fielders, so the defense check is due.",
   "setupFile": "standard",
   "events": [
     {
@@ -180,6 +180,7 @@
           },
           "runners": [],
           "batter": "m1",
+          "defenseCheckDue": false,
           "lineups": [
             {
               "team": "away",
@@ -201,6 +202,7 @@
       },
       "runners": [],
       "batter": "c4",
+      "defenseCheckDue": true,
       "pitchers": [
         {
           "pitcher": "m9",

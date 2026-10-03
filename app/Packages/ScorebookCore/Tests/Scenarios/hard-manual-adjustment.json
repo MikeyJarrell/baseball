@@ -1,5 +1,5 @@
 {
-  "description": "Ortiz singles, but the umpire's view of the game differs from the book: the scorer sets one out, a 1-1 count on Ruiz, a 2-0 Cardinals lead and Ortiz on second. The next pitch is a ball.",
+  "description": "Ortiz singles, but the umpire's view of the game differs from the book: the scorer sets one out, a 1-1 count on Ruiz, a 2-0 Cardinals lead and Ortiz on second. The next pitch is a ball. The two runs the adjustment adds go in the first inning of the line score, credited to nobody and charged to nobody.",
   "setupFile": "standard",
   "events": [
     {
@@ -67,6 +67,28 @@
         }
       ],
       "batter": "c2"
-    }
+    },
+    "teams": [
+      {
+        "team": "away",
+        "runs": 2,
+        "hits": 1,
+        "lineScore": [
+          2
+        ]
+      }
+    ],
+    "batting": [
+      {
+        "player": "c1",
+        "runs": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 0
+      }
+    ]
   }
 }

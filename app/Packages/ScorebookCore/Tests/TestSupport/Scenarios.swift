@@ -103,6 +103,10 @@ extension ScenarioExpectation {
         for e in batting ?? [] {
             // A player can have more than one line (batting in two spots); add them up.
             let lines = teamsBoxes.flatMap(\.batting).filter { $0.player == e.player }
+            guard !lines.isEmpty else {
+                problems.append("batting \(e.player): no batting line in the box score")
+                continue
+            }
             let s = lines.reduce(BattingCounts()) { $0 + $1.stats }
             let p = "batting \(e.player)"
             check(&problems, p, "plateAppearances", e.plateAppearances, s.plateAppearances)
@@ -123,8 +127,12 @@ extension ScenarioExpectation {
         }
 
         for e in pitching ?? [] {
-            let s = teamsBoxes.flatMap(\.pitching).filter { $0.player == e.pitcher }
-                .reduce(PitchingCounts()) { $0 + $1.stats }
+            let lines = teamsBoxes.flatMap(\.pitching).filter { $0.player == e.pitcher }
+            guard !lines.isEmpty else {
+                problems.append("pitching \(e.pitcher): no pitching line in the box score")
+                continue
+            }
+            let s = lines.reduce(PitchingCounts()) { $0 + $1.stats }
             let p = "pitching \(e.pitcher)"
             check(&problems, p, "outsRecorded", e.outsRecorded, s.outsRecorded)
             check(&problems, p, "battersFaced", e.battersFaced, s.battersFaced)
@@ -139,8 +147,12 @@ extension ScenarioExpectation {
         }
 
         for e in fielding ?? [] {
-            let s = teamsBoxes.flatMap(\.fielding).filter { $0.player == e.player }
-                .reduce(FieldingCounts()) { $0 + $1.stats }
+            let lines = teamsBoxes.flatMap(\.fielding).filter { $0.player == e.player }
+            guard !lines.isEmpty else {
+                problems.append("fielding \(e.player): no fielding line in the box score")
+                continue
+            }
+            let s = lines.reduce(FieldingCounts()) { $0 + $1.stats }
             let p = "fielding \(e.player)"
             check(&problems, p, "putouts", e.putouts, s.putouts)
             check(&problems, p, "assists", e.assists, s.assists)
@@ -154,6 +166,7 @@ extension ScenarioExpectation {
             check(&problems, p, "hits", e.hits, t.hits)
             check(&problems, p, "errors", e.errors, t.errors)
             check(&problems, p, "leftOnBase", e.leftOnBase, t.leftOnBase)
+            check(&problems, p, "lineScore", e.lineScore, box.lineScore[e.team])
             let dp = box.notes.doublePlays.filter { $0.team == e.team }.reduce(0) { $0 + $1.count }
             check(&problems, p, "doublePlays", e.doublePlays, dp)
             let tp = box.notes.triplePlays.filter { $0.team == e.team }.reduce(0) { $0 + $1.count }
@@ -178,6 +191,8 @@ extension ExpectedSituation {
         check(&problems, "situation", "isRunnerNeeded", isRunnerNeeded, s.runnerNeededFor != nil)
         check(&problems, "situation", "runnerNeededFor", runnerNeededFor, s.runnerNeededFor)
         check(&problems, "situation", "isBetweenHalfInnings", isBetweenHalfInnings, s.isBetweenHalfInnings)
+        check(&problems, "situation", "defenseCheckDue", defenseCheckDue, s.defenseCheckDue)
+        check(&problems, "situation", "droppedThirdStrikePossible", droppedThirdStrikePossible, s.droppedThirdStrikePossible)
         check(&problems, "situation", "isRegulationComplete", isRegulationComplete, s.isRegulationComplete)
         check(&problems, "situation", "isFinal", isFinal, s.isFinal)
 

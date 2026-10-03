@@ -39,21 +39,15 @@ public enum SampleSetups {
     }
 
     /// The sample game: Cardinals at Mudcats, nine innings scheduled, a 100-minute time limit.
+    /// Pat Quinn, our first baseman batting fourth, is a designated non-runner.
     public static let cardinalsAtMudcats = GameSetup(
         date: gameDay,
         away: GameTeam(teamID: SampleTeams.cardinals.id, name: "Cardinals", isOurs: false,
                        roster: SampleTeams.cardinals.roster, lineup: cardinalsLineup),
-        home: mudcatsAtHome(),
+        home: mudcatsAtHome(designatedNonRunner: "m4"),
         scheduledInnings: 9,
         timeLimitMinutes: 100
     )
-
-    /// The same game with our leadoff hitter, Alex Moreno, a designated non-runner.
-    public static let cardinalsAtMudcatsWithNonRunner: GameSetup = {
-        var setup = cardinalsAtMudcats
-        setup.home = mudcatsAtHome(designatedNonRunner: "m1")
-        return setup
-    }()
 
     /// Mudcats at the Bombers, who are known only by jersey numbers. Their fielding positions
     /// are unknown except their pitcher, number 44, who does not bat.

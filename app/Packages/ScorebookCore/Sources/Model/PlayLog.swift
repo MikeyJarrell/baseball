@@ -50,6 +50,8 @@ public struct PlayLog: Codable, Equatable, Sendable {
 public struct PlayLogEntry: Codable, Equatable, Sendable {
     /// The event this entry explains, copied in full.
     public var event: GameEvent
+    /// The inning and half the event happened in. For a manual adjustment that moves the
+    /// inning, the inning and half it moved the game to.
     public var inning: Int
     public var half: HalfInning
     /// The batter at the plate when the event happened (for a steal, the batter mid-count).
@@ -64,8 +66,13 @@ public struct PlayLogEntry: Codable, Equatable, Sendable {
     /// Outs, count and runners just before the event.
     public var before: BasesAndOuts
     /// Outs, count and runners just after it. When the event made the third out, this shows
-    /// three outs and the runners still on base (the runners left on base); the switch of
-    /// sides happens between entries.
+    /// three outs and the runners still on base; the switch of sides happens between entries.
+    ///
+    /// Runners left on base are counted from this: the `after` runners of every entry that
+    /// ends a half-inning, plus the `after` runners of the end-of-game entry, which are the
+    /// runners still on base when the game ended (after a walk-off, or when the time limit
+    /// ran out mid-inning). A game that ends right after a third out has nobody on base by
+    /// then, so nobody is counted twice.
     public var after: BasesAndOuts
     /// Pitches this event added to the pitcher's count: 1 for a pitch or ball in play, else 0.
     public var pitches: Int
@@ -73,6 +80,10 @@ public struct PlayLogEntry: Codable, Equatable, Sendable {
     public var strikes: Int
     /// Runs that scored on this event, each with the pitcher charged.
     public var runs: [RunScored]
+    /// For a manual adjustment that changed the score: how many runs it added for each team
+    /// (negative when it took runs away). These count in the line score and the team's runs,
+    /// in this entry's inning, but belong to no player and no pitcher. Missing otherwise.
+    public var adjustedRuns: Score?
     /// Every out made on this event, with the putout and assists tied to players.
     public var outs: [OutMade]
     /// Every error charged on this event, tied to the player at that position.
@@ -103,6 +114,7 @@ public struct PlayLogEntry: Codable, Equatable, Sendable {
         pitches: Int = 0,
         strikes: Int = 0,
         runs: [RunScored] = [],
+        adjustedRuns: Score? = nil,
         outs: [OutMade] = [],
         errors: [ChargedError] = [],
         plateAppearance: PlateAppearanceResult? = nil,
@@ -123,6 +135,7 @@ public struct PlayLogEntry: Codable, Equatable, Sendable {
         self.pitches = pitches
         self.strikes = strikes
         self.runs = runs
+        self.adjustedRuns = adjustedRuns
         self.outs = outs
         self.errors = errors
         self.plateAppearance = plateAppearance

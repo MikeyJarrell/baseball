@@ -103,6 +103,15 @@ struct ScenarioFileTests {
         #expect(batter.runner == "c2" && batter.to == .out && batter.outBy == [.secondBase, .firstBase])
     }
 
+    @Test("Expecting numbers for a player with no box score line is reported, even zeros")
+    func missingLineIsReported() throws {
+        let scenario = try Scenarios.load("hard-pinch-runner")
+        let replay = DoNothingRulesEngine().replay(scenario.game)
+        let emptyBox = DoNothingStatsCalculator().boxScore(for: replay.log)
+        let problems = scenario.expected.mismatches(box: emptyBox)
+        #expect(problems.contains("batting c10: no batting line in the box score"))
+    }
+
     @Test("A dropped third strike rides on the strike-three pitch")
     func droppedThirdStrike() throws {
         let scenario = try Scenarios.load("hard-dropped-third-strike-batter-reaches")

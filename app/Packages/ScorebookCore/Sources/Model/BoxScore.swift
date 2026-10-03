@@ -48,18 +48,23 @@ public struct TeamBoxScore: Codable, Equatable, Sendable {
     public var side: TeamSide
     public var teamID: TeamID
     public var name: String
-    /// A line for every player who batted, in batting order, with substitutes listed
-    /// right under the player they replaced.
+    /// A line for every player who held a spot in the batting order, in batting order, with
+    /// substitutes listed right under the player they replaced, plus a line for anyone who ran
+    /// for a designated non-runner (see `BattingLine`).
     public var batting: [BattingLine]
     /// A line for every pitcher, in the order they pitched.
     public var pitching: [PitchingLine]
     /// Putouts, assists and errors for every player who fielded.
     public var fielding: [FieldingLine]
-    /// Runs, hits and errors for the line score's R H E columns.
+    /// Runs, hits and errors for the line score's R H E columns. Runs always equal the team's
+    /// final score: runs added or taken away by a manual adjustment count here (see
+    /// `ManualAdjustment`), credited to no player and charged to no pitcher.
     public var runs: Int
     public var hits: Int
     public var errors: Int
-    /// Runners left on base when the third out was made, added up over the game.
+    /// Runners left on base: the runners still on base whenever a half-inning ended, added up
+    /// over the game. That includes the last half-inning however the game ended: a third out,
+    /// a walk-off, the time limit, or the scorer ending it.
     public var leftOnBase: Int
 
     public init(
@@ -98,12 +103,23 @@ public struct TeamBoxScore: Codable, Equatable, Sendable {
 }
 
 /// One batter's line in a box score.
+///
+/// Every player who held a spot in the batting order gets a line, even with no plate
+/// appearances (a relief pitcher who never batted). Substitutes come right under the player
+/// they replaced, with the same `batterIndex`.
+///
+/// Someone who ran for a designated non-runner gets a line right under that designated
+/// non-runner: the same `batterIndex`, `isSubstitute` true, position "pr", no plate
+/// appearances and no at-bats. Their stolen bases and caught stealing go on this line; the
+/// runs they score are credited to the designated non-runner's line. The line exists only if
+/// they ran at least once. A runner who also holds a batting spot of their own keeps
+/// everything on that line instead.
 public struct BattingLine: Codable, Equatable, Sendable {
     public var player: PlayerID
     /// The name to print: "Derek Jeter", "#22", "Batter 4".
     public var name: String
     public var number: String?
-    /// The spot in the order they batted in, counting from 0.
+    /// The spot in the order they batted in (or ran for), counting from 0.
     public var batterIndex: Int
     /// Every position they played today, in order: "ss", or "ph" then "2b".
     public var positions: [BoxPosition]
@@ -180,7 +196,10 @@ public enum BoxPosition: String, Codable, Sendable, CaseIterable {
 
 /// Runs by inning for both teams, for the line score.
 public struct LineScore: Codable, Equatable, Sendable {
-    /// The visitors' runs in each inning, first inning first.
+    /// The visitors' runs in each inning, first inning first, with a cell for every inning
+    /// from the first to the last one played. Runs added or taken away by a manual adjustment
+    /// go in the cell for the inning the adjustment left the game in, so the line always adds
+    /// up to the final score.
     public var away: [Int?]
     /// The home team's runs in each inning. A missing value means they did not bat that
     /// inning (printed "x"), as when the home team leads after the top of the last inning.
