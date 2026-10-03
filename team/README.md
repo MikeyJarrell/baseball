@@ -2,7 +2,7 @@
 
 The Diamond Dogs roster, kept here until the app has its own saved team.
 
-[roster.csv](roster.csv) lists every player, the name they go by, their jersey number once known, and their walk-up song: the song, the artist, the time in the full track where it should hit (`hook`), and where the audio came from (`source`). The last two columns are filled in by the song script: the clip’s file name in `~/Dropbox/baseball/songs/`, and where the hook falls inside that clip, which is the start point to set in the app.
+[roster.csv](roster.csv) lists every player, the name they go by, their jersey number once known, which side they bat and throw from (R or L), their usual position (P, C, 1B, 2B, 3B, SS, LF, CF, RF, DH), their usual role (leads off, starts on the bench, player-coach), and their walk-up song: the song, the artist, the time in the full track where it should hit (`hook`), and where the audio came from (`source`). The last two columns are filled in by the song script: the clip’s file name in `~/Dropbox/baseball/songs/`, and where the hook falls inside that clip, which is the start point to set in the app.
 
 To add a song, fill in `song`, `artist`, `hook` and `source` (a YouTube Music or YouTube address) for the player, then run from the repository root:
 
