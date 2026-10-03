@@ -26,9 +26,11 @@ The real version of the rules-engine interface in `Model/`:
 - The batting order wraps after its last slot, whatever the number of slots. When a hitter is added to the bottom mid-game, the order includes them from that point on; if the last hitter in the old order just batted, the new hitter is up next.
 - Pitches and strikes count against the pitcher on the mound at the moment. Fouls and balls in play count as strikes; a hit-by-pitch counts as a pitch and not a strike; an intentional walk counts no pitches.
 - Every runner carries the pitcher responsible for putting them on base. A runner who reaches on a fielder’s choice that retires a runner takes over the retired runner’s responsible pitcher (Official Baseball Rules 9.16(g)). A batter who walks after a pitching change made with the count at 2-0, 2-1, 3-0, 3-1 or 3-2 belongs to the earlier pitcher (rule 9.16(h)).
-- A courtesy runner takes the base without changing the batting order; the original player stays in the slot.
+- A courtesy runner, or the runner for a designated non-runner, takes the base without changing the batting order; the original player stays in the slot and is credited with the run if the runner scores.
+- The engine always knows which of our players is at each fielding position, from the starting positions plus every substitution, so every out and error is tied to a player. The situation flags when a designated non-runner has just reached base, so the app can ask who is running.
 - Runs come only from what the play says scored; the engine never decides on its own whether a run counted.
 - The manual adjustment event overrides whatever it sets.
+- Games often end early on the time limit; the scorer ends them, and the engine never assumes the game runs nine innings.
 - Regulation is complete when the scheduled innings are done and the score is not tied, or when the home team leads after the top half of the last scheduled inning, or when the home team goes ahead in the bottom of the last inning or later. The engine reports it; the scorer ends the game.
 
 ## Suggested runner outcomes

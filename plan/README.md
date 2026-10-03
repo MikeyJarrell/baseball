@@ -8,7 +8,7 @@ The other files in this folder hold the detail. [architecture.md](architecture.m
 
 **Walk-up songs.** Song clips live on the phone, imported from the Files app. Each player on our roster has a song, with a start point so a full track can begin at the hook. When one of our hitters comes up, that player’s song is cued on the batting screen: one tap plays it, a second tap fades it out. The phone ignores the silent switch and plays through a Bluetooth speaker, including with the screen locked.
 
-**Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Each player’s introduction is either a recording imported like a song (a teammate doing the impression into Voice Memos) or spoken by the iPhone’s built-in voice, slowed to that cadence and given a stadium echo. One tap plays the introduction and then the song. This is a nice-to-have, built after the walk-up songs work.
+**Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Mikey records each player’s introduction in his own impression, straight into the app from that player’s page, and the app adds a stadium echo. A player without a recording yet can use the iPhone’s built-in voice, slowed to that cadence. One tap plays the introduction and then the song. This is a nice-to-have, built after the walk-up songs work.
 
 **Between-innings music.** A playlist that plays during the changeover at the tap of a button and fades out when the next half-inning’s first pitch is recorded.
 
@@ -18,7 +18,9 @@ After the play is saved, the next batter appears. After the third out, the scree
 
 **Checking the situation.** The top of the batting screen always shows the inning, score, outs, count, runners on base, who is up and who is on deck, the pitcher with throwing hand and pitch count, and what this batter has done earlier today (“6-3, walk, single to left”). A second screen, a swipe away, shows the full box score so far.
 
-**Lineups and changes.** Before the game: pick the opponent, who bats first, the number of innings, both batting orders and both starting pitchers. Our lineup comes from our roster. Their lineup can be names and numbers, numbers alone, or nothing, in which case their hitters are filled in as they come up. During the game, from the batting screen: change pitchers, pinch-hit, pinch-run, move fielders around, and add a hitter to the bottom of the batting order at any point. Batters and pitchers can be marked right- or left-handed.
+**Lineups and changes.** Before the game: pick the opponent, whether we are home or away, the number of innings (nine unless changed), an optional time limit, both batting orders, our fielders’ positions, and both starting pitchers. Players who are designated non-runners are marked in the lineup. Our lineup comes from our roster. Their lineup can be names and numbers, numbers alone, or nothing, in which case their hitters are filled in as they come up. During the game, one substitution button on the batting screen opens every kind of change: new pitcher, fielders moved or replaced, pinch hitter, pinch runner, courtesy runner, a runner for a designated non-runner, and a hitter added to the bottom of the batting order. When a designated non-runner reaches base, the app asks straight away who is running. Batters and pitchers can be marked right- or left-handed.
+
+**Fielders.** Each time our team takes the field, a quick check lists who is at each position; one tap confirms it, or tap a position to fix it. Errors, putouts and assists are kept for each player, so the app always knows who is standing where. When a game hits the time limit, the scorer ends it from the menu.
 
 **Stats.** Every finished game becomes a box score and joins the season totals: batting average, on-base percentage, slugging, and the counting stats behind them, for every player on our team, plus pitching lines. At the end of a game the app produces an old-newspaper-style box score as a picture, ready to text to the group. A public stats website comes later.
 
@@ -93,5 +95,6 @@ Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten thi
 2. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
 3. Answer the remaining league-rules questions in [OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md).
 4. Approve the batting screen and in-play mockups.
-5. Collect the song clips, as audio files (MP3 or M4A) in a folder on the phone or in iCloud Drive, and decide each player’s song.
-6. Score a televised game as the dress rehearsal.
+5. Put the song files (MP3 or M4A) in the Dropbox folder `baseball/songs/`, named for the player they belong to. On the Mac, an agent can trim each to the hook and even out the loudness; on the phone, the app imports them from Dropbox through the Files app.
+6. Record the announcer introductions in the app, once it can record.
+7. Score a televised game as the dress rehearsal.

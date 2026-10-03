@@ -62,11 +62,11 @@ Who depends on whom:
 
 This is the agreement between builders. The foundation job writes it as real Swift in `Model/`; the sketch below gives the intent, and the code in `Model/` is the final word. Every type is `Codable` (can be saved as JSON), `Equatable` and `Sendable`. The packages use the Swift 6 language mode. Changes after the foundation lands go through the lead builder (see [rules-for-agents.md](rules-for-agents.md)).
 
-**People and teams.** `Player` has an id, name, optional jersey number, optional batting side (right, left, switch), optional throwing hand, an optional walk-up song id, and an optional announcer introduction (a recording’s id, or a setting to use the phone’s speech voice). `Team` has an id, name, whether it is our team, and a roster. Opponent teams are saved too, so their rosters can be reused the next time we play them. A player can be created mid-game with only a number, or nothing at all (“Batter 4”), and filled in later.
+**People and teams.** `Player` has an id, name, optional jersey number, optional batting side (right, left, switch), optional throwing hand, an optional walk-up song id, and an optional announcer introduction (a recording made in the app or imported, or a setting to use the phone’s speech voice). `Team` has an id, name, whether it is our team, and a roster. Opponent teams are saved too, so their rosters can be reused the next time we play them. A player can be created mid-game with only a number, or nothing at all (“Batter 4”), and filled in later.
 
 **Positions.** The standard scorebook numbers: 1 pitcher, 2 catcher, 3 first base, 4 second base, 5 third base, 6 shortstop, 7 left field, 8 center field, 9 right field. Also “extra hitter” for a batter in the order who does not play the field, which our league’s long lineups need.
 
-**Game setup.** Date, our team, opponent, whether we are home, scheduled innings, each team’s starting batting order and starting pitcher.
+**Game setup.** Date, our team, opponent, whether we are home, scheduled innings (nine by default), an optional time limit, each team’s starting batting order, starting fielding positions and starting pitcher, and which hitters are designated non-runners (players who bat but are replaced on the bases every time they reach).
 
 **Batting order.** A list of slots, always of known length. Each slot holds the history of who has batted there (the last one is current) and that player’s fielding position. A team whose hitters are unknown gets placeholder players in each slot (“Batter 1” to “Batter 9” by default), named later. The list can grow during the game: adding a hitter appends a slot. The order wraps from the last slot to the first, however many slots there are. A player can appear in the history of a slot more than once, for leagues that allow re-entry.
 
@@ -79,8 +79,9 @@ This is the agreement between builders. The foundation job writes it as real Swi
 | Ball in play | One complete play: see below. Counts as a pitch. |
 | Runner action | Between pitches: one or more runners each with a reason (stolen base, caught stealing, pickoff, wild pitch, passed ball, balk, advance on error, defensive indifference, out on appeal), the fielders who made any out, and any error. A double steal is one event. |
 | Error with no advance | An error charged to a fielder with nobody moving, such as a dropped foul pop-up |
-| Substitution | Pinch hitter, pinch runner, defensive replacement, position switch |
-| Courtesy runner | A runner who replaces a player on base without a substitution. Our league allows it. |
+| Substitution | Pinch hitter, pinch runner, defensive replacement, position switch. Several fielding changes made at once are one event. |
+| Defense confirmed | The scorer checked our fielders at the start of a half-inning and nothing had changed. Changes found during the check are recorded as a substitution. |
+| Courtesy runner | A runner who replaces a player on base without a substitution: a courtesy runner, or the runner for a designated non-runner. The original player stays in the batting order and is credited with the run if the runner scores. Stolen bases and caught stealing go to whoever actually ran. |
 | Pitching change | New pitcher for the fielding team |
 | Add hitter | Appends a slot to a team’s batting order |
 | Manual adjustment | Set outs, score, runners or count directly, for when the field and the book disagree and nobody can say why |

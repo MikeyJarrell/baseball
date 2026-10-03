@@ -12,7 +12,7 @@
 
 The real version of the stats interface in `Model/`:
 
-1. **Box score for one game.** A batting line for every player who batted, in batting order with substitutes under the player they replaced: plate appearances, at-bats, runs, hits, doubles, triples, home runs, runs batted in, walks, strikeouts, hit-by-pitches, sacrifice flies, sacrifice bunts, stolen bases, caught stealing. A pitching line for every pitcher: innings pitched (as outs recorded, shown as 5.1 for five and a third), hits, runs, walks, strikeouts, home runs, hit batters, batters faced, pitches, strikes. Runs are charged to the pitcher responsible for the runner who scored, which the play log records, so a reliever who inherits a runner is not charged when that runner scores. Errors for each fielder; putouts and assists by position until the league question about free substitution in the field is answered. The line score by inning. The notes underneath: doubles, triples, home runs, runs batted in, stolen bases, errors, double plays, runners left on base.
+1. **Box score for one game.** A batting line for every player who batted, in batting order with substitutes under the player they replaced: plate appearances, at-bats, runs, hits, doubles, triples, home runs, runs batted in, walks, strikeouts, hit-by-pitches, sacrifice flies, sacrifice bunts, stolen bases, caught stealing. A pitching line for every pitcher: innings pitched (as outs recorded, shown as 5.1 for five and a third), hits, runs, walks, strikeouts, home runs, hit batters, batters faced, pitches, strikes. Runs are charged to the pitcher responsible for the runner who scored, which the play log records, so a reliever who inherits a runner is not charged when that runner scores. Errors, putouts and assists for each fielder, using the player at that position at the moment of the play, which the play log records. The line score by inning. The notes underneath: doubles, triples, home runs, runs batted in, stolen bases, errors, double plays, runners left on base.
 2. **Season totals** from a list of games: batting and pitching. The same counting stats summed per player, plus batting average, on-base percentage and slugging percentage for hitters, innings pitched, strikeouts and walks per inning, and walks and hits per inning for pitchers, and each player’s game-by-game log.
 3. **A player’s plate appearances in one game**, in scorebook notation, for the batter history on the batting screen.
 
@@ -28,6 +28,8 @@ Follow the official scoring rules of Major League Baseball (Official Baseball Ru
 - Runs batted in come from the play, which stores the final number the scorer confirmed. Stats never recompute them.
 
 Earned runs need judgment about which runs errors caused, so pitching lines carry runs only.
+
+A run scored by a courtesy runner, or by the runner for a designated non-runner, is credited to the player they ran for; stolen bases and caught stealing go to whoever ran.
 
 Our players are matched across games by player id. Opponent players appear in single-game box scores and are left out of season totals.
 

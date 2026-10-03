@@ -23,7 +23,10 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 - A runner on the field drawing opens the runner actions (steal, caught stealing, pickoff, wild pitch, passed ball, balk, advance on error), handled by the in-game changes builder’s sheet.
 - The pitcher opens the pitching change.
 - The batter opens pinch-hit and batting-side options.
-- A menu holds the rest: add a hitter, substitutions, manual adjustment, end game.
+- One substitution button opens every kind of change (see the in-game changes brief).
+- A menu holds the rest: manual adjustment, end game.
+
+**Game clock.** When the game has a time limit, the time left shows beside the inning.
 
 **The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. During a changeover, the same spot holds the between-innings music button. A setting, off by default, fades the song out automatically when the first pitch is recorded.
 
