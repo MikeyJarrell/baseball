@@ -25,7 +25,7 @@ These are the engine’s answers where `Model/` and the plan were silent. Each c
 - **The defense check stops being due** when our team confirms its defense, when our team makes a fielding change during the check, or at the first piece of play in the half-inning, so a skipped check does not reopen on every pitch.
 - **A manual adjustment** that moves the inning or half starts the new half with no outs, a fresh count and nobody on, unless it sets those too. Runners it lists who were already on base keep their responsible pitcher; only runners newly put on base are charged to the pitcher on the mound. The `ManualAdjustment` comment says runners “placed this way are charged to the pitcher on the mound”; the engine reads that as newly placed runners, so a run scored by a runner the adjustment only moved stays with the pitcher who put them on.
 - **The dropped-third-strike button** is offered after every called or swinging strike three, whatever the outs and whoever is on first, since the app does not enforce the rule. A foul tip or foul bunt for strike three never offers it.
-- **The runner suggested for a designated non-runner** also skips anyone already on base, not only the batter now at bat.
+- **The runner suggested for a designated non-runner** skips the batter now at bat and anyone already on base.
 - **Batters faced** are counted when a plate appearance ends, so a batter who was up when a runner made the third out is not counted until they finish next inning.
 - **The walk-off limit** (only the winning run scores, nobody moves further than that runner) is applied to singles, doubles and triples. Home runs, errors and the rest get their ordinary suggestion.
 - **Default runs batted in** count every run that scores on the play, except none on an error, a dropped third strike or a ground-ball double play, and none for a runner marked as advancing on an error. The scorer confirms the number.
@@ -33,7 +33,7 @@ These are the engine’s answers where `Model/` and the plan were silent. Each c
 
 ## Scenario the engine disagrees with
 
-`hard-walk-off-single-bases-loaded` expects `gameOverQuestion: "regulation"` after the `endOfGame` event. `Model/Situation.swift` says the question is “cleared once the game is final,” and the wiring brief shows the question whenever it is set, so keeping it would ask “Is the game over?” about a finished game. The engine clears it. The scenario should check `isGameOverQuestionOpen: false` there (its checkpoint after `e3` already checks the question while the game is still open). Until the test writer changes it, `ScenarioTests.knownDisagreements` lists this one mismatch, and a test fails once the scenario no longer disagrees, so the entry gets removed. Every other expected value in all 39 scenario files passes.
+`hard-walk-off-single-bases-loaded` expects `gameOverQuestion: "regulation"` after the `endOfGame` event. `Model/Situation.swift` says the question is “cleared once the game is final,” and the wiring shows the question whenever it is set, so a set question would ask “Is the game over?” about a finished game. The engine clears it. The scenario’s final check should be `isGameOverQuestionOpen: false`; its checkpoint after `e3` covers the question while the game is open. `ScenarioTests.knownDisagreements` lists this one mismatch, and a separate test fails when the scenario stops disagreeing, as a reminder to delete the entry. Every other expected value in all 39 scenario files passes.
 
 ## Vocabulary change requests
 
@@ -43,8 +43,8 @@ These are the engine’s answers where `Model/` and the plan were silent. Each c
 ## For the wiring job
 
 - `replay(game)` after every event; `clock(for:at:)` on a timer for time left, the last-inning warning, and asking between innings.
-- When `Situation.isBattingHoleUp` is true, record the `automaticOut` event. An automatic out that no longer lines up with the hole after an edit is flagged and does not count, so the hole comes up again.
-- `Situation.runnerChoice` opens when a designated non-runner reaches and closes on the next pitch, ball in play or intentional walk, a `runnerForNonRunner` event, a pinch runner for them, or when they are no longer on base.
+- When `Situation.isBattingHoleUp` is true, record the `automaticOut` event. An automatic out that does not line up with the hole after an edit is flagged and does not count, so the hole comes up again.
+- `Situation.runnerChoice` opens when a designated non-runner reaches and closes on the next pitch, ball in play or intentional walk, a `runnerForNonRunner` event, a pinch runner for them, or when they leave the bases.
 - Entries with `needsReview` carry a plain-English `reviewNote` (“Ruiz is not on base.”, “The play names Kim as the batter, but Ford is up.”) for the play-by-play screen.
 
 ## For the stats job
