@@ -130,6 +130,33 @@ struct GameEndTests {
         #expect(s.declinedEndings.isEmpty)
     }
 
+    @Test("An automatic out at a batting hole leading off keeps the question, the changeover and the defense check")
+    func automaticOutKeepsQuestion() throws {
+        // Diamond Dogs up 12-0 after six and a half, and their leadoff spot is a batting hole.
+        var w = try GameWriter.standard()
+        w.add(.manualAdjustment(ManualAdjustment(inning: 7, half: .top, score: Score(away: 0, home: 12))))
+        w.add(.battingHole(BattingHole(team: .home, spotIndex: 0)))
+        threeOuts(&w, ["m1", "m2", "m3"])
+        var s = engine.replay(w.game).situation
+        #expect(s.gameOverQuestion == .runRule && s.isBattingHoleUp)
+        // The app records the automatic out straight away.
+        w.add(.automaticOut(AutomaticOut(team: .home, spotIndex: 0)))
+        s = engine.replay(w.game).situation
+        #expect(s.gameOverQuestion == .runRule)
+        #expect(s.isBetweenHalfInnings)
+        #expect(s.outs == 1 && s.batter == "d2")
+
+        // When the Mudcats' hole leads off, our defense check is still due afterward.
+        var v = try GameWriter.standard()
+        v.add(.battingHole(BattingHole(team: .away, spotIndex: 3)))
+        threeOuts(&v, ["m1", "m2", "m3"])
+        threeOuts(&v, ["d1", "d2", "d3"])
+        #expect(engine.replay(v.game).situation.defenseCheckDue)
+        v.add(.automaticOut(AutomaticOut(team: .away, spotIndex: 3)))
+        s = engine.replay(v.game).situation
+        #expect(s.defenseCheckDue && s.isBetweenHalfInnings && s.outs == 1)
+    }
+
     @Test("Official if rain stops it: five innings, or four and a half with the home team ahead")
     func officialGame() throws {
         var w = try GameWriter.standard()
