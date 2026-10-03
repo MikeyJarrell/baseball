@@ -115,4 +115,7 @@ final class LevelMeter: Sendable {
 
     /// The most recent loudness measured.
     nonisolated var current: Float { level.withLock { $0 } }
+
+    /// Back to silence, for when the engine stops (it sends no more slices to measure).
+    nonisolated func reset() { level.withLock { $0 = 0 } }
 }

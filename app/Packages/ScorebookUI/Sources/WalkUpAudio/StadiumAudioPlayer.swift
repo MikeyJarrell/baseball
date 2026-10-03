@@ -649,6 +649,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         graph.songNode.stop()
         graph.introNode.stop()
         graph.engine.mainMixerNode.outputVolume = 1
+        graph.meter.reset()
         if recorder == nil {
             graph.engine.stop()
             AudioSessionSettings.deactivate()
