@@ -43,6 +43,9 @@ public struct CountButtonStyle: ButtonStyle {
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .brightness(configuration.isPressed ? -0.08 : 0)
             .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
+            // The buttons keep their size at any text size, so their words stop growing
+            // at the first accessibility size and shrink to fit after that.
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 
@@ -83,12 +86,16 @@ public struct PlainActionButtonStyle: ButtonStyle {
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(ScorebookFont.chip)
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
             .foregroundStyle(ScorebookColor.textPrimary)
             .padding(.horizontal, Spacing.medium)
             .frame(minHeight: Spacing.minimumTapSize)
             .background(ScorebookColor.surfaceSecondary.opacity(configuration.isPressed ? 0.6 : 1),
                         in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
             .contentShape(RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
+            // Chips sit four to a row, so their words stop growing at the largest ordinary text size.
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
 
@@ -126,6 +133,8 @@ public struct TeamButtonStyle: ButtonStyle {
         let shape = RoundedRectangle(cornerRadius: Spacing.bigButtonCornerRadius, style: .continuous)
         return configuration.label
             .font(ScorebookFont.headline)
+            .lineLimit(2)
+            .minimumScaleFactor(0.6)
             .foregroundStyle(look.onFill)
             .frame(maxWidth: .infinity, minHeight: Spacing.songButtonHeight)
             .background {
@@ -138,6 +147,9 @@ public struct TeamButtonStyle: ButtonStyle {
             }
             .contentShape(shape)
             .brightness(configuration.isPressed ? -0.06 : 0)
+            // The song button keeps its place at the bottom edge, so its words stop growing
+            // at the first accessibility size.
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 }
 

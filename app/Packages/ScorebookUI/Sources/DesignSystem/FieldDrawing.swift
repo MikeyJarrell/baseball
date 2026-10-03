@@ -153,7 +153,7 @@ public struct FieldDrawing: View {
                 throwArrows(map)
                 runnerPaths(map)
                 bases(map)
-                if fieldersShown ?? (zoomLevel == .wholeField) {
+                if showFielders {
                     fielders(map)
                 }
                 hitMarker(map)
@@ -162,7 +162,12 @@ public struct FieldDrawing: View {
             .frame(width: geo.size.width, height: geo.size.height)
         }
         .aspectRatio(area.width / area.height, contentMode: .fit)
+        // Zoomed in, the outfield reaches past the frame; keep it inside.
+        .clipped()
     }
+
+    /// Whether the fielder circles are drawn.
+    private var showFielders: Bool { fieldersShown ?? (zoomLevel == .wholeField) }
 
     /// The color for runners and lit bases: the batting team's, or neutral amber if not given.
     private var runnerFill: Color { teamLook?.fill ?? ScorebookColor.baseOccupied }
@@ -392,7 +397,7 @@ public struct FieldDrawing: View {
                 }
                 .buttonStyle(.plain)
                 .disabled(onTap == nil)
-                .position(map.point(Layout.tagSpot(tag.base)).offset(dx: spread))
+                .position(map.point(Layout.tagSpot(tag.base, fieldersShown: showFielders)).offset(dx: spread))
                 .accessibilityLabel(Text(tag.isOut ? "\(tag.label) at \(tag.base.rawValue)" : "Runner \(tag.label), \(tag.base == .home ? "scored" : "on \(tag.base.rawValue)")"))
             }
         }
@@ -496,7 +501,7 @@ enum Layout {
 
     /// The part of the drawing shown for each zoom level.
     static let wholeFieldArea = CGRect(x: 0, y: 0, width: 320, height: 322)
-    static let infieldArea = CGRect(x: 22, y: 90, width: 276, height: 216)
+    static let infieldArea = CGRect(x: 22, y: 90, width: 276, height: 224)
 
     /// Where each base is.
     static func base(_ base: Base) -> CGPoint {
@@ -524,10 +529,11 @@ enum Layout {
     }
 
     /// Where a runner's name tag sits for each base: beside it, out of the base paths' way.
-    static func tagSpot(_ base: Base) -> CGPoint {
+    /// With the fielders drawn, the tag for second sits higher, above the shortstop and second baseman.
+    static func tagSpot(_ base: Base, fieldersShown: Bool = false) -> CGPoint {
         switch base {
         case .first: CGPoint(x: 244, y: 240)
-        case .second: CGPoint(x: 160, y: 110)
+        case .second: CGPoint(x: 160, y: fieldersShown ? 94 : 110)
         case .third: CGPoint(x: 76, y: 240)
         case .home: CGPoint(x: 160, y: 297)
         }
