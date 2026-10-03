@@ -1,0 +1,150 @@
+{
+  "description": "Moreno, the Diamond Dogs' designated non-runner, singles. Before anyone decides who runs, the Mudcats change pitchers; the question stays open, since a runner can go in until the next pitch (league rule 9.11 A 3, D). The next pitch is thrown with Moreno still on first, so Moreno ran themself and the question closes.",
+  "setupFile": "designated-non-runner",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          5,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              5,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "popUp",
+        "fielders": [
+          2
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              2
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitchingChange": {
+        "team": "away",
+        "newPitcher": "m12"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
+        }
+      }
+    },
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "pitcher": "m12",
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "d1",
+          "responsiblePitcher": "m9"
+        }
+      ],
+      "batter": "d2",
+      "isRunnerChoiceOpen": false
+    }
+  }
+}

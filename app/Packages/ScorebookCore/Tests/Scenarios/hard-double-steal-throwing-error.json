@@ -11,7 +11,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -28,12 +28,12 @@
         "hitLocation": 8,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "first",
             "to": "second"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "first"
           }
@@ -54,14 +54,14 @@
       "runnerAction": {
         "moves": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "second",
             "to": "scored",
             "reason": "stolenBase",
             "advancedOnError": true
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "first",
             "to": "third",
             "reason": "stolenBase",
@@ -91,14 +91,14 @@
       "runners": [
         {
           "base": "third",
-          "runner": "c2",
-          "responsiblePitcher": "m9"
+          "runner": "m2",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c3",
+      "batter": "m3",
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 3,
           "strikes": 2
         }
@@ -106,29 +106,29 @@
     },
     "batting": [
       {
-        "player": "c1",
+        "player": "m1",
         "stolenBases": 1,
         "runs": 1
       },
       {
-        "player": "c2",
+        "player": "m2",
         "stolenBases": 1,
         "runs": 0
       },
       {
-        "player": "c3",
+        "player": "m3",
         "plateAppearances": 0
       }
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "runs": 1
       }
     ],
     "fielding": [
       {
-        "player": "m8",
+        "player": "d8",
         "errors": 1
       }
     ],

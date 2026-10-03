@@ -1,0 +1,354 @@
+{
+  "description": "The same fifth inning as time-limit-passes-mid-inning, but when the app asks whether the game is over, the teams agree to keep playing. The sixth inning is an ordinary inning: no last-inning warning and no second question about the time limit.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 5,
+        "half": "top",
+        "score": {
+          "away": 2,
+          "home": 1
+        },
+        "note": "Start in the fifth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "timeLimitChange": {
+        "endsAt": "2026-05-02T18:06:30Z",
+        "note": "Umpire's time."
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "keepPlaying": {
+        "reason": "timeLimit"
+      }
+    },
+    {
+      "id": "e10",
+      "enteredAt": "2026-05-02T18:08:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e11",
+      "enteredAt": "2026-05-02T18:08:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m5",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e12",
+      "enteredAt": "2026-05-02T18:09:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m6",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e13",
+      "enteredAt": "2026-05-02T18:09:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e14",
+      "enteredAt": "2026-05-02T18:09:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d5",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e15",
+      "enteredAt": "2026-05-02T18:10:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d6",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e8",
+      "expected": {
+        "situation": {
+          "gameOverQuestion": "timeLimit"
+        }
+      }
+    },
+    {
+      "afterEvent": "e9",
+      "expected": {
+        "situation": {
+          "inning": 6,
+          "half": "top",
+          "isGameOverQuestionOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e13",
+      "expected": {
+        "situation": {
+          "inning": 6,
+          "half": "bottom",
+          "isLastInning": false,
+          "isGameOverQuestionOpen": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 7,
+      "half": "top",
+      "score": {
+        "away": 2,
+        "home": 1
+      },
+      "isGameOverQuestionOpen": false,
+      "isLastInning": false,
+      "isFinal": false
+    }
+  }
+}

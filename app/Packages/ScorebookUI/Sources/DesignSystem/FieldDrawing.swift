@@ -240,8 +240,8 @@ public struct FieldDrawing: View {
     FieldDrawing(
         tapSequence: [.thirdBase, .secondBase, .firstBase],
         runnerMarkers: [
-            FieldRunnerMarker(runner: "c1", label: "1", from: .first, to: .out, outAt: .second),
-            FieldRunnerMarker(runner: "c2", label: "2", from: .home, to: .out, outAt: .first),
+            FieldRunnerMarker(runner: "m1", label: "1", from: .first, to: .out, outAt: .second),
+            FieldRunnerMarker(runner: "m2", label: "2", from: .home, to: .out, outAt: .first),
         ]
     ).padding()
 }

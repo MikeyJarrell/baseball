@@ -23,8 +23,8 @@ struct RoundTripTests {
 
     @Test("Game setups read back exactly")
     func setups() throws {
-        for setup in [SampleSetups.cardinalsAtMudcats,
-                      SampleSetups.mudcatsAtBombers, SampleSetups.unknownAtMudcats] {
+        for setup in [SampleSetups.mudcatsAtDiamondDogs,
+                      SampleSetups.diamondDogsAtBombers, SampleSetups.unknownAtDiamondDogs] {
             #expect(try roundTrip(setup) == setup)
         }
     }
@@ -65,14 +65,17 @@ struct RoundTripTests {
             .runnerAction(RunnerAction(moves: [RunnerMove(runner: "a", from: .first, to: .out, reason: .caughtStealing,
                                                           outBy: [.catcher, .shortstop], outAt: .second)])),
             .errorWithNoAdvance(ErrorCharge(fielder: .firstBase, type: .fielding)),
-            .substitution(Substitution(team: .home, changes: [
-                LineupChange(kind: .positionSwitch, incoming: "a", position: .shortstop),
-                LineupChange(kind: .defensiveReplacement, incoming: "c", replacing: "b", position: .secondBase),
-            ])),
+            .substitution(Substitution(team: .home,
+                batting: [BattingChange(kind: .replacement, incoming: "c", replacing: "b")],
+                defense: [FielderAssignment(position: .shortstop, player: "a"), FielderAssignment(position: .secondBase, player: "c")],
+                leavesField: ["z"])),
             .defenseConfirmed(DefenseConfirmed(team: .home)),
             .runnerForNonRunner(RunnerForNonRunner(runner: "c", replacing: "a")),
             .pitchingChange(PitchingChange(team: .away, newPitcher: "p2", previousPitcherMovesTo: .rightField, takesBattingSpotOf: "x")),
-            .addHitter(AddHitter(team: .home, player: "n", position: nil)),
+            .addHitter(AddHitter(team: .home, player: "n")),
+            .battingHole(BattingHole(team: .away, spotIndex: 4)),
+            .automaticOut(AutomaticOut(team: .away, spotIndex: 4)),
+            .timeLimitChange(TimeLimitChange(endsAt: Date(timeIntervalSince1970: 1_777_748_400), note: "Umpire added 20 minutes")),
             .manualAdjustment(ManualAdjustment(inning: 4, half: .bottom, outs: 2, count: Count(balls: 1, strikes: 2),
                                                score: Score(away: 1, home: 2), runners: BaseOccupants(first: "a", third: "b"),
                                                batterIndex: 3, note: "Fixing the book")),
@@ -109,7 +112,7 @@ struct RoundTripTests {
     func handWrittenEvent() throws {
         let json = """
         { "ballInPlay": { "batterResult": "out", "fielders": [6, 3],
-                          "runners": [ { "runner": "c1", "from": "home", "to": "out", "outBy": [6, 3] } ] } }
+                          "runners": [ { "runner": "m1", "from": "home", "to": "out", "outBy": [6, 3] } ] } }
         """
         let event = try ScorebookJSON.decode(GameEvent.self, from: Data(json.utf8))
         guard case .ballInPlay(let play) = event.kind else {
@@ -174,16 +177,79 @@ struct HelperTests {
         #expect(state.onDeckBatter == "a")
     }
 
-    @Test("The game clock counts down from the time limit, from the first event")
-    func gameClock() {
-        var situation = SampleSituations.topOfFirst.situation
-        #expect(situation.timeLimitMinutes == 100)
-        #expect(situation.timeRemaining(at: Date()) == nil)
-        let start = Date(timeIntervalSinceReferenceDate: 1_000)
-        situation.gameStartedAt = start
-        #expect(situation.timeRemaining(at: start.addingTimeInterval(30 * 60)) == TimeInterval(70 * 60))
-        situation.timeLimitMinutes = nil
-        #expect(situation.timeRemaining(at: start) == nil)
+    @Test("Before the first pitch the limit shows the scheduled start plus three hours")
+    func clockBeforeFirstPitch() {
+        let situation = SampleSituations.topOfFirst.situation
+        let setup = SampleSituations.topOfFirst.setup
+        #expect(situation.timeLimitEndsAt == setup.scheduledStart.addingTimeInterval(3 * 3600))
+        let clock = SampleRulesEngine().clock(for: situation, at: setup.scheduledStart)
+        #expect(clock.timeLimitEndsAt == situation.timeLimitEndsAt)
+        #expect(clock.timeRemaining == nil && !clock.isLastInning && !clock.askIfOverOnTime)
+    }
+
+    @Test("The stand-in clock counts down from the first pitch and repeats the stored facts")
+    func clockDuringGame() {
+        let engine = SampleRulesEngine()
+        let situation = SampleSituations.runnerOnFirstOneOut.situation
+        let start = situation.gameStartedAt!
+        let end = situation.timeLimitEndsAt!
+        #expect(end == start.addingTimeInterval(180 * 60))
+        #expect(engine.clock(for: situation, at: start.addingTimeInterval(30 * 60)).timeRemaining == TimeInterval(150 * 60))
+        let lastInning = SampleSituations.lastInningOnTime.situation
+        #expect(engine.clock(for: lastInning, at: lastInning.timeLimitEndsAt!).isLastInning)
+    }
+
+    @Test("A finished game's clock never asks anything")
+    func clockAfterTheGame() {
+        var finished = SampleGame.finalSituation
+        finished.gameOverQuestion = .timeLimit
+        finished.isLastInning = true
+        for engine in [SampleRulesEngine() as RulesEngine, DoNothingRulesEngine()] {
+            let clock = engine.clock(for: finished, at: finished.timeLimitEndsAt!.addingTimeInterval(3600))
+            #expect(!clock.askIfOverOnTime && !clock.isLastInning && clock.timeRemaining == nil)
+        }
+    }
+
+    @Test("The walk-off inning: bottom of the ninth or later, or of the inning the time limit made the last")
+    func walkOffInning() {
+        var s = SampleSituations.lastInningOnTime.situation
+        #expect(s.inning == 7 && s.isWalkOffInning)
+        s.isLastInning = false
+        #expect(!s.isWalkOffInning)
+        s.inning = 9
+        #expect(s.isWalkOffInning)
+        s.half = .top
+        #expect(!s.isWalkOffInning)
+    }
+
+    @Test("League and championship rules, and rules missing from a file")
+    func rules() throws {
+        #expect(GameRules.league.timeLimitMinutes == 180 && GameRules.league.runRuleMargin == 12)
+        #expect(GameRules.championship.timeLimitMinutes == 195 && GameRules.championship.runRuleMargin == 15)
+        #expect(GameRules.league.maxDesignatedNonRunners == 2 && GameRules.league.runRuleInning == 7)
+        #expect(try ScorebookJSON.decode(GameRules.self, from: Data("{}".utf8)) == .league)
+        let noLimit = GameRules(timeLimitMinutes: nil, runRuleMargin: nil)
+        #expect(try roundTrip(noLimit) == noLimit)
+        let nine = GameSetup.nineInTheMorning(on: SampleSetups.gameDay)
+        #expect(Calendar.current.component(.hour, from: nine) == 9)
+    }
+
+    @Test("Batting order and defense are separate: a pitcher can field without batting, a hitter bat without fielding")
+    func separateLists() {
+        let bombers = SampleSetups.diamondDogsAtBombers.home
+        #expect(bombers.startingPitcher == "b11")
+        #expect(!bombers.battingOrder.contains("b11"))
+        let ours = SampleSetups.mudcatsAtDiamondDogs.home
+        #expect(ours.startingPosition(of: "d10") == nil && ours.battingOrder.contains("d10"))
+        #expect(ours.bench.map(\.id) == ["d11", "d12"])
+        #expect(ours.designatedNonRunners == ["d4"] && ours.isDesignatedNonRunner("d4"))
+        // A non-runner may be declared from the bench, and is marked when they bat.
+        var withBench = SampleSetups.mudcatsAtDiamondDogs
+        withBench.home.designatedNonRunners = ["d4", "d11"]
+        #expect(withBench.home.bench.contains { $0.id == "d11" })
+        let start = Situation(startOf: withBench)
+        #expect(start.home.battingOrder.slots[3].isDesignatedNonRunner)
+        #expect(!start.home.battingOrder.slots[0].isDesignatedNonRunner)
     }
 
     @Test("Event times are kept to the whole second")

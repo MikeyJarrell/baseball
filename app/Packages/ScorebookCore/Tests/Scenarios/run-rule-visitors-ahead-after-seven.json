@@ -1,0 +1,111 @@
+{
+  "description": "Bottom of the seventh, Mudcats ahead 14-2. The Diamond Dogs go down in order, so after seven full innings the Mudcats lead by 12 and the app asks whether the game is over on the run rule.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 7,
+        "half": "bottom",
+        "score": {
+          "away": 14,
+          "home": 2
+        },
+        "note": "Start in the bottom of the seventh."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "isGameOverQuestionOpen": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 8,
+      "half": "top",
+      "score": {
+        "away": 14,
+        "home": 2
+      },
+      "gameOverQuestion": "runRule",
+      "isFinal": false
+    }
+  }
+}
