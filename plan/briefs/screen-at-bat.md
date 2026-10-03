@@ -17,7 +17,7 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 
 **Always visible, no scrolling:** inning and half, both teams’ scores, outs, balls and strikes, runners on the field drawing, batter (name, number, batting side, earlier today in scorebook notation), on-deck hitter, current pitcher (name, throwing hand, pitches and strikes so far).
 
-**Big buttons:** ball, strike, foul, in play. Strike asks nothing more; called or swinging is a small toggle beside it, defaulting to swinging.
+**Big buttons:** ball, strike, foul, in play. Strike records a swinging strike; a small “Called” button inside it records a called strike, one tap either way.
 
 **One tap away:** undo (with what it will undo shown, “Undo: ball”), hit by pitch, intentional walk, foul tip, the song button. After strike three, a “dropped third strike” button stays up until the next pitch, and opens that version of the in-play sequence.
 
