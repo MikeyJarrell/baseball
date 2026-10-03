@@ -219,28 +219,58 @@ struct FileStorageTests {
 
         let start = SampleGame.game.setup.scheduledStart
         let week: TimeInterval = 7 * 86_400
-        // Finished last: never offered for resuming.
+        // Finished: never offered for resuming.
         try await storage.saveGame(copy(of: SampleGame.game, id: "finished", startingAt: start.addingTimeInterval(2 * week)))
         #expect(try await storage.gameInProgress() == nil)
 
-        // An unfinished game from a week ago, abandoned in the third inning.
+        // A game set up but not started is offered when nothing else has been started.
+        let setUpEarly = Game(id: "set-up-early", setup: SampleSetups.diamondDogsAtBombers)
+        try await storage.saveGame(setUpEarly)
+        #expect(try await storage.gameInProgress() == setUpEarly)
+
+        // An unfinished game from a week ago, abandoned in the third inning, has been started,
+        // so it beats any game not yet started.
         let abandoned = copy(of: SampleGame.game, id: "abandoned", startingAt: start, eventCount: 40)
         try await storage.saveGame(abandoned)
         #expect(try await storage.gameInProgress()?.id == "abandoned")
 
-        // Today's game, set up but with no pitch thrown yet, is the one to resume.
-        let today = Game(id: "today", setup: {
-            var setup = SampleSetups.diamondDogsAtBombers
-            setup.scheduledStart = start.addingTimeInterval(3 * week)
-            return setup
-        }())
+        // Today's game, 30 events in, is newer than the abandoned one.
+        let today = copy(of: SampleGame.game, id: "today", startingAt: start.addingTimeInterval(3 * week), eventCount: 30)
         try await storage.saveGame(today)
-        let resumed = try await folder.storage().gameInProgress()
-        #expect(resumed == today)
+        #expect(try await folder.storage().gameInProgress() == today)
 
-        // Once today's game is over, the abandoned one is the only game left to resume.
-        try await storage.appendEvent(GameEvent(kind: .endOfGame(EndOfGame(reason: .called))), toGame: "today")
+        // Once today's game is over, the abandoned one is the game left to resume.
+        try await storage.appendEvent(GameEvent(enteredAt: start.addingTimeInterval(3 * week + 9_000),
+                                                kind: .endOfGame(EndOfGame(reason: .called))), toGame: "today")
         #expect(try await storage.gameInProgress()?.id == "abandoned")
+    }
+
+    @Test("A game set up in advance for next week never takes over from today's game in progress")
+    func gameSetUpInAdvance() async throws {
+        let folder = try TemporaryFolder()
+        let storage = try folder.storage()
+        // Today's game, 30 events in, entered just now.
+        let now = Date().wholeSecond
+        var today = Game(id: "today", setup: SampleSetups.mudcatsAtDiamondDogs)
+        today.setup.scheduledStart = now.addingTimeInterval(-3_600)
+        today.events = SampleGame.game.events.prefix(30).enumerated().map { index, event in
+            GameEvent(id: event.id, enteredAt: now.addingTimeInterval(Double(index - 30) * 60), kind: event.kind)
+        }
+        try await storage.saveGame(today)
+
+        // Then, between innings, the coach sets up next Saturday's game.
+        var nextWeek = Game(id: "next-week", setup: SampleSetups.diamondDogsAtBombers)
+        nextWeek.setup.scheduledStart = now.addingTimeInterval(7 * 86_400)
+        try await storage.saveGame(nextWeek)
+
+        #expect(try await folder.storage().gameInProgress()?.id == "today")
+
+        // And with two unstarted games, the one saved last is offered, whatever its date.
+        try await storage.deleteGame("today")
+        var tomorrow = Game(id: "tomorrow", setup: SampleSetups.mudcatsAtDiamondDogs)
+        tomorrow.setup.scheduledStart = now.addingTimeInterval(86_400)
+        try await storage.saveGame(tomorrow)
+        #expect(try await folder.storage().gameInProgress()?.id == "tomorrow")
     }
 
     // MARK: Damaged files

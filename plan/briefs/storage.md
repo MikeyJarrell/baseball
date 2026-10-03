@@ -10,7 +10,7 @@
 
 ## Deliver
 
-The real version of the storage interface in `Model/`, saving JSON files in a folder it is given (the app passes its Documents folder; tests pass a temporary one):
+The real version of the storage interface in `Model/`, saving JSON files in two folders it is given (tests pass temporary ones). The live files go in the app’s private Application Support folder, which the Files app cannot see, so nobody can delete or edit a game there by mistake:
 
 ```
 teams/<team id>.json
@@ -18,8 +18,9 @@ games/<game id>.json        setup and every event
 songs/library.json          song names, start points, file names
 settings.json               app settings, such as fading the song on the first pitch
 songs/audio/                the audio files themselves (written by the audio builder’s import)
-backups/
 ```
+
+Backups go in `backups/` inside the Documents folder, the only folder the Files app shows (decided after the storage review).
 
 1. **Save after every event.** Each new event is written to disk before the call returns, written to a temporary file and then swapped in, so a crash mid-write never leaves a half-written game.
 2. **Game in progress.** On launch, find the most recent game that has not ended so the app can offer to resume it.

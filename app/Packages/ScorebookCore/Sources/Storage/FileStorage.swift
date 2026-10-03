@@ -1,27 +1,33 @@
-// FileStorage: the real storage, saving everything as JSON files in one folder.
+// FileStorage: the real storage, saving everything as JSON files.
 //
-// The app hands it its Documents folder; tests hand it a temporary one. Inside it:
+// It is given two folders. The data folder holds the live files, and the app passes its
+// private Application Support folder, which the iPhone Files app cannot see, so nobody can
+// delete or edit a game by mistake:
 //
 //     teams/<team id>.json      one file per team, ours and every opponent
 //     games/<game id>.json      a game's setup and every event (see GameFileLayout.swift)
 //     songs/library.json        song names, start points and file names
 //     songs/audio/              the audio files themselves (written by the walk-up audio import)
 //     settings.json             the app's settings
-//     backups/                  dated backup files
+//
+// The backups folder holds dated backup files, and the app passes `Documents/backups`, so
+// the Files app shows them and a backup can be copied off the phone. Tests pass temporary
+// folders for both.
 //
 // Every write goes through SafeFileWriter, so a crash mid-write never leaves a half-written
-// file. Use one FileStorage per folder: it remembers the open game's file between events.
+// file. Use one FileStorage per data folder: it remembers the open game's file between events.
 
 import Foundation
 import Model
 
 /// Saves and loads teams, games, the song library and the settings as JSON files.
 public actor FileStorage: ScorebookStorage {
-    /// The folder everything is saved in.
-    public nonisolated let folder: URL
-    /// Where imported song files are kept. Storage creates it; the walk-up audio import fills it.
+    /// The private folder the live files are saved in.
+    public nonisolated let dataFolder: URL
+    /// Where imported song files are kept, inside the data folder. Storage creates it; the
+    /// walk-up audio import fills it.
     public nonisolated let audioFolder: URL
-    /// Where backup files are written.
+    /// Where backup files are written: the one folder the scorer sees in the Files app.
     public nonisolated let backupsFolder: URL
 
     private let teamsFolder: URL
@@ -34,22 +40,25 @@ public actor FileStorage: ScorebookStorage {
     /// next event is quick. Forgotten whenever that game's file is replaced some other way.
     private var openGame: GameFileLayout?
 
-    /// Sets up storage in a folder, creating the folders inside it if they are not there yet,
-    /// and clearing away any temporary file left by a write that never finished.
-    public init(folder: URL) throws {
-        self.folder = folder
-        teamsFolder = folder.appendingPathComponent("teams", isDirectory: true)
-        gamesFolder = folder.appendingPathComponent("games", isDirectory: true)
-        songsFolder = folder.appendingPathComponent("songs", isDirectory: true)
+    /// Sets up storage, creating the folders it needs if they are not there yet and clearing
+    /// away any temporary file left by a write that never finished.
+    /// - Parameters:
+    ///   - dataFolder: where the live files go. The app passes its Application Support folder.
+    ///   - backupsFolder: where backups go. The app passes `backups` inside its Documents folder.
+    public init(dataFolder: URL, backupsFolder: URL) throws {
+        self.dataFolder = dataFolder
+        self.backupsFolder = backupsFolder
+        teamsFolder = dataFolder.appendingPathComponent("teams", isDirectory: true)
+        gamesFolder = dataFolder.appendingPathComponent("games", isDirectory: true)
+        songsFolder = dataFolder.appendingPathComponent("songs", isDirectory: true)
         audioFolder = songsFolder.appendingPathComponent("audio", isDirectory: true)
-        backupsFolder = folder.appendingPathComponent("backups", isDirectory: true)
         libraryFile = songsFolder.appendingPathComponent("library.json")
-        settingsFile = folder.appendingPathComponent("settings.json")
+        settingsFile = dataFolder.appendingPathComponent("settings.json")
 
         for subfolder in [teamsFolder, gamesFolder, songsFolder, audioFolder, backupsFolder] {
             try FileManager.default.createDirectory(at: subfolder, withIntermediateDirectories: true)
         }
-        for subfolder in [folder, teamsFolder, gamesFolder, songsFolder] {
+        for subfolder in [dataFolder, teamsFolder, gamesFolder, songsFolder, backupsFolder] {
             SafeFileWriter.clearLeftovers(in: subfolder)
         }
     }
@@ -127,12 +136,25 @@ public actor FileStorage: ScorebookStorage {
     }
 
     /// The game that has not ended and was worked on most recently, so the app can offer to
-    /// resume it. "Most recently" goes by the time its last event was entered, or its scheduled
-    /// start if it has no events yet. Damaged game files are skipped.
+    /// resume it. A game with at least one event always beats a game not yet started, and
+    /// started games are ranked by when their last event was entered. Only if no game has
+    /// been started is an unstarted one offered: the one set up most recently, going by when
+    /// its file was saved, never by a start time that may still be in the future (a game set
+    /// up for next Saturday). Damaged game files are skipped.
     public func gameInProgress() async throws -> Game? {
-        try readEveryGame().items
-            .filter { !$0.isFinished }
-            .max { (lastWorkedOn($0), $0.id.rawValue) < (lastWorkedOn($1), $1.id.rawValue) }
+        let unfinished = try readEveryGame().items.filter { !$0.isFinished }
+        if let started = unfinished
+            .filter({ !$0.events.isEmpty })
+            .max(by: { ($0.events.last!.enteredAt, $0.id.rawValue) < ($1.events.last!.enteredAt, $1.id.rawValue) }) {
+            return started
+        }
+        return unfinished.max { (savedAt($0.id), $0.id.rawValue) < (savedAt($1.id), $1.id.rawValue) }
+    }
+
+    /// When a game's file was last written, or the distant past if that cannot be told.
+    private func savedAt(_ id: GameID) -> Date {
+        let attributes = try? FileManager.default.attributesOfItem(atPath: gameFile(id).path)
+        return attributes?[.modificationDate] as? Date ?? .distantPast
     }
 
     /// Every game that has ended, oldest first, for the season totals, plus any game file
@@ -185,6 +207,10 @@ public actor FileStorage: ScorebookStorage {
     /// Audio files are left alone. The backup is checked in full before anything is touched,
     /// and what was there before is first saved as a "before-restore" backup, so a restore
     /// can itself be undone.
+    ///
+    /// The backup's files are written first, each one safely replacing the file of the same
+    /// name, and only then are the files the backup does not have removed. A restore cut off
+    /// partway, by a crash or a full phone, leaves every game in place, plus perhaps some extras.
     public func restoreBackup(from file: URL) async throws {
         // 1. Read and check the whole backup. A damaged backup changes nothing.
         let data: Data
@@ -197,37 +223,68 @@ public actor FileStorage: ScorebookStorage {
 
         // 2. Keep a copy of what is there now.
         _ = try writeBackup(namedFrom: "before-restore")
-
-        // 3. Clear away the current teams, games, song library and settings.
         openGame = nil
+
+        // 3. Write the backup's contents over the current files, noting each file written.
+        var kept: Set<String> = []
+        for team in backup.teams {
+            try await saveTeam(team)
+            kept.insert(relativeName(teamFile(team.id)))
+        }
+        for game in backup.games {
+            try await saveGame(game)
+            kept.insert(relativeName(gameFile(game.id)))
+        }
+        if let library = backup.songLibrary {
+            try await saveSongLibrary(library)
+            kept.insert(relativeName(libraryFile))
+        }
+        if let settings = backup.settings {
+            try await saveSettings(settings)
+            kept.insert(relativeName(settingsFile))
+        }
+        for copy in backup.unreadableFiles {
+            // Put an unreadable file back exactly as it was, but only inside the data folder.
+            let target = dataFolder.appendingPathComponent(copy.fileName)
+            guard target.standardizedFileURL.path.hasPrefix(dataFolder.standardizedFileURL.path + "/") else { continue }
+            try SafeFileWriter.write(copy.contents, to: target)
+            kept.insert(copy.fileName)
+        }
+        openGame = nil
+
+        // 4. Only now remove the teams, games, song library and settings the backup did not have.
         for subfolder in [teamsFolder, gamesFolder] {
-            for name in try FileManager.default.contentsOfDirectory(atPath: subfolder.path) where name.hasSuffix(".json") {
+            for name in try FileManager.default.contentsOfDirectory(atPath: subfolder.path)
+            where name.hasSuffix(".json") && !name.hasPrefix(".") && !kept.contains("\(subfolder.lastPathComponent)/\(name)") {
                 try FileManager.default.removeItem(at: subfolder.appendingPathComponent(name))
             }
         }
-        try removeIfPresent(libraryFile)
-        try removeIfPresent(settingsFile)
-
-        // 4. Write the backup's contents in their place.
-        for team in backup.teams { try await saveTeam(team) }
-        for game in backup.games { try await saveGame(game) }
-        if let library = backup.songLibrary { try await saveSongLibrary(library) }
-        if let settings = backup.settings { try await saveSettings(settings) }
-        for copy in backup.unreadableFiles {
-            // Put an unreadable file back exactly as it was, but only inside the storage folder.
-            let target = folder.appendingPathComponent(copy.fileName)
-            guard target.standardizedFileURL.path.hasPrefix(folder.standardizedFileURL.path + "/") else { continue }
-            try SafeFileWriter.write(copy.contents, to: target)
+        for single in [libraryFile, settingsFile] where !kept.contains(relativeName(single)) {
+            try removeIfPresent(single)
         }
-        openGame = nil
     }
 
-    /// Every backup file, newest first, for a restore screen to offer.
+    /// A file's name inside the data folder, such as "games/1234.json" or "settings.json".
+    private func relativeName(_ file: URL) -> String {
+        String(file.standardizedFileURL.path.dropFirst(dataFolder.standardizedFileURL.path.count + 1))
+    }
+
+    /// Every backup file, newest first, for a restore screen to offer. "Newest" goes by when
+    /// each file was made, not by its name, so "before-restore" backups and two backups made
+    /// in the same second fall in their true order.
     public func listBackups() throws -> [URL] {
-        try FileManager.default.contentsOfDirectory(atPath: backupsFolder.path)
+        let files = try FileManager.default.contentsOfDirectory(atPath: backupsFolder.path)
             .filter { $0.hasSuffix(".json") && !$0.hasPrefix(".") }
-            .sorted(by: >)
             .map { backupsFolder.appendingPathComponent($0) }
+        // When each file was made, to the fraction of a second the disk records.
+        func madeAt(_ file: URL) -> Date {
+            let attributes = try? FileManager.default.attributesOfItem(atPath: file.path)
+            return attributes?[.creationDate] as? Date ?? .distantPast
+        }
+        return files
+            .map { (file: $0, madeAt: madeAt($0)) }
+            .sorted { ($0.madeAt, $0.file.lastPathComponent) > ($1.madeAt, $1.file.lastPathComponent) }
+            .map(\.file)
     }
 
     /// Gathers everything except audio into one backup file named `<prefix>-<date and time>.json`.
@@ -236,7 +293,7 @@ public actor FileStorage: ScorebookStorage {
         let games = try readEveryGame()
         var unreadable = (teams.damaged + games.damaged).map {
             UnreadableFileCopy(fileName: $0.fileName,
-                               contents: (try? Data(contentsOf: folder.appendingPathComponent($0.fileName))) ?? Data())
+                               contents: (try? Data(contentsOf: dataFolder.appendingPathComponent($0.fileName))) ?? Data())
         }
         // The song library and settings: kept as values if they read, copied byte for byte if not.
         var library: SongLibrary?
@@ -342,10 +399,4 @@ public actor FileStorage: ScorebookStorage {
         // because a real "%" is always written as "%25".
         return name.isEmpty ? "%00" : name
     }
-}
-
-/// When a game was last worked on: the time its last event was entered, or its scheduled
-/// start if nothing has been recorded yet.
-private func lastWorkedOn(_ game: Game) -> Date {
-    game.events.last?.enteredAt ?? game.setup.scheduledStart
 }
