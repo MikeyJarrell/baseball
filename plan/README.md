@@ -45,11 +45,9 @@ The app is built as a set of separate pieces, each owned by one builder:
 
 The screens never do baseball arithmetic. A screen is handed a situation to display and hands back whatever the scorer tapped. That is what lets the batting screen be built and tested with made-up game situations while the rules engine is still being written.
 
-The pieces that need no screen can be built and tested on Mikey’s Mac today. The screens need Xcode, Apple’s app-building program, which is not installed yet.
+The pieces that need no screen build and test on the Mac with or without Xcode, Apple’s app-building program. The screens and audio need Xcode and its iPhone simulator, both installed.
 
 ## Build order
-
-**Before any code.** Mikey installs Xcode from the Mac App Store and answers the remaining questions in [OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md).
 
 **Foundation.** One builder sets up the empty project, writes the shared vocabulary, and writes a set of made-up teams and game situations for everyone else to build against. Before finishing, it writes out twenty of the hardest plays in baseball scoring (a dropped third strike, a run scored by a runner the previous pitcher put on base, a double steal with a throwing error) in that vocabulary, and fixes the vocabulary until every one fits. This is the one job that has to finish before the rest start. At the same time, the designer starts on screen mockups, since those need no code.
 
@@ -87,14 +85,12 @@ Each job below has its own brief in [briefs/](briefs/). A brief says what the jo
 | Reviewer: a fresh reader who checks each job before it is accepted | [rules-for-agents.md](rules-for-agents.md) | As each job finishes |
 | Website builder | [stats website](briefs/stats-website.md) | Later |
 
-Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten things at once. A good first wave is foundation and design together; then the rules engine and test scenarios together, with stats, storage and the box score printer; then audio and the screens once Xcode is installed and the mockups are approved.
+Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten things at once. A good first wave is foundation and design together; then the rules engine and test scenarios together, with stats, storage and the box score printer; then audio and the screens once the mockups are approved.
 
 ## What Mikey has to do
 
-1. Install Xcode from the Mac App Store. It is free and large, and needs his Apple ID.
-2. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
-3. Answer the remaining league-rules questions in [OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md).
-4. Approve the batting screen and in-play mockups.
-5. Put the song files (MP3 or M4A) in the Dropbox folder `baseball/songs/`, named for the player they belong to. On the Mac, an agent can trim each to the hook and even out the loudness; on the phone, the app imports them from Dropbox through the Files app.
-6. Record the announcer introductions in the app, once it can record.
-7. Score a televised game as the dress rehearsal.
+1. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
+2. Approve the batting screen and in-play mockups.
+3. Put the song files (MP3 or M4A) in the Dropbox folder `baseball/songs/`, named for the player they belong to. On the Mac, an agent can trim each to the hook and even out the loudness; on the phone, the app imports them from Dropbox through the Files app.
+4. Record the announcer introductions in the app, once it can record.
+5. Score a televised game as the dress rehearsal.

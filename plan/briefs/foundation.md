@@ -20,7 +20,7 @@
    - A stand-in rules engine that returns canned suggestions and play previews, for the screens to use until wiring.
 5. One scenario file in `Tests/Scenarios/` showing the exact JSON format, so the test writer has a pattern to copy.
 6. `DesignSystem/` stub: named colors, text styles, spacing values, a plain button style, and the field drawing’s interface (what it is given: occupied bases, highlighted positions, a numbered tap sequence; what it hands back: which position or base was tapped) with a plain placeholder drawing. The names and the interface are the contract; the designer fills them in.
-7. The Xcode app shell, if Xcode is installed: an iPhone app that opens to a placeholder screen and imports both packages. If Xcode is not installed yet, the wiring job creates it.
+7. The Xcode app shell: an iPhone app that opens to a placeholder screen in the simulator and imports both packages.
 8. A short `app/README.md`: how to build, how to run the tests, where things live.
 
 ## Test the vocabulary before anyone builds on it

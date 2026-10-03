@@ -8,16 +8,15 @@
 
 ## Deliver
 
-1. **The Xcode app shell,** if the foundation job could not create it.
-2. **Vocabulary change requests** from every handoff note: decide each, make the accepted ones, and fix every module they touch.
-3. **The game session:** the one place that holds the current game’s events, saves each new event through storage, asks the rules engine for the new situation, asks stats for the batter history, and feeds the screens. Undo and edits go through it.
-4. **Walk-up songs:** cue the next batter’s song as soon as our team’s next hitter is known, so it is loaded before anyone reaches for the button.
-5. **App settings:** keep the screen from auto-locking while a game is open; let the app’s files show in the iPhone Files app, for backups; switch on background audio; ask for microphone permission, for recording announcer introductions.
-6. **Prompts the game raises:** open the defense check each time our team takes the field, and the runner sheet when a designated non-runner reaches base.
-7. **Navigation:** home (resume game in progress, new game, teams, songs, season stats), pregame into the batting screen, the batting screen to and from the overview, end of game to the box score.
-8. **Resume:** if the app was closed mid-game, it opens to that game.
-9. **Installation on Mikey’s phone** with his free Apple account. The phone needs iOS 18 or later and Developer Mode switched on (Settings, Privacy and Security); write Mikey a step-by-step for reinstalling every seven days.
-10. **Simulator walkthrough:** drive the app in the iPhone simulator through the complete game in `SampleData`, and through the real Major League games in `Tests/Scenarios/`, and check the final box score against the official one.
+1. **Vocabulary change requests** from every handoff note: decide each, make the accepted ones, and fix every module they touch.
+2. **The game session:** the one place that holds the current game’s events, saves each new event through storage, asks the rules engine for the new situation, asks stats for the batter history, and feeds the screens. Undo and edits go through it.
+3. **Walk-up songs:** cue the next batter’s song as soon as our team’s next hitter is known, so it is loaded before anyone reaches for the button.
+4. **App settings:** keep the screen from auto-locking while a game is open; let the app’s files show in the iPhone Files app, for backups; switch on background audio; ask for microphone permission, for recording announcer introductions.
+5. **Prompts the game raises:** open the defense check each time our team takes the field, and the runner sheet when a designated non-runner reaches base.
+6. **Navigation:** home (resume game in progress, new game, teams, songs, season stats), pregame into the batting screen, the batting screen to and from the overview, end of game to the box score.
+7. **Resume:** if the app was closed mid-game, it opens to that game.
+8. **Installation on Mikey’s phone** with his free Apple account. The phone needs iOS 18 or later and Developer Mode switched on (Settings, Privacy and Security); write Mikey a step-by-step for reinstalling every seven days.
+9. **Simulator walkthrough:** drive the app in the iPhone simulator through the complete game in `SampleData`, and through the real Major League games in `Tests/Scenarios/`, and check the final box score against the official one.
 
 ## Dress rehearsal
 
