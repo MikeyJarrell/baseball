@@ -1,4 +1,0 @@
-module GameEngine {
-header "GameEngine-Swift.h"
-export *
-}

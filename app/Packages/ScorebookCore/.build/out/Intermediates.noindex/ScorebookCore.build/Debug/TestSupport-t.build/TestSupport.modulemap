@@ -1,4 +1,0 @@
-module TestSupport {
-header "TestSupport-Swift.h"
-export *
-}
