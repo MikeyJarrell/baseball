@@ -1,0 +1,1030 @@
+Building for debugging...
+[Computing dependencies]
+[Pre-planning 1 / 559]
+[Planning deferred tasks]
+[120 / 265] ScorebookCore_TestSupport
+[123 / 265]
+[124 / 266] Model
+[134 / 313]
+[141 / 313]
+[143 / 313]
+[147 / 313]
+[150 / 313]
+[155 / 313]
+[156 / 313]
+[157 / 313]
+[158 / 313]
+[171 / 313] Model
+[172 / 313] Model
+[182 / 318] Model
+[185 / 318] Storage
+[196 / 335] GameEngine
+[209 / 350] Stats
+[221 / 350] GameEngine
+[233 / 350] SampleData
+[236 / 350] Storage
+[245 / 350] Stats
+[247 / 350] SampleData
+[259 / 351] BoxScoreText
+[263 / 351] TestSupport
+[267 / 355] TestSupport
+[283 / 355] TestSupport
+[301 / 360] StorageTests-product
+[305 / 360] StatsTests-product
+[306 / 397]
+[320 / 397] StatsTests-product
+[322 / 397] StatsTests-product
+[340 / 397] StatsTests-product
+[348 / 397] GameEngineTests-product
+[350 / 397] ModelTests-product
+[356 / 397] GameEngineTests-product
+[357 / 397] GameEngineTests-product
+[360 / 397] GameEngineTests-product
+[362 / 397] GameEngineTests-product
+[363 / 397] GameEngineTests-product
+[365 / 397] BoxScoreTextTests-product
+[366 / 397] GameEngineTests-product
+[369 / 397] GameEngineTests-product
+[369 / 397] ModelTests-product
+[375 / 397] BoxScoreTextTests-product
+[381 / 397] StorageTests-product
+[385 / 397] BoxScoreTextTests-product
+[393 / 397] GameEngineTests-product
+Build complete! (10.12 sec)
+Test Suite 'All tests' started at 2026-10-03 16:12:08.417.
+Test Suite 'All tests' passed at 2026-10-03 16:12:08.418.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-10-03 16:12:08.624.
+Test Suite 'All tests' passed at 2026-10-03 16:12:08.625.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-10-03 16:12:08.829.
+Test Suite 'All tests' passed at 2026-10-03 16:12:08.830.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-10-03 16:12:09.043.
+Test Suite 'All tests' passed at 2026-10-03 16:12:09.044.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+Test Suite 'All tests' started at 2026-10-03 16:12:09.249.
+Test Suite 'All tests' passed at 2026-10-03 16:12:09.250.
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.001) seconds
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Backups" started.
+◇ Suite "Saving and loading files" started.
+◇ Test "A damaged backup is refused and changes nothing" started.
+◇ Test "A damaged file is copied into the backup byte for byte and put back by a restore" started.
+◇ Test "A leftover scrap from a backup cut off mid-write is cleared on the next start" started.
+◇ Test "A backup restored after changes brings back exactly what was saved" started.
+◇ Test "Live files and backups go in the two separate folders the app gives" started.
+◇ Test "Backups are listed newest first by when they were made, whatever their names" started.
+◇ Test "Audio files are left out of a backup and untouched by a restore" started.
+◇ Test "A 400-event game saved one event at a time takes under a second in total" started.
+◇ Test "Undo and edits save the whole game, and the next event goes after them" started.
+◇ Test "Every file storage writes records the format version" started.
+◇ Test "Loading or adding to a game that was never saved says it is not found" started.
+◇ Test "Restoring first saves what was there, so a restore can be undone" started.
+◇ Test "The song library and settings read back exactly, with defaults before anything is saved" started.
+◇ Test "Every sample team reads back exactly, ours first, and can be replaced or deleted" started.
+◇ Test "A write cut off before its swap leaves the saved game whole, and the leftover is cleared" started.
+◇ Test "The games list is newest first, with date, opponent and final score" started.
+◇ Test "An id with odd characters stays inside its folder" started.
+◇ Test "The game in progress is the unfinished game worked on most recently" started.
+◇ Test "A game set up in advance for next week never takes over from today's game in progress" started.
+◇ Test "A corrupted game file is reported as damaged and every other game still loads" started.
+◇ Test "The complete sample game and every sample setup read back exactly" started.
+◇ Test "Normal saving leaves no temporary files behind" started.
+◇ Test "Each event is on disk the moment it is added, even with a new storage between events" started.
+◇ Test "One of every kind of event, added one at a time, reads back exactly and in order" started.
+◇ Test "Garbled, empty, unversioned and newer-version files each get a plain reason" started.
+✔ Test "Loading or adding to a game that was never saved says it is not found" passed after 0.060 seconds.
+✔ Test "The song library and settings read back exactly, with defaults before anything is saved" passed after 0.060 seconds.
+✔ Test "A leftover scrap from a backup cut off mid-write is cleared on the next start" passed after 0.060 seconds.
+✔ Test "Undo and edits save the whole game, and the next event goes after them" passed after 0.060 seconds.
+✔ Test "Every file storage writes records the format version" passed after 0.060 seconds.
+✔ Test "Every sample team reads back exactly, ours first, and can be replaced or deleted" passed after 0.060 seconds.
+✔ Test "A damaged file is copied into the backup byte for byte and put back by a restore" passed after 0.060 seconds.
+✔ Test "Live files and backups go in the two separate folders the app gives" passed after 0.060 seconds.
+✔ Test "A write cut off before its swap leaves the saved game whole, and the leftover is cleared" passed after 0.060 seconds.
+✔ Test "A damaged backup is refused and changes nothing" passed after 0.060 seconds.
+✔ Test "An id with odd characters stays inside its folder" passed after 0.060 seconds.
+✔ Test "The games list is newest first, with date, opponent and final score" passed after 0.060 seconds.
+✔ Test "A game set up in advance for next week never takes over from today's game in progress" passed after 0.060 seconds.
+✔ Test "The complete sample game and every sample setup read back exactly" passed after 0.060 seconds.
+✔ Test "A corrupted game file is reported as damaged and every other game still loads" passed after 0.064 seconds.
+✔ Test "Normal saving leaves no temporary files behind" passed after 0.067 seconds.
+✔ Test "A backup restored after changes brings back exactly what was saved" passed after 0.071 seconds.
+✔ Test "The game in progress is the unfinished game worked on most recently" passed after 0.071 seconds.
+✔ Test "Each event is on disk the moment it is added, even with a new storage between events" passed after 0.073 seconds.
+✔ Test "Garbled, empty, unversioned and newer-version files each get a plain reason" passed after 0.074 seconds.
+✔ Test "Audio files are left out of a backup and untouched by a restore" passed after 0.074 seconds.
+✔ Test "Backups are listed newest first by when they were made, whatever their names" passed after 0.076 seconds.
+✔ Test "One of every kind of event, added one at a time, reads back exactly and in order" passed after 0.081 seconds.
+✔ Test "Restoring first saves what was there, so a restore can be undone" passed after 0.085 seconds.
+✔ Suite "Backups" passed after 0.085 seconds.
+Saving 400 events one at a time took 0.193119 seconds.
+✔ Test "A 400-event game saved one event at a time takes under a second in total" passed after 0.205 seconds.
+✔ Suite "Saving and loading files" passed after 0.205 seconds.
+✔ Test run with 25 tests in 2 suites passed after 0.205 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Season totals" started.
+◇ Suite "Scenario stats" started.
+◇ Suite "Scoring rules" started.
+◇ Test "Pitching totals and per-inning rates match hand calculations" started.
+◇ Test "Batting average, on-base and slugging match hand calculations" started.
+◇ Suite "The sample game's stats" started.
+◇ Test "Each player's game-by-game log runs oldest first, with the opponent" started.
+◇ Test "Opponents are left out, and every one of our players is listed once" started.
+◇ Test "A season with no games, or none of ours, is empty, not a crash" started.
+◇ Test "The sample game replayed by the rules engine gives the hand-written box score" started.
+◇ Test "Each scenario's batter histories agree with its box score" started.
+◇ Test "A walk-off: only the winning run, runners left on base, and runs from the adjustment in the ninth" started.
+◇ Test "A pinch hitter is listed under the player they replaced, as "ph" and then where they fielded" started.
+◇ Test "Each scenario's box score matches its expected stats" started.
+◇ Test "A fielder gets one assist per out, even after handling the ball twice in a rundown" started.
+◇ Test "Walks, hit-by-pitches, sacrifices and catcher's interference are not at-bats; errors and fielder's choices are" started.
+◇ Test "The home team that leads after the top of the last inning does not bat: an empty cell" started.
+◇ Test "A strikeout is a strikeout even when the batter reaches on a dropped third strike" started.
+◇ Test "The scenarios with stats expectations are all found" started.
+◇ Test "A reliever is not charged with the inherited runner who scores" started.
+◇ Test "A walk after a 3-1 pitching change is the first pitcher's; the pitch is the reliever's" started.
+◇ Test "An empty play log gives an empty box score with the right team names" started.
+◇ Test "A batting hole's automatic out is nobody's plate appearance and no fielder's putout" started.
+◇ Test "Runs are charged to the pitcher who put the runner on base" started.
+◇ Test "A triple play is one triple play and no double play, with each fielder's part" started.
+◇ Test "The final box score matches the hand-written one exactly" started.
+◇ Test "A pitcher who comes back keeps one line, in the order they first pitched" started.
+◇ Test "Someone with no batting spot who runs for a designated non-runner gets a "pr" line; the run is the non-runner's" started.
+◇ Test "Runs from a manual adjustment count for the team and the line score, but for no player or pitcher" started.
+◇ Test case passing 1 argument name → "balk-moves-every-runner" to "Each scenario's batter histories agree with its box score" started.
+◇ Test "Every batter's plate appearances match the hand-written history" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "Each scenario's batter histories agree with its box score" started.
+◇ Test "The runner for a designated non-runner keeps their caught stealing on their own line" started.
+◇ Test "A one-game season matches the hand-written season totals" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "batting-hole-out-each-time-around" to "Each scenario's batter histories agree with its box score" started.
+◇ Test "The box score after three innings matches the hand-written one exactly" started.
+◇ Test case passing 1 argument name → "caught-stealing-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "defensive-replacement-takes-batting-spot" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-runs-and-scores" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "designated-non-runner-pinch-runner-leaves-order" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runner-steals-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "balk-moves-every-runner" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "double-play-4-6-3" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "double-play-6-4-3" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "error-lets-runner-score-no-rbi" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "batting-hole-out-each-time-around" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "extra-innings-visitors-win-in-tenth" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "fielders-choice-keeps-first-pitchers-runner" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "caught-stealing-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "fielders-choice-lead-runner-out-at-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "defensive-replacement-takes-batting-spot" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "fly-outs-to-each-outfielder" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-runs-and-scores" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "designated-non-runner-pinch-runner-leaves-order" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "foul-with-two-strikes-leaves-count" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runner-steals-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "grand-slam" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "groundout-4-3" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "double-play-4-6-3" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "groundout-first-baseman-unassisted" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "double-play-6-4-3" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "error-lets-runner-score-no-rbi" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "extra-innings-visitors-win-in-tenth" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "fielders-choice-keeps-first-pitchers-runner" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "fielders-choice-lead-runner-out-at-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "fly-outs-to-each-outfielder" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "foul-with-two-strikes-leaves-count" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "grand-slam" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "groundout-first-baseman-unassisted" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "groundout-4-3" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hit-by-pitch-forces-runner" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hits-doubles-every-base-situation" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hits-home-runs-every-base-situation" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hits-singles-every-base-situation" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hits-triples-every-base-situation" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "home-team-does-not-bat-in-last-inning" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "inherited-runner-on-second-scores-later" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "line-drive-double-play" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "lineup-grows-to-eleven-and-cycles" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hit-by-pitch-forces-runner" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "passed-ball-runners-move-up" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hits-doubles-every-base-situation" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pickoff-at-first" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hits-home-runs-every-base-situation" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "hits-singles-every-base-situation" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pinch-hitter-then-takes-the-field" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pinch-runner-scores" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "hits-triples-every-base-situation" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "home-team-does-not-bat-in-last-inning" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-1-then-walk" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "inherited-runner-on-second-scores-later" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-2-then-strikeout" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "line-drive-double-play" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pitching-change-at-2-1-then-single" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "lineup-grows-to-eleven-and-cycles" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pop-up-to-catcher" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "passed-ball-runners-move-up" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "position-switch-then-error" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-04-21-royals-at-yankees" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pickoff-at-first" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-05-08-mets-at-padres" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pinch-hitter-then-takes-the-field" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "pinch-runner-scores" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-06-23-astros-at-yankees" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "sacrifice-bunt" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-1-then-walk" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "sacrifice-fly" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-2-then-strikeout" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "single-batter-takes-second-on-error" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "stolen-base-second" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pitching-change-at-2-1-then-single" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "strikeout-looking" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "strikeout-on-foul-bunt" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "pop-up-to-catcher" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "position-switch-then-error" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-04-21-royals-at-yankees" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "strikeout-swinging" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-05-08-mets-at-padres" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "undo/undo-automatic-out" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-06-23-astros-at-yankees" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-ball-in-play-third-out" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "sacrifice-bunt" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-error-with-no-advance" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "sacrifice-fly" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-intentional-walk" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "single-batter-takes-second-on-error" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-manual-adjustment" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "stolen-base-second" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "strikeout-looking" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-pitch" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-action" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "strikeout-on-foul-bunt" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-bases-empty" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "strikeout-swinging" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-off-home-run" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-automatic-out" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-runner-on-first" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "walk-runners-on-first-and-third" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "undo/undo-ball-in-play-third-out" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-error-with-no-advance" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "wild-pitch-runner-scores" to "Each scenario's batter histories agree with its box score" started.
+◇ Test case passing 1 argument name → "undo/undo-intentional-walk" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-manual-adjustment" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-pitch" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-action" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-bases-empty" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-off-home-run" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-runner-on-first" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "walk-runners-on-first-and-third" to "Each scenario's box score matches its expected stats" started.
+◇ Test case passing 1 argument name → "wild-pitch-runner-scores" to "Each scenario's box score matches its expected stats" started.
+✔ Test "A walk-off: only the winning run, runners left on base, and runs from the adjustment in the ninth" passed after 0.077 seconds.
+✔ Test "A fielder gets one assist per out, even after handling the ball twice in a rundown" passed after 0.077 seconds.
+✔ Test "Walks, hit-by-pitches, sacrifices and catcher's interference are not at-bats; errors and fielder's choices are" passed after 0.077 seconds.
+✔ Test "A pinch hitter is listed under the player they replaced, as "ph" and then where they fielded" passed after 0.077 seconds.
+✔ Test "The home team that leads after the top of the last inning does not bat: an empty cell" passed after 0.077 seconds.
+✔ Test "The scenarios with stats expectations are all found" passed after 0.077 seconds.
+✔ Test "A reliever is not charged with the inherited runner who scores" passed after 0.077 seconds.
+✔ Test "A season with no games, or none of ours, is empty, not a crash" passed after 0.077 seconds.
+✔ Test "A walk after a 3-1 pitching change is the first pitcher's; the pitch is the reliever's" passed after 0.077 seconds.
+✔ Test "A strikeout is a strikeout even when the batter reaches on a dropped third strike" passed after 0.077 seconds.
+✔ Test "An empty play log gives an empty box score with the right team names" passed after 0.077 seconds.
+✔ Test "A batting hole's automatic out is nobody's plate appearance and no fielder's putout" passed after 0.077 seconds.
+✔ Test "Each player's game-by-game log runs oldest first, with the opponent" passed after 0.077 seconds.
+✔ Test "Batting average, on-base and slugging match hand calculations" passed after 0.077 seconds.
+✔ Test "Opponents are left out, and every one of our players is listed once" passed after 0.077 seconds.
+✔ Test "Runs are charged to the pitcher who put the runner on base" passed after 0.077 seconds.
+✔ Test "The final box score matches the hand-written one exactly" passed after 0.077 seconds.
+✔ Test "A pitcher who comes back keeps one line, in the order they first pitched" passed after 0.077 seconds.
+✔ Test "A triple play is one triple play and no double play, with each fielder's part" passed after 0.077 seconds.
+✔ Test "Pitching totals and per-inning rates match hand calculations" passed after 0.077 seconds.
+✔ Test "Runs from a manual adjustment count for the team and the line score, but for no player or pitcher" passed after 0.077 seconds.
+✔ Test "The sample game replayed by the rules engine gives the hand-written box score" passed after 0.077 seconds.
+✔ Test "Every batter's plate appearances match the hand-written history" passed after 0.077 seconds.
+✔ Test "Someone with no batting spot who runs for a designated non-runner gets a "pr" line; the run is the non-runner's" passed after 0.077 seconds.
+✔ Test "The runner for a designated non-runner keeps their caught stealing on their own line" passed after 0.077 seconds.
+✔ Suite "Scoring rules" passed after 0.078 seconds.
+✔ Suite "Season totals" passed after 0.078 seconds.
+✔ Test "The box score after three innings matches the hand-written one exactly" passed after 0.078 seconds.
+✔ Test "A one-game season matches the hand-written season totals" passed after 0.078 seconds.
+✔ Suite "The sample game's stats" passed after 0.079 seconds.
+✘ Test "Each scenario's box score matches its expected stats" recorded an issue with 1 argument name → "retrosheet/2019-05-08-mets-at-padres" at ScenarioStatsTests.swift:52:9: Expectation failed: scenario.expected.mismatches(box: box) == []
+↳ retrosheet/2019-05-08-mets-at-padres, after the last event
+↳ scenario.expected.mismatches(box: box) == [] → false
+↳   scenario.expected.mismatches(box: box) → ["team away doublePlays: expected 1, got 0"]
+✔ Test "Each scenario's batter histories agree with its box score" with 85 test cases passed after 0.096 seconds.
+✘ Test "Each scenario's box score matches its expected stats" with 85 test cases failed after 0.098 seconds with 1 issue.
+✘ Suite "Scenario stats" failed after 0.098 seconds with 1 issue.
+✘ Test run with 29 tests in 4 suites failed after 0.099 seconds with 1 issue.
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Small vocabulary helpers" started.
+◇ Suite "Saving and reading back" started.
+◇ Suite "The sample game" started.
+◇ Suite "Scenario files" started.
+◇ Test "Teams and the song library read back exactly" started.
+◇ Test "One of every kind of event reads back exactly" started.
+◇ Test "Settings, damaged-file lists and manual run changes read back exactly" started.
+◇ Test "A dropped third strike rides on the strike-three pitch" started.
+◇ Test "A 5-4-3 double play reads back as: runner forced at second 5-4, batter out at first 4-3" started.
+◇ Test "Every sample situation reads back exactly" started.
+◇ Test "A player's name falls back to their number, then their placeholder" started.
+◇ Test "Game setups read back exactly" started.
+◇ Test "Rates print the baseball way, with a dash when there are no at-bats" started.
+◇ Test "A hand-written event may leave out its id, time and empty lists" started.
+◇ Test "Batting average, on-base and slugging follow the standard formulas" started.
+◇ Test "All twenty-two hard plays and the pattern file are there" started.
+◇ Test "The stand-in clock counts down from the first pitch and repeats the stored facts" started.
+◇ Test "A batting hole and the time limit are events; keep playing answers the question" started.
+◇ Test "A finished game's clock never asks anything" started.
+◇ Test "The play log through three innings adds up to the box score so far" started.
+◇ Test "One play log entry per event, in the same order" started.
+◇ Test "The walk-off inning: bottom of the ninth or later, or of the inning the time limit made the last" started.
+◇ Test "The last out runs for a designated non-runner and keeps their own stats" started.
+◇ Test "Sample situations put the pitcher with a pitch count on the mound" started.
+◇ Test "The complete sample game, its play log and box score read back exactly" started.
+◇ Test "Sample situations cover the plan's list" started.
+◇ Test "The play log adds up to the final box score" started.
+◇ Test "An event with no kind is reported, not guessed" started.
+◇ Test "Expecting numbers for a player with no box score line is reported, even zeros" started.
+◇ Test "League and championship rules, and rules missing from a file" started.
+◇ Test "The canned rules engine suggests the obvious runner moves" started.
+◇ Test "Every event in a scenario has a unique id" started.
+◇ Test "The league-rule scenarios are there" started.
+◇ Test "The order wraps from the last spot to the first for the on-deck hitter" started.
+◇ Test "Event times are kept to the whole second" started.
+◇ Test "Before the first pitch the limit shows the scheduled start plus three hours" started.
+◇ Test "Every batter's hand-written history matches the play log" started.
+◇ Test "Season totals list all twelve of our players, including two with no at-bats" started.
+◇ Test "Shared setups decode, and the standard one matches the sample teams" started.
+◇ Test "Batting order and defense are separate: a pitcher can field without batting, a hitter bat without fielding" started.
+◇ Test "Every scenario file decodes, with a setup and at least one event" started.
+◇ Test "Substitutes are in the final batting orders under the players they replaced" started.
+◇ Test "The sample game's time limit runs out during the fifth, which began before it" started.
+◇ Test "Innings pitched print as whole innings and outs: 16 outs is 5.1" started.
+◇ Test "Every player a scenario names is on one of the two rosters" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runs-themself" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-now-batting" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "time-limit-passes-mid-inning" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "time-limit-home-ahead-after-top" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "All twenty-two hard plays and the pattern file are there" started.
+◇ Test case passing 1 argument name → "tie-at-time-limit" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "keep-playing-past-time-limit" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "tie-after-nine-goes-to-extra-innings" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "run-rule-home-ahead-after-top-of-seventh" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-ahead-after-seven" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "designated-non-runner-choice-waits-for-pitch" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-up-after-top-of-seventh" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "run-rule-eleven-runs-after-seven" to "The league-rule scenarios are there" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "The league-rule scenarios are there" started.
+✔ Test "A player's name falls back to their number, then their placeholder" passed after 0.007 seconds.
+✔ Test "Batting average, on-base and slugging follow the standard formulas" passed after 0.007 seconds.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "All twenty-two hard plays and the pattern file are there" started.
+✔ Test "A hand-written event may leave out its id, time and empty lists" passed after 0.007 seconds.
+✔ Test "The stand-in clock counts down from the first pitch and repeats the stored facts" passed after 0.007 seconds.
+✔ Test "Teams and the song library read back exactly" passed after 0.007 seconds.
+✔ Test "Game setups read back exactly" passed after 0.007 seconds.
+✔ Test "A finished game's clock never asks anything" passed after 0.007 seconds.
+✔ Test "The walk-off inning: bottom of the ninth or later, or of the inning the time limit made the last" passed after 0.007 seconds.
+✔ Test "One play log entry per event, in the same order" passed after 0.007 seconds.
+✔ Test "Settings, damaged-file lists and manual run changes read back exactly" passed after 0.008 seconds.
+✔ Test "The last out runs for a designated non-runner and keeps their own stats" passed after 0.007 seconds.
+✔ Test "One of every kind of event reads back exactly" passed after 0.008 seconds.
+✔ Test "Rates print the baseball way, with a dash when there are no at-bats" passed after 0.008 seconds.
+✔ Test "Sample situations put the pitcher with a pitch count on the mound" passed after 0.008 seconds.
+✔ Test "Sample situations cover the plan's list" passed after 0.008 seconds.
+✔ Test "The play log through three innings adds up to the box score so far" passed after 0.008 seconds.
+✔ Test "An event with no kind is reported, not guessed" passed after 0.008 seconds.
+✔ Test "The order wraps from the last spot to the first for the on-deck hitter" passed after 0.008 seconds.
+✔ Test "The canned rules engine suggests the obvious runner moves" passed after 0.008 seconds.
+✔ Test "A 5-4-3 double play reads back as: runner forced at second 5-4, batter out at first 4-3" passed after 0.008 seconds.
+✔ Test "Before the first pitch the limit shows the scheduled start plus three hours" passed after 0.008 seconds.
+✔ Test "Event times are kept to the whole second" passed after 0.008 seconds.
+✔ Test "The play log adds up to the final box score" passed after 0.008 seconds.
+✔ Test "A batting hole and the time limit are events; keep playing answers the question" passed after 0.008 seconds.
+✔ Test "Every batter's hand-written history matches the play log" passed after 0.008 seconds.
+✔ Test "Substitutes are in the final batting orders under the players they replaced" passed after 0.008 seconds.
+✔ Test "Innings pitched print as whole innings and outs: 16 outs is 5.1" passed after 0.008 seconds.
+✔ Test "Season totals list all twelve of our players, including two with no at-bats" passed after 0.008 seconds.
+✔ Test "Shared setups decode, and the standard one matches the sample teams" passed after 0.008 seconds.
+✔ Test "All twenty-two hard plays and the pattern file are there" with 23 test cases passed after 0.008 seconds.
+✔ Test "The sample game's time limit runs out during the fifth, which began before it" passed after 0.008 seconds.
+✔ Test "The league-rule scenarios are there" with 16 test cases passed after 0.008 seconds.
+✔ Suite "The sample game" passed after 0.008 seconds.
+✔ Test "A dropped third strike rides on the strike-three pitch" passed after 0.008 seconds.
+✔ Test "Expecting numbers for a player with no box score line is reported, even zeros" passed after 0.008 seconds.
+✔ Test "Batting order and defense are separate: a pitcher can field without batting, a hitter bat without fielding" passed after 0.008 seconds.
+✔ Test "Every sample situation reads back exactly" passed after 0.008 seconds.
+✔ Test "League and championship rules, and rules missing from a file" passed after 0.012 seconds.
+✔ Suite "Small vocabulary helpers" passed after 0.012 seconds.
+✔ Test "The complete sample game, its play log and box score read back exactly" passed after 0.022 seconds.
+✔ Suite "Saving and reading back" passed after 0.023 seconds.
+✔ Test "Every scenario file decodes, with a setup and at least one event" passed after 0.045 seconds.
+✔ Test "Every event in a scenario has a unique id" passed after 0.046 seconds.
+✔ Test "Every player a scenario names is on one of the two rosters" passed after 0.047 seconds.
+✔ Suite "Scenario files" passed after 0.048 seconds.
+✔ Test run with 41 tests in 4 suites passed after 0.048 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Is the game over? and the game clock" started.
+◇ Suite "Batting orders and lineup changes" started.
+◇ Suite "Who gets credit in the play log" started.
+◇ Suite "Suggestions and the play preview" started.
+◇ Suite "Undo, edits, and speed" started.
+◇ Test "An order of eleven grows to thirteen in the fifth and wraps after the thirteenth hitter" started.
+◇ Test "A batting hole filled again by a substitute stops being a hole" started.
+◇ Test "A starter may re-enter only after the substitute has batted, any number of times" started.
+◇ Suite "Scorebook notation" started.
+◇ Test "Keep playing past the run rule: not asked again, even with a bigger lead later" started.
+◇ Test "A hitter added after the last hitter batted is up next, unless the leadoff hitter already came up" started.
+◇ Test "Fielding changes: a position switch, a replacement, and a fielder leaving with nobody in their place" started.
+◇ Test "A walk-off in extra innings asks at once; the visitors scoring in the top of the tenth asks nothing until the inning ends" started.
+◇ Suite "A complete nine-inning game" started.
+◇ Test "An unanswered question lapses once play goes on; nothing ends by itself" started.
+◇ Test "The clock between events: time left, the last inning, and asking once an inning ends past the limit" started.
+◇ Test "Official if rain stops it: five innings, or four and a half with the home team ahead" started.
+◇ Suite "Scenario files" started.
+◇ Suite "The sample game, replayed" started.
+◇ Test "A pitcher who moves to another position stays in the field; a new pitcher can take a batting spot" started.
+◇ Test "A batter who reaches on a fielder's choice that retires an inherited runner is charged to the earlier pitcher (rule 9.16(g))" started.
+◇ Test "Strikeouts: the catcher's putout; on a dropped third strike, the throw's putout or none if the batter reached" started.
+◇ Test "Playing on past the limit without answering: that inning is a last inning, and the question comes back at its end" started.
+◇ Test "Triple play: three outs, each with its own putout" started.
+◇ Test "The run scored by the runner for a designated non-runner is the non-runner's; the steal is the runner's" started.
+◇ Test "A pinch hitter bats in the same spot, mid-count, and the count carries on" started.
+◇ Test "A pitching change at 2-2 does not move the walk; any result but a walk is the new pitcher's" started.
+◇ Test "5-4-3 double play: third baseman an assist, second baseman a putout and an assist, first baseman a putout" started.
+◇ Test "The time limit runs three hours from the first pitch, or 3:15 for a championship game" started.
+◇ Test "A play that makes the third out: nobody else moves and no run is suggested" started.
+◇ Test "Walk-like results push only forced runners; a sacrifice bunt moves the runners up" started.
+◇ Test "A manual adjustment's runs are reported as adjusted runs, credited to nobody" started.
+◇ Test "A walk-off: only the winning run, three runners left on base when the game ends" started.
+◇ Test "Notation the scenarios use" started.
+◇ Test "The automatic out at a batting hole: nobody's plate appearance, no putout, the pitcher's out" started.
+◇ Test "A walk after a pitching change at 3-1 is the earlier pitcher's; the pitch is the new one's (rule 9.16(h))" started.
+◇ Test "Who runs for a designated non-runner, asked of the engine directly" started.
+◇ Test "Hits: every runner moves up as many bases as the batter; a home run scores everyone" started.
+◇ Test "Fielder's choice: the lead forced runner is out, the batter is on first" started.
+◇ Test "Preview: the notation builds up as fielders are tapped" started.
+◇ Test "A game-ending hit: only the winning run scores, and nobody moves further than that runner" started.
+◇ Test "Errors are tied to the player at the position; an unknown fielder is left blank" started.
+◇ Test "An inherited runner who scores is charged to the pitcher who put them on" started.
+◇ Test "Inserting a forgotten pitching change moves later pitches and the walk to the new pitcher" started.
+◇ Test "A bases-loaded walk forces in a run and a run batted in" started.
+◇ Test "Runner moves between pitches: steals, caught stealing, pickoffs, and a wild pitch that moves everyone" started.
+◇ Test "Deleting a ball in the middle of a walk leaves the next batter's play pointing at the wrong batter, flagged" started.
+◇ Test "Undoing the end of the game reopens it, with the question asked again" started.
+◇ Test "The scorer's own runner moves win; a batter who takes an extra base on an error keeps the hit" started.
+◇ Test "Editing an early hit into an out changes the score and flags the later steal that no longer makes sense" started.
+◇ Test "Ground out otherwise: forced runners move up one, the rest hold, the batter is out" started.
+◇ Test "Undo: dropping the last event gives back exactly the situation before it, all game long" started.
+◇ Test "Ground-ball double play: the runner from first out at second, the batter at first, no run batted in" started.
+◇ Test "Fly out: runners hold. Sacrifice fly: the runner on third scores, one run batted in" started.
+◇ Test "Editing a home run into a single in the nine-inning game changes the final score and nothing else breaks" started.
+◇ Test "Error: batter safe at first on the error, runners up one, no run batted in" started.
+◇ Test "Undoing a third out puts the half-inning back: two outs, the runners, the count" started.
+◇ Test "Nonsense never crashes the replay: thousands of random events, each one either applied or flagged" started.
+◇ Test "Fast enough to replay after every tap: a 300-event game, replayed once per event" started.
+◇ Test "Pitches: one letter mid-count; BB, K, ꓘ and HBP when they end it" started.
+◇ Test "Balls in play" started.
+◇ Test "Runner moves between pitches" started.
+◇ Test "Lineup changes and bookkeeping events" started.
+◇ Test "Dropped third strikes: thrown out, or how the batter reached" started.
+◇ Test "The sixth inning ends on a caught stealing; Park leads off the seventh with a fresh count" started.
+◇ Test "After the top of the ninth the home team leads, so the app asks; the scorer ends it" started.
+◇ Test "Final score, line score, runners left on base and pitch counts" started.
+◇ Test "Every scenario's checkpoints" started.
+◇ Test "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test "When the fifth inning ended past the time limit, the app asked whether the game was over" started.
+◇ Test "The known disagreements are still real, so they are not hiding a fixed scenario" started.
+◇ Test "Every scenario's expected situation and notation" started.
+◇ Test "Every entry matches the hand-written play log" started.
+◇ Test "The final situation matches the hand-written one" started.
+✔ Test "Fielding changes: a position switch, a replacement, and a fielder leaving with nobody in their place" passed after 0.012 seconds.
+✔ Test "A batting hole filled again by a substitute stops being a hole" passed after 0.012 seconds.
+✔ Test "A batter who reaches on a fielder's choice that retires an inherited runner is charged to the earlier pitcher (rule 9.16(g))" passed after 0.012 seconds.
+✔ Test "A pitcher who moves to another position stays in the field; a new pitcher can take a batting spot" passed after 0.012 seconds.
+✔ Test "An unanswered question lapses once play goes on; nothing ends by itself" passed after 0.012 seconds.
+✔ Test "Triple play: three outs, each with its own putout" passed after 0.012 seconds.
+✔ Test "Official if rain stops it: five innings, or four and a half with the home team ahead" passed after 0.012 seconds.
+✔ Test "A walk-off in extra innings asks at once; the visitors scoring in the top of the tenth asks nothing until the inning ends" passed after 0.013 seconds.
+✔ Test "A pinch hitter bats in the same spot, mid-count, and the count carries on" passed after 0.013 seconds.
+✔ Test "Playing on past the limit without answering: that inning is a last inning, and the question comes back at its end" passed after 0.013 seconds.
+✔ Test "5-4-3 double play: third baseman an assist, second baseman a putout and an assist, first baseman a putout" passed after 0.013 seconds.
+✔ Test "A play that makes the third out: nobody else moves and no run is suggested" passed after 0.013 seconds.
+✔ Test "Walk-like results push only forced runners; a sacrifice bunt moves the runners up" passed after 0.013 seconds.
+✔ Test "A pitching change at 2-2 does not move the walk; any result but a walk is the new pitcher's" passed after 0.013 seconds.
+✔ Test "Strikeouts: the catcher's putout; on a dropped third strike, the throw's putout or none if the batter reached" passed after 0.013 seconds.
+✔ Test "The time limit runs three hours from the first pitch, or 3:15 for a championship game" passed after 0.013 seconds.
+✔ Test "Keep playing past the run rule: not asked again, even with a bigger lead later" passed after 0.013 seconds.
+✔ Test "A manual adjustment's runs are reported as adjusted runs, credited to nobody" passed after 0.013 seconds.
+✔ Test "Hits: every runner moves up as many bases as the batter; a home run scores everyone" passed after 0.013 seconds.
+✔ Test "Fielder's choice: the lead forced runner is out, the batter is on first" passed after 0.013 seconds.
+✔ Test "The automatic out at a batting hole: nobody's plate appearance, no putout, the pitcher's out" passed after 0.013 seconds.
+✔ Test "A starter may re-enter only after the substitute has batted, any number of times" passed after 0.013 seconds.
+✔ Test "Preview: the notation builds up as fielders are tapped" passed after 0.013 seconds.
+✔ Test "A walk after a pitching change at 3-1 is the earlier pitcher's; the pitch is the new one's (rule 9.16(h))" passed after 0.013 seconds.
+✔ Test "An inherited runner who scores is charged to the pitcher who put them on" passed after 0.013 seconds.
+✔ Test "Inserting a forgotten pitching change moves later pitches and the walk to the new pitcher" passed after 0.013 seconds.
+✔ Test "The run scored by the runner for a designated non-runner is the non-runner's; the steal is the runner's" passed after 0.013 seconds.
+✔ Test "A game-ending hit: only the winning run scores, and nobody moves further than that runner" passed after 0.013 seconds.
+✔ Test "Runner moves between pitches: steals, caught stealing, pickoffs, and a wild pitch that moves everyone" passed after 0.013 seconds.
+✔ Test "Who runs for a designated non-runner, asked of the engine directly" passed after 0.013 seconds.
+✔ Test "The scorer's own runner moves win; a batter who takes an extra base on an error keeps the hit" passed after 0.013 seconds.
+✔ Test "Ground out otherwise: forced runners move up one, the rest hold, the batter is out" passed after 0.013 seconds.
+✔ Test "Editing an early hit into an out changes the score and flags the later steal that no longer makes sense" passed after 0.013 seconds.
+✔ Test "Undoing the end of the game reopens it, with the question asked again" passed after 0.013 seconds.
+✔ Test "Ground-ball double play: the runner from first out at second, the batter at first, no run batted in" passed after 0.013 seconds.
+✔ Test "Deleting a ball in the middle of a walk leaves the next batter's play pointing at the wrong batter, flagged" passed after 0.013 seconds.
+✔ Test "A walk-off: only the winning run, three runners left on base when the game ends" passed after 0.013 seconds.
+✔ Test "Fly out: runners hold. Sacrifice fly: the runner on third scores, one run batted in" passed after 0.013 seconds.
+✔ Test "Errors are tied to the player at the position; an unknown fielder is left blank" passed after 0.013 seconds.
+✔ Test "Error: batter safe at first on the error, runners up one, no run batted in" passed after 0.013 seconds.
+✔ Test "Undoing a third out puts the half-inning back: two outs, the runners, the count" passed after 0.013 seconds.
+◇ Test case passing 1 argument name → "balk-moves-every-runner" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "batting-hole-out-each-time-around" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "caught-stealing-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "defensive-replacement-takes-batting-spot" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-choice-waits-for-pitch" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-now-batting" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-runs-and-scores" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-pinch-runner-leaves-order" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runner-steals-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runs-themself" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "double-play-4-6-3" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "double-play-6-4-3" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "error-lets-runner-score-no-rbi" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "extra-innings-visitors-win-in-tenth" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "fielders-choice-keeps-first-pitchers-runner" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "fielders-choice-lead-runner-out-at-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "fly-outs-to-each-outfielder" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "foul-with-two-strikes-leaves-count" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "grand-slam" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "groundout-4-3" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "groundout-first-baseman-unassisted" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hit-by-pitch-forces-runner" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hits-doubles-every-base-situation" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hits-home-runs-every-base-situation" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hits-singles-every-base-situation" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "hits-triples-every-base-situation" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "home-team-does-not-bat-in-last-inning" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "inherited-runner-on-second-scores-later" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "keep-playing-past-time-limit" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "line-drive-double-play" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "lineup-grows-to-eleven-and-cycles" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "passed-ball-runners-move-up" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pickoff-at-first" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pinch-hitter-then-takes-the-field" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pinch-runner-scores" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-1-then-walk" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-2-then-strikeout" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pitching-change-at-2-1-then-single" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "pop-up-to-catcher" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "position-switch-then-error" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-04-21-royals-at-yankees" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-05-08-mets-at-padres" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-06-23-astros-at-yankees" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "run-rule-eleven-runs-after-seven" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "run-rule-home-ahead-after-top-of-seventh" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-ahead-after-seven" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-up-after-top-of-seventh" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "sacrifice-bunt" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "sacrifice-fly" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "single-batter-takes-second-on-error" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "stolen-base-second" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "strikeout-looking" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "strikeout-on-foul-bunt" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "strikeout-swinging" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "tie-at-time-limit" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "tie-after-nine-goes-to-extra-innings" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "time-limit-home-ahead-after-top" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "time-limit-passes-mid-inning" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-add-hitter" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-automatic-out" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-ball-in-play-third-out" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-batting-hole" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-defense-confirmed" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-end-of-game" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-error-with-no-advance" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-intentional-walk" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-keep-playing" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-manual-adjustment" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-pitch" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-pitching-change" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-action" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-for-non-runner" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-substitution" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "undo/undo-time-limit-change" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "walk-bases-empty" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "walk-off-home-run" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "walk-runner-on-first" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "walk-runners-on-first-and-third" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "wild-pitch-runner-scores" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "balk-moves-every-runner" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "Every scenario's checkpoints" started.
+◇ Test case passing 1 argument name → "batting-hole-out-each-time-around" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "caught-stealing-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "defensive-replacement-takes-batting-spot" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-choice-waits-for-pitch" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-now-batting" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-runs-and-scores" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-pinch-runner-leaves-order" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runner-steals-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runs-themself" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "double-play-4-6-3" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "double-play-6-4-3" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "error-lets-runner-score-no-rbi" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "extra-innings-visitors-win-in-tenth" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "fielders-choice-keeps-first-pitchers-runner" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "fielders-choice-lead-runner-out-at-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "fly-outs-to-each-outfielder" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "foul-with-two-strikes-leaves-count" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "grand-slam" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "groundout-4-3" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "groundout-first-baseman-unassisted" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hit-by-pitch-forces-runner" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hits-doubles-every-base-situation" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hits-home-runs-every-base-situation" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hits-singles-every-base-situation" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "hits-triples-every-base-situation" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "home-team-does-not-bat-in-last-inning" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "inherited-runner-on-second-scores-later" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "keep-playing-past-time-limit" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "line-drive-double-play" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "lineup-grows-to-eleven-and-cycles" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "passed-ball-runners-move-up" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pickoff-at-first" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pinch-hitter-then-takes-the-field" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pinch-runner-scores" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-1-then-walk" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-2-then-strikeout" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pitching-change-at-2-1-then-single" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "pop-up-to-catcher" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-04-21-royals-at-yankees" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-05-08-mets-at-padres" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-06-23-astros-at-yankees" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "run-rule-eleven-runs-after-seven" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "run-rule-home-ahead-after-top-of-seventh" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-ahead-after-seven" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-up-after-top-of-seventh" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "sacrifice-bunt" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "sacrifice-fly" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "single-batter-takes-second-on-error" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "stolen-base-second" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "strikeout-looking" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "strikeout-on-foul-bunt" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "tie-after-nine-goes-to-extra-innings" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "position-switch-then-error" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "tie-at-time-limit" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "time-limit-home-ahead-after-top" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "time-limit-passes-mid-inning" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-automatic-out" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-ball-in-play-third-out" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-batting-hole" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-defense-confirmed" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-end-of-game" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-error-with-no-advance" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-intentional-walk" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "strikeout-swinging" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-keep-playing" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-manual-adjustment" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-pitch" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-add-hitter" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-pitching-change" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-action" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-for-non-runner" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-substitution" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "undo/undo-time-limit-change" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "walk-bases-empty" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "walk-off-home-run" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "walk-runner-on-first" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "walk-runners-on-first-and-third" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+◇ Test case passing 1 argument name → "wild-pitch-runner-scores" to "Every scenario replays cleanly: one entry per event and nothing flagged for review" started.
+✔ Test "A bases-loaded walk forces in a run and a run batted in" passed after 0.057 seconds.
+◇ Test case passing 1 argument name → "balk-moves-every-runner" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "batting-hole-automatic-out" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "batting-hole-not-last-recorded-out" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "batting-hole-out-each-time-around" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "caught-stealing-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "defensive-replacement-takes-batting-spot" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-choice-waits-for-pitch" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-now-batting" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-last-out-runs-and-scores" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-pinch-runner-leaves-order" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runner-steals-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "designated-non-runner-runs-themself" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "double-play-4-6-3" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "double-play-6-4-3" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "error-lets-runner-score-no-rbi" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "extra-innings-visitors-win-in-tenth" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "fielders-choice-keeps-first-pitchers-runner" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "fielders-choice-lead-runner-out-at-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "fly-outs-to-each-outfielder" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "foul-with-two-strikes-leaves-count" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "grand-slam" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "groundout-4-3" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "groundout-first-baseman-unassisted" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-5-4-3-double-play" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-6-3-double-play-shortstop-steps-on-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-bases-loaded-walk" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-designated-non-runner-singles" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-double-steal-throwing-error" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-dropped-foul-pop-error" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-batter-reaches" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-dropped-third-strike-thrown-out" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-error-on-fly-ball-batter-to-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-foul-tip-strike-three" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-hitter-added-while-last-hitter-bats" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-inherited-runner-scores" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-manual-adjustment" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-pinch-runner" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-pitching-change-at-3-1-then-walk" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-runner-for-non-runner-scores" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-sacrifice-fly-with-throwing-error" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-starter-re-enters" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-third-out-on-bases-mid-at-bat" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-triple-play" to "Every scenario's expected situation and notation" started.
+✔ Test "Pitches: one letter mid-count; BB, K, ꓘ and HBP when they end it" passed after 0.067 seconds.
+◇ Test case passing 1 argument name → "hard-unknown-lineup-cycles" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hard-walk-off-single-bases-loaded" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hit-by-pitch-forces-runner" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hits-doubles-every-base-situation" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hits-singles-every-base-situation" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hits-triples-every-base-situation" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "home-team-does-not-bat-in-last-inning" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "inherited-runner-on-second-scores-later" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "keep-playing-past-time-limit" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "hits-home-runs-every-base-situation" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "line-drive-double-play" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "lineup-grows-to-eleven-and-cycles" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "passed-ball-runners-move-up" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pattern-6-3-groundout" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pickoff-at-first" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pinch-hitter-then-takes-the-field" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pinch-runner-scores" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pitcher-returns-once" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-1-then-walk" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pitching-change-at-1-2-then-strikeout" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pitching-change-at-2-1-then-single" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "pop-up-to-catcher" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "position-switch-then-error" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-04-21-royals-at-yankees" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-05-08-mets-at-padres" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "retrosheet/2019-06-23-astros-at-yankees" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "run-rule-eleven-runs-after-seven" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "run-rule-home-ahead-after-top-of-seventh" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-ahead-after-seven" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "run-rule-visitors-up-after-top-of-seventh" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "sacrifice-bunt" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "sacrifice-fly" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "single-batter-takes-second-on-error" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "stolen-base-second" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "strikeout-looking" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "strikeout-on-foul-bunt" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "strikeout-swinging" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "tie-after-nine-goes-to-extra-innings" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "tie-at-time-limit" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "time-limit-home-ahead-after-top" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "time-limit-passes-mid-inning" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "time-limit-walk-off" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-add-hitter" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-automatic-out" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-ball-in-play-third-out" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-batting-hole" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-end-of-game" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-error-with-no-advance" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-intentional-walk" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-keep-playing" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-manual-adjustment" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-pitch" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-pitching-change" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-action" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-runner-for-non-runner" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-substitution" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "undo/undo-time-limit-change" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "walk-bases-empty" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "walk-off-home-run" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "walk-runner-on-first" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "walk-runners-on-first-and-third" to "Every scenario's expected situation and notation" started.
+◇ Test case passing 1 argument name → "wild-pitch-runner-scores" to "Every scenario's expected situation and notation" started.
+✔ Test "A hitter added after the last hitter batted is up next, unless the leadoff hitter already came up" passed after 0.093 seconds.
+✔ Test "An order of eleven grows to thirteen in the fifth and wraps after the thirteenth hitter" passed after 0.094 seconds.
+✔ Test "Balls in play" passed after 0.093 seconds.
+✔ Test "Lineup changes and bookkeeping events" passed after 0.093 seconds.
+✔ Test "The clock between events: time left, the last inning, and asking once an inning ends past the limit" passed after 0.094 seconds.
+✔ Test "Editing a home run into a single in the nine-inning game changes the final score and nothing else breaks" passed after 0.093 seconds.
+✔ Test "Dropped third strikes: thrown out, or how the batter reached" passed after 0.093 seconds.
+✔ Test "The sixth inning ends on a caught stealing; Park leads off the seventh with a fresh count" passed after 0.090 seconds.
+✔ Test "Runner moves between pitches" passed after 0.093 seconds.
+✔ Test "Final score, line score, runners left on base and pitch counts" passed after 0.090 seconds.
+✔ Test "Notation the scenarios use" passed after 0.093 seconds.
+✔ Test "Every scenario's checkpoints" with 106 test cases passed after 0.084 seconds.
+✔ Test "After the top of the ninth the home team leads, so the app asks; the scorer ends it" passed after 0.090 seconds.
+✔ Test "Every scenario replays cleanly: one entry per event and nothing flagged for review" with 106 test cases passed after 0.084 seconds.
+✔ Test "The known disagreements are still real, so they are not hiding a fixed scenario" passed after 0.083 seconds.
+✔ Test "The final situation matches the hand-written one" passed after 0.082 seconds.
+✔ Test "Every entry matches the hand-written play log" passed after 0.082 seconds.
+✔ Test "When the fifth inning ended past the time limit, the app asked whether the game was over" passed after 0.083 seconds.
+✔ Suite "Suggestions and the play preview" passed after 0.094 seconds.
+✔ Suite "Scorebook notation" passed after 0.094 seconds.
+◇ Test case passing 1 argument name → "undo/undo-defense-confirmed" to "Every scenario's expected situation and notation" started.
+✔ Suite "Is the game over? and the game clock" passed after 0.094 seconds.
+✔ Suite "A complete nine-inning game" passed after 0.094 seconds.
+✔ Suite "Who gets credit in the play log" passed after 0.094 seconds.
+✔ Suite "The sample game, replayed" passed after 0.094 seconds.
+✔ Suite "Batting orders and lineup changes" passed after 0.094 seconds.
+✔ Test "Every scenario's expected situation and notation" with 106 test cases passed after 0.099 seconds.
+✔ Suite "Scenario files" passed after 0.110 seconds.
+✔ Test "Undo: dropping the last event gives back exactly the situation before it, all game long" passed after 0.781 seconds.
+✔ Test "Nonsense never crashes the replay: thousands of random events, each one either applied or flagged" passed after 0.877 seconds.
+✔ Test "Fast enough to replay after every tap: a 300-event game, replayed once per event" passed after 1.509 seconds.
+✔ Suite "Undo, edits, and speed" passed after 1.510 seconds.
+✔ Test run with 65 tests in 9 suites passed after 1.510 seconds.
+◇ Test run started.
+↳ Testing Library Version: 2084
+↳ Target Platform: arm64e-apple-macos14.0
+◇ Suite "Innings pitched and notes" started.
+◇ Suite "The line score" started.
+◇ Suite "The sample game's box score text" started.
+◇ Suite "Shortened names" started.
+◇ Suite "Long and short lineups" started.
+◇ Test "A tie puts the visitors first in the headline" started.
+◇ Suite "The picture's preview box scores" started.
+◇ Test "The finished sample game matches the hand-checked box score, character for character" started.
+◇ Test "A note with nobody in it is left out, and so is a team with no double plays" started.
+◇ Test "Innings print in groups of three, a ten-run inning in brackets, and x when the home team did not bat" started.
+◇ Test "A game still going says so under the headline, with the leader first" started.
+◇ Test "Each team's totals row adds up its batters' at-bats, runs, hits and runs batted in" started.
+◇ Test "Substitutes are printed under the player they replaced, pushed in" started.
+◇ Test "When two pitchers hit batters, the hit batters are listed without guessing who hit whom" started.
+◇ Test "Numbers, stand-ins and one-word names are printed whole; Jr. stays with the last name" started.
+◇ Test "A pitcher whose pitches were not counted is still listed, with a dash" started.
+◇ Test "A player who did something twice has the count after their name, and the visitors come first" started.
+◇ Test "Last names only, unless two players in the game share one" started.
+◇ Test "A last name of more than one word is kept whole: De La Cruz, Van Buren, St. Clair" started.
+◇ Test "A shared last name across the two teams gets initials in the batting lines and the notes" started.
+◇ Test "When the initials match too, both players are printed in full" started.
+◇ Test "Innings pitched print as whole innings and thirds" started.
+◇ Test "A player who played two positions shows both, joined by a dash" started.
+◇ Test "Nine and fourteen hitters both print every batter, with every column lined up" started.
+◇ Test "The saved copies match the sample game's box scores" started.
+✔ Test "A tie puts the visitors first in the headline" passed after 0.003 seconds.
+✔ Test "Numbers, stand-ins and one-word names are printed whole; Jr. stays with the last name" passed after 0.003 seconds.
+✔ Test "Last names only, unless two players in the game share one" passed after 0.003 seconds.
+✔ Test "When the initials match too, both players are printed in full" passed after 0.003 seconds.
+✔ Test "A last name of more than one word is kept whole: De La Cruz, Van Buren, St. Clair" passed after 0.003 seconds.
+✔ Test "Innings pitched print as whole innings and thirds" passed after 0.003 seconds.
+✔ Test "Each team's totals row adds up its batters' at-bats, runs, hits and runs batted in" passed after 0.003 seconds.
+✔ Test "Substitutes are printed under the player they replaced, pushed in" passed after 0.003 seconds.
+✔ Test "When two pitchers hit batters, the hit batters are listed without guessing who hit whom" passed after 0.003 seconds.
+✔ Test "A note with nobody in it is left out, and so is a team with no double plays" passed after 0.004 seconds.
+✔ Test "The finished sample game matches the hand-checked box score, character for character" passed after 0.004 seconds.
+✔ Test "A player who did something twice has the count after their name, and the visitors come first" passed after 0.004 seconds.
+✔ Test "A player who played two positions shows both, joined by a dash" passed after 0.004 seconds.
+✔ Test "Innings print in groups of three, a ten-run inning in brackets, and x when the home team did not bat" passed after 0.004 seconds.
+✔ Test "A shared last name across the two teams gets initials in the batting lines and the notes" passed after 0.004 seconds.
+✔ Suite "The line score" passed after 0.004 seconds.
+✔ Suite "Shortened names" passed after 0.004 seconds.
+✔ Test "A game still going says so under the headline, with the leader first" passed after 0.004 seconds.
+✔ Suite "The sample game's box score text" passed after 0.004 seconds.
+✔ Test "A pitcher whose pitches were not counted is still listed, with a dash" passed after 0.004 seconds.
+✔ Suite "Innings pitched and notes" passed after 0.004 seconds.
+✔ Test "Nine and fourteen hitters both print every batter, with every column lined up" passed after 0.004 seconds.
+✔ Suite "Long and short lineups" passed after 0.005 seconds.
+✔ Test "The saved copies match the sample game's box scores" passed after 0.006 seconds.
+✔ Suite "The picture's preview box scores" passed after 0.007 seconds.
+✔ Test run with 19 tests in 6 suites passed after 0.007 seconds.
+Note: Some test targets reported failures:
+  - StatsTests (Swift Testing)
