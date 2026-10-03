@@ -39,7 +39,7 @@ enum DemoMoments {
     static let takingTheField = context(SampleSituations.ourPitcherWarmingUp)
 
     /// Two fielders swapped on the check: Webb from center to right, Lang from right to center.
-    static let swappedFielders = DefenseSuggestion(fielders: takingTheField.situation.home.fielders.map { f in
+    static let swappedFielders = DefenseSuggestion(team: .home, fielders: takingTheField.situation.home.fielders.map { f in
         switch f.position {
         case .centerField: FielderAssignment(position: .centerField, player: "d7")
         case .rightField: FielderAssignment(position: .rightField, player: "d3")
@@ -49,9 +49,8 @@ enum DemoMoments {
 
     /// First base alternating by inning: Robin Nash plays first in even innings, Pat Quinn in odd ones.
     static let alternatingFirstBase = DefenseSuggestion(
-        fielders: takingTheField.situation.home.fielders.map {
-            $0.position == .firstBase ? FielderAssignment(position: .firstBase, player: "d11") : $0
-        },
+        team: .home,
+        fielders: [FielderAssignment(position: .firstBase, player: "d11")],
         reasons: [.firstBase: "alternating"]
     )
 

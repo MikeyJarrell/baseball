@@ -11,7 +11,6 @@ import DesignSystem
 /// through this menu's `onFinish`; the back arrow returns to the list without recording.
 public struct ChangesMenuSheet: View {
     var context: GameChangeContext
-    var defenseSuggestion: DefenseSuggestion?
     var onFinish: (GameChangeResult) -> Void
 
     /// The sheet open on top of the list.
@@ -23,12 +22,9 @@ public struct ChangesMenuSheet: View {
 
     /// - Parameters:
     ///   - context: The game's setup and the situation now.
-    ///   - defenseSuggestion: A planned defense for the fielders sheet to start from, if any.
     ///   - onFinish: Called once with whatever the chosen sheet hands back, or `.cancel`.
-    public init(context: GameChangeContext, defenseSuggestion: DefenseSuggestion? = nil,
-                onFinish: @escaping (GameChangeResult) -> Void) {
+    public init(context: GameChangeContext, onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
-        self.defenseSuggestion = defenseSuggestion
         self.onFinish = onFinish
     }
 
@@ -56,7 +52,7 @@ public struct ChangesMenuSheet: View {
             .navigationDestination(item: $open) { item in
                 switch item {
                 case .pitcher: PitchingChangeSheet(context: context, onFinish: onFinish)
-                case .fielders: DefenseSheet(context: context, purpose: .changes, suggestion: defenseSuggestion, onFinish: onFinish)
+                case .fielders: DefenseSheet(context: context, purpose: .changes, onFinish: onFinish)
                 case .pinchHitter: PinchHitterSheet(context: context, onFinish: onFinish)
                 case .pinchRunner: PinchRunnerSheet(context: context, onFinish: onFinish)
                 case .nonRunner: NonRunnerSheet(context: context, onFinish: onFinish)

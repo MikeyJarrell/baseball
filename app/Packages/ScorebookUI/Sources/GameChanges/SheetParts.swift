@@ -462,7 +462,7 @@ struct SegmentedChoice<Value: Hashable>: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
                         .foregroundStyle(isOn ? ScorebookColor.textPrimary : ScorebookColor.textSecondary)
-                        .frame(maxWidth: .infinity, minHeight: 40)
+                        .frame(maxWidth: .infinity, minHeight: Spacing.minimumTapSize)
                         .background(isOn ? ScorebookColor.surface : Color.clear,
                                     in: RoundedRectangle(cornerRadius: 9, style: .continuous))
                         .shadow(color: isOn ? .black.opacity(0.15) : .clear, radius: 1.5, y: 1)

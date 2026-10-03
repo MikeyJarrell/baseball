@@ -10,12 +10,12 @@ Everything is in `app/Packages/ScorebookUI/Sources/GameChanges/`, one file per s
 
 - **`ChangesMenuSheet`**: what the batting screen’s big substitution button opens. Pitching change, fielders, pinch hitter, pinch runner, runner for a non-runner, add a hitter; each opens inside the same sheet, with a back arrow to the list.
 - **`PitchingChangeSheet`**: outgoing pitcher’s pitches and strikes; a note when a batter is part way through a count (rule 9.12 B 2, “your call”); “Can pitch again” from `eligibleToPitchAgain`; the bench first, then players already in the game; a new pitcher by number, name and throwing hand; where the old pitcher goes, and whether the new one takes the old one’s batting spot.
-- **`PinchHitterSheet`**: “Can re-enter” from `eligibleToReenter` for this spot, then the bench, a new hitter, and “Someone else” with everyone and where they are now. It also offers a batting hole, behind a confirmation, since no other screen records that event.
+- **`PinchHitterSheet`**: “Can re-enter” from `eligibleToReenter` for this spot, then the bench, a new hitter, and “Someone else” with everyone and where they are now. It also offers a batting hole, behind a confirmation that says the current hitter’s turn becomes an out right away, since no other screen records that event.
 - **`PinchRunnerSheet`**: tap the runner, choose the replacement; the explanation changes for a designated non-runner (rule 9.11 M) and for the runner already running for one (9.11 N).
-- **`NonRunnerSheet`**: the automatic prompt. The rule’s runner from `runnerChoice.suggestedRunner`, then “Quinn runs” (records nothing), “Pinch runner instead”, and “Someone else”. “Later” cancels.
+- **`NonRunnerSheet`**: the automatic prompt. The rule’s runner from `runnerChoice.suggestedRunner`, then “Quinn runs” (records nothing), “Pinch runner instead” (the bench, then “Someone else”), and “Someone else”. “Later” cancels.
 - **`AddHitterSheet`**: roster or new player; says where they bat and how soon they are up.
 - **`DefenseSheet`**: the defense check (`.check`, our team, “Later”, one tap on “Everyone’s where they were”) and the fielders sheet (`.changes`, either team). Tap a position for chips of every player; picking someone already in the field swaps the two; “Nobody” leaves a position empty. Changes go back as one substitution touching only the defense.
-- **`RunnerActionSheet`**: the eight actions plus defensive indifference and a pinch runner link. Tap more runners for a double steal. The second page starts from the handed-in suggestion, shows every runner with a button for each place they could end up, takes fielder taps on the field drawing for an out, and the fielder for an advance on error.
+- **`RunnerActionSheet`**: the eight actions plus defensive indifference and a pinch runner link. Tap more runners for a double steal. The second page starts from the handed-in suggestion, shows every runner with a button for each place they could end up, takes fielder taps on the field drawing for an out, and offers “Add an error” on every action (a steal where the catcher throws the ball away). On save, runners who stayed are left out and each runner gets their own reason from where they ended up: on a double steal with the lead runner thrown out, the trail runner stole and the lead runner was caught stealing, whichever button started it. A pickoff or appeal out defaults to the runner’s own base. An out or error with no fielder tapped saves under “Save without fielders”.
 - **`GameMenuSheet`**: manual adjustment, error with nobody moving, time limit, edit this batter, the walk-up song length (if a binding is handed in), and end game with a reason.
 - **`ManualAdjustmentSheet`**, **`ErrorSheet`**, **`TimeLimitSheet`**, **`BatterSheet`** (name, number, batting side; for our batter it also leads to the pinch hitter sheet), **`GameOverSheet`** (no Cancel; End game or Keep playing).
 
@@ -30,7 +30,7 @@ Every sheet takes a `GameChangeContext(setup:situation:)` and an `onFinish` clos
 
 Present each one as an ordinary `.sheet`; each brings its own navigation. Notes:
 
-- **Defense check:** open `DefenseSheet(context:)` when `defenseCheckDue` is true. **Alternating positions (Mikey’s addition):** pass `suggestion: DefenseSuggestion(fielders:reasons:)` with the planned defense for this half-inning and a reason per differing position (`[.firstBase: "alternating"]`). The sheet opens with the plan filled in, shades each differing position (“First base · alternating (was Quinn)”), and the big button reads “Save 1 change”, so one tap records it. Nothing in `Model` yet says who alternates; the wiring builds the suggestion once the lead builder adds the planned alternations to the setup. `ChangesMenuSheet` takes the same `defenseSuggestion` for its fielders sheet.
+- **Defense check:** open `DefenseSheet(context:)` when `defenseCheckDue` is true. **Alternating positions (Mikey’s addition):** pass `suggestion: DefenseSuggestion(team:fielders:reasons:)` with the team, the planned positions for this half-inning (only the ones the plan sets) and a reason per position (`[.firstBase: "alternating"]`). The plan is used only on that team’s defense check, never on the fielders sheet. The sheet starts from the fielders on the field and lays the plan over them, so a position the plan leaves out keeps its player. It shades each differing position (“First base · alternating (was Quinn)”), and the big button reads “Save 1 change”, so one tap records it. Nothing in `Model` yet says who alternates; the wiring builds the suggestion once the lead builder adds the planned alternations to the setup.
 - **Non-runner prompt:** open `NonRunnerSheet(context:)` when `runnerChoice` is set.
 - **Runner actions:** `RunnerActionSheet(context:runner:suggest:onFinish:)`, where `suggest` is `{ reason, runners in engine.suggestRunnerAction(reason, runners: runners, in: situation) }`. For a wild pitch, passed ball or balk the sheet passes every runner on base.
 - **Game over:** open `GameOverSheet(context:)` when `gameOverQuestion` is set or `clock(for:at:).askIfOverOnTime` turns true. It uses a half-height sheet and refuses to be swiped away.
@@ -46,6 +46,10 @@ Nothing is blocked. Re-entry (9.9), pitcher re-entry (9.12 B), the non-runner’
 - Setting a throwing hand or batting side for an existing player from the pitching change or add-hitter sheets is not offered; only new players get one there. The batter sheet edits batting side.
 - The manual adjustment does not set the inning or half.
 - `RadioMark` draws its tick in white and the segmented control’s shadow in black, as the design system’s own primary button does; everything else uses named colors.
+
+## Event building and its tests
+
+The decisions that turn taps into events are plain functions in `EventBuilding.swift`: `RunnerActionBuilder` (who goes into a runner action, each runner’s reason, where an out goes by default) and `DefenseBuilder` (laying a plan over the field, swaps, the substitution). ScorebookUI has no test target on `main` yet, so 14 tests for them are in [screen-in-game-changes-tests/EventBuildingTests.swift](screen-in-game-changes-tests/EventBuildingTests.swift): the double steal with the lead runner out (from either button), a runner who stayed, a steal plus the catcher’s throwing error, a wild pitch with a runner thrown out, pickoff and appeal out bases, a one-position plan, a swap plan, a plan for the other team, a plan on the fielders sheet, and an emptied position. All 14 pass in a scratch package outside the repository that depends on ScorebookUI (`xcodebuild test` on the iPhone 17 simulator). Move the file into the ScorebookUI test target when the lead builder adds it.
 
 ## Vocabulary requests
 
@@ -63,4 +67,9 @@ None required. One for later: the planned alternations for the defense suggestio
   - `nonRunnerPrompt.png` and the dark version: Quinn on first, Tate suggested.
   - `gameOverTimeLimit.png`, its dark version and `gameOverMercyRule.png`.
   - `runnerAction-caught-stealing-2-6.png`: Hale caught stealing, catcher to shortstop; Save recorded “m3 first→out 2-6”.
+  - `runnerAction-steal-plus-E2.png`: Hale steals second and takes third on the catcher’s throwing error; Save recorded “m3 first→third, E2”.
   - The rest of the sheets, and three at the largest text size.
+
+## Review
+
+A fresh reviewer’s notes are in `feedback/ai/screen-in-game-changes-review.md`. Findings 1 to 6, 8, 9 and 10 are fixed. Finding 7 (fielders who were replaced look like bench players) is left as the reviewer judged it harmless; it is the first item under “Left out or stubbed”.
