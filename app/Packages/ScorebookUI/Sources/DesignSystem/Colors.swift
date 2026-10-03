@@ -101,9 +101,15 @@ public enum ScorebookColor {
     public static let fieldDirt = adaptive(light: 0xE4C99C, dark: 0x4C3B27)
     /// Foul lines.
     public static let fieldChalk = adaptive(light: 0xFFFFFF, dark: 0xE8E8E8)
-    /// The thin outline around bases and the mound.
-    public static let fieldOutline = adaptive(light: 0x8B775A, dark: 0xCDB892)
-    /// An empty base.
+    /// The thin outline around home plate and the mound.
+    public static let fieldOutline = adaptive(light: 0x6B5638, dark: 0xCDB892)
+    /// The outline of an empty base, drawn with no fill: 5.5 to 1 against the dirt in light
+    /// mode and 6.5 to 1 in dark mode.
+    public static let baseEmptyOutline = adaptive(light: 0x5C4630, dark: 0xD9C7A3)
+    /// The thick outline around an occupied base, which is filled in the batting team's color:
+    /// 8.8 to 1 against the dirt in light mode, 10.7 to 1 in dark mode.
+    public static let baseOccupiedOutline = adaptive(light: 0x2C2B2A, dark: 0xFFFFFF)
+    /// Home plate's fill. The three bases are outlines when empty (`baseEmptyOutline`).
     public static let baseEmpty = adaptive(light: 0xFFFFFF, dark: 0xE8E8E8)
     /// A base with a runner on it when the drawing does not know whose runner it is.
     /// With `FieldDrawing.battingTeam(_:)`, occupied bases take the batting team's color instead.
