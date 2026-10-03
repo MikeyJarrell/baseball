@@ -15,8 +15,13 @@ enum PlainText {
         // Every left-hand label is padded to the same width, so the numbers in every table
         // and the line score start in the same place down the page. Team names are printed
         // in capitals as table headings, so measure those too.
-        let labelWidth = (box.allRowLabels + (box.batting + box.pitching).map { $0.title.uppercased() })
-            .map(\.count).max() ?? 0
+        // The line score's team names sit to the left of the innings, so they need room for
+        // the name, a space and the innings, which keeps its runs, hits and errors under the
+        // batting columns.
+        let inningsLength = inningsText(box.lineScore.rows.first, widths: box.lineScore.inningWidths).count
+        let labelWidth = ((box.allRowLabels + (box.batting + box.pitching).map { $0.title.uppercased() })
+            .map(\.count) + box.lineScore.rows.map { $0.teamName.count + 1 + inningsLength })
+            .max() ?? 0
 
         var sections: [[String]] = []
 
@@ -30,7 +35,7 @@ enum PlainText {
             sections.append(lines(for: table, labelWidth: labelWidth, columnWidths: battingWidths))
         }
 
-        sections.append(lineScoreLines(box.lineScore, labelWidth: labelWidth))
+        sections.append(lineScoreLines(box.lineScore, labelWidth: labelWidth, battingWidths: battingWidths))
 
         if !box.notes.isEmpty {
             sections.append([box.notes.joined(separator: " ")])
@@ -81,21 +86,31 @@ enum PlainText {
         }
     }
 
-    /// The line score: each team's name, its innings in groups of three, a dash, then runs,
-    /// hits and errors. "Mudcats      011 10 —  3  7  1".
-    static func lineScoreLines(_ lineScore: NewspaperLineScore, labelWidth: Int) -> [String] {
-        let widths = lineScore.inningWidths
-        let totals = lineScore.rows.flatMap { [$0.runs, $0.hits, $0.errors] }
-        let totalWidth = max(2, totals.map { String($0).count }.max() ?? 0)
+    /// The line score: each team's name, its innings in groups of three ending where the
+    /// names end in the tables above, then a dash under "ab" and runs, hits and errors under
+    /// "r", "h" and "bi". "Mudcats      011 10  —  3  7  1".
+    static func lineScoreLines(_ lineScore: NewspaperLineScore, labelWidth: Int, battingWidths: [Int]) -> [String] {
+        // The dash and the three totals take the batting table's four column widths.
+        var widths = battingWidths
+        while widths.count < 4 { widths.append(2) }
         return lineScore.rows.map { row in
-            var innings = ""
-            for (index, width) in widths.enumerated() {
-                if index > 0 && index % 3 == 0 { innings += " " }
-                innings += padLeft(index < row.innings.count ? row.innings[index] : "", to: width)
-            }
-            let rhe = [row.runs, row.hits, row.errors].map { " " + padLeft(String($0), to: totalWidth) }
-            return padRight(row.teamName, to: labelWidth) + " " + innings + " —" + rhe.joined()
+            let innings = inningsText(row, widths: lineScore.inningWidths)
+            let cells = ["—", String(row.runs), String(row.hits), String(row.errors)]
+            let numbers = zip(cells, widths).map { " " + padLeft($0, to: $1) }.joined()
+            return padRight(row.teamName, to: labelWidth - innings.count) + innings + numbers
         }
+    }
+
+    /// One team's innings in groups of three, each inning as wide as it is in either row:
+    /// "011 10".
+    static func inningsText(_ row: NewspaperLineScoreRow?, widths: [Int]) -> String {
+        var innings = ""
+        for (index, width) in widths.enumerated() {
+            if index > 0 && index % 3 == 0 { innings += " " }
+            let cell = row.flatMap { index < $0.innings.count ? $0.innings[index] : nil } ?? ""
+            innings += padLeft(cell, to: width)
+        }
+        return innings
     }
 
     /// Adds spaces after text until it is `width` characters long.
