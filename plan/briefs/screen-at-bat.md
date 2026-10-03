@@ -10,6 +10,9 @@
 
 ## Deliver
 
+Mikey chose layout A, the field view, in the approved mockup.
+
+
 The screen the scorer looks at for nearly the whole game. It takes a situation, the batter’s plate appearances earlier in the game, the on-deck hitter, and the batter’s song if the batter is ours with one assigned, and hands back what was tapped.
 
 **Always visible, no scrolling:** inning and half, both teams’ scores, outs, balls and strikes, runners on the field drawing, batter (name, number, batting side, earlier today in scorebook notation), on-deck hitter, current pitcher (name, throwing hand, pitches and strikes so far).
@@ -23,12 +26,13 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 - A runner on the field drawing opens the runner actions (steal, caught stealing, pickoff, wild pitch, passed ball, balk, advance on error), handled by the in-game changes builder’s sheet.
 - The pitcher opens the pitching change.
 - The batter opens pinch-hit and batting-side options.
-- One substitution button opens every kind of change (see the in-game changes brief).
+- One large, clearly labeled substitution button opens every kind of change (see the in-game changes brief).
+- A “Box score” button opens the game overview; a swipe does the same.
 - A menu holds the rest: manual adjustment, end game.
 
 **Game clock.** When the game has a time limit, the time left shows beside the inning.
 
-**The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. During a changeover, the same spot holds the between-innings music button. A setting, off by default, fades the song out automatically when the first pitch is recorded.
+**The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. During a changeover, the same spot holds the between-innings music button. The song fades out by itself after 12 seconds of song (the length is a setting), with a small countdown on the button; tapping stops it early. A second setting, off by default, also fades it when the first pitch is recorded. For their hitters, the same spot is an empty gray bar.
 
 **Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Cardinals 4, Mudcats 2”) and the next team’s batter.
 
