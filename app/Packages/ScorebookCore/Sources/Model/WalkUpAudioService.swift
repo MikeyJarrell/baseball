@@ -46,8 +46,13 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     func rename(_ song: SongID, to title: String)
     /// Sets where the walk-up clip starts, in seconds into the track.
     func setStartPoint(_ seconds: TimeInterval, for song: SongID)
-    /// Sets how long the clip plays before fading out by itself. Missing means until stopped.
+    /// Sets how long this song plays before fading out by itself. Missing means the usual
+    /// walk-up length (`walkUpLength`).
     func setPlayLength(_ seconds: TimeInterval?, for song: SongID)
+    /// Seconds of song a walk-up plays before fading out by itself, counted from when the song
+    /// starts (after any announcer introduction). The app sets it from
+    /// `AppSettings.walkUpSongSeconds`. A tap on the song button stops it sooner.
+    var walkUpLength: TimeInterval { get set }
     /// Sets the song's loudness, 0 to 1.
     func setVolume(_ volume: Double, for song: SongID)
     func setBetweenInningsPlaylist(_ songs: [SongID], shuffle: Bool)
@@ -59,7 +64,8 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// Loads a player's song (and introduction) ahead of time so the play button starts instantly.
     func cue(for player: Player)
     /// Plays a player's walk-up song from its start point, with their announcer introduction
-    /// first when `withIntroduction` is true and they have one.
+    /// first when `withIntroduction` is true and they have one. The song fades out by itself
+    /// after `walkUpLength` seconds (or the song's own play length).
     func playWalkUp(for player: Player, withIntroduction: Bool)
     /// Plays any song from a given point, for previewing in the song library.
     func playPreview(_ song: SongID, from seconds: TimeInterval)
@@ -105,6 +111,7 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
     public private(set) var nowPlaying: SongID?
     public private(set) var playbackPosition: TimeInterval?
     public var onPlaybackEnded: ((SongID?) -> Void)?
+    public var walkUpLength: TimeInterval = 12
 
     public init(library: SongLibrary = SongLibrary()) {
         self.library = library

@@ -192,8 +192,9 @@ public enum SampleGame {
                                                    runners: [move("m4", .home, .first)])),
             Outcome(outs: 1, runners: [on("m4", .first, by: "c9")], result: .single, reached: true, notation: "1B 7"))
 
-        // Quinn is a designated non-runner, so Nash runs for them, and is caught stealing
-        // with Shaw up 1-0. The caught stealing is Nash's.
+        // Quinn is a designated non-runner. The app offers Webb first, who made the last out;
+        // the team sends Nash from the bench instead, so the box score gets a "pr" line.
+        // Nash is caught stealing with Shaw up 1-0, and the caught stealing is Nash's.
         s.runnerForNonRunner("m11", replacing: "m4", notation: "R Nash for Quinn")
         s.pitches("B", to: "m5")
         s.runnerAction(RunnerAction(moves: [move("m11", .first, .out, outBy: [.catcher, .shortstop], at: .second, reason: .caughtStealing)]),

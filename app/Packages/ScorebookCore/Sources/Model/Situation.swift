@@ -33,9 +33,11 @@ public struct Situation: Codable, Equatable, Sendable {
     /// True when the fielding team is our team, a new half-inning has started, and the scorer
     /// has not yet confirmed who is at each position. The app opens the defense check.
     public var defenseCheckDue: Bool
-    /// A designated non-runner who has just reached base and needs someone to run for them.
-    /// The app opens the runner sheet straight away.
-    public var runnerNeededFor: PlayerID?
+    /// Set right after a designated non-runner reaches base, until the next event: the app asks
+    /// straight away who runs, suggesting the teammate who made the most recent out, or the
+    /// designated non-runner themselves. Recording a `runnerForNonRunner` event, or any other
+    /// event (they chose to run themselves), clears it.
+    public var runnerChoice: RunnerChoice?
     /// True right after a strike three that ended a plate appearance, until the next event.
     /// The batting screen offers the "dropped third strike" button.
     public var droppedThirdStrikePossible: Bool
@@ -66,7 +68,7 @@ public struct Situation: Codable, Equatable, Sendable {
         lastPlayNotation: String? = nil,
         isBetweenHalfInnings: Bool = false,
         defenseCheckDue: Bool = false,
-        runnerNeededFor: PlayerID? = nil,
+        runnerChoice: RunnerChoice? = nil,
         droppedThirdStrikePossible: Bool = false,
         isRegulationComplete: Bool = false,
         isFinal: Bool = false,
@@ -86,7 +88,7 @@ public struct Situation: Codable, Equatable, Sendable {
         self.lastPlayNotation = lastPlayNotation
         self.isBetweenHalfInnings = isBetweenHalfInnings
         self.defenseCheckDue = defenseCheckDue
-        self.runnerNeededFor = runnerNeededFor
+        self.runnerChoice = runnerChoice
         self.droppedThirdStrikePossible = droppedThirdStrikePossible
         self.isRegulationComplete = isRegulationComplete
         self.isFinal = isFinal
@@ -142,6 +144,20 @@ public struct Situation: Codable, Equatable, Sendable {
     /// Today's pitches and strikes for one pitcher.
     public func tally(for pitcher: PlayerID) -> PitcherTally? {
         pitchers.first { $0.pitcher == pitcher }
+    }
+}
+
+/// The question the app asks when a designated non-runner reaches base: who runs?
+public struct RunnerChoice: Codable, Equatable, Hashable, Sendable {
+    /// The designated non-runner who just reached base.
+    public var nonRunner: PlayerID
+    /// The teammate who made the batting team's most recent out, offered first because
+    /// league rules say the last out runs. Missing when the team has not made an out yet.
+    public var suggestedRunner: PlayerID?
+
+    public init(nonRunner: PlayerID, suggestedRunner: PlayerID?) {
+        self.nonRunner = nonRunner
+        self.suggestedRunner = suggestedRunner
     }
 }
 

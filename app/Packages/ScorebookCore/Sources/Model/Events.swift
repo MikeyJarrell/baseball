@@ -116,7 +116,7 @@ public enum EventKind: Equatable, Sendable {
     /// The scorer checked a team's fielders at the start of a half-inning and nothing had changed.
     case defenseConfirmed(DefenseConfirmed)
     /// Someone runs for a designated non-runner who has just reached base, without changing
-    /// the batting order.
+    /// the batting order. Nothing is recorded when the designated non-runner runs themselves.
     case runnerForNonRunner(RunnerForNonRunner)
     /// A new pitcher for the fielding team.
     case pitchingChange(PitchingChange)
@@ -412,10 +412,15 @@ public struct DefenseConfirmed: Codable, Equatable, Hashable, Sendable {
 }
 
 /// Someone running for a designated non-runner who has just reached base. Our league has
-/// designated non-runners: players who bat but are replaced on the bases every time they
-/// reach. The runner takes the base without changing the batting order; the designated
-/// non-runner stays in their spot and is credited with the run if the runner scores.
-/// Stolen bases and caught stealing go to the runner, who actually ran.
+/// designated non-runners: players declared before the game who bat, and who may have
+/// someone else run for them when they reach. By league rule the runner is the teammate who
+/// made the team's most recent out; the app suggests that player (see
+/// `Situation.runnerChoice`). The runner takes the base without changing the batting order;
+/// the designated non-runner stays in their spot and is credited with the run if the runner
+/// scores. Stolen bases and caught stealing go to the runner, who actually ran.
+///
+/// A designated non-runner who chooses to run themselves needs no event at all: the scorer
+/// simply carries on, and they stay on base like any other runner.
 ///
 /// An ordinary pinch runner, who replaces a player for good, is a `Substitution` instead.
 public struct RunnerForNonRunner: Codable, Equatable, Hashable, Sendable {

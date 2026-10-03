@@ -99,10 +99,14 @@ public struct ExpectedSituation: Codable, Sendable {
     public var lineups: [ExpectedLineup]?
     /// Who is playing particular positions.
     public var fielders: [ExpectedFielder]?
-    /// Whether a designated non-runner is waiting for a runner.
-    public var isRunnerNeeded: Bool?
-    /// Which designated non-runner is waiting for a runner.
-    public var runnerNeededFor: PlayerID?
+    /// Whether the app should be asking who runs for a designated non-runner.
+    public var isRunnerChoiceOpen: Bool?
+    /// The designated non-runner the app is asking about.
+    public var runnerChoiceFor: PlayerID?
+    /// The runner the app should offer first: the teammate who made the most recent out.
+    public var suggestedRunner: PlayerID?
+    /// Whether the app should offer anyone first (false before the team has made an out).
+    public var hasSuggestedRunner: Bool?
     public var isBetweenHalfInnings: Bool?
     /// Whether the app should open the defense check: our team has just taken the field and
     /// the scorer has not confirmed the fielders yet.

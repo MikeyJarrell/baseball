@@ -95,6 +95,7 @@ struct RoundTripTests {
         // An older settings file with nothing in it takes every default.
         #expect(try ScorebookJSON.decode(AppSettings.self, from: Data("{}".utf8)) == AppSettings())
         #expect(AppSettings().fadeSongOnFirstPitch == false)
+        #expect(AppSettings().walkUpSongSeconds == 12)
 
         let list = LoadedList(items: SampleSeason.games, damaged: [DamagedFile(fileName: "games/x.json", reason: "cut off mid-write")])
         #expect(try roundTrip(list) == list)

@@ -24,7 +24,7 @@ let replay = engine.replay(scenario.game)
 - `expected`: what should be true after the last event.
 - `source` (optional): for a converted real game, where it came from, with the credit line.
 
-Every expected value is optional; leave out anything the scenario does not test. The expected sections are `situation` (inning, half, outs, count, score, runners, batter, pitch counts, batting order spots, fielders, whether the defense check is due, whether the dropped third strike button shows), `notation` (an event’s scorebook notation), `batting`, `pitching` and `fielding` (box score numbers, named as in `BattingCounts`, `PitchingCounts` and `FieldingCounts`), and `teams` (runs, hits, errors, runners left on base, runs by inning in the line score, double and triple plays). Naming a player the box score has no line for is reported as a problem, even when every number expected is zero.
+Every expected value is optional; leave out anything the scenario does not test. The expected sections are `situation` (inning, half, outs, count, score, runners, batter, pitch counts, batting order spots, fielders, whether the defense check is due, whether the dropped third strike button shows, who the app offers to run for a designated non-runner), `notation` (an event’s scorebook notation), `batting`, `pitching` and `fielding` (box score numbers, named as in `BattingCounts`, `PitchingCounts` and `FieldingCounts`), and `teams` (runs, hits, errors, runners left on base, runs by inning in the line score, double and triple plays). Naming a player the box score has no line for is reported as a problem, even when every number expected is zero.
 
 In `situation`, a `runners` list is the whole set of runners: a base it leaves out must be empty, and `[]` means nobody on.
 

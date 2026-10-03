@@ -102,6 +102,15 @@ struct SampleGameTests {
         let wildPitch = engine.suggestRunnerAction(.wildPitch, runners: twoOn.runners.map(\.runner), in: twoOn)
         #expect(wildPitch.contains { $0.runner == "c4" && $0.to == .scored })
         #expect(wildPitch.contains { $0.runner == "c5" && $0.to == .third })
+        // The last out runs: the Mudcats' most recent out was Quinn, the batter on the 4-6-3
+        // double play; the Cardinals' was Park's fly to right.
+        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: log) == "m4")
+        #expect(engine.suggestedRunner(forNonRunnerOn: .away, in: log) == "c6")
+        let soFar = SampleGame.throughThreeInnings.log
+        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: soFar) == "m5")
+        var noOuts = log
+        noOuts.entries = []
+        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: noOuts) == nil)
         let caught = engine.suggestRunnerAction(.caughtStealing, runners: ["c3"], in: situation)
         #expect(caught == [RunnerMove(runner: "c3", from: .first, to: .out, reason: .caughtStealing, outAt: .second)])
     }
