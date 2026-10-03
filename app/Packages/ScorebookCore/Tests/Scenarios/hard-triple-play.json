@@ -1,5 +1,5 @@
 {
-  "description": "Ortiz and Ruiz single, putting runners on first and second with nobody out. Hale grounds to third, who steps on third, throws to second, and on to first. Triple play; the Mudcats come up.",
+  "description": "Ortiz and Ruiz single, putting runners on first and second with nobody out. Hale grounds to third, who steps on third, throws to second, and on to first. Triple play; the Diamond Dogs come up.",
   "setupFile": "standard",
   "events": [
     {
@@ -11,7 +11,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -28,12 +28,12 @@
         "hitLocation": 9,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "first",
             "to": "second"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "first"
           }
@@ -54,7 +54,7 @@
         ],
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "second",
             "to": "out",
             "outBy": [
@@ -63,7 +63,7 @@
             "outAt": "third"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "first",
             "to": "out",
             "outBy": [
@@ -73,7 +73,7 @@
             "outAt": "second"
           },
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -102,7 +102,7 @@
         "home": 0
       },
       "runners": [],
-      "batter": "m1",
+      "batter": "d1",
       "isBetweenHalfInnings": true,
       "lineups": [
         {
@@ -112,7 +112,7 @@
       ],
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 3,
           "strikes": 3,
           "battersFaced": 3
@@ -121,7 +121,7 @@
     },
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "outsRecorded": 3,
         "battersFaced": 3,
         "hits": 2
@@ -129,17 +129,17 @@
     ],
     "fielding": [
       {
-        "player": "m5",
+        "player": "d5",
         "putouts": 1,
         "assists": 1
       },
       {
-        "player": "m1",
+        "player": "d1",
         "putouts": 1,
         "assists": 1
       },
       {
-        "player": "m4",
+        "player": "d4",
         "putouts": 1,
         "assists": 0
       }

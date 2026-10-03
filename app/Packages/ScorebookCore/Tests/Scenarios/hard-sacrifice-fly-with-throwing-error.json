@@ -11,7 +11,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "first"
           }
@@ -28,12 +28,12 @@
         "hitLocation": 9,
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "first",
             "to": "third"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "first"
           }
@@ -52,7 +52,7 @@
         ],
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -60,12 +60,12 @@
             ]
           },
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "third",
             "to": "scored"
           },
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "first",
             "to": "third",
             "advancedOnError": true
@@ -91,35 +91,35 @@
       "runners": [
         {
           "base": "third",
-          "runner": "c2",
-          "responsiblePitcher": "m9"
+          "runner": "m2",
+          "responsiblePitcher": "d9"
         }
       ],
-      "batter": "c4"
+      "batter": "m4"
     },
     "batting": [
       {
-        "player": "c3",
+        "player": "m3",
         "plateAppearances": 1,
         "atBats": 0,
         "sacrificeFlies": 1,
         "runsBattedIn": 1
       },
       {
-        "player": "c1",
+        "player": "m1",
         "runs": 1
       }
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "runs": 1,
         "outsRecorded": 1
       }
     ],
     "fielding": [
       {
-        "player": "m3",
+        "player": "d3",
         "putouts": 1,
         "errors": 1
       }

@@ -45,33 +45,34 @@ struct SampleGameTests {
             #expect(history.map(\.outcome) == entries.map { $0.plateAppearance!.outcome }, "outcomes for \(player)")
             #expect(history.map(\.rbi) == entries.map { $0.plateAppearance!.rbi }, "runs batted in for \(player)")
         }
-        #expect(SampleGame.plateAppearancesThroughThree["m1"]?.map(\.notation) == ["BB", "6-3"])
-        #expect(SampleGame.plateAppearancesThroughThree["c10"] == nil)
+        #expect(SampleGame.plateAppearancesThroughThree["d1"]?.map(\.notation) == ["BB", "6-3"])
+        #expect(SampleGame.plateAppearancesThroughThree["m10"] == nil)
     }
 
-    @Test("The runner for a designated non-runner has a pr line under them, with the caught stealing")
+    @Test("The last out runs for a designated non-runner and keeps their own stats")
     func runnerForNonRunner() {
+        // Webb, the last out, ran for Quinn, so the caught stealing is on Webb's own line and
+        // nobody has a line under Quinn.
         let lines = box.home.batting
-        let quinn = lines.firstIndex { $0.player == "m4" }!
-        let nash = lines[quinn + 1]
-        #expect(nash.player == "m11" && nash.positions == [.pr] && nash.batterIndex == 3 && nash.isSubstitute)
-        #expect(nash.stats.plateAppearances == 0 && nash.stats.atBats == 0 && nash.stats.caughtStealing == 1)
+        let quinn = lines.firstIndex { $0.player == "d4" }!
+        #expect(lines[quinn + 1].player == "d5")
+        #expect(lines.first { $0.player == "d3" }?.stats.caughtStealing == 1)
         #expect(lines[quinn].stats.caughtStealing == 0)
     }
 
     @Test("Substitutes are in the final batting orders under the players they replaced")
     func finalOrders() {
-        #expect(log.awayOrder.slots[8].players == ["c9", "c10", "c12"])
-        #expect(log.homeOrder.slots[8].players == ["m9", "m12"])
+        #expect(log.awayOrder.slots[8].players == ["m9", "m10", "m12"])
+        #expect(log.homeOrder.slots[8].players == ["d9", "d12"])
         #expect(log.homeOrder.count == 10)
     }
 
     @Test("Season totals list all twelve of our players, including two with no at-bats")
     func season() {
         #expect(SampleSeason.totals.batting.count == 12)
-        let nash = SampleSeason.totals.batting.first { $0.player == "m11" }
-        #expect(nash?.stats.atBats == 0 && nash?.stats.battingAverage == nil && nash?.stats.caughtStealing == 1)
-        let voss = SampleSeason.totals.batting.first { $0.player == "m12" }
+        let nash = SampleSeason.totals.batting.first { $0.player == "d11" }
+        #expect(nash?.games == 0 && nash?.stats.atBats == 0 && nash?.stats.battingAverage == nil)
+        let voss = SampleSeason.totals.batting.first { $0.player == "d12" }
         #expect(voss?.games == 1 && voss?.stats.plateAppearances == 0)
     }
 
@@ -79,8 +80,8 @@ struct SampleGameTests {
     func situations() {
         #expect(SampleSituations.all.count >= 8)
         #expect(SampleSituations.basesLoadedTwoOutsFullCount.situation.runners.count == 3)
-        #expect(SampleSituations.tenthHitterUpAfterAddingOne.situation.batter == "m10")
-        #expect(SampleSituations.tenthHitterUpAfterAddingOne.situation.onDeck == "m11")
+        #expect(SampleSituations.tenthHitterUpAfterAddingOne.situation.batter == "d10")
+        #expect(SampleSituations.tenthHitterUpAfterAddingOne.situation.onDeck == "d11")
         #expect(SampleSituations.extraInnings.situation.inning == 10)
         #expect(SampleSituations.theirHitterKnownByNumber.player(SampleSituations.theirHitterKnownByNumber.situation.batter)?.displayName == "#5")
     }
@@ -90,8 +91,8 @@ struct SampleGameTests {
         let engine = SampleRulesEngine()
         let situation = SampleSituations.runnerOnFirstOneOut.situation
         let single = engine.suggestRunners(for: PlayDraft(batterResult: .single), in: situation)
-        #expect(single.runners.contains { $0.runner == "c3" && $0.to == .second })
-        #expect(single.runners.contains { $0.runner == "c4" && $0.to == .first })
+        #expect(single.runners.contains { $0.runner == "m3" && $0.to == .second })
+        #expect(single.runners.contains { $0.runner == "m4" && $0.to == .first })
         let doublePlay = PlayDraft(batterResult: .out, fielders: [.thirdBase, .secondBase, .firstBase], multiOut: .doublePlay)
         let preview = engine.preview(doublePlay, in: situation)
         #expect(preview.outsOnPlay == 2 && preview.endsHalfInning && preview.notation == "5-4-3 DP")
@@ -100,19 +101,38 @@ struct SampleGameTests {
         // A wild pitch with runners on second and third moves both up one.
         let twoOn = SampleSituations.secondAndThirdNobodyOut.situation
         let wildPitch = engine.suggestRunnerAction(.wildPitch, runners: twoOn.runners.map(\.runner), in: twoOn)
-        #expect(wildPitch.contains { $0.runner == "c4" && $0.to == .scored })
-        #expect(wildPitch.contains { $0.runner == "c5" && $0.to == .third })
-        // The last out runs: the Mudcats' most recent out was Quinn, the batter on the 4-6-3
-        // double play; the Cardinals' was Park's fly to right.
-        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: log) == "m4")
-        #expect(engine.suggestedRunner(forNonRunnerOn: .away, in: log) == "c6")
-        let soFar = SampleGame.throughThreeInnings.log
-        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: soFar) == "m5")
+        #expect(wildPitch.contains { $0.runner == "m4" && $0.to == .scored })
+        #expect(wildPitch.contains { $0.runner == "m5" && $0.to == .third })
+        // The last out runs. Quinn singles in the bottom of the 3rd with Shaw coming up: the
+        // Diamond Dogs' last recorded out was Webb's strikeout, so Webb runs.
+        var reached = SampleSituations.designatedNonRunnerOnFirst.situation
+        reached.home.nextBatterIndex = 4
+        let quinnSingle = log.entries.firstIndex { $0.notation == "1B 7" && $0.batter == "d4" }!
+        var soFar = log
+        soFar.entries = Array(log.entries[...quinnSingle])
+        #expect(engine.suggestedRunner(for: "d4", in: soFar, situation: reached) == "d3")
+        // If Webb were the one now at bat, the last recorded out before them runs: Moreno.
+        reached.home.nextBatterIndex = 2
+        #expect(engine.suggestedRunner(for: "d4", in: soFar, situation: reached) == "d1")
+        // First inning, no outs yet: the last batter in the order, Cole.
+        reached.home.nextBatterIndex = 1
         var noOuts = log
         noOuts.entries = []
-        #expect(engine.suggestedRunner(forNonRunnerOn: .home, in: noOuts) == nil)
-        let caught = engine.suggestRunnerAction(.caughtStealing, runners: ["c3"], in: situation)
-        #expect(caught == [RunnerMove(runner: "c3", from: .first, to: .out, reason: .caughtStealing, outAt: .second)])
+        #expect(engine.suggestedRunner(for: "d1", in: noOuts, situation: reached) == "d10")
+        #expect(DoNothingRulesEngine().suggestedRunner(for: "d1", in: noOuts, situation: reached) == nil)
+        let caught = engine.suggestRunnerAction(.caughtStealing, runners: ["m3"], in: situation)
+        #expect(caught == [RunnerMove(runner: "m3", from: .first, to: .out, reason: .caughtStealing, outAt: .second)])
+    }
+
+    @Test("The sample game's time limit runs out during the fifth, which began before it")
+    func sampleGameClock() {
+        let end = SampleGame.finalSituation.timeLimitEndsAt!
+        #expect(end == SampleGame.finalSituation.gameStartedAt!.addingTimeInterval(3 * 3600))
+        let fifth = log.entries.filter { $0.inning == 5 && $0.pitches > 0 }
+        #expect(fifth.first!.event.enteredAt < end)
+        #expect(fifth.last!.event.enteredAt >= end)
+        #expect(log.entries.filter { $0.pitches > 0 }.allSatisfy { $0.inning <= 5 })
+        #expect(SampleGame.game.ending?.reason == .timeLimit)
     }
 
     @Test("Sample situations put the pitcher with a pitch count on the mound")
@@ -122,10 +142,13 @@ struct SampleGameTests {
             for side in TeamSide.allCases {
                 guard let pitcher = s[side].pitcher, let tally = s.pitchers.last(where: { $0.team == side }) else { continue }
                 #expect(tally.pitcher == pitcher, "\(sample.title): \(side) pitcher")
-                let ninth = s[side].battingOrder.slots.first { $0.position == .pitcher }
-                if let ninth { #expect(ninth.current == pitcher, "\(sample.title): \(side) pitcher's batting spot") }
+                // Where the starting pitcher batted, the pitcher now on the mound bats.
+                let starter = sample.setup[side].startingPitcher
+                if let spot = s[side].battingOrder.slots.first(where: { $0.players.first == starter }) {
+                    #expect(spot.current == pitcher, "\(sample.title): \(side) pitcher's batting spot")
+                }
             }
-            #expect(s.timeLimitMinutes == sample.setup.timeLimitMinutes, "\(sample.title): time limit")
+            #expect((s.timeLimitEndsAt != nil) == (sample.setup.timeLimitMinutes != nil), "\(sample.title): time limit")
         }
     }
 }
@@ -193,6 +216,24 @@ func boxScoreProblems(log: PlayLog, box: BoxScore) -> [String] {
               moves.filter { $0.runner == line.player && $0.reason == .stolenBase }.count, line.stats.stolenBases)
         check("caught stealing for \(line.name)",
               moves.filter { $0.runner == line.player && $0.reason == .caughtStealing }.count, line.stats.caughtStealing)
+    }
+
+    // Where each fielder played, by inning, from the fielders the play log lists for each pitch.
+    for (side, half) in [(TeamSide.away, HalfInning.bottom), (.home, .top)] {
+        var played: [PlayerID: [Position: Set<Int>]] = [:]
+        for entry in entries where entry.half == half && entry.pitches > 0 {
+            for f in entry.fielders { played[f.player, default: [:]][f.position, default: []].insert(entry.inning) }
+        }
+        let lines = box[side].fielding
+        check("\(side) fielders with lines", lines.count, played.count)
+        for line in lines {
+            for appearance in line.appearances {
+                let innings = (played[line.player]?[appearance.position] ?? []).sorted()
+                if innings != appearance.innings {
+                    problems.append("\(line.name) at \(appearance.position.abbreviation): play log says \(innings), box score says \(appearance.innings)")
+                }
+            }
+        }
     }
 
     let outs = entries.flatMap(\.outs)

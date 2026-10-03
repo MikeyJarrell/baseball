@@ -1,8 +1,8 @@
 // A play: one ball in play, from contact until the ball is dead.
 //
-// Here is how a 5-4-3 double play with a runner on first is recorded. The batter ("c2")
+// Here is how a 5-4-3 double play with a runner on first is recorded. The batter ("m2")
 // grounds to the third baseman, who throws to second for the force on the runner from
-// first ("c1"); the second baseman throws on to first to get the batter:
+// first ("m1"); the second baseman throws on to first to get the batter:
 //
 //     "ballInPlay": {
 //       "batterResult": "out",
@@ -10,8 +10,8 @@
 //       "fielders": [5, 4, 3],
 //       "multiOut": "doublePlay",
 //       "runners": [
-//         { "runner": "c1", "from": "first", "to": "out", "outAt": "second", "outBy": [5, 4] },
-//         { "runner": "c2", "from": "home",  "to": "out", "outAt": "first",  "outBy": [4, 3] }
+//         { "runner": "m1", "from": "first", "to": "out", "outAt": "second", "outBy": [5, 4] },
+//         { "runner": "m2", "from": "home",  "to": "out", "outAt": "first",  "outBy": [4, 3] }
 //       ],
 //       "rbi": 0
 //     }

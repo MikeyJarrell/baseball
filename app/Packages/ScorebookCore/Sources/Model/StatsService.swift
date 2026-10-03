@@ -36,7 +36,7 @@ public struct DoNothingStatsCalculator: StatsCalculator {
         }
         return BoxScore(
             gameID: log.gameID,
-            date: log.setup.date,
+            date: log.setup.scheduledStart,
             away: team(.away),
             home: team(.home),
             lineScore: LineScore(away: [], home: []),

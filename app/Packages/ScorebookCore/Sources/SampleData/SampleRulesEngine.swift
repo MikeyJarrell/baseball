@@ -121,9 +121,30 @@ public struct SampleRulesEngine: RulesEngine {
         }
     }
 
-    /// Reads the play log back to the batting team's most recent out.
-    public func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID? {
-        log.entries.last { $0.battingSide == side && !$0.outs.isEmpty }?.outs.last?.runner
+    /// The plainest clock: time left, and the stored last-inning and game-over facts as they
+    /// are. Nothing once the game is final.
+    public func clock(for situation: Situation, at now: Date) -> GameClock {
+        simpleClock(for: situation, at: now)
+    }
+
+    /// Reads the play log back to the batting team's last recorded out, skipping the batter
+    /// now at bat and the designated non-runner themself. Before the team's first out, the last
+    /// batter in the batting order.
+    public func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID? {
+        let side = situation.battingSide
+        let atBat = situation.batter
+        // Every player the team has had put out, oldest first. An automatic out at a batting
+        // hole is not a recorded out for this rule (the player has left the game), so it is
+        // left out.
+        let outs = log.entries.filter { $0.battingSide == side }.flatMap { entry -> [PlayerID] in
+            if case .automaticOut = entry.event.kind { return [] }
+            return entry.outs.map(\.runner)
+        }
+        if let lastOut = outs.reversed().first(where: { $0 != atBat && $0 != nonRunner }) {
+            return lastOut
+        }
+        guard outs.isEmpty else { return nil }
+        return situation[side].battingOrder.slots.last { $0.current != nonRunner && $0.current != atBat }?.current
     }
 
     public func notation(for event: GameEvent, in situation: Situation) -> String {

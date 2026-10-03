@@ -1,5 +1,5 @@
 {
-  "description": "Three quick Cardinals outs. Moreno, the Mudcats' designated non-runner, doubles; Cole runs for them. Cole steals third, then scores on Tate's sacrifice fly. The run is Moreno's and the stolen base is Cole's; the batting order does not change.",
+  "description": "Three quick Mudcats outs. Moreno, the Diamond Dogs' designated non-runner, doubles. With no Diamond Dogs out yet in the first inning, the runner is the last batter in the order, Barros (league rule 9.11 E). Barros steals third, then scores on Tate's sacrifice fly. The run is Moreno's and the stolen base is Barros's; the batting order does not change.",
   "setupFile": "designated-non-runner",
   "events": [
     {
@@ -13,7 +13,7 @@
         ],
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -36,7 +36,7 @@
         ],
         "runners": [
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -60,7 +60,7 @@
         ],
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -80,7 +80,7 @@
         "hitLocation": 7,
         "runners": [
           {
-            "runner": "m1",
+            "runner": "d1",
             "from": "home",
             "to": "second"
           }
@@ -92,8 +92,8 @@
       "id": "e5",
       "enteredAt": "2026-05-02T18:06:40Z",
       "runnerForNonRunner": {
-        "runner": "m10",
-        "replacing": "m1"
+        "runner": "d9",
+        "replacing": "d1"
       }
     },
     {
@@ -109,7 +109,7 @@
       "runnerAction": {
         "moves": [
           {
-            "runner": "m10",
+            "runner": "d9",
             "from": "second",
             "to": "third",
             "reason": "stolenBase"
@@ -128,7 +128,7 @@
         ],
         "runners": [
           {
-            "runner": "m2",
+            "runner": "d2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -136,7 +136,7 @@
             ]
           },
           {
-            "runner": "m10",
+            "runner": "d9",
             "from": "third",
             "to": "scored"
           }
@@ -147,15 +147,25 @@
   ],
   "checkpoints": [
     {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
+        }
+      }
+    },
+    {
       "afterEvent": "e5",
       "expected": {
         "situation": {
           "runners": [
             {
               "base": "second",
-              "runner": "m10",
-              "responsiblePitcher": "c9",
-              "standingInFor": "m1"
+              "runner": "d9",
+              "responsiblePitcher": "m9",
+              "standingInFor": "d1"
             }
           ],
           "isRunnerChoiceOpen": false,
@@ -164,7 +174,7 @@
               "team": "home",
               "index": 0,
               "players": [
-                "m1"
+                "d1"
               ]
             }
           ]
@@ -179,13 +189,13 @@
             "balls": 1,
             "strikes": 0
           },
-          "batter": "m2",
+          "batter": "d2",
           "runners": [
             {
               "base": "third",
-              "runner": "m10",
-              "responsiblePitcher": "c9",
-              "standingInFor": "m1"
+              "runner": "d9",
+              "responsiblePitcher": "m9",
+              "standingInFor": "d1"
             }
           ]
         }
@@ -202,34 +212,34 @@
         "home": 1
       },
       "runners": [],
-      "batter": "m3",
+      "batter": "d3",
       "battingSlots": [
         {
           "team": "home",
           "index": 0,
           "players": [
-            "m1"
+            "d1"
           ]
         }
       ]
     },
     "batting": [
       {
-        "player": "m1",
+        "player": "d1",
         "runs": 1,
         "hits": 1,
         "doubles": 1,
         "stolenBases": 0
       },
       {
-        "player": "m2",
+        "player": "d2",
         "plateAppearances": 1,
         "atBats": 0,
         "sacrificeFlies": 1,
         "runsBattedIn": 1
       },
       {
-        "player": "m10",
+        "player": "d9",
         "plateAppearances": 0,
         "runs": 0,
         "stolenBases": 1
@@ -237,7 +247,7 @@
     ],
     "pitching": [
       {
-        "pitcher": "c9",
+        "pitcher": "m9",
         "runs": 1
       }
     ]

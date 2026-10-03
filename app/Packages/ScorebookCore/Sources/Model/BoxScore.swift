@@ -1,5 +1,5 @@
 // Box scores: one game's batting lines, pitching lines, fielding, line score by inning,
-// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Cardinals 4.").
+// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Diamond Dogs 4.").
 //
 // The stats engine fills these in from the play log. The counting-stat bundles
 // (BattingCounts, PitchingCounts, FieldingCounts) are shared with season totals, and
@@ -54,7 +54,9 @@ public struct TeamBoxScore: Codable, Equatable, Sendable {
     public var batting: [BattingLine]
     /// A line for every pitcher, in the order they pitched.
     public var pitching: [PitchingLine]
-    /// Putouts, assists and errors for every player who fielded.
+    /// A line for every player who took a fielding position, even with no putouts, assists or
+    /// errors, showing where they played. Players who field without batting appear only here,
+    /// which is how a manager shows they took part, for playoff eligibility [3.5 B 2].
     public var fielding: [FieldingLine]
     /// Runs, hits and errors for the line score's R H E columns. Runs always equal the team's
     /// final score: runs added or taken away by a manual adjustment count here (see
@@ -121,7 +123,8 @@ public struct BattingLine: Codable, Equatable, Sendable {
     public var number: String?
     /// The spot in the order they batted in (or ran for), counting from 0.
     public var batterIndex: Int
-    /// Every position they played today, in order: "ss", or "ph" then "2b".
+    /// Every position they played today, in order: "ss", or "ph" then "2b". A player who only
+    /// batted has none, or just "ph".
     public var positions: [BoxPosition]
     /// True for a player who came into the game after it started.
     public var isSubstitute: Bool
@@ -161,16 +164,34 @@ public struct PitchingLine: Codable, Equatable, Sendable {
     }
 }
 
-/// One fielder's putouts, assists and errors in a box score.
+/// One fielder's line in a box score: where they played, by inning, and their putouts,
+/// assists and errors.
 public struct FieldingLine: Codable, Equatable, Sendable {
     public var player: PlayerID
     public var name: String
+    /// Every position they played, in the order they first played it, each with the innings
+    /// they were there. A fielder who was at a position for any part of an inning counts that
+    /// inning.
+    public var appearances: [FieldingAppearance]
     public var stats: FieldingCounts
 
-    public init(player: PlayerID, name: String, stats: FieldingCounts) {
+    public init(player: PlayerID, name: String, appearances: [FieldingAppearance], stats: FieldingCounts) {
         self.player = player
         self.name = name
+        self.appearances = appearances
         self.stats = stats
+    }
+}
+
+/// One position a player played, and the innings they played it.
+public struct FieldingAppearance: Codable, Equatable, Hashable, Sendable {
+    public var position: Position
+    /// The innings, first inning first: `[1, 2, 3]`.
+    public var innings: [Int]
+
+    public init(position: Position, innings: [Int]) {
+        self.position = position
+        self.innings = innings
     }
 }
 
@@ -181,16 +202,15 @@ public enum BoxPosition: String, Codable, Sendable, CaseIterable {
     case secondBase = "2b"
     case thirdBase = "3b"
     case ss, lf, cf, rf
-    /// Extra hitter: bats, does not field.
-    case eh
     /// Pinch hitter.
     case ph
     /// Pinch runner.
     case pr
 
-    /// The box score label for a fielding position: shortstop is "ss".
+    /// The box score label for a fielding position: shortstop is "ss". Every position has one;
+    /// "ph" is a fallback that never crashes the app.
     public init(_ position: Position) {
-        self = BoxPosition(rawValue: position.abbreviation) ?? .eh
+        self = BoxPosition(rawValue: position.abbreviation) ?? .ph
     }
 }
 

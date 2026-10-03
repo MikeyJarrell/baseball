@@ -126,7 +126,7 @@ public struct GameSummary: Identifiable, Codable, Equatable, Sendable {
         let ourSide = game.setup.ourSide ?? .home
         self.init(
             id: game.id,
-            date: game.setup.date,
+            date: game.setup.scheduledStart,
             opponentName: game.setup[ourSide.opponent].name,
             weAreHome: ourSide == .home,
             finalScore: game.ending?.finalScore,

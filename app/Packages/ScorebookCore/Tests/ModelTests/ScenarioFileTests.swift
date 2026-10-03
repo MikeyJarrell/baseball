@@ -35,6 +35,44 @@ struct ScenarioFileTests {
         "hard-sacrifice-fly-with-throwing-error",
     ]
 
+    /// Scenarios for the league's own rules: designated non-runners, batting holes, the time
+    /// limit and the run rule.
+    static let leagueRuleScenarios = [
+        "designated-non-runner-runs-themself",
+        "designated-non-runner-last-out-now-batting",
+        "batting-hole-automatic-out",
+        "time-limit-passes-mid-inning",
+        "time-limit-home-ahead-after-top",
+        "tie-at-time-limit",
+        "keep-playing-past-time-limit",
+        "tie-after-nine-goes-to-extra-innings",
+        "run-rule-home-ahead-after-top-of-seventh",
+        "run-rule-visitors-ahead-after-seven",
+        "batting-hole-not-last-recorded-out",
+        "designated-non-runner-choice-waits-for-pitch",
+        "time-limit-walk-off",
+        "run-rule-visitors-up-after-top-of-seventh",
+        "run-rule-eleven-runs-after-seven",
+        "pitcher-returns-once",
+    ]
+
+    @Test("The league-rule scenarios are there", arguments: leagueRuleScenarios)
+    func leagueRuleScenarioExists(name: String) throws {
+        let scenario = try Scenarios.load(name)
+        #expect(scenario.expected.situation != nil)
+    }
+
+    @Test("A batting hole and the time limit are events; keep playing answers the question")
+    func leagueRuleEvents() throws {
+        let hole = try Scenarios.load("batting-hole-automatic-out")
+        #expect(hole.events.first?.kind == .battingHole(BattingHole(team: .away, spotIndex: 1)))
+        // The automatic out is an ordinary event in the saved game.
+        #expect(hole.events.last?.kind == .automaticOut(AutomaticOut(team: .away, spotIndex: 1)))
+        let keep = try Scenarios.load("keep-playing-past-time-limit")
+        #expect(keep.events.contains { $0.kind == .keepPlaying(KeepPlaying(reason: .timeLimit)) })
+        #expect(keep.events.contains { if case .timeLimitChange = $0.kind { true } else { false } })
+    }
+
     @Test("Every scenario file decodes, with a setup and at least one event")
     func everyScenarioDecodes() throws {
         let names = Scenarios.names()
@@ -62,7 +100,7 @@ struct ScenarioFileTests {
                 case .ballInPlay(let play): named += play.runners.map(\.runner)
                 case .pitch(let pitch): named += pitch.droppedThirdStrike?.runners.map(\.runner) ?? []
                 case .runnerAction(let action): named += action.moves.map(\.runner)
-                case .substitution(let sub): named += sub.changes.flatMap { [$0.incoming] + ($0.replacing.map { [$0] } ?? []) }
+                case .substitution(let sub): named += sub.batting.flatMap { [$0.incoming, $0.replacing] } + sub.defense.map(\.player)
                 case .runnerForNonRunner(let r): named += [r.runner, r.replacing]
                 case .pitchingChange(let change): named.append(change.newPitcher)
                 case .addHitter(let add): named.append(add.player)
@@ -96,11 +134,11 @@ struct ScenarioFileTests {
         #expect(play.batterResult == .out)
         #expect(play.fielders == [.thirdBase, .secondBase, .firstBase])
         #expect(play.multiOut == .doublePlay)
-        let runner = try #require(play.runners.first { $0.runner == "c1" })
+        let runner = try #require(play.runners.first { $0.runner == "m1" })
         #expect(runner.from == .first && runner.to == .out && runner.outAt == .second)
         #expect(runner.outBy == [.thirdBase, .secondBase])
         let batter = try #require(play.batterMove)
-        #expect(batter.runner == "c2" && batter.to == .out && batter.outBy == [.secondBase, .firstBase])
+        #expect(batter.runner == "m2" && batter.to == .out && batter.outBy == [.secondBase, .firstBase])
     }
 
     @Test("Expecting numbers for a player with no box score line is reported, even zeros")
@@ -109,7 +147,7 @@ struct ScenarioFileTests {
         let replay = DoNothingRulesEngine().replay(scenario.game)
         let emptyBox = DoNothingStatsCalculator().boxScore(for: replay.log)
         let problems = scenario.expected.mismatches(box: emptyBox)
-        #expect(problems.contains("batting c10: no batting line in the box score"))
+        #expect(problems.contains("batting m10: no batting line in the box score"))
     }
 
     @Test("A dropped third strike rides on the strike-three pitch")
@@ -126,16 +164,16 @@ struct ScenarioFileTests {
     @Test("Shared setups decode, and the standard one matches the sample teams")
     func setupsDecode() throws {
         let standard = try Scenarios.setup(named: "standard")
-        #expect(standard.away.lineup.count == 9 && standard.home.lineup.count == 9)
+        #expect(standard.away.battingOrder.count == 9 && standard.home.battingOrder.count == 9 && standard.home.defense.count == 9)
         #expect(standard.ourSide == .home)
         for player in standard.home.roster {
-            #expect(SampleTeamsLookup.mudcats(player.id)?.name == player.name)
+            #expect(SampleTeamsLookup.diamondDogs(player.id)?.name == player.name)
         }
         for player in standard.away.roster {
-            #expect(SampleTeamsLookup.cardinals(player.id)?.name == player.name)
+            #expect(SampleTeamsLookup.mudcats(player.id)?.name == player.name)
         }
         let dnr = try Scenarios.setup(named: "designated-non-runner")
-        #expect(dnr.home.designatedNonRunners == ["m1"])
+        #expect(dnr.home.designatedNonRunners == ["d1"])
         let unknown = try Scenarios.setup(named: "unknown-opponent")
         let allUnnamed = unknown.away.roster.allSatisfy { $0.isUnnamed }
         #expect(allUnnamed)
@@ -145,6 +183,6 @@ struct ScenarioFileTests {
 
 /// Looks up players on the sample teams, for comparing with the scenario setups.
 enum SampleTeamsLookup {
+    static func diamondDogs(_ id: PlayerID) -> Player? { SampleTeams.diamondDogs.player(id) }
     static func mudcats(_ id: PlayerID) -> Player? { SampleTeams.mudcats.player(id) }
-    static func cardinals(_ id: PlayerID) -> Player? { SampleTeams.cardinals.player(id) }
 }

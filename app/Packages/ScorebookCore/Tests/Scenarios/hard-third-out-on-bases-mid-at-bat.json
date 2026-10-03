@@ -1,5 +1,5 @@
 {
-  "description": "Two outs, then Hale singles. With Diaz up 1-1, Hale is caught stealing, catcher to shortstop: third out. Diaz leads off the second inning with a fresh count after the Mudcats go down in order. The Mudcats take the field again with nobody having checked their fielders, so the defense check is due.",
+  "description": "Two outs, then Hale singles. With Diaz up 1-1, Hale is caught stealing, catcher to shortstop: third out. Diaz leads off the second inning with a fresh count after the Diamond Dogs go down in order. The Diamond Dogs take the field again with nobody having checked their fielders, so the defense check is due.",
   "setupFile": "standard",
   "events": [
     {
@@ -13,7 +13,7 @@
         ],
         "runners": [
           {
-            "runner": "c1",
+            "runner": "m1",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -35,7 +35,7 @@
         ],
         "runners": [
           {
-            "runner": "c2",
+            "runner": "m2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -55,7 +55,7 @@
         "hitLocation": 8,
         "runners": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "home",
             "to": "first"
           }
@@ -83,7 +83,7 @@
       "runnerAction": {
         "moves": [
           {
-            "runner": "c3",
+            "runner": "m3",
             "from": "first",
             "to": "out",
             "reason": "caughtStealing",
@@ -108,7 +108,7 @@
         ],
         "runners": [
           {
-            "runner": "m1",
+            "runner": "d1",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -132,7 +132,7 @@
         ],
         "runners": [
           {
-            "runner": "m2",
+            "runner": "d2",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -154,7 +154,7 @@
         ],
         "runners": [
           {
-            "runner": "m3",
+            "runner": "d3",
             "from": "home",
             "to": "out",
             "outBy": [
@@ -179,7 +179,7 @@
             "strikes": 0
           },
           "runners": [],
-          "batter": "m1",
+          "batter": "d1",
           "defenseCheckDue": false,
           "lineups": [
             {
@@ -201,17 +201,17 @@
         "strikes": 0
       },
       "runners": [],
-      "batter": "c4",
+      "batter": "m4",
       "defenseCheckDue": true,
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 5,
           "strikes": 4,
           "battersFaced": 3
         },
         {
-          "pitcher": "c9",
+          "pitcher": "m9",
           "pitches": 3,
           "strikes": 3,
           "battersFaced": 3
@@ -220,18 +220,18 @@
     },
     "batting": [
       {
-        "player": "c3",
+        "player": "m3",
         "hits": 1,
         "caughtStealing": 1
       },
       {
-        "player": "c4",
+        "player": "m4",
         "plateAppearances": 0
       }
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "outsRecorded": 3,
         "battersFaced": 3,
         "pitches": 5,
@@ -240,12 +240,12 @@
     ],
     "fielding": [
       {
-        "player": "m8",
+        "player": "d8",
         "assists": 1,
         "putouts": 0
       },
       {
-        "player": "m2",
+        "player": "d2",
         "putouts": 1
       }
     ],

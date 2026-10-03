@@ -1,0 +1,120 @@
+{
+  "description": "Before the game the Mudcats lose Ruiz, their second hitter, with nobody to replace them, so the second spot is a batting hole (league rules 9.2 B, 9.5 C). Ortiz singles; the second spot is up, so the app records an automatic out straight away, as an ordinary event. It is nobody's plate appearance, no fielder gets a putout, and it counts toward Barros's outs. Hale is up with one out.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "battingHole": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "automaticOut": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "outs": 0,
+          "batter": "m2",
+          "isBattingHoleUp": true
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 1,
+          "players": [
+            "m2"
+          ],
+          "isHole": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "away",
+          "length": 9,
+          "nextBatterIndex": 2
+        }
+      ],
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 0,
+        "atBats": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 0,
+        "assists": 0
+      },
+      {
+        "player": "d4",
+        "putouts": 0
+      }
+    ]
+  }
+}
