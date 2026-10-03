@@ -1,10 +1,114 @@
 // PlayEntry: the in-play sequence and runner confirmation.
 //
-// Placeholder written by the foundation job so the module exists and builds.
-// The screen builder replaces this file (see plan/briefs/screen-play-entry.md).
-// Screens here may use Model, SampleData and DesignSystem, and nothing else.
+// The sequence opens when the scorer taps "In play" on the batting screen (or "Dropped 3rd
+// strike" after strike three). It asks what happened to the batter, has the scorer tap the
+// fielders (or where a hit landed, or who made the error) on the field drawing, then shows
+// where every runner most likely ended up for a glance and a save. It ends in one ball-in-play
+// event, the dropped-third-strike play, or a cancel that records nothing.
+//
+// The screen does no baseball arithmetic. Notation, outs, runs, runs batted in, "inning over"
+// and where the runners went all come from the two rules-engine functions it is handed in
+// `PlayEntryRules`. Until wiring, previews and demos use the stand-in rules engine from SampleData.
+//
+// This file holds what the rest of the app sees: the view to show, what it is handed, and
+// what it hands back. The steps themselves are in the other files of this folder.
 
 import SwiftUI
 import Model
 import SampleData
 import DesignSystem
+
+/// The two rules-engine functions the in-play sequence needs while the scorer is tapping.
+/// The app hands in the real rules engine's; previews hand in the stand-in's.
+public struct PlayEntryRules: Sendable {
+    /// Where every runner, batter included, most likely ended up, and the runs batted in,
+    /// given what the scorer has picked so far (including any runners they have moved).
+    public var suggestRunners: @Sendable (PlayDraft, Situation) -> RunnerSuggestion
+    /// The play so far: its notation ("6", then "6-3"), the outs and runs it would produce,
+    /// and whether it ends the half-inning or the game.
+    public var preview: @Sendable (PlayDraft, Situation) -> PlayPreview
+
+    public init(
+        suggestRunners: @escaping @Sendable (PlayDraft, Situation) -> RunnerSuggestion,
+        preview: @escaping @Sendable (PlayDraft, Situation) -> PlayPreview
+    ) {
+        self.suggestRunners = suggestRunners
+        self.preview = preview
+    }
+
+    /// Takes both functions from a rules engine, such as the real one from GameEngine.
+    public init(engine: some RulesEngine) {
+        self.init(
+            suggestRunners: { draft, situation in engine.suggestRunners(for: draft, in: situation) },
+            preview: { draft, situation in engine.preview(draft, in: situation) }
+        )
+    }
+
+    /// The stand-in rules engine from SampleData, exactly as it is. Its notation and runs
+    /// batted in are rough (a single has no notation at all), so demos use `demo` instead.
+    public static var standIn: PlayEntryRules { PlayEntryRules(engine: SampleRulesEngine()) }
+
+    /// The stand-in rules engine with its notation and runs batted in filled in, for previews
+    /// and simulator demos only (see DemoRulesEngine.swift). Never for a real game.
+    public static var demo: PlayEntryRules { PlayEntryRules(engine: DemoRulesEngine()) }
+}
+
+/// How the sequence was opened.
+public enum PlayEntryStart: Sendable, Equatable {
+    /// The "In play" button: starts at "What happened to the batter?".
+    case inPlay
+    /// The "Dropped 3rd strike" button after strike three: starts at "thrown out, or safe?".
+    /// Hand the sequence the situation from just before the strike-three pitch, so the batter
+    /// is the one who struck out.
+    case droppedThirdStrike
+}
+
+/// What the sequence hands back when it closes.
+public enum PlayEntryOutcome: Equatable, Sendable {
+    /// One ball-in-play event, ready to record.
+    case ballInPlay(GameEvent)
+    /// A dropped third strike: the play to put on the strike-three pitch
+    /// (`Pitch.droppedThirdStrike`). The wiring replaces the strike-three event with the same
+    /// pitch carrying this play. Comes back whether the sequence was opened from the
+    /// "Dropped 3rd strike" button or from "More" on the first step.
+    case droppedThirdStrike(Play)
+    /// The scorer backed out. Nothing is recorded.
+    case cancelled
+}
+
+/// The in-play sequence: the screen the app shows, full screen, when the scorer taps "In play".
+///
+///     PlayEntryView(situation: situation, setup: setup, rules: PlayEntryRules(engine: engine)) { outcome in
+///         // record the event, or do nothing on .cancelled
+///     }
+public struct PlayEntryView: View {
+    @State private var model: PlayEntryModel
+
+    /// - Parameters:
+    ///   - situation: where the game stands as the ball is put in play (for a dropped third
+    ///     strike, just before the strike-three pitch).
+    ///   - setup: the game's setup, for player names.
+    ///   - start: which button opened the sequence.
+    ///   - rules: the rules engine's two functions.
+    ///   - onFinish: called once, with the event to record or a cancel.
+    public init(
+        situation: Situation,
+        setup: GameSetup,
+        start: PlayEntryStart = .inPlay,
+        rules: PlayEntryRules,
+        onFinish: @escaping (PlayEntryOutcome) -> Void
+    ) {
+        _model = State(initialValue: PlayEntryModel(situation: situation, setup: setup, start: start,
+                                                    rules: rules, onFinish: onFinish))
+    }
+
+    /// Opens the sequence part way through, as if the scorer had already made `taps`. For
+    /// previews and simulator demos.
+    init(model: PlayEntryModel) {
+        _model = State(initialValue: model)
+    }
+
+    public var body: some View {
+        PlayEntryScreen(model: model)
+    }
+}
