@@ -102,8 +102,7 @@ public struct PlayEntryView: View {
                                                     rules: rules, onFinish: onFinish))
     }
 
-    /// Opens the sequence part way through, as if the scorer had already made `taps`. For
-    /// previews and simulator demos.
+    /// Shows a sequence that is already part way through, for previews and simulator demos.
     init(model: PlayEntryModel) {
         _model = State(initialValue: model)
     }
