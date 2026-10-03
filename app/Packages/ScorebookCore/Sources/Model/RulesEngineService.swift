@@ -136,10 +136,17 @@ public struct RunnerSuggestion: Codable, Equatable, Hashable, Sendable {
     public var runners: [RunnerMove]
     /// Runs batted in under the official scoring rules, for the scorer to confirm.
     public var rbi: Int
+    /// The hit to save instead of the one the scorer picked, when they differ: on a game-ending
+    /// hit the batter is credited only with as many bases as the winning run needed, a walk-off
+    /// "double" with the winning run on third being a single (Official Baseball Rules 9.06(f));
+    /// home runs excepted. Missing when the scorer's pick stands. The replay applies the same
+    /// rule to a saved play, so the box score is right either way.
+    public var batterResult: BatterResult?
 
-    public init(runners: [RunnerMove], rbi: Int) {
+    public init(runners: [RunnerMove], rbi: Int, batterResult: BatterResult? = nil) {
         self.runners = runners
         self.rbi = rbi
+        self.batterResult = batterResult
     }
 }
 
@@ -186,7 +193,8 @@ extension Situation {
             home: state(for: setup.home),
             defenseCheckDue: setup.home.isOurs,
             timeLimitEndsAt: setup.scheduledEnd,
-            scheduledInnings: setup.scheduledInnings
+            scheduledInnings: setup.scheduledInnings,
+            suggestedDefense: setup.home.isOurs ? setup.home.defense(forInning: 1, from: setup.home.defense) : nil
         )
     }
 }

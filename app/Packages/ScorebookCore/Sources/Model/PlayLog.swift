@@ -227,14 +227,24 @@ public struct PlateAppearanceResult: Codable, Equatable, Hashable, Sendable {
     /// True when the batter ended up safe on base or scored (a hit, a walk, an error,
     /// a dropped third strike).
     public var batterReachedBase: Bool
+    /// The batter the box score charges with this plate appearance, when it is not the one who
+    /// finished it. A pinch hitter who comes in with two strikes and strikes out: the strikeout
+    /// and the at-bat go to the batter they replaced (Official Baseball Rules 9.15(b)). Missing
+    /// almost always, meaning `batter`. The rules engine fills it in.
+    public var chargedBatter: PlayerID?
 
-    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0, batterReachedBase: Bool) {
+    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0,
+                batterReachedBase: Bool, chargedBatter: PlayerID? = nil) {
         self.batter = batter
         self.pitcher = pitcher
         self.outcome = outcome
         self.rbi = rbi
         self.batterReachedBase = batterReachedBase
+        self.chargedBatter = chargedBatter
     }
+
+    /// The batter whose line in the box score gets this plate appearance.
+    public var batterCharged: PlayerID { chargedBatter ?? batter }
 }
 
 /// The ways a plate appearance can end.

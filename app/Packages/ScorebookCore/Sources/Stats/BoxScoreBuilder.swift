@@ -38,7 +38,8 @@ struct BoxScoreBuilder {
             home: home,
             lineScore: tally.lineScore(),
             notes: tally.notes(away: away, home: home),
-            isFinal: log.isFinal
+            isFinal: log.isFinal,
+            gameLength: log.gameLength
         )
     }
 }
@@ -49,7 +50,14 @@ private struct GameTally {
 
     init(log: PlayLog) {
         self.log = log
+        decisions = log.pitchingDecisions()
+        substituteEntries = log.substituteEntries()
     }
+
+    /// The winning and losing pitchers, once the game is final.
+    let decisions: [PlayerID: PitchingDecision]
+    /// How each substitute came in, for the footnotes.
+    let substituteEntries: [PlayerID: SubstituteEntry]
 
     // MARK: Running tallies
 
@@ -139,7 +147,8 @@ private struct GameTally {
 
         // A plate appearance that ended: the batter's line and the charged pitcher's line.
         if let result = entry.plateAppearance {
-            batting[result.batter, default: BattingCounts()].add(result)
+            // A pinch hitter's strikeout can belong to the batter they replaced [9.15(b)].
+            batting[result.batterCharged, default: BattingCounts()].add(result)
             if let spot = entry.batterIndex {
                 battersSeen[battingTeam, default: []].append((result.batter, spot))
             }
@@ -181,8 +190,9 @@ private struct GameTally {
         for move in entry.runnerMoves {
             switch move.reason {
             case .stolenBase: batting[move.runner, default: BattingCounts()].stolenBases += 1
-            case .caughtStealing: batting[move.runner, default: BattingCounts()].caughtStealing += 1
-            default: break
+            default:
+                // Caught stealing, or picked off while trying to steal [9.07(h)].
+                if move.countsAsCaughtStealing { batting[move.runner, default: BattingCounts()].caughtStealing += 1 }
             }
         }
 
@@ -344,7 +354,8 @@ private struct GameTally {
             batterIndex: spot,
             positions: positions(of: player),
             isSubstitute: isSubstitute,
-            stats: batting[player] ?? BattingCounts()
+            stats: batting[player] ?? BattingCounts(),
+            entered: isSubstitute ? substituteEntries[player] : nil
         )
     }
 
@@ -386,7 +397,8 @@ private struct GameTally {
                 player: pitcher,
                 name: person?.displayName ?? pitcher.rawValue,
                 number: person?.number,
-                stats: pitching[pitcher] ?? PitchingCounts()
+                stats: pitching[pitcher] ?? PitchingCounts(),
+                decision: decisions[pitcher]
             )
         }
     }
@@ -475,7 +487,9 @@ private struct GameTally {
             hitByPitch: battingStat(\.hitByPitch),
             doublePlays: teamTallies(doublePlays),
             triplePlays: teamTallies(triplePlays),
-            leftOnBase: teamTallies(leftOnBase, always: true)
+            leftOnBase: teamTallies(leftOnBase, always: true),
+            hitBatters: log.hitBatterNotes(),
+            ranForNonRunners: log.nonRunnerRunnerNotes()
         )
     }
 

@@ -113,7 +113,10 @@ public enum BatterResult: String, Codable, Sendable, CaseIterable {
     case sacrificeBunt
     /// Struck out, but safe at first because the catcher did not hold strike three.
     case reachedOnDroppedThirdStrike
-    /// Awarded first because the catcher interfered with the swing.
+    /// Awarded first because the catcher interfered with the swing. Official scoring charges
+    /// the catcher with an error (Official Baseball Rules 9.12(a)(3)): the rules engine adds it
+    /// by itself, so the play need not list it; a catcher's error the play does list is not
+    /// counted twice.
     case catchersInterference
 
     /// The word for screens: "single", "fielder's choice".
