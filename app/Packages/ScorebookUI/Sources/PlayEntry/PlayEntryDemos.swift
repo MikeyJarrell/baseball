@@ -194,6 +194,8 @@ enum PlayEntryDemos {
 public struct PlayEntryDemoGallery: View {
     @State private var open: OpenDemo?
     @State private var lastResult = "Nothing entered yet."
+    /// The text size the gallery was given, passed on to the sequence, which opens full screen.
+    @Environment(\.dynamicTypeSize) private var typeSize
     private let autoOpen: OpenDemo?
 
     /// - Parameters:
@@ -239,6 +241,7 @@ public struct PlayEntryDemoGallery: View {
                 lastResult = Self.describe(outcome)
                 open = nil
             })
+            .environment(\.dynamicTypeSize, typeSize)
         }
         .onAppear { if let autoOpen { open = autoOpen } }
     }

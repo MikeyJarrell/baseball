@@ -34,6 +34,7 @@ struct RunnersStep: View {
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, Spacing.large)
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 VStack(spacing: 6) {
                     ForEach(model.draft.runners, id: \.runner) { move in
                         RunnerRow(model: model, move: move)
@@ -74,6 +75,8 @@ struct RunnersStep: View {
             VStack(spacing: 2) {
                 Text("RUNS BATTED IN")
                     .font(ScorebookFont.sectionLabel)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
                     .foregroundStyle(ScorebookColor.textSecondary)
                 HStack(spacing: 0) {
                     stepperButton("minus", label: "Fewer runs batted in", change: -1)
@@ -90,7 +93,7 @@ struct RunnersStep: View {
         .padding(Spacing.medium)
         .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .padding(.horizontal, Spacing.screenEdge)
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
     /// The minus or plus beside the runs batted in.

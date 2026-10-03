@@ -167,7 +167,8 @@ struct BottomBar<Buttons: View>: View {
                 .overlay(alignment: .top) { ScorebookColor.divider.frame(height: 1) }
                 .ignoresSafeArea(edges: .bottom)
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
+        // The bar sits under the field, so its words stop growing at the largest ordinary size.
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
 
@@ -209,6 +210,8 @@ struct RunnersButton: View {
                     Text("Runners").fontWeight(.bold)
                     Image(systemName: "chevron.right")
                 }
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
             }
             .buttonStyle(PrimaryButtonStyle())
             .frame(width: 150)
