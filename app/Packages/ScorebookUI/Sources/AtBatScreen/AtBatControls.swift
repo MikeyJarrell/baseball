@@ -159,11 +159,16 @@ struct ChipRow: View {
     @Environment(\.dynamicTypeSize) private var textSize
 
     var body: some View {
-        // One row when everything fits at its full width; at large text sizes, Undo gets a row
-        // of its own above the others, so its words are never squeezed.
+        // The first layout that fits: one row with Undo on one line; one row with Undo's words
+        // on two lines; at large text sizes, Undo on a row of its own above the others, so its
+        // words are never squeezed.
         ViewThatFits(in: .horizontal) {
             HStack(spacing: Spacing.small) {
                 undoButton
+                otherChips
+            }
+            HStack(spacing: Spacing.small) {
+                undoButton.frame(idealWidth: 104)
                 otherChips
             }
             VStack(spacing: Spacing.small) {
