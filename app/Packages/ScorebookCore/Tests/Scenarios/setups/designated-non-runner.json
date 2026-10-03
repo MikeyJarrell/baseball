@@ -91,33 +91,15 @@
       }
     ],
     "battingOrder": [
-      {
-        "player": "m1"
-      },
-      {
-        "player": "m2"
-      },
-      {
-        "player": "m3"
-      },
-      {
-        "player": "m4"
-      },
-      {
-        "player": "m5"
-      },
-      {
-        "player": "m6"
-      },
-      {
-        "player": "m7"
-      },
-      {
-        "player": "m8"
-      },
-      {
-        "player": "m9"
-      }
+      "m1",
+      "m2",
+      "m3",
+      "m4",
+      "m5",
+      "m6",
+      "m7",
+      "m8",
+      "m9"
     ],
     "defense": [
       {
@@ -249,34 +231,15 @@
       }
     ],
     "battingOrder": [
-      {
-        "player": "d1",
-        "isDesignatedNonRunner": true
-      },
-      {
-        "player": "d2"
-      },
-      {
-        "player": "d3"
-      },
-      {
-        "player": "d4"
-      },
-      {
-        "player": "d5"
-      },
-      {
-        "player": "d6"
-      },
-      {
-        "player": "d7"
-      },
-      {
-        "player": "d8"
-      },
-      {
-        "player": "d9"
-      }
+      "d1",
+      "d2",
+      "d3",
+      "d4",
+      "d5",
+      "d6",
+      "d7",
+      "d8",
+      "d9"
     ],
     "defense": [
       {
@@ -315,6 +278,9 @@
         "position": 9,
         "player": "d7"
       }
+    ],
+    "designatedNonRunners": [
+      "d1"
     ]
   }
 }

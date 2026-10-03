@@ -37,16 +37,16 @@ extension SampleGame {
                     outsRecorded: 6, battersFaced: 9, hits: 3, runs: 2, hitBatters: 1, pitches: 23, strikes: 15)),
             ],
             fielding: [
-                field("m1", "Luis Ortiz", FieldingCounts(putouts: 1)),
-                field("m2", "Danny Ruiz", FieldingCounts(putouts: 2, assists: 3)),
-                field("m3", "Marcus Hale", FieldingCounts(putouts: 6)),
-                field("m4", "Tommy Diaz", FieldingCounts(putouts: 2)),
-                field("m5", "Sam Kim", FieldingCounts(assists: 1, errors: 1)),
-                field("m6", "Eddie Park", FieldingCounts(putouts: 1)),
-                field("m7", "Joe Varga", FieldingCounts(putouts: 2, assists: 1)),
-                field("m8", "Nate Bell", FieldingCounts(putouts: 1, assists: 3)),
-                field("m9", "Ray Collins", FieldingCounts(assists: 1)),
-                field("m12", "Gus Reyes", FieldingCounts()),
+                field("m1", "Luis Ortiz", .centerField, 1...5, FieldingCounts(putouts: 1)),
+                field("m2", "Danny Ruiz", .shortstop, 1...5, FieldingCounts(putouts: 2, assists: 3)),
+                field("m3", "Marcus Hale", .firstBase, 1...5, FieldingCounts(putouts: 6)),
+                field("m4", "Tommy Diaz", .leftField, 1...5, FieldingCounts(putouts: 2)),
+                field("m5", "Sam Kim", .thirdBase, 1...5, FieldingCounts(assists: 1, errors: 1)),
+                field("m6", "Eddie Park", .rightField, 1...5, FieldingCounts(putouts: 1)),
+                field("m7", "Joe Varga", .catcher, 1...5, FieldingCounts(putouts: 2, assists: 1)),
+                field("m8", "Nate Bell", .secondBase, 1...5, FieldingCounts(putouts: 1, assists: 3)),
+                field("m9", "Ray Collins", .pitcher, 1...3, FieldingCounts(assists: 1)),
+                field("m12", "Gus Reyes", .pitcher, 4...5, FieldingCounts()),
             ],
             runs: 3, hits: 7, errors: 1, leftOnBase: 6
         ),
@@ -72,16 +72,16 @@ extension SampleGame {
                     outsRecorded: 3, battersFaced: 5, hits: 1, walks: 1, strikeouts: 1, pitches: 13, strikes: 9)),
             ],
             fielding: [
-                field("d1", "Alex Moreno", FieldingCounts(putouts: 2, assists: 5)),
-                field("d2", "Chris Tate", FieldingCounts(putouts: 3, assists: 1, errors: 1)),
-                field("d3", "Jordan Webb", FieldingCounts(putouts: 2)),
-                field("d4", "Pat Quinn", FieldingCounts(putouts: 5)),
-                field("d5", "Riley Shaw", FieldingCounts()),
-                field("d6", "Casey Ford", FieldingCounts()),
-                field("d7", "Drew Lang", FieldingCounts(putouts: 1)),
-                field("d8", "Morgan Fisk", FieldingCounts(putouts: 2)),
-                field("d9", "Sky Barros", FieldingCounts()),
-                field("d12", "Taylor Voss", FieldingCounts()),
+                field("d1", "Alex Moreno", .secondBase, 1...5, FieldingCounts(putouts: 2, assists: 5)),
+                field("d2", "Chris Tate", .shortstop, 1...5, FieldingCounts(putouts: 3, assists: 1, errors: 1)),
+                field("d3", "Jordan Webb", .centerField, 1...5, FieldingCounts(putouts: 2)),
+                field("d4", "Pat Quinn", .firstBase, 1...5, FieldingCounts(putouts: 5)),
+                field("d5", "Riley Shaw", .thirdBase, 1...5, FieldingCounts()),
+                field("d6", "Casey Ford", .leftField, 1...5, FieldingCounts()),
+                field("d7", "Drew Lang", .rightField, 1...5, FieldingCounts(putouts: 1)),
+                field("d8", "Morgan Fisk", .catcher, 1...5, FieldingCounts(putouts: 2)),
+                field("d9", "Sky Barros", .pitcher, 1...4, FieldingCounts()),
+                field("d12", "Taylor Voss", .pitcher, 5...5, FieldingCounts()),
             ],
             runs: 5, hits: 9, errors: 1, leftOnBase: 4
         ),
@@ -114,9 +114,11 @@ extension SampleGame {
         BattingLine(player: id, name: name, number: number, batterIndex: spot, positions: positions, isSubstitute: sub, stats: stats)
     }
 
-    /// A fielding line.
-    static func field(_ id: PlayerID, _ name: String, _ stats: FieldingCounts) -> FieldingLine {
-        FieldingLine(player: id, name: name, stats: stats)
+    /// A fielding line for a player who played one position for a run of innings.
+    static func field(_ id: PlayerID, _ name: String, _ position: Position, _ innings: ClosedRange<Int>,
+                      _ stats: FieldingCounts) -> FieldingLine {
+        FieldingLine(player: id, name: name,
+                     appearances: [FieldingAppearance(position: position, innings: Array(innings))], stats: stats)
     }
 
     /// One player's entry in a box score note, once.

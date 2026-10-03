@@ -119,8 +119,14 @@ public struct GameSetup: Codable, Equatable, Sendable {
 public struct GameRules: Codable, Equatable, Hashable, Sendable {
     /// Innings in a full game: nine [9.1 D]. A tie after them with time left goes to extra innings.
     public var scheduledInnings: Int
-    /// Minutes from the first pitch after which no new inning may begin: three hours, or three
-    /// and a quarter in a championship game [9.1 G, 9.1 J]. Missing means no time limit.
+    /// Minutes from the first pitch after which no new inning may begin, set for each game:
+    /// three hours by default [9.1 G], with three and a quarter offered for a championship game
+    /// [9.1 J]. Missing means no time limit.
+    ///
+    /// The rule book disagrees with itself here: rule 8.1 C 2 says championship games have no
+    /// time limit and a run rule announced before the playoffs, and 8.1 C 1 says a playoff game
+    /// tied at the limit keeps going. Since the time limit only asks a question, the scorer
+    /// handles either reading.
     public var timeLimitMinutes: Int?
     /// A lead this big ends the game by the run rule: 12 runs, or 15 in a championship game [9.13].
     /// Missing means no run rule.
@@ -148,7 +154,8 @@ public struct GameRules: Codable, Equatable, Hashable, Sendable {
     /// An ordinary league game: nine innings, three hours, 12-run rule after seven, two non-runners.
     public static let league = GameRules()
 
-    /// A championship game: three hours and fifteen minutes, 15-run rule [9.1 J, 9.13 B].
+    /// A championship game as rules 9.1 J and 9.13 B describe it: three hours and fifteen
+    /// minutes, 15-run rule. Offered as a choice; see `timeLimitMinutes` for rule 8.1 C.
     public static let championship = GameRules(timeLimitMinutes: 195, runRuleMargin: 15)
 
     // Reading from JSON: anything left out takes the league's value.
@@ -190,18 +197,26 @@ public struct GameTeam: Codable, Equatable, Sendable {
     /// Everyone at the field for this game, including players added during it.
     public var roster: [Player]
     /// The starting batting order, first hitter first. Any number of hitters [9.5 A].
-    public var battingOrder: [BattingOrderEntry]
+    public var battingOrder: [PlayerID]
     /// Who starts at each fielding position, one player per position. A position nobody is
-    /// known to be playing (an opponent nobody knows) is left out.
+    /// known to be playing (an opponent nobody knows, or a team playing short-handed) is left out.
     public var defense: [FielderAssignment]
+    /// Players declared as designated non-runners, from the batting order or the eligible
+    /// substitutes on the bench [9.4 C]. Declared before the game and never after it starts
+    /// [9.11 C]; at most `GameRules.maxDesignatedNonRunners`, which the app shows but does not
+    /// enforce. When one reaches base, the teammate the rule names may run for them, or they may
+    /// run themselves; the scorer is asked each time [9.11 A, D]. A substitute who is declared
+    /// keeps the declaration when they come into the batting order.
+    public var designatedNonRunners: [PlayerID]
 
     public init(
         teamID: TeamID,
         name: String,
         isOurs: Bool,
         roster: [Player],
-        battingOrder: [BattingOrderEntry],
-        defense: [FielderAssignment]
+        battingOrder: [PlayerID],
+        defense: [FielderAssignment],
+        designatedNonRunners: [PlayerID] = []
     ) {
         self.teamID = teamID
         self.name = name
@@ -209,6 +224,20 @@ public struct GameTeam: Codable, Equatable, Sendable {
         self.roster = roster
         self.battingOrder = battingOrder
         self.defense = defense
+        self.designatedNonRunners = designatedNonRunners
+    }
+
+    // Reading from JSON: `designatedNonRunners` may be left out and means none.
+    private enum CodingKeys: String, CodingKey { case teamID, name, isOurs, roster, battingOrder, defense, designatedNonRunners }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        teamID = try c.decode(TeamID.self, forKey: .teamID)
+        name = try c.decode(String.self, forKey: .name)
+        isOurs = try c.decode(Bool.self, forKey: .isOurs)
+        roster = try c.decode([Player].self, forKey: .roster)
+        battingOrder = try c.decode([PlayerID].self, forKey: .battingOrder)
+        defense = try c.decode([FielderAssignment].self, forKey: .defense)
+        designatedNonRunners = try c.decodeIfPresent([PlayerID].self, forKey: .designatedNonRunners) ?? []
     }
 
     /// Finds a player on this team by id.
@@ -218,7 +247,7 @@ public struct GameTeam: Codable, Equatable, Sendable {
 
     /// The bench: everyone at the field who neither bats nor fields at the start.
     public var bench: [Player] {
-        let starters = Set(battingOrder.map(\.player) + defense.map(\.player))
+        let starters = Set(battingOrder + defense.map(\.player))
         return roster.filter { !starters.contains($0.id) }
     }
 
@@ -232,31 +261,9 @@ public struct GameTeam: Codable, Equatable, Sendable {
         defense.first { $0.position == .pitcher }?.player
     }
 
-    /// The designated non-runners in the starting batting order.
-    public var designatedNonRunners: [PlayerID] {
-        battingOrder.filter(\.isDesignatedNonRunner).map(\.player)
-    }
-}
-
-/// One hitter in a starting batting order.
-public struct BattingOrderEntry: Codable, Equatable, Hashable, Sendable {
-    public var player: PlayerID
-    /// A designated non-runner is declared before the game and cannot be declared after it
-    /// starts [9.11 C]. When they reach base, the teammate who made the most recent out may run
-    /// for them, or they may run themselves; the scorer is asked each time [9.11 A, D].
-    public var isDesignatedNonRunner: Bool
-
-    public init(player: PlayerID, isDesignatedNonRunner: Bool = false) {
-        self.player = player
-        self.isDesignatedNonRunner = isDesignatedNonRunner
-    }
-
-    // Reading from JSON: `isDesignatedNonRunner` may be left out and means false.
-    private enum CodingKeys: String, CodingKey { case player, isDesignatedNonRunner }
-    public init(from decoder: Decoder) throws {
-        let c = try decoder.container(keyedBy: CodingKeys.self)
-        player = try c.decode(PlayerID.self, forKey: .player)
-        isDesignatedNonRunner = try c.decodeIfPresent(Bool.self, forKey: .isDesignatedNonRunner) ?? false
+    /// True when a player is declared as a designated non-runner.
+    public func isDesignatedNonRunner(_ player: PlayerID) -> Bool {
+        designatedNonRunners.contains(player)
     }
 }
 

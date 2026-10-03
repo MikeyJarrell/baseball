@@ -40,6 +40,8 @@ To start a scenario in the ninth inning or with runners already on, make the fir
 
 ## The foundation job’s scenarios
 
-The `hard-` files are the twenty-two hard plays the foundation job used to test the vocabulary, with expected values worked out by hand. The files on the league’s own rules cover designated non-runners (`designated-non-runner-…`), a batting hole, the time limit (`time-limit-…`, `tie-…`, `keep-playing-past-time-limit`) and the run rule (`run-rule-…`). To make the time limit pass mid-game, a scenario sets the umpire’s time with a `timeLimitChange` event; events are 20 seconds apart.
+The `hard-` files are the twenty-two hard plays the foundation job used to test the vocabulary, with expected values worked out by hand. The files on the league’s own rules cover designated non-runners (`designated-non-runner-…`), batting holes (`batting-hole-…`), a pitcher coming back once, the time limit (`time-limit-…`, `tie-…`, `keep-playing-past-time-limit`) the run rule (`run-rule-…`), and a walk-off in an inning the time limit made the last (`time-limit-walk-off`). To make the time limit pass mid-game, a scenario sets the umpire’s time with a `timeLimitChange` event; events are 20 seconds apart.
 
 None of these rules ends a game by itself: when one says the game could be over, the situation’s `gameOverQuestion` is set, and the game goes on until an `endOfGame` event. A `keepPlaying` event answers the question, and the same reason is not asked again.
+
+A batting hole’s automatic out is an ordinary `automaticOut` event in the file, placed where the app would record it: right after the event that brought the hole up.

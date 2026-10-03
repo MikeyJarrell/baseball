@@ -121,6 +121,12 @@ public struct SampleRulesEngine: RulesEngine {
         }
     }
 
+    /// The plainest clock: time left, and the stored last-inning and game-over facts as they
+    /// are. Nothing once the game is final.
+    public func clock(for situation: Situation, at now: Date) -> GameClock {
+        simpleClock(for: situation, at: now)
+    }
+
     /// Reads the play log back to the batting team's last recorded out, skipping the batter
     /// now at bat and the designated non-runner themself. Before the team's first out, the last
     /// batter in the batting order.
@@ -128,7 +134,8 @@ public struct SampleRulesEngine: RulesEngine {
         let side = situation.battingSide
         let atBat = situation.batter
         // Every player the team has had put out, oldest first. An automatic out at a batting
-        // hole belongs to a spot, not a player, so it is left out.
+        // hole is not a recorded out for this rule (the player has left the game), so it is
+        // left out.
         let outs = log.entries.filter { $0.battingSide == side }.flatMap { entry -> [PlayerID] in
             if case .automaticOut = entry.event.kind { return [] }
             return entry.outs.map(\.runner)

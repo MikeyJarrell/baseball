@@ -35,6 +35,15 @@ public protocol RulesEngine: Sendable {
     /// in `runnerChoice`.
     func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID?
 
+    /// The game clock at a moment between events, for the batting screen: time left, whether
+    /// this is the last inning, and whether to ask "Is the game over?" on time. The rules
+    /// engine's own decisions stored in the situation (`isLastInning`, `gameOverQuestion`,
+    /// `declinedEndings`, `isFinal`) are what count; this carries them forward as the clock
+    /// runs, so the question can come up between innings with no new event. A finished game
+    /// never asks anything. This is the only place the time-limit decision is made outside the
+    /// replay itself.
+    func clock(for situation: Situation, at now: Date) -> GameClock
+
     /// Scorebook notation for one event, given the situation just before it:
     /// "6-3", "F8", "E6", "1B 7", "K", "ꓘ", "BB".
     func notation(for event: GameEvent, in situation: Situation) -> String
@@ -146,7 +155,9 @@ public struct PlayPreview: Codable, Equatable, Hashable, Sendable {
     public var outsAfter: Int
     /// True when the play makes the third out.
     public var endsHalfInning: Bool
-    /// True when the play wins the game for the home team in its last at-bat.
+    /// True when the play puts the home team ahead in a walk-off inning: the bottom of the
+    /// scheduled last inning or later, or of the inning the time limit has made the last one
+    /// (`Situation.isWalkOffInning`). The app then asks "Is the game over?". Nothing ends by itself.
     public var endsGame: Bool
 
     public init(notation: String, outsOnPlay: Int = 0, runsOnPlay: Int = 0, outsAfter: Int = 0, endsHalfInning: Bool = false, endsGame: Bool = false) {
@@ -166,7 +177,7 @@ extension Situation {
     public init(startOf setup: GameSetup) {
         func state(for team: GameTeam) -> TeamState {
             let slots = team.battingOrder.map {
-                BattingSlot(players: [$0.player], isDesignatedNonRunner: $0.isDesignatedNonRunner)
+                BattingSlot(players: [$0], isDesignatedNonRunner: team.isDesignatedNonRunner($0))
             }
             return TeamState(battingOrder: BattingOrder(slots: slots), nextBatterIndex: 0, fielders: team.defense)
         }
@@ -205,6 +216,12 @@ public struct DoNothingRulesEngine: RulesEngine {
 
     public func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview {
         PlayPreview(notation: draft.fielders.map(\.description).joined(separator: "-"), outsAfter: situation.outs)
+    }
+
+    /// Reports only the time left, and nothing at all once the game is final. The real
+    /// decisions about the last inning come from the rules engine.
+    public func clock(for situation: Situation, at now: Date) -> GameClock {
+        simpleClock(for: situation, at: now)
     }
 
     /// Never suggests anyone.

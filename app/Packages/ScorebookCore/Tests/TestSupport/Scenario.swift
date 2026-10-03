@@ -123,6 +123,8 @@ public struct ExpectedSituation: Codable, Sendable {
     public var isGameOverQuestionOpen: Bool?
     /// Whether the time limit has passed during this inning.
     public var isLastInning: Bool?
+    /// Whether the batter due up holds a batting hole, so the app should record an automatic out.
+    public var isBattingHoleUp: Bool?
     public var isFinal: Bool?
 }
 

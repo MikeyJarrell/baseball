@@ -33,10 +33,12 @@ public struct Situation: Codable, Equatable, Sendable {
     /// True when the fielding team is our team, a new half-inning has started, and the scorer
     /// has not yet confirmed who is at each position. The app opens the defense check.
     public var defenseCheckDue: Bool
-    /// Set right after a designated non-runner reaches base, until the next event: the app asks
-    /// straight away who runs, suggesting the player the league's rule names (see
-    /// `RunnerChoice.suggestedRunner`), or the designated non-runner themselves. Recording a
-    /// `runnerForNonRunner` event, or any other event (they chose to run themselves), clears it.
+    /// Set right after a designated non-runner reaches base, and kept until the next pitch
+    /// [9.11 A 3, D]: the app asks straight away who runs, suggesting the player the league's
+    /// rule names (see `RunnerChoice.suggestedRunner`), or the designated non-runner themselves.
+    /// It stays open through anything that is not a pitch, such as a pitching change. It closes
+    /// on the next pitch, ball in play or intentional walk (they ran themselves), on a
+    /// `runnerForNonRunner` event, or on a substitution that puts a pinch runner in for them.
     public var runnerChoice: RunnerChoice?
     /// True right after a strike three that ended a plate appearance, until the next event.
     /// The batting screen offers the "dropped third strike" button.
@@ -55,15 +57,20 @@ public struct Situation: Codable, Equatable, Sendable {
     ///   leads after the top of the last inning, or the home team went ahead in its last at-bat.
     ///   A tie after the scheduled innings with time left goes to extra innings, with no question.
     /// - `timeLimit`: the inning in which the time limit passed has ended, or its top half has
-    ///   ended with the home team ahead [9.1 G]. A tie stays a tie [9.1 H].
-    /// - `runRule`: a lead of `GameRules.runRuleMargin` at the end of the run rule's inning or
-    ///   any later one, or after its top half with the home team ahead [9.13].
+    ///   ended with the home team ahead [9.1 G]. A tie stays a tie [9.1 H]. That inning is the
+    ///   last inning, so a walk-off works as in the ninth: the moment the home team takes the
+    ///   lead in its bottom half, the question is asked, and only the winning run is suggested
+    ///   to score (all runs on a home run). See `isWalkOffInning`.
+    /// - `runRule`: a lead of `GameRules.runRuleMargin` when a half-inning ends: the end of the
+    ///   run rule's inning or any later one, or its top half with the home team ahead [9.13].
+    ///   Never in the middle of a half-inning, following the rule's "at the end of seven innings".
+    ///   No question is asked while the visitors lead after a top half, since the home team bats.
     public var gameOverQuestion: EndOfGame.Reason?
     /// The reasons the scorer has already answered "keep playing" to, so they are not asked again.
     public var declinedEndings: [EndOfGame.Reason]
     /// True when the time limit has passed during this inning, which began before it: the last
     /// inning [9.1 G]. False once the scorer has chosen to keep playing past the limit. As of the
-    /// latest event; `clock(at:)` gives the live answer.
+    /// latest event; `RulesEngine.clock(for:at:)` gives the live answer between events.
     public var isLastInning: Bool
     /// True once the scorer has ended the game.
     public var isFinal: Bool
@@ -77,7 +84,8 @@ public struct Situation: Codable, Equatable, Sendable {
     /// the time limit. Missing when there is no time limit.
     public var timeLimitEndsAt: Date?
     /// Innings in a full game, copied from the setup, so suggestions can tell when a hit
-    /// in the bottom of the last inning ends the game.
+    /// in the bottom of the last inning ends the game. An inning the time limit made the last
+    /// one counts the same way (see `isWalkOffInning`).
     public var scheduledInnings: Int
 
     public init(
@@ -155,6 +163,22 @@ public struct Situation: Codable, Equatable, Sendable {
         runners.first { $0.base == base }
     }
 
+    /// True in the bottom of an inning that has to be the last one: the scheduled last inning or
+    /// later, or the inning the time limit has made the last one. Here the home team taking the
+    /// lead ends the game, and only the winning run is suggested to score (all of them on a home
+    /// run). Read straight from the stored facts.
+    public var isWalkOffInning: Bool {
+        half == .bottom && !isFinal && (inning >= scheduledInnings || isLastInning)
+    }
+
+    /// True when the batter due up holds a batting hole: the app records an `automaticOut`
+    /// event straight away.
+    public var isBattingHoleUp: Bool {
+        let team = self[battingSide]
+        return team.battingOrder.slots.indices.contains(team.nextBatterIndex)
+            && team.battingOrder.slots[team.nextBatterIndex].isHole
+    }
+
     /// Which bases have a runner on them.
     public var occupiedBases: Set<Base> { Set(runners.map(\.base)) }
 
@@ -167,38 +191,13 @@ public struct Situation: Codable, Equatable, Sendable {
         )
     }
 
-    /// The game clock at a given moment, for the batting screen: time left, whether this is
-    /// the last inning, and whether to ask if the game is over on time. Worked out from the
-    /// stored times, so it stays right between events while the clock runs. Once the scorer has
-    /// chosen to keep playing past the limit, it reports only the time.
-    public func clock(at now: Date) -> GameClock {
-        guard let end = timeLimitEndsAt else {
-            return GameClock(timeLimitEndsAt: nil, timeRemaining: nil, isLastInning: false, askIfOverOnTime: false)
-        }
-        // After "keep playing", innings past the limit are ordinary innings.
-        let passed = now >= end && !declinedEndings.contains(.timeLimit)
-        // The inning began before the limit if its first pitch came first. Between a finished
-        // inning and the next one's first pitch, nothing has begun yet.
-        let startedBeforeLimit = currentInningStartedAt.map { $0 < end } ?? false
-        let betweenInnings = half == .top && isBetweenHalfInnings
-        let homeAheadAfterTop = half == .bottom && isBetweenHalfInnings && score.home > score.away
-        let overOnTime = gameOverQuestion == .timeLimit
-            || (passed && gameStartedAt != nil && (betweenInnings || (homeAheadAfterTop && startedBeforeLimit)))
-        return GameClock(
-            timeLimitEndsAt: end,
-            timeRemaining: gameStartedAt == nil ? nil : end.timeIntervalSince(now),
-            isLastInning: isLastInning || (passed && startedBeforeLimit && !betweenInnings),
-            askIfOverOnTime: overOnTime
-        )
-    }
-
     /// Today's pitches and strikes for one pitcher.
     public func tally(for pitcher: PlayerID) -> PitcherTally? {
         pitchers.first { $0.pitcher == pitcher }
     }
 }
 
-/// The game clock at one moment.
+/// The game clock at one moment, from `RulesEngine.clock(for:at:)`.
 public struct GameClock: Codable, Equatable, Hashable, Sendable {
     /// When no new inning may begin. Before the first pitch, the scheduled start plus the limit.
     public var timeLimitEndsAt: Date?
@@ -216,6 +215,22 @@ public struct GameClock: Codable, Equatable, Hashable, Sendable {
         self.isLastInning = isLastInning
         self.askIfOverOnTime = askIfOverOnTime
     }
+}
+
+/// The plainest reading of the clock, for stand-in rules engines: time left from the stored
+/// limit, and the stored `isLastInning` and `gameOverQuestion` as they are. Nothing at all once
+/// the game is final. The real rules engine makes the time-limit decisions.
+public func simpleClock(for situation: Situation, at now: Date) -> GameClock {
+    guard !situation.isFinal, let end = situation.timeLimitEndsAt else {
+        return GameClock(timeLimitEndsAt: situation.isFinal ? nil : situation.timeLimitEndsAt,
+                         timeRemaining: nil, isLastInning: false, askIfOverOnTime: false)
+    }
+    return GameClock(
+        timeLimitEndsAt: end,
+        timeRemaining: situation.gameStartedAt == nil ? nil : end.timeIntervalSince(now),
+        isLastInning: situation.isLastInning,
+        askIfOverOnTime: situation.gameOverQuestion == .timeLimit
+    )
 }
 
 /// The question the app asks when a designated non-runner reaches base: who runs?
@@ -271,7 +286,7 @@ public struct TeamState: Codable, Equatable, Sendable {
     /// removed never appears here [9.6 B]. For the substitution screens to list; nothing is blocked.
     public var eligibleToReenter: [ReentryOption]
     /// Pitchers who were removed as pitcher and may come back to pitch, which each may do once
-    /// per game [9.12 B].
+    /// per game [9.12 B]. A pitcher who has already come back once is not listed.
     public var eligibleToPitchAgain: [PlayerID]
 
     public init(
@@ -337,7 +352,7 @@ public struct BattingSlot: Codable, Equatable, Sendable {
     /// Everyone who has held this spot, in order; the last one holds it now. A player can
     /// appear more than once, for a starter who left and came back.
     public var players: [PlayerID]
-    /// True when the current player is a designated non-runner.
+    /// True when the player who holds the spot now is a declared designated non-runner.
     public var isDesignatedNonRunner: Bool
     /// True when the spot is a batting hole: an automatic out each time it comes up.
     public var isHole: Bool

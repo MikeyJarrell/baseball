@@ -8,15 +8,13 @@
 
 import Foundation
 
-/// One game's play log: one entry per event, in order, plus an entry the rules engine adds
-/// by itself for each automatic out at a batting hole (see `AutomaticOut`).
+/// One game's play log: one entry per event, in order.
 public struct PlayLog: Codable, Equatable, Sendable {
     public var gameID: GameID
     /// The game's setup, with both rosters as they stand at the end (every player who
     /// appeared, with their latest name and number), for box score names.
     public var setup: GameSetup
-    /// One entry per event, oldest first, with automatic-out entries where the batting hole
-    /// came up. An automatic-out entry's event is made up by the engine and is not in the game.
+    /// One entry per event, oldest first.
     public var entries: [PlayLogEntry]
     /// The visiting team's batting order at the end of the game, with everyone who batted in
     /// each spot, so a box score can list substitutes under the player they replaced.
