@@ -136,7 +136,7 @@ public struct PinchHitterSheet: View {
         .confirmationDialog("Leave a batting hole?", isPresented: $askingAboutHole, titleVisibility: .visible) {
             Button("Leave a batting hole", role: .destructive, action: recordHole)
         } message: {
-            Text("The \(ordinal(spot + 1)) spot becomes an automatic out each time it comes up. Putting someone in the spot later fills it again.")
+            Text("\(batter.map { context.shortName($0) } ?? "This hitter")’s turn now is an out right away. After that, the \(ordinal(spot + 1)) spot is an automatic out each time it comes up. Putting someone in the spot later fills it again.")
         }
     }
 

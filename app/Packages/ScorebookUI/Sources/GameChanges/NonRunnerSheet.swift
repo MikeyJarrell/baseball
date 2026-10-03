@@ -33,6 +33,7 @@ public struct NonRunnerSheet: View {
     @State private var pick: Pick?
     @State private var showPinchRunners = false
     @State private var showEveryone = false
+    @State private var showEveryonePinch = false
 
     /// The designated non-runner on base.
     private let nonRunner: PlayerID?
@@ -138,6 +139,20 @@ public struct NonRunnerSheet: View {
                     PlayerChoiceRow(context: context, player: player.id, detail: "Bench", look: look,
                                     isSelected: pick == .pinchRunner(player.id)) { pick = .pinchRunner(player.id) }
                 }
+            }
+            // Anyone else on the roster may pinch-run too; the scorer decides.
+            let others = everyoneElse.filter { player in !context.bench(side).contains { $0.id == player.id } }
+            if showEveryonePinch {
+                SectionLabel("Someone else to pinch-run")
+                Card {
+                    ForEach(Array(others.enumerated()), id: \.element.id) { i, player in
+                        if i > 0 { RowDivider() }
+                        PlayerChoiceRow(context: context, player: player.id, detail: "Your call", look: look,
+                                        isSelected: pick == .pinchRunner(player.id)) { pick = .pinchRunner(player.id) }
+                    }
+                }
+            } else if !others.isEmpty {
+                SomeoneElseButton { showEveryonePinch = true }
             }
         }
 

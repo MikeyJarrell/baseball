@@ -4,7 +4,9 @@
 //   One tap confirms nobody moved; tapping a position swaps in another player. The app can
 //   hand in a suggested defense, such as two players who alternate at first base by inning:
 //   the sheet starts from the suggestion, marks each position that differs from now ("Ruiz at
-//   first base · alternating"), and one tap on the big button records the change.
+//   first base · alternating"), and one tap on the big button records the change. The plan
+//   carries its team and is used only on that team's defense check, laid over the fielders on
+//   the field now, so a position the plan leaves out keeps its player.
 // - Fielders (from the changes menu): the same list, for moving players between positions and
 //   bringing players in from the bench, saved as one batch.
 //
@@ -15,21 +17,6 @@ import SwiftUI
 import Model
 import SampleData
 import DesignSystem
-
-/// A defense to start the check from instead of the one on the field now, with a reason for
-/// each position that differs. Built by the app from the game's plan (two players alternating
-/// at one position by inning, for example); this sheet only shows it.
-public struct DefenseSuggestion: Equatable, Sendable {
-    /// Who should be at each position this half-inning.
-    public var fielders: [FielderAssignment]
-    /// Why a position differs from now, shown beside it: "alternating".
-    public var reasons: [Position: String]
-
-    public init(fielders: [FielderAssignment], reasons: [Position: String] = [:]) {
-        self.fielders = fielders
-        self.reasons = reasons
-    }
-}
 
 /// The nine positions, to confirm or change. Hands back `defenseConfirmed`, a substitution with
 /// the fielding changes, or `.cancel`.
@@ -57,7 +44,8 @@ public struct DefenseSheet: View {
     ///   - context: The game's setup and the situation now.
     ///   - purpose: `.check` when our team takes the field, `.changes` from the changes menu.
     ///   - side: The team. Leave it out for our team on a check, or the fielding team for changes.
-    ///   - suggestion: A defense to start from instead of the one on the field, with reasons.
+    ///   - suggestion: A planned defense to lay over the one on the field, with reasons. Used only
+    ///     when it is for this team and `purpose` is `.check`.
     ///   - onFinish: Called once with the event to record, or `.cancel` ("Later").
     public init(context: GameChangeContext, purpose: Purpose = .check, side: TeamSide? = nil,
                 suggestion: DefenseSuggestion? = nil, onFinish: @escaping (GameChangeResult) -> Void) {
@@ -67,23 +55,24 @@ public struct DefenseSheet: View {
         self.onFinish = onFinish
         let team = side ?? (purpose == .check ? context.ourSide : nil) ?? context.situation.fieldingSide
         _side = State(initialValue: team)
-        _draft = State(initialValue: Self.startingDraft(context: context, side: team, suggestion: suggestion))
+        _draft = State(initialValue: DefenseBuilder.startingDraft(
+            current: context.state(team).fielders, plan: suggestion, side: team, isCheck: purpose == .check))
     }
 
-    /// The defense the sheet opens with: the suggestion if there is one, else the field as it is.
-    private static func startingDraft(context: GameChangeContext, side: TeamSide, suggestion: DefenseSuggestion?) -> [Position: PlayerID] {
-        let fielders = suggestion?.fielders ?? context.state(side).fielders
-        return Dictionary(fielders.map { ($0.position, $0.player) }, uniquingKeysWith: { first, _ in first })
+    /// The plan, when it applies to this sheet: that team's defense check only.
+    private var plan: DefenseSuggestion? {
+        guard purpose == .check, let suggestion, suggestion.team == side else { return nil }
+        return suggestion
     }
 
     /// Who is at each position now, as the situation has it.
     private var current: [Position: PlayerID] {
-        Dictionary(context.state(side).fielders.map { ($0.position, $0.player) }, uniquingKeysWith: { first, _ in first })
+        DefenseBuilder.lineup(context.state(side).fielders)
     }
 
     /// Positions where the sheet differs from the field now.
     private var changedPositions: [Position] {
-        Position.allCases.filter { draft[$0] != current[$0] }
+        DefenseBuilder.changedPositions(current: current, draft: draft)
     }
 
     private var look: TeamLook { context.look(side) }
@@ -98,7 +87,7 @@ public struct DefenseSheet: View {
                                 selection: Binding(get: { side }, set: { switchTeam(to: $0) }))
                     .padding(.bottom, Spacing.medium)
             }
-            if let suggestion, !suggestion.reasons.isEmpty, !changedPositions.isEmpty, purpose == .check {
+            if let plan, !plan.reasons.isEmpty, !changedPositions.isEmpty {
                 InfoBox(Text("Set up from the plan for this inning. Check the marked positions, then save."))
             }
             Card {
@@ -130,7 +119,7 @@ public struct DefenseSheet: View {
         let changed = draft[position] != current[position]
         var detail = positionTitle(position)
         if changed {
-            if let reason = suggestion?.reasons[position], draft[position] == suggestedPlayer(at: position) {
+            if let reason = plan?.reasons[position], draft[position] == suggestedPlayer(at: position) {
                 detail += " · \(reason)"
             } else {
                 detail += " · changed"
@@ -150,7 +139,7 @@ public struct DefenseSheet: View {
 
     /// The suggestion's player at a position, if any.
     private func suggestedPlayer(at position: Position) -> PlayerID? {
-        suggestion?.fielders.first { $0.position == position }?.player
+        plan?.fielders.first { $0.position == position }?.player
     }
 
     /// The chips for choosing who plays a position: everyone on the roster except the player
@@ -186,14 +175,9 @@ public struct DefenseSheet: View {
         .background(ScorebookColor.surfaceSecondary)
     }
 
-    /// Puts a player at a position on the sheet. Someone already in the field swaps with the
-    /// player who was there; someone coming in from the bench sends that player off the field.
+    /// Puts a player at a position on the sheet (see `DefenseBuilder.put`).
     private func put(_ player: PlayerID?, at position: Position) {
-        let previous = draft[position]
-        if let player, let from = draft.first(where: { $0.value == player })?.key {
-            draft[from] = previous
-        }
-        draft[position] = player
+        DefenseBuilder.put(player, at: position, in: &draft)
         openPosition = nil
     }
 
@@ -201,7 +185,7 @@ public struct DefenseSheet: View {
     private func switchTeam(to newSide: TeamSide?) {
         guard let newSide, newSide != side else { return }
         side = newSide
-        draft = Self.startingDraft(context: context, side: newSide, suggestion: nil)
+        draft = DefenseBuilder.lineup(context.state(newSide).fielders)
         openPosition = nil
     }
 
@@ -227,18 +211,9 @@ public struct DefenseSheet: View {
         }
     }
 
-    /// Hands back one substitution with every position that changed. A player moved off the
-    /// field with nobody taking their position, and not playing anywhere else, leaves the field.
+    /// Hands back one substitution with every position that changed (see `DefenseBuilder.substitution`).
     private func saveChanges() {
-        let assignments = changedPositions.compactMap { position in
-            draft[position].map { FielderAssignment(position: position, player: $0) }
-        }
-        let stillFielding = Set(draft.values)
-        let leaving = changedPositions.compactMap { position -> PlayerID? in
-            guard draft[position] == nil, let old = current[position], !stillFielding.contains(old) else { return nil }
-            return old
-        }
-        let change = Substitution(team: side, defense: assignments, leavesField: leaving)
+        guard let change = DefenseBuilder.substitution(team: side, current: current, draft: draft) else { return }
         onFinish(.record(EnteredEvent(event: GameEvent(kind: .substitution(change)))))
     }
 }

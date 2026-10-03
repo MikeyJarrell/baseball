@@ -184,6 +184,10 @@ struct RunnerActionConfirmPage: View {
     @State private var moves: [RunnerMove]
     /// The runner whose out the fielder taps go to.
     @State private var activeRunner: PlayerID?
+    /// True once the scorer has said there was an error on the play.
+    @State private var hasError: Bool
+    /// True while fielder taps go to the error instead of to an out.
+    @State private var tappingError: Bool
     @State private var errorFielder: Position?
     @State private var errorType: ErrorType?
 
@@ -202,6 +206,9 @@ struct RunnerActionConfirmPage: View {
         for i in start.indices { start[i].reason = reason }
         _moves = State(initialValue: start.sorted { $0.from > $1.from })
         _activeRunner = State(initialValue: start.first { $0.to == .out }?.runner)
+        // "Advanced on error" always has an error; any other action can add one.
+        _hasError = State(initialValue: reason == .advanceOnError)
+        _tappingError = State(initialValue: reason == .advanceOnError)
     }
 
     var body: some View {
@@ -228,24 +235,40 @@ struct RunnerActionConfirmPage: View {
                 runnerCard(i)
             }
 
-            if reason == .advanceOnError {
-                SectionLabel("Error")
+            SectionLabel("Error")
+            if hasError {
                 Card {
                     HStack {
                         Text(errorFielder.map { "E\($0.number), \($0.name)" } ?? "Tap the fielder on the drawing")
                             .font(ScorebookFont.headline)
                             .foregroundStyle(errorFielder == nil ? ScorebookColor.textSecondary : ScorebookColor.out)
                         Spacer()
+                        if !tappingError {
+                            Button("Change") { tappingError = true }
+                                .buttonStyle(ChipStyle(isOn: false))
+                        }
+                        if reason != .advanceOnError {
+                            Button("Remove") { removeError() }
+                                .buttonStyle(ChipStyle(isOn: false))
+                        }
                     }
                     .padding(.horizontal, Spacing.large - 2)
                     .frame(minHeight: 52)
                 }
                 SegmentedChoice(options: [(ErrorType.fielding, "Fielding"), (.throwing, "Throwing")], selection: $errorType)
                     .padding(.top, Spacing.small)
+            } else {
+                Card {
+                    OptionRow(title: "Add an error", detail: "Such as the catcher throwing the ball away on a steal",
+                              end: .chevron, action: { hasError = true; tappingError = true }) {
+                        IconBadge(systemName: "exclamationmark.circle", tint: ScorebookColor.out)
+                    }
+                }
             }
         } footer: {
-            Button("Save", action: save)
+            Button(saveTitle, action: save)
                 .buttonStyle(PrimaryButtonStyle())
+                .disabled(builtAction == nil)
         }
     }
 
@@ -263,7 +286,7 @@ struct RunnerActionConfirmPage: View {
     }
 
     private var drawingHint: String {
-        if reason == .advanceOnError { return "Tap the fielder who made the error." }
+        if tappingError { return "Tap the fielder who made the error." }
         if let active = activeMove { return "Tap the fielders who put \(context.shortName(active.runner)) out, in order." }
         return "Tap a runner’s bases below to change where they ended up."
     }
@@ -294,7 +317,7 @@ struct RunnerActionConfirmPage: View {
                         .font(ScorebookFont.notation)
                     Spacer()
                     if activeRunner != move.runner {
-                        Button("Tap fielders") { activeRunner = move.runner }
+                        Button("Tap fielders") { activeRunner = move.runner; tappingError = false }
                             .buttonStyle(ChipStyle(isOn: false))
                     } else if !move.outBy.isEmpty {
                         Button("Clear") { moves[i].outBy = [] }
@@ -326,9 +349,10 @@ struct RunnerActionConfirmPage: View {
         moves[i].to = end
         if end == .out {
             if moves[i].outAt == nil {
-                moves[i].outAt = Base.allCases.first { $0.order == (moves[i].from.order + 1) % 4 }
+                moves[i].outAt = RunnerActionBuilder.defaultOutBase(for: reason, from: moves[i].from)
             }
             activeRunner = moves[i].runner
+            tappingError = false
         } else {
             moves[i].outBy = []
             moves[i].outAt = nil
@@ -341,8 +365,10 @@ struct RunnerActionConfirmPage: View {
     private func tapped(_ tap: FieldTap) {
         switch tap {
         case .position(let position):
-            if reason == .advanceOnError {
-                errorFielder = errorFielder == position ? nil : position
+            if tappingError {
+                errorFielder = position
+                // Once the error is placed, further taps go back to any out.
+                tappingError = false
             } else if let i = moves.firstIndex(where: { $0.runner == activeRunner && $0.to == .out }) {
                 // Tapping the last fielder again takes them back off, as in the in-play sequence.
                 if moves[i].outBy.last == position { moves[i].outBy.removeLast() } else { moves[i].outBy.append(position) }
@@ -354,17 +380,34 @@ struct RunnerActionConfirmPage: View {
         }
     }
 
-    /// Builds the runner action and hands it back.
+    /// The error entered, if any.
+    private var errors: [ErrorCharge] {
+        guard hasError, let errorFielder else { return [] }
+        return [ErrorCharge(fielder: errorFielder, type: errorType)]
+    }
+
+    /// The event as it stands (see `RunnerActionBuilder.action`): nothing when no runner moved.
+    private var builtAction: RunnerAction? {
+        RunnerActionBuilder.action(moves: moves, picked: reason, errors: errors)
+    }
+
+    /// "Save", or "Save without fielders" when an out or the error has nobody tapped.
+    private var saveTitle: String {
+        let missing = RunnerActionBuilder.outsMissingFielders(moves) || (hasError && errorFielder == nil)
+        return missing ? "Save without fielders" : "Save"
+    }
+
+    /// Takes the error back off.
+    private func removeError() {
+        hasError = false
+        tappingError = false
+        errorFielder = nil
+        errorType = nil
+    }
+
+    /// Hands back the runner action.
     private func save() {
-        var final = moves
-        var errors: [ErrorCharge] = []
-        if reason == .advanceOnError, let errorFielder {
-            errors = [ErrorCharge(fielder: errorFielder, type: errorType)]
-            for i in final.indices where final[i].to != .out && final[i].to != .safe(at: final[i].from) {
-                final[i].advancedOnError = true
-            }
-        }
-        let action = RunnerAction(moves: final, errors: errors)
+        guard let action = builtAction else { return }
         onFinish(.record(EnteredEvent(event: GameEvent(kind: .runnerAction(action)))))
     }
 }
