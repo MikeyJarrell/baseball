@@ -573,7 +573,7 @@ input[type=range]{width:100%;accent-color:var(--us);height:32px}
 .news{background:var(--paper);color:var(--paper-ink);font-family:var(--serif);padding:16px 14px 14px;border-radius:3px;box-shadow:0 2px 10px rgba(0,0,0,.18);font-size:12.5px;line-height:1.28;
   background-image:radial-gradient(rgba(0,0,0,.035) 1px,transparent 1px);background-size:3px 3px}
 .news .kick{text-align:center;font-size:10.5px;letter-spacing:.18em;text-transform:uppercase}
-.news .head{text-align:center;font-weight:800;font-size:23px;letter-spacing:-.01em;margin:3px 0 6px;line-height:1.05}
+.news .head{text-align:center;font-weight:800;font-size:20px;letter-spacing:-.01em;margin:3px 0 6px;line-height:1.05}
 .news .rule2{border-top:3px double var(--paper-ink);margin:6px 0}
 .news .rule{border-top:1px solid var(--paper-ink);margin:5px 0}
 .news .ln{display:grid;grid-template-columns:1fr repeat(4,24px);font-variant-numeric:tabular-nums}
@@ -747,12 +747,12 @@ function todayStr(p){ const t=todayList(p); return t.length ? t.map(fmtNote).joi
 const PITCH0 = {us:{name:'Fischer',n:31,hand:'R',p:48,st:31}, them:{name:'Morales',n:21,hand:'L',p:54,st:33}};
 // Clock times are minutes after midnight
 const fmtClock = m => { const h=Math.floor(m/60)%24, mm=String(m%60).padStart(2,'0'); return `${h%12||12}:${mm} ${h<12?'AM':'PM'}`; };
-const fmtLeft = m => m<=0 ? 'time’s up' : `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')} left`;
+const fmtLeft = m => m<=0 ? 'past the time limit' : `${Math.floor(m/60)}:${String(m%60).padStart(2,'0')} left`;
 function preset(k){
   resetRosters();
   // outsHist lists who made each out today, oldest first (the runner for a non-runner comes from it)
   const s = {inning:3,half:'bot',score:{us:4,them:2},outs:1,b:0,s:0,bases:{1:null,2:null,3:null},idx:{us:2,them:5},pit:clone(PITCH0),
-    nowMin:10*60+55, limitMin:12*60+7, started:true, alert:null, outsHist:['ortiz','hart','whit','brooks','price','brooks','ortiz'], today:clone(TODAY0), banner:null, k3:null};
+    nowMin:10*60+55, limitMin:12*60+7, started:true, alert:null, asked:{}, outsHist:['ortiz','hart','whit','brooks','price','brooks','ortiz'], today:clone(TODAY0), banner:null, k3:null};
   const R = id => clone(findP(id));
   switch(k){
     case 'ours': s.b=1; s.s=1; s.bases[2]=R('diaz'); break;
@@ -768,7 +768,7 @@ function preset(k){
     case 'start': s.inning=1; s.half='top'; s.outs=0; s.score={us:0,them:0}; s.idx={us:0,them:0}; s.nowMin=9*60+4; s.limitMin=12*60; s.started=false; s.outsHist=[]; s.today={};
       s.pit={us:{name:'Fischer',n:31,hand:'R',p:0,st:0},them:{name:'Morales',n:21,hand:'L',p:0,st:0}}; s.banner={t:'Play ball',sc:'Mudcats lead off',def:true}; break;
     case 'timeup': s.inning=8; s.half='top'; s.outs=1; s.score={us:7,them:5}; s.idx.them=4; s.nowMin=12*60+9; s.alert='time'; s.pit.us={name:'Wallace',n:15,hand:'L',p:22,st:15}; break;
-    case 'over': s.inning=8; s.half='bot'; s.outs=0; s.score={us:7,them:5}; s.idx.us=5; s.nowMin=12*60+16; s.alert='over'; break;
+    case 'over': s.inning=8; s.half='bot'; s.outs=0; s.score={us:7,them:5}; s.idx.us=5; s.nowMin=12*60+16; s.banner={t:'Middle 8th',sc:'Diamond Dogs 7, Mudcats 5',def:false}; break;
     case 'mercy': s.inning=8; s.half='top'; s.outs=0; s.score={us:14,them:2}; s.idx.them=2; s.nowMin=11*60+40; s.banner={t:'End 7th',sc:'Diamond Dogs 14, Mudcats 2',def:true}; break;
     case 'phre': { // Wallace pinch-hit for Hartley in the 2nd and has batted, so Hartley can come back in that spot
       s.idx.us=3; s.bases[2]=R('diaz'); const w=findP('wall'), h=findP('hart'); OURS[3]=w; w.pos=7; h.pos=null; h.outOfGame=true; h.spot=3; s.today.wall=['F9']; break; }
@@ -876,7 +876,6 @@ function describe(){
 }
 // On a hit, any runner who ends up past where the hit alone would carry them got there on the throw or on an error
 const extraBase = x => HITS[P.result] && typeof x.to==='number' && typeof x.sugg==='number' && x.to > x.sugg;
-const needsHow = () => (P.out||[]).some(x => extraBase(x) && (!x.how || (x.how==='error' && !x.errBy)));
 const needRunners = () => [1,2,3].some(i=>S.bases[i]) || ['E','FC','CI','K3safe'].includes(P.result);
 
 // ---------- Recording events (each one can be undone in one tap) ----------
@@ -904,15 +903,16 @@ function endHalf(){
   S.outs=0; S.b=0; S.s=0; S.k3=null; S.bases={1:null,2:null,3:null};
   S.banner = {t:(wasBot?'End ':'Middle ')+ord(inn), sc:`Diamond Dogs ${S.score.us}, Mudcats ${S.score.them}`, def:wasBot};
   if(wasBot){ sheet='defense'; ui.def=null; ui.defOpen=null; ui.defChanged={}; }
+  // The app never ends a game by itself: it asks once per reason, and "Keep playing" means play on.
   // Time limit (rule 9.1 G): the inning in progress finishes; we are home, so we skip our half if ahead
-  if(S.alert==='time' && (wasBot || S.score.us>S.score.them)){ S.alert='over'; sheet=null; }
+  if(S.alert==='time' && (wasBot || S.score.us>S.score.them)){ S.alert=null; if(!S.asked.time){ sheet='gameover'; ui.overWhy='time'; } }
   // Mercy rule (rule 9.13): 12 runs after seven, or after six and a half with us (home) ahead
   const lead=S.score.us-S.score.them;
-  if(S.alert!=='over' && inn>=7 && ((wasBot && Math.abs(lead)>=12) || (!wasBot && lead>=12))) sheet='mercy';
+  if(sheet!=='gameover' && !S.asked.mercy && inn>=7 && ((wasBot && Math.abs(lead)>=12) || (!wasBot && lead>=12))){ sheet='gameover'; ui.overWhy='mercy'; }
 }
 function checkNR(){
   if(batTeam()!=='us') return;
-  for(const i of [1,2,3]) if(S.bases[i] && S.bases[i].nr){ sheet='nr'; ui.nrBase=i; ui.nrPick=null; ui.nrMore=false; return; }
+  for(const i of [1,2,3]) if(S.bases[i] && S.bases[i].nr){ sheet='nr'; ui.nrBase=i; ui.nrPick=null; ui.nrMore=false; ui.nrAny=false; return; }
 }
 function savePlay(){
   const o = P.out || suggest(), note = notation(), say = describe(), team = batTeam(), bat = batter();
@@ -1096,7 +1096,7 @@ SCREENS.songs = () => {
     <div class="info">Walk-up songs play when our hitter comes up. A pitcher’s warm-up song plays at the changeover when we take the field.</div>
     <div class="card">${Object.keys(SONGS).map(id=>{ const s=SONGS[id], w=who(id,'song'), wu=who(id,'warm'); return `<button class="row" data-a="openSong" data-v="${id}">
       <span class="num" style="background:var(--surface2);color:var(--us-text);box-shadow:none">${ic('play',16)}</span>
-      <div class="grow"><div class="t1">${esc(s[0])}</div><div class="t2">${esc(s[1])} · starts ${fmtT(s[2])}${w?` · <b style="color:var(--ink2)">walk-up: ${esc(w)}</b>`:''}${wu?` · <b style="color:var(--ink2)">warm-up: ${esc(wu)}</b>`:''}${!w&&!wu?' · unassigned':''}</div></div>
+      <div class="grow"><div class="t1">${esc(s[0])}</div><div class="t2" style="white-space:normal">${esc(s[1])} · starts ${fmtT(s[2])}${w?` · <b style="color:var(--ink2)">walk-up: ${esc(w)}</b>`:''}${wu?` · <b style="color:var(--ink2)">warm-up: ${esc(wu)}</b>`:''}${!w&&!wu?' · unassigned':''}</div></div>
       <span class="chev">${ic('chevr',18)}</span></button>`; }).join('')}</div>
   </div></div>`;
 };
@@ -1229,7 +1229,6 @@ function songSpot(compact){
 }
 function alertHTML(){
   if(S.alert==='time') return `<div class="cobanner alert"><div class="cb-t"><b>Time’s up — finish this inning</b><span>No new inning after ${fmtClock(S.limitMin)}</span></div></div>`;
-  if(S.alert==='over') return `<div class="cobanner alert"><div class="cb-t"><b>Game over on time</b><span>Diamond Dogs ${S.score.us}, Mudcats ${S.score.them}</span></div><button data-a="endGame">End game</button></div>`;
   return '';
 }
 function bannerHTML(){
@@ -1247,7 +1246,7 @@ function batA(){
   <div class="band">
     <div class="band-row">
       <button class="icbtn" data-a="sheet" data-v="menu" aria-label="Game menu">${ic('menu')}</button>
-      <div class="band-title">${us?'Diamond Dogs':'Mudcats'}<span> batting</span><button class="limitbtn" data-a="sheet" data-v="limit">${ic('clock',12)} Limit ${fmtClock(S.limitMin)} · ${fmtLeft(S.limitMin-S.nowMin)}</button></div>
+      <div class="band-title">${us?'Diamond Dogs':'Mudcats'}<span> batting</span><button class="limitbtn" data-a="sheet" data-v="limit">${ic('clock',12)} ${S.limitMin>S.nowMin?`Limit ${fmtClock(S.limitMin)} · ${fmtLeft(S.limitMin-S.nowMin)}`:`Past the limit (${fmtClock(S.limitMin)})`}</button></div>
       <button class="bandbtn" data-go="overview">Box score${ic('chevr',15)}</button>
     </div>
     <div class="board">
@@ -1381,7 +1380,7 @@ SCREENS['play-runners'] = () => {
   <div class="runfield">${field({mode:'runners',out:o,team:batTeam(),fly:isFly})}</div>
   <div style="font-size:12.5px;color:var(--ink3);padding:0 14px 2px">Dot = the app’s guess. Tap any base to change it.</div>
   <div class="rrows">${rows}</div>
-  <div class="bottombar"><div class="sum"><b>${total>=3?'Three outs':`${Math.min(total,3)} out${total===1?'':'s'} after this`}</b>${total>=3?'Saving switches sides':'Then the next batter is up'}</div><button class="btn pri" data-a="save" data-k="save" ${needsHow()?'disabled':''}>${ic('check',20)} Save</button></div></div>`;
+  <div class="bottombar"><div class="sum"><b>${total>=3?'Three outs':`${Math.min(total,3)} out${total===1?'':'s'} after this`}</b>${total>=3?'Saving switches sides':'Then the next batter is up'}</div><button class="btn pri" data-a="save" data-k="save">${ic('check',20)} Save</button></div></div>`;
 };
 SCREENS['play-k3'] = () => `<div class="screen">${flowHead('Dropped 3rd strike')}${ctxStrip(2,3)}
   <div class="k3opts">
@@ -1535,7 +1534,9 @@ SHEETS.ph = () => {
   const opt = q => `<button class="opt ${ui.phPick===q.id?'on':''}" data-a="phPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${q.outOfGame?'Started in this spot':'Bench'} · bats ${q.bats}</div></div><span class="radio">${ui.phPick===q.id?ic('check',16):''}</span></button>`;
   return sheetWrap('Pinch hitter', `<div class="info">Batting for <b>${esc(p.name)}</b>, ${ord(spot+1)} in the order.</div>
     ${re.length?`<div class="sec">Can re-enter</div><div class="card">${re.map(opt).join('')}</div>`:''}
-    <div class="sec">Bench</div><div class="card">${bench().map(opt).join('')||'<div class="empty">Nobody on the bench.</div>'}</div>`,
+    <div class="sec">Bench</div><div class="card">${bench().map(opt).join('')||'<div class="empty">Nobody on the bench.</div>'}</div>
+    ${ui.phAny?`<div class="sec">Someone else</div><div class="card">${roster().filter(q=>q.id!==p.id && !re.includes(q) && !bench().includes(q)).map(q=>`<button class="opt ${ui.phPick===q.id?'on':''}" data-a="phPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${OURS.includes(q)?'Already batting '+ord(OURS.indexOf(q)+1):q.gone?'Substitute already removed (rule 9.6 B)':q.outOfGame?'Started in another spot':'Fielding only'} · your call</div></div><span class="radio">${ui.phPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>`
+      :`<button class="btn out" style="margin-top:10px;min-height:44px;font-size:15px" data-a="phAny">Someone else</button>`}`,
     {foot:`<button class="btn pri" data-a="doPH" ${ui.phPick?'':'disabled'}>${ui.phPick?esc(findP(ui.phPick).short)+' bats':'Pick a hitter'}</button>`});
 };
 SHEETS.pr = () => {
@@ -1565,9 +1566,11 @@ SHEETS.nr = () => {
   return sheetWrap(`Who runs for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. Pick before the next pitch.</div>
     <div class="card">${opt(sg.p.id,'nr-last',sg.p.n,esc(sg.p.name),sg.why)}${opt('self','nr-self',r.n,esc(r.short)+' runs','Nobody replaces them')}
       <button class="opt ${ui.nrMore?'on':''}" data-a="nrMore" data-k="nr-pr"><span class="oic">${ic('run')}</span><div class="grow"><div class="t1">Pinch runner instead</div><div class="t2">${esc(r.short)} leaves the batting order</div></div>${ic(ui.nrMore?'x':'chevr',18)}</button></div>
+    ${ui.nrAny?`<div class="sec">Someone else</div><div class="card">${roster().filter(q=>q.id!==r.id&&q.id!==sg.p.id&&q.id!==batter().id).map(q=>opt(q.id,'nr-'+q.id,q.n,esc(q.name),'Your call')).join('')}</div>`
+      :`<button class="btn out" style="margin-top:10px;min-height:44px;font-size:15px" data-a="nrAny">Someone else</button>`}
     ${ui.nrMore?`<div class="sec">Pinch runner</div><div class="card">${bench().map(q=>opt('pr:'+q.id,'nr-pr-'+q.id,q.n,esc(q.name),'Bench')).join('')||'<div class="empty">Nobody on the bench.</div>'}</div>`:''}
     <div style="font-size:13px;color:var(--ink3);margin:10px 4px">With the suggested runner, ${esc(r.short)} stays in the batting order, and if the runner scores, the run is ${esc(r.short)}’s.</div>`,
-    {foot:`<button class="btn pri" data-a="doNR" data-k="nr-ok" ${pick?'':'disabled'}>${label}</button>`, modal:true, noCancel:true, sub:'Asked when they reach base'});
+    {foot:`<button class="btn pri" data-a="doNR" data-k="nr-ok" ${pick?'':'disabled'}>${label}</button>`, left:'Later', sub:'A suggestion, by rule 9.11'});
 };
 SHEETS.add = () => {
   const len=OURS.length, i=S.idx.us%len, until=len-i;
@@ -1580,8 +1583,13 @@ SHEETS.limit = () => sheetWrap('Time limit', `<div style="text-align:center;font
   <div style="text-align:center;color:var(--ink3);margin-bottom:12px">${fmtLeft(S.limitMin-S.nowMin)} · now ${fmtClock(S.nowMin)}</div>
   <div class="nudges"><button data-a="limitAdj" data-v="-5">−5 min</button><button data-a="limitAdj" data-v="-1">−1 min</button><button data-a="limitAdj" data-v="1">+1 min</button><button data-a="limitAdj" data-v="5">+5 min</button></div>
   <div class="info">No new inning starts after this time (rule 9.1 G). The app set it to three hours after the first pitch; match it to the plate umpire, who keeps the official time.</div>`, {left:'Done'});
-SHEETS.mercy = () => sheetWrap('Mercy rule', `<div class="info" style="font-size:16px"><b>Diamond Dogs ${S.score.us}, Mudcats ${S.score.them}</b> after seven innings. A 12-run lead ends the game (rule 9.13).</div>`,
-  {foot:`<button class="btn us" data-a="endGame">End game</button><button class="btn sec2" style="margin-top:8px" data-a="closeSheet">Keep playing</button>`, modal:true, noCancel:true});
+SHEETS.gameover = () => {
+  const why = ui.overWhy==='mercy'
+    ? `A 12-run lead after seven innings ends the game under the mercy rule (rule 9.13).`
+    : `The time limit, ${fmtClock(S.limitMin)}, has passed and the inning is over. No new inning starts after the limit (rule 9.1 G).`;
+  return sheetWrap('Is the game over?', `<div style="text-align:center;font-size:20px;font-weight:800;margin:4px 0 10px">Diamond Dogs ${S.score.us}, Mudcats ${S.score.them}</div><div class="info">${why} The umpire makes the call; the app only asks.</div>`,
+    {foot:`<button class="btn us" data-a="endGame">End game</button><button class="btn sec2" style="margin-top:8px" data-a="keepPlaying">Keep playing</button>`, modal:true, noCancel:true});
+};
 function defaultDefense(){ const d={}; roster().forEach(p=>{ if(typeof p.pos==='number' && !p.gone && !p.outOfGame) d[p.pos]=p.id; }); return d; }
 SHEETS.defense = () => {
   if(!ui.def) ui.def=defaultDefense();
@@ -1589,7 +1597,7 @@ SHEETS.defense = () => {
   const rows=[1,2,3,4,5,6,7,8,9].map(pos=>{ const p=findP(ui.def[pos]);
     return `<button class="opt ${ui.defChanged[pos]?'changed':''}" data-a="defOpen" data-v="${pos}"><span class="posnum">${pos}</span><div class="grow"><div class="t1">${esc(p.name)}</div><div class="t2">${POSLONG[pos]}${ui.defChanged[pos]?' · changed':''}</div></div>${ic(ui.defOpen==pos?'x':'swap',18)}</button>
     ${ui.defOpen==pos?`<div class="picker">${roster().filter(q=>q.id!==p.id&&!q.gone&&!q.outOfGame).map(q=>`<button class="chipbtn" data-a="defSet" data-v="${pos}:${q.id}">${esc(q.short)}${Object.entries(ui.def).find(([k,v])=>v===q.id)?` <span style="opacity:.6">${POSN[Object.entries(ui.def).find(([k,v])=>v===q.id)[0]]}</span>`:''}</button>`).join('')}</div>`:''}`; }).join('');
-  return sheetWrap('Take the field', `<div class="card">${rows}</div>`, {sub:`${S.banner?S.banner.t+' · ':''}check who is where`, modal:true,
+  return sheetWrap('Take the field', `<div class="card">${rows}</div>`, {sub:`${S.banner?S.banner.t+' · ':''}check who is where`, left:'Later',
     foot:`<button class="btn ${changes?'pri':'us'}" data-a="defOk" data-k="def-ok">${ic('check',20)} ${changes?`Save ${changes} change${changes>1?'s':''}`:'Everyone’s where they were'}</button>`});
 };
 SHEETS.fielders = () => SHEETS.defense().replace('Take the field','Fielders');
@@ -1657,7 +1665,7 @@ ACT.songFor = v => { ui.pickFor=v; sheet='songpick'; };
 ACT.theirMode = v => ui.theirMode=v; ACT.theirN = v => ui.theirN=Math.max(1,ui.theirN+ +v);
 ACT.pickPitch = v => { const [t,id]=v.split(':'); ui.pickPitch[t]=id; };
 ACT.playball = () => { S=preset('start'); S.nowMin=ui.startMin+4; S.limitMin=ui.limitMin; route='bat'; sheet='defense'; };
-ACT.sheet = (v,el) => { if(v==='pitch'){ ui.pitchPick=null; } if(v==='nr'){ ui.nrBase=[1,2,3].find(i=>S&&S.bases[i]&&S.bases[i].nr)||1; ui.nrPick=null; ui.nrMore=false; } if(v==='add'){ ui.addPick=(roster().find(q=>!OURS.includes(q)&&!q.gone&&!q.outOfGame)||{id:'new'}).id; } if(v==='songpick'&&route==='bat') ui.pickFor='walk'; sheet=v; };
+ACT.sheet = (v,el) => { if(v==='pitch'){ ui.pitchPick=null; } if(v==='nr'){ ui.nrBase=[1,2,3].find(i=>S&&S.bases[i]&&S.bases[i].nr)||1; ui.nrPick=null; ui.nrMore=false; ui.nrAny=false; } if(v==='ph') ui.phAny=false; if(v==='add'){ ui.addPick=(roster().find(q=>!OURS.includes(q)&&!q.gone&&!q.outOfGame)||{id:'new'}).id; } if(v==='songpick'&&route==='bat') ui.pickFor='walk'; sheet=v; };
 ACT.closeSheet = () => { sheet=null; if(ui.rec==='rec') ACT.recToggle(); ui.rec='idle'; ui.recT=0; };
 // Pitches
 ACT.ball = () => { prePitch('ball'); pc(false); S.b++; if(S.b>=4) reach('BB','Walk'); };
@@ -1744,6 +1752,7 @@ ACT.doPitch = () => { const ft=fieldTeam(), id=ui.pitchPick; let name='New pitch
   if(ft==='us'){ const p=findP(id); name=p.short; hand=p.thr; } else if(id==='gar'){ name='Garza'; hand='R'; } else if(id==='sat'){ name='Sato'; hand='L'; } else name='#33';
   pushUndo('pitching change'); S.pit[ft]={name,hand,p:0,st:0}; sheet=null; toast(`${name} (${hand}) is pitching`); };
 ACT.phPick = v => ui.phPick=v;
+ACT.phAny = () => ui.phAny=true;
 // Substitutions: a starter who leaves can re-enter in their own spot (rule 9.9); a removed substitute cannot (rule 9.6 B)
 function takeOut(old, i){ if(old.starter){ old.outOfGame=true; old.spot=i; } else old.gone=true; }
 ACT.doPH = () => { const q=findP(ui.phPick), i=S.idx.us%OURS.length, old=OURS[i]; pushUndo('pinch hitter');
@@ -1754,6 +1763,7 @@ ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the
   const i=OURS.findIndex(x=>x.id===old.id); if(i>=0){ const real=OURS[i]; OURS[i]=q; takeOut(real,i); }
   S.bases[ui.prBase]=clone(q); sheet=null; ui.prPick=null; toast(`${q.short} pinch-runs for ${nm(old)}`); };
 ACT.nrPick = v => ui.nrPick=v;
+ACT.nrAny = () => ui.nrAny=true;
 ACT.nrMore = () => { ui.nrMore=!ui.nrMore; if(ui.nrPick&&ui.nrPick.startsWith('pr:')) ui.nrPick=null; };
 ACT.doNR = () => { const old=S.bases[ui.nrBase], v=ui.nrPick; sheet=null; ui.nrMore=false;
   if(v==='self'){ toast(`${old.short} runs`); return; }
@@ -1769,6 +1779,7 @@ ACT.defOk = () => { const n=Object.keys(ui.defChanged).length; sheet=null; ui.de
 ACT.bats = v => { batter().bats=v; };
 ACT.saveThem = () => { const p=batter(), n=$('#inNum'), nmEl=$('#inName'); if(n&&n.value) p.n=+n.value; if(nmEl) p.name=nmEl.value.trim()||null; sheet=null; toast('Saved to the Mudcats roster'); };
 ACT.endGame = () => { sheet=null; route='final'; };
+ACT.keepPlaying = () => { S.asked[ui.overWhy]=true; S.alert=null; sheet=null; toast('Playing on. The app won’t ask again for this.'); };
 ACT.pickSong = v => { const p = route==='bat' ? batter() : (findP(ui.player)||findP('kow')); p[ui.pickFor==='warm'?'warm':'song']=v; };
 let recTimer=null;
 ACT.recToggle = () => {
@@ -1790,7 +1801,7 @@ const INDEX = [
   ['Batting screen', [['Our hitter, with song','bat-a-ours'],['Their hitter','bat-a-theirs'],['Our hitter, no song','bat-a-nosong']]],
   ['In-play steps (jump straight in)', [['What happened','step-result'],['Fielders: 6-3','step-63'],['Fielders: 5-4-3 double play','step-dp'],['Where a single landed','step-where'],['Runners: single, runner on 2nd','step-runners'],['Single, extra base on an error','step-1be'],['Error by the shortstop','step-e6'],['Dropped third strike','step-k3']]],
   ['Changes', [['Changes menu','sheet-subs'],['Pitching change','sheet-pitch'],['Pinch hitter, with re-entry','sheet-phre'],['Pinch runner','sheet-pr'],['Non-runner prompt','sheet-nr'],['Add a hitter','sheet-add'],['Defense check','sheet-defense'],['Runner actions','sheet-runner'],['Game menu','sheet-menu'],['Changeover','changeover']]],
-  ['Time limit and mercy rule', [['Time limit','sheet-limit'],['Time’s up mid-inning','timeup'],['Game over on time','over'],['Mercy rule','mercy']]],
+  ['Time limit and mercy rule', [['Time limit','sheet-limit'],['Time’s up mid-inning','timeup'],['Is the game over? (time)','over'],['Is the game over? (mercy rule)','mercy']]],
   ['Layout B (not chosen)', [['Our hitter','bat-b-ours'],['Their hitter','bat-b-theirs']]],
   ['Game and season', [['Game overview','overview'],['Box so far','overview/box'],['Pitchers','overview/pitch'],['Play-by-play','overview/plays'],['End of game','final'],['Season stats','season'],['Games list','games']]],
 ];
@@ -1801,7 +1812,7 @@ function openHash(h){
   if((m=r.match(/^bat-(a|b)-(ours|theirs|nosong)$/))){ L=m[1]; S=preset(m[2]); route='bat'; taps=0; lastPA=null; }
   else if((m=r.match(/^walk-(\w+)$/)) && WALKS[m[1]]) startWalk(m[1]);
   else if(r==='changeover'){ S=preset('co'); route='bat'; sheet='defense'; }
-  else if(['timeup','over','mercy'].includes(r)){ S=preset(r); route='bat'; if(r==='mercy') sheet='mercy'; }
+  else if(['timeup','over','mercy'].includes(r)){ S=preset(r); route='bat'; if(r!=='timeup'){ sheet='gameover'; ui.overWhy = r==='mercy' ? 'mercy' : 'time'; } }
   else if(r.startsWith('step-')){
     const k=r.slice(5);
     const pre = {'1be':'we6',result:'w63','63':'w63',dp:'wdp',where:'w1b',runners:'w1b',e6:'we6',k3:'wk3'}[k]||'w63';
@@ -1841,7 +1852,7 @@ const NOTES = {
   'pg-theirs':`<p>Three ways in: their saved roster, numbers only, or unknown. Unknown still asks how many hitters they bat, so the order knows when to wrap.</p>`,
   'pg-pitchers':`<p>Ours lists the roster with whoever pitched most recently first. Theirs comes from the Mudcats’ saved roster, with the pitchers we have seen first, plus someone new.</p>`,
   'pg-review':`<p>One look at both lineups, including fielders who don’t bat. “Play ball” opens the batting screen and the defense check, since we are home and take the field first. The first pitch sets the time limit.</p>`,
-  'bat-a':`<p><b>The batting screen.</b> The situation sits in the band, powder blue for us and striped slate for them: the time limit as a clock time with the time left (tap to match the umpire), inning, score, a big count and the outs. Below it, the field with runners (tap one for steals, wild pitches and the like), the on-deck hitter and the pitcher.</p><p>The four count buttons fill the bottom half in a 2×2 block, each saying what it will do (“makes it 2–1”). Undo leads the chip row. Subs, beside the batter, opens every kind of change; Box score, top right, opens the game so far. The song button runs the full width of the bottom edge, so a thumb finds it without looking. At the changeover when we take the field, it plays our pitcher’s warm-up song instead.</p><p>When the time limit passes, a red banner says to finish the inning, then “Game over on time” offers End game. A 12-run lead after seven brings up the mercy rule.</p><p><b>8 taps</b> for four pitches and a 6-3: Ball, Strike, Foul, In play, Batter out, 6, 3, Save.</p>`,
+  'bat-a':`<p><b>The batting screen.</b> The situation sits in the band, powder blue for us and striped slate for them: the time limit as a clock time with the time left (tap to match the umpire), inning, score, a big count and the outs. Below it, the field with runners (tap one for steals, wild pitches and the like), the on-deck hitter and the pitcher.</p><p>The four count buttons fill the bottom half in a 2×2 block, each saying what it will do (“makes it 2–1”). Undo leads the chip row. Subs, beside the batter, opens every kind of change; Box score, top right, opens the game so far. The song button runs the full width of the bottom edge, so a thumb finds it without looking. At the changeover when we take the field, it plays our pitcher’s warm-up song instead.</p><p>When the time limit passes, a red banner says to finish the inning. When that inning ends, or a 12-run lead after seven triggers the mercy rule, the app asks “Is the game over?” once. It never ends the game by itself; “Keep playing” carries on, and the clock just reads “past the time limit.”</p><p><b>8 taps</b> for four pitches and a 6-3: Ball, Strike, Foul, In play, Batter out, 6, 3, Save.</p>`,
   'bat-b':`<p><b>Layout B, big buttons.</b> The situation is squeezed into a TV-style score bug, which frees room for bigger buttons. The batter gets a full-width color block: red for us, striped slate for them.</p><p>“In play” is split into <b>Out</b> and <b>Safe or hit</b>, which saves one tap on every ball in play. Undo and the song button own the two bottom corners.</p><p><b>7 taps</b> for four pitches and a 6-3: Ball, Strike, Foul, Out, 6, 3, Save.</p>`,
   'play-result':`<p>Step one: what happened to the batter. “Batter out” is the big one; fielder’s choice means the batter is safe and someone else is out. “More” holds sacrifices, dropped third strike and catcher’s interference.</p>`,
   'play-fielders':`<p>Tap fielders in the order they touched the ball; the notation builds as you go and the throw is drawn. Tap the last fielder again (or the arrow) to take it back.</p><p>The kind of ball is guessed: one outfielder is a fly ball, a throw is a grounder. The dashed chip shows a guess; tap another to change it.</p><p>With nobody on, Save is right here. With runners on, the next step confirms where they went.</p>`,
