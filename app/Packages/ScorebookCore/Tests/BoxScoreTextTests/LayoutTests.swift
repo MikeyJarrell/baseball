@@ -39,6 +39,20 @@ struct ShortNameTests {
         #expect(names.name(for: "e", fallback: "") == "Unknown player")
     }
 
+    @Test("A last name of more than one word is kept whole: De La Cruz, Van Buren, St. Clair")
+    func multiWordLastNames() {
+        let names = ShortNames(fullNames: [
+            ("a", "Elly De La Cruz"), ("b", "Martin Van Buren"), ("c", "Pat St. Clair"),
+            ("d", "Ana de la Cruz"), ("e", "Van Smith"),
+        ])
+        #expect(names.name(for: "a", fallback: "") == "E. De La Cruz")
+        #expect(names.name(for: "d", fallback: "") == "A. de la Cruz")
+        #expect(names.name(for: "b", fallback: "") == "Van Buren")
+        #expect(names.name(for: "c", fallback: "") == "St. Clair")
+        // "Van" here is a first name, so only "Smith" is the last name.
+        #expect(names.name(for: "e", fallback: "") == "Smith")
+    }
+
     @Test("A shared last name across the two teams gets initials in the batting lines and the notes")
     func sharedAcrossTeams() {
         var box = SampleGame.boxScore
@@ -125,8 +139,8 @@ struct LineScoreTests {
         box.away.runs = 14
         box.home.runs = 13
         let text = BoxScorePrinter.text(box, timeZone: pacific)
-        #expect(text.contains("Mudcats      010 00(12) 000 1 — 14  7  1"))
-        #expect(text.contains("Diamond Dogs 200 30   0 422 x — 13  9  1"))
+        #expect(text.contains("Mudcats      010 00(12) 000 1  — 14  7  1"))
+        #expect(text.contains("Diamond Dogs 200 30   0 422 x  — 13  9  1"))
         #expect(text.hasPrefix("Saturday, May 2\nMudcats 14, Diamond Dogs 13"))
     }
 
@@ -166,6 +180,20 @@ struct NotesTests {
                                                TeamTally(team: .home, name: "Diamond Dogs", count: 3)])
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).notes
         #expect(notes == ["LOB—Mudcats 0, Diamond Dogs 3."])
+    }
+
+    @Test("A pitcher whose pitches were not counted is still listed, with a dash")
+    func uncountedPitcher() {
+        var box = SampleGame.boxScore
+        box.home.pitching[1].stats.pitches = 0
+        box.home.pitching[1].stats.strikes = 0
+        let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
+        #expect(notes.last == "Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss —.")
+
+        // With no pitches counted for anybody, the note is left out.
+        for i in box.away.pitching.indices { box.away.pitching[i].stats.pitches = 0 }
+        for i in box.home.pitching.indices { box.home.pitching[i].stats.pitches = 0 }
+        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes == ["HBP—by Reyes (Ford)."])
     }
 
     @Test("When two pitchers hit batters, the hit batters are listed without guessing who hit whom")
