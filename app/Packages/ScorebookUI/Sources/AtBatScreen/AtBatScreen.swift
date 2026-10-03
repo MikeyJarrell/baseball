@@ -6,7 +6,7 @@
 //   2. the field drawing with the runners, a changeover or time-limit banner across its top,
 //      the on-deck hitter in one corner and the pitcher in the other;
 //   3. the batter, with what they have done today, and a big Subs button beside them;
-//   4. a row of small buttons led by Undo (HBP, IBB, Foul tip, or "Dropped 3rd strike");
+//   4. a row of small buttons led by Undo (HBP, IBB, and Foul tip or, after strike three, "Dropped K");
 //   5. the 2×2 block of Ball, Strike (with a small Called button), Foul and In play;
 //   6. the song button across the bottom edge.
 //
@@ -34,9 +34,11 @@ public enum AtBatAction: Equatable, Sendable {
     case record(GameEvent)
     /// Take back the last event (the Undo button).
     case undo
+    /// Put back the event just undone (the Redo button, shown only after an undo).
+    case redo
 
     /// Open the in-play sequence: `.ballInPlay` from the In play button, or
-    /// `.droppedThirdStrike` from the "Dropped 3rd strike" button after strike three.
+    /// `.droppedThirdStrike` from the "Dropped K" button after strike three.
     case openInPlay(PlayDraft.Context)
     /// Open the runner actions (steal, caught stealing, pickoff, wild pitch, passed ball, balk,
     /// advance on error) for the runner the scorer tapped on the field drawing.
@@ -99,6 +101,7 @@ public enum SongPlayback: Equatable, Sendable {
 ///   - settings: The app settings: walk-up song length, introductions, fade on the first pitch.
 ///   - songPlayback: What the walk-up audio is doing now.
 ///   - undoLabel: What Undo would take back ("ball"), or nothing when there is nothing to undo.
+///   - redoLabel: What Redo would put back, right after an undo ("6-3"); nothing hides Redo.
 ///   - clock: The game clock at a moment, from the rules engine (`RulesEngine.clock(for:at:)`).
 ///     The screen asks it again every few seconds, so the time left and the "Is the game over?"
 ///     question keep up with the clock between events.
@@ -111,6 +114,7 @@ public struct AtBatScreen: View {
     public var settings: AppSettings
     public var songPlayback: SongPlayback
     public var undoLabel: String?
+    public var redoLabel: String?
     public var clock: (Date) -> GameClock
     public var onAction: (AtBatAction) -> Void
 
@@ -122,6 +126,7 @@ public struct AtBatScreen: View {
         settings: AppSettings = AppSettings(),
         songPlayback: SongPlayback = .idle,
         undoLabel: String? = nil,
+        redoLabel: String? = nil,
         clock: ((Date) -> GameClock)? = nil,
         onAction: @escaping (AtBatAction) -> Void
     ) {
@@ -132,6 +137,7 @@ public struct AtBatScreen: View {
         self.settings = settings
         self.songPlayback = songPlayback
         self.undoLabel = undoLabel
+        self.redoLabel = redoLabel
         // Without a clock, read the stored facts as they are (the stand-in engines' clock).
         self.clock = clock ?? { [situation] now in simpleClock(for: situation, at: now) }
         self.onAction = onAction
@@ -143,7 +149,7 @@ public struct AtBatScreen: View {
         TimelineView(.periodic(from: .now, by: 15)) { context in
             AtBatLayout(info: AtBatInfo(setup: setup, situation: situation, batterHistory: batterHistory,
                                         songs: songs, settings: settings, songPlayback: songPlayback,
-                                        undoLabel: undoLabel, clock: clock(context.date)),
+                                        undoLabel: undoLabel, redoLabel: redoLabel, clock: clock(context.date)),
                         onAction: onAction)
         }
     }
@@ -161,6 +167,7 @@ struct AtBatInfo {
     var settings: AppSettings
     var songPlayback: SongPlayback
     var undoLabel: String?
+    var redoLabel: String?
     var clock: GameClock
 
     /// True when our team is batting.

@@ -15,7 +15,10 @@ import DesignSystem
 struct AtBatPreview: View {
     var sample: SampleSituation
     var playback: SongPlayback = .idle
-    var undoLabel: String? = "ball"
+    /// What Redo would put back, for the preview right after an undo.
+    var redoLabel: String?
+    /// The batter's earlier plate appearances, when a preview wants its own (a long day).
+    var history: [PlateAppearanceSummary]?
     var settings = AppSettings()
     /// Changes to the situation for one preview, such as raising the game-over question.
     var adjust: (inout Situation) -> Void = { _ in }
@@ -28,7 +31,7 @@ struct AtBatPreview: View {
         adjust(&situation)
         let previewNow = (situation.currentInningStartedAt ?? sample.setup.scheduledStart).addingTimeInterval(12 * 60)
         // Earlier today: the batter's plate appearances in the sample game before this inning.
-        let history = situation.batter.map { id in
+        let history = self.history ?? situation.batter.map { id in
             (SampleGame.plateAppearances[id] ?? []).filter { $0.inning < situation.inning }
         } ?? []
         return AtBatScreen(
@@ -38,7 +41,8 @@ struct AtBatPreview: View {
             songs: SampleSongs.library,
             settings: settings,
             songPlayback: playback,
-            undoLabel: undoLabel,
+            undoLabel: AtBatPreview.undoLabels[sample.title] ?? nil,
+            redoLabel: redoLabel,
             clock: { [situation] _ in simpleClock(for: situation, at: previewNow) },
             onAction: { action in lastTap = describe(action) }
         )
@@ -55,6 +59,36 @@ struct AtBatPreview: View {
             }
         }
     }
+
+    /// What Undo would take back in each sample situation: the event that most likely led to it,
+    /// as the app's undo label would name it.
+    static let undoLabels: [String: String?] = [
+        SampleSituations.topOfFirst.title: nil,
+        SampleSituations.runnerOnFirstOneOut.title: "ball",
+        SampleSituations.basesLoadedTwoOutsFullCount.title: "ball",
+        SampleSituations.secondAndThirdNobodyOut.title: "2B 7",
+        SampleSituations.tenthHitterUpAfterAddingOne.title: "added hitter",
+        SampleSituations.newPitcherJustIn.title: "pitching change",
+        SampleSituations.lastInningHomeAhead.title: "called strike",
+        SampleSituations.extraInnings.title: "F8",
+        SampleSituations.betweenHalfInnings.title: "L4-3 DP",
+        SampleSituations.designatedNonRunnerOnFirst.title: "1B 9",
+        SampleSituations.ourHitterWithoutSong.title: "swinging strike",
+        SampleSituations.theirHitterKnownByNumber.title: "K",
+        SampleSituations.rightAfterStrikeThree.title: "strikeout",
+        SampleSituations.lastInningOnTime.title: "ball",
+        SampleSituations.ourPitcherWarmingUp.title: "F9",
+    ]
+
+    /// A long day: six plate appearances, more than fit on the batter's line.
+    static let longDay: [PlateAppearanceSummary] = [
+        PlateAppearanceSummary(inning: 1, notation: "1B 7", outcome: .single),
+        PlateAppearanceSummary(inning: 2, notation: "F8", outcome: .out),
+        PlateAppearanceSummary(inning: 4, notation: "6-4-3 DP", outcome: .out),
+        PlateAppearanceSummary(inning: 5, notation: "BB", outcome: .walk),
+        PlateAppearanceSummary(inning: 7, notation: "HR 9", outcome: .homeRun, rbi: 3),
+        PlateAppearanceSummary(inning: 8, notation: "K", outcome: .strikeout),
+    ]
 
     /// A few words for what a tap handed back.
     private func describe(_ action: AtBatAction) -> String {
@@ -84,13 +118,13 @@ struct AtBatPreview: View {
 }
 
 #Preview("Their hitter known only by number") {
-    AtBatPreview(sample: SampleSituations.theirHitterKnownByNumber, undoLabel: nil)
+    AtBatPreview(sample: SampleSituations.theirHitterKnownByNumber)
 }
 
 // MARK: - Every sample situation
 
 #Preview("Top of the 1st, nobody on") {
-    AtBatPreview(sample: SampleSituations.topOfFirst, undoLabel: nil)
+    AtBatPreview(sample: SampleSituations.topOfFirst)
 }
 
 #Preview("Runner on first, one out, 2-1") {
@@ -106,7 +140,7 @@ struct AtBatPreview: View {
 }
 
 #Preview("New pitcher just in") {
-    AtBatPreview(sample: SampleSituations.newPitcherJustIn, undoLabel: "pitching change")
+    AtBatPreview(sample: SampleSituations.newPitcherJustIn)
 }
 
 #Preview("Top of the 9th, home team ahead") {
@@ -118,15 +152,15 @@ struct AtBatPreview: View {
 }
 
 #Preview("Changeover, middle of the 3rd") {
-    AtBatPreview(sample: SampleSituations.betweenHalfInnings, undoLabel: "ball in play")
+    AtBatPreview(sample: SampleSituations.betweenHalfInnings)
 }
 
 #Preview("Designated non-runner on first") {
-    AtBatPreview(sample: SampleSituations.designatedNonRunnerOnFirst, undoLabel: "ball in play")
+    AtBatPreview(sample: SampleSituations.designatedNonRunnerOnFirst)
 }
 
 #Preview("Right after strike three") {
-    AtBatPreview(sample: SampleSituations.rightAfterStrikeThree, undoLabel: "swinging strike")
+    AtBatPreview(sample: SampleSituations.rightAfterStrikeThree)
 }
 
 #Preview("Time limit passed: last inning") {
@@ -134,17 +168,25 @@ struct AtBatPreview: View {
 }
 
 #Preview("Our team taking the field: warm-up song") {
-    AtBatPreview(sample: SampleSituations.ourPitcherWarmingUp, undoLabel: "ball in play")
+    AtBatPreview(sample: SampleSituations.ourPitcherWarmingUp)
 }
 
 #Preview("Warm-up song playing") {
-    AtBatPreview(sample: SampleSituations.ourPitcherWarmingUp, playback: .warmUp, undoLabel: "ball in play")
+    AtBatPreview(sample: SampleSituations.ourPitcherWarmingUp, playback: .warmUp)
 }
 
 #Preview("Is the game over? (time limit)") {
-    AtBatPreview(sample: SampleSituations.lastInningOnTime, undoLabel: "ball in play") { s in
+    AtBatPreview(sample: SampleSituations.lastInningOnTime) { s in
         s.gameOverQuestion = .timeLimit
     }
+}
+
+#Preview("Long day: six plate appearances") {
+    AtBatPreview(sample: SampleSituations.basesLoadedTwoOutsFullCount, history: AtBatPreview.longDay)
+}
+
+#Preview("Right after an undo: Redo showing") {
+    AtBatPreview(sample: SampleSituations.secondAndThirdNobodyOut, redoLabel: "6-3")
 }
 
 // MARK: - Dark mode and the largest text size

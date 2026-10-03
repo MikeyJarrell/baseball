@@ -13,11 +13,42 @@ struct AtBatControls: View {
 
     var body: some View {
         VStack(spacing: Spacing.small) {
+            if let redo = info.redoLabel { RedoBar(redoLabel: redo, onAction: onAction) }
             BatterRow(info: info, onAction: onAction)
             ChipRow(info: info, onAction: onAction)
             CountButtons(count: info.situation.count, onAction: onAction)
             SongButton(info: info, onAction: onAction)
         }
+    }
+}
+
+// MARK: - Redo
+
+/// Shown only right after an undo, when the app hands the screen a redo label: "Undone: 6-3"
+/// and a Redo button, so a stray tap on Undo never loses a play for good.
+struct RedoBar: View {
+    var redoLabel: String
+    var onAction: (AtBatAction) -> Void
+
+    var body: some View {
+        HStack(spacing: Spacing.small) {
+            Text("Undone: \(redoLabel)")
+                .font(ScorebookFont.chip)
+                .foregroundStyle(ScorebookColor.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            Button { onAction(.redo) } label: {
+                Label("Redo", systemImage: "arrow.uturn.forward")
+            }
+            .buttonStyle(PlainActionButtonStyle())
+            .accessibilityLabel(Text("Redo \(redoLabel)"))
+        }
+        .padding(.leading, Spacing.medium)
+        .padding(.trailing, Spacing.extraSmall)
+        .padding(.vertical, Spacing.extraSmall)
+        .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
 
@@ -54,11 +85,13 @@ struct BatterRow: View {
                                     .background(ScorebookColor.ourTeamAccent, in: Capsule())
                             }
                         }
-                        Text("\(AtBatWording.bats(batter.bats)) · Today: ")
-                            .foregroundStyle(ScorebookColor.textSecondary)
-                            + Text(AtBatWording.today(info.batterHistory))
-                            .font(ScorebookFont.caption.weight(.bold))
-                            .foregroundStyle(ScorebookColor.textPrimary)
+                        // The whole day if it fits; on a long day, the latest plate appearances
+                        // with "…" in front, so the newest never get cut off.
+                        ViewThatFits(in: .horizontal) {
+                            todayLine(AtBatWording.today(info.batterHistory))
+                            todayLine(AtBatWording.today(info.batterHistory, latest: 4))
+                            todayLine(AtBatWording.today(info.batterHistory, latest: 2))
+                        }
                     }
                     .font(ScorebookFont.caption)
                     .lineLimit(1)
@@ -94,6 +127,13 @@ struct BatterRow: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
+    /// "Bats L · Today: 4-3, 1B 7", with the plate appearances in bold.
+    private func todayLine(_ today: String) -> some View {
+        Text("\(AtBatWording.bats(info.batter.bats)) · Today: \(Text(today).font(ScorebookFont.caption.weight(.bold)).foregroundStyle(ScorebookColor.textPrimary))")
+            .foregroundStyle(ScorebookColor.textSecondary)
+            .fixedSize(horizontal: true, vertical: false)
+    }
+
     /// "Batter: number 33, Pat Quinn, bats left, designated non-runner. Today: 4-3, 1B 7."
     private var spokenBatter: String {
         let b = info.batter
@@ -109,43 +149,69 @@ struct BatterRow: View {
 
 // MARK: - Undo and the small buttons
 
-/// Undo, then HBP, IBB and Foul tip. Right after strike three, "Dropped 3rd strike" takes the
-/// place of the three small buttons until the next pitch.
+/// Undo, then HBP, IBB and Foul tip. Right after strike three, the dropped-third-strike chip takes Foul
+/// tip's place until the next event (as "Dropped K"); HBP and IBB stay, since the next batter is already up.
 struct ChipRow: View {
     var info: AtBatInfo
     var onAction: (AtBatAction) -> Void
 
-    var body: some View {
-        HStack(spacing: Spacing.small) {
-            Button { onAction(.undo) } label: {
-                Label(info.undoLabel.map { "Undo: \($0)" } ?? "Undo", systemImage: "arrow.uturn.backward")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .buttonStyle(PlainActionButtonStyle())
-            .disabled(info.undoLabel == nil)
-            .opacity(info.undoLabel == nil ? 0.5 : 1)
-            .accessibilityLabel(Text(info.undoLabel.map { "Undo \($0)" } ?? "Nothing to undo"))
+    /// The phone's text size: at the large sizes Undo drops its arrow to leave room for words.
+    @Environment(\.dynamicTypeSize) private var textSize
 
-            if info.situation.droppedThirdStrikePossible {
-                Button { onAction(.openInPlay(.droppedThirdStrike)) } label: {
-                    HStack(spacing: Spacing.extraSmall) {
-                        Text("Dropped 3rd strike")
-                        Image(systemName: "chevron.right").font(.caption.weight(.bold))
-                    }
-                    .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(WarningChipStyle())
-                .accessibilityLabel(Text("Dropped third strike"))
-                .accessibilityHint(Text("The catcher did not hold strike three"))
-            } else {
-                Button("HBP") { pitch(.hitByPitch) }
-                    .accessibilityLabel(Text("Hit by pitch"))
-                Button("IBB") { onAction(.record(GameEvent(kind: .intentionalWalk(IntentionalWalk())))) }
-                    .accessibilityLabel(Text("Intentional walk"))
-                Button("Foul tip") { pitch(.foulTip) }
+    var body: some View {
+        // One row when everything fits at its full width; at large text sizes, Undo gets a row
+        // of its own above the others, so its words are never squeezed.
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: Spacing.small) {
+                undoButton
+                otherChips
+            }
+            VStack(spacing: Spacing.small) {
+                undoButton
+                HStack(spacing: Spacing.small) { otherChips }
             }
         }
         .buttonStyle(PlainActionButtonStyle())
+    }
+
+    /// Undo, saying what it will take back.
+    private var undoButton: some View {
+        Button { onAction(.undo) } label: {
+            Label(info.undoLabel.map { "Undo: \($0)" } ?? "Undo", systemImage: "arrow.uturn.backward")
+                .labelStyle(UndoLabelStyle(showsIcon: textSize < .xxLarge))
+                // The words wrap onto a second line rather than shrink below the other chips.
+                .lineLimit(2)
+                .minimumScaleFactor(0.95)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .buttonStyle(PlainActionButtonStyle())
+        .disabled(info.undoLabel == nil)
+        .opacity(info.undoLabel == nil ? 0.5 : 1)
+        .accessibilityLabel(Text(info.undoLabel.map { "Undo \($0)" } ?? "Nothing to undo"))
+    }
+
+    /// HBP, IBB, and Foul tip or, right after strike three, the dropped-third-strike chip.
+    @ViewBuilder private var otherChips: some View {
+        Button("HBP") { pitch(.hitByPitch) }
+            .accessibilityLabel(Text("Hit by pitch"))
+        Button("IBB") { onAction(.record(GameEvent(kind: .intentionalWalk(IntentionalWalk())))) }
+            .accessibilityLabel(Text("Intentional walk"))
+        if info.situation.droppedThirdStrikePossible {
+            Button { onAction(.openInPlay(.droppedThirdStrike)) } label: {
+                // "Dropped K" (K is the scorebook strikeout) keeps the chip short, so HBP and
+                // IBB fit beside it; it is never cut off.
+                HStack(spacing: Spacing.extraSmall) {
+                    Text("Dropped K")
+                    Image(systemName: "chevron.right").font(.caption.weight(.bold))
+                }
+                .fixedSize()
+            }
+            .buttonStyle(WarningChipStyle())
+            .accessibilityLabel(Text("Dropped third strike"))
+            .accessibilityHint(Text("The catcher did not hold strike three"))
+        } else {
+            Button("Foul tip") { pitch(.foulTip) }
+        }
     }
 
     /// Hands back one pitch to record.
@@ -154,7 +220,19 @@ struct ChipRow: View {
     }
 }
 
-/// The amber "Dropped 3rd strike" chip: the gray chip's shape in the warning color.
+/// Undo's words with or without the curved arrow in front.
+struct UndoLabelStyle: LabelStyle {
+    var showsIcon: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        HStack(spacing: Spacing.extraSmall + 2) {
+            if showsIcon { configuration.icon }
+            configuration.title
+        }
+    }
+}
+
+/// The amber "Dropped K" chip: the gray chip's shape in the warning color.
 struct WarningChipStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -178,6 +256,12 @@ struct WarningChipStyle: ButtonStyle {
 struct CountButtons: View {
     var count: Count
     var onAction: (AtBatAction) -> Void
+
+    /// True between a long press on Foul (a foul bunt) and the finger lifting, so the lift does
+    /// not record a foul as well. Only what the finger is doing; no game state.
+    @State private var heldForBunt = false
+    /// Counts foul bunts, so the phone buzzes once for each.
+    @State private var buntCount = 0
 
     /// How wide the Called button is, and how much room the Strike words leave for it.
     private let calledWidth: CGFloat = 66
@@ -207,12 +291,24 @@ struct CountButtons: View {
                 .overlay(alignment: .trailing) { calledButton }
             }
             GridRow {
-                Button { pitch(.foul) } label: {
+                // A tap is a foul; holding it down is a foul bunt, which is strike three with
+                // two strikes. The long press marks itself, so lifting the finger afterward does
+                // not also record a foul.
+                Button {
+                    if heldForBunt { heldForBunt = false } else { pitch(.foul) }
+                } label: {
                     CountButtonLabel("Foul", hint: AtBatWording.foulHint(count))
                 }
                 .buttonStyle(CountButtonStyle.foul)
+                .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                    heldForBunt = true
+                    buntCount += 1
+                    pitch(.foulBunt)
+                })
+                .sensoryFeedback(.impact, trigger: buntCount)
                 .accessibilityLabel(Text("Foul"))
                 .accessibilityHint(Text(AtBatWording.foulHint(count)))
+                .accessibilityAction(named: Text("Foul bunt")) { pitch(.foulBunt) }
 
                 Button { onAction(.openInPlay(.ballInPlay)) } label: {
                     CountButtonLabel("In play", hint: AtBatWording.inPlayHint)
@@ -312,7 +408,7 @@ struct SongButton: View {
         let withIntro = info.settings.playIntroductions && player.introduction != nil
         let seconds = Int(length.rounded())
         return Button {
-            onAction(playing ? .stopSong : .playWalkUp(player, withIntroduction: info.settings.playIntroductions))
+            onAction(playing ? .stopSong : .playWalkUp(player, withIntroduction: withIntro))
         } label: {
             HStack(spacing: Spacing.medium) {
                 SongButtonLabel(
