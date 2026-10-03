@@ -397,6 +397,8 @@ struct EmptyNote: View {
 /// A rounded chip that can be on or off, like the mockup's `.chipbtn`: "Webb on 2nd".
 struct ChipStyle: ButtonStyle {
     var isOn: Bool
+    /// The chip's color when off: gray, or white on a gray background.
+    var fill: Color = ScorebookColor.surfaceSecondary
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -405,7 +407,7 @@ struct ChipStyle: ButtonStyle {
             .foregroundStyle(isOn ? ScorebookColor.background : ScorebookColor.textPrimary)
             .padding(.horizontal, Spacing.large - 2)
             .frame(minHeight: Spacing.minimumTapSize)
-            .background(isOn ? ScorebookColor.textPrimary : ScorebookColor.surfaceSecondary, in: Capsule())
+            .background(isOn ? ScorebookColor.textPrimary : fill, in: Capsule())
             .opacity(configuration.isPressed ? 0.7 : 1)
             .contentShape(Capsule())
     }

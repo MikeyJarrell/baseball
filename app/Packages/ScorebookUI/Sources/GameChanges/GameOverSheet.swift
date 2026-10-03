@@ -15,6 +15,8 @@ public struct GameOverSheet: View {
     var reason: EndOfGame.Reason
     var onFinish: (GameChangeResult) -> Void
 
+    @Environment(\.dynamicTypeSize) private var textSize
+
     /// - Parameters:
     ///   - context: The game's setup and the situation now.
     ///   - reason: Why the app is asking. Leave it out for the situation's `gameOverQuestion`.
@@ -72,6 +74,8 @@ public struct GameOverSheet: View {
             .buttonStyle(SecondaryButtonStyle())
         }
         .interactiveDismissDisabled()
-        .presentationDetents([.medium, .large])
+        // Half height normally, so the batting screen shows behind it; full height at the
+        // accessibility text sizes, so the explanation is not hidden.
+        .presentationDetents(textSize.isAccessibilitySize ? [.large] : [.medium, .large])
     }
 }

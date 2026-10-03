@@ -245,14 +245,36 @@ public struct GameChangesDemo: View {
     }
 }
 
-/// A short description of a result, for the demo log and previews: "Recorded: added hitter".
+/// A short description of a result, for the demo log: "Recorded: added hitter d10".
 func describe(_ result: GameChangeResult) -> String {
     switch result {
     case .record(let entered):
         let extra = entered.newPlayers.isEmpty ? "" : " (with \(entered.newPlayers.count) new player)"
-        return "Recorded: \(entered.event.kind.label)\(extra)"
+        return "Recorded: \(entered.event.kind.label)\(details(entered.event.kind))\(extra)"
     case .updatePlayer(let edit): return "Updated player: \(edit.player.displayName)"
     case .nothingToRecord: return "Nothing to record"
     case .cancel: return "Cancelled"
+    }
+}
+
+/// The main details of an event, for the demo log, by player id and position number.
+private func details(_ kind: EventKind) -> String {
+    switch kind {
+    case .substitution(let s):
+        let batting = s.batting.map { "\($0.incoming) for \($0.replacing)" }
+        let defense = s.defense.map { "\($0.position.number): \($0.player)" }
+        let leaving = s.leavesField.map { "\($0) leaves the field" }
+        return " (" + (batting + defense + leaving).joined(separator: ", ") + ")"
+    case .addHitter(let a): return " \(a.player)"
+    case .pitchingChange(let p): return " \(p.newPitcher)"
+    case .runnerForNonRunner(let r): return " \(r.runner) for \(r.replacing)"
+    case .runnerAction(let a):
+        let moves = a.moves.map { "\($0.runner) \($0.from.rawValue)→\($0.to.rawValue)\($0.outBy.isEmpty ? "" : " " + $0.outBy.map(\.description).joined(separator: "-"))" }
+        let errors = a.errors.map { "E\($0.fielder.number)" }
+        return " (" + (moves + errors).joined(separator: ", ") + ")"
+    case .errorWithNoAdvance(let e): return " E\(e.fielder.number)"
+    case .keepPlaying(let k): return " (\(k.reason.rawValue))"
+    case .endOfGame(let e): return " (\(e.reason.rawValue))"
+    default: return ""
     }
 }

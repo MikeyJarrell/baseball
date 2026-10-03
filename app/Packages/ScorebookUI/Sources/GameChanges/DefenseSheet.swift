@@ -170,12 +170,12 @@ public struct DefenseSheet: View {
                         }
                     }
                 }
-                .buttonStyle(ChipStyle(isOn: false))
+                .buttonStyle(ChipStyle(isOn: false, fill: ScorebookColor.surface))
                 .accessibilityLabel("\(player.displayName)\(whereOnSheet[player.id].map { ", now at \($0.name)" } ?? "")")
             }
             if here != nil {
                 Button("Nobody") { put(nil, at: position) }
-                    .buttonStyle(ChipStyle(isOn: false))
+                    .buttonStyle(ChipStyle(isOn: false, fill: ScorebookColor.surface))
                     .accessibilityLabel("Leave \(position.name) empty")
             }
         }

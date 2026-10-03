@@ -53,23 +53,23 @@ public struct RunnerActionSheet: View {
     public var body: some View {
         SheetFrame(title: title, subtitle: "Between pitches", onCancel: { onFinish(.cancel) }) {
             VStack(alignment: .leading, spacing: 0) {
-            if context.situation.runners.isEmpty {
-                EmptyNote("Nobody is on base.")
-            } else {
-                chooseRunners
-                actionGrid
-                SectionLabel("Also")
-                Card {
-                    OptionRow(title: "Took the base, no throw", detail: "Defensive indifference: not a stolen base",
-                              end: .chevron, action: { reason = .defensiveIndifference }) {
-                        IconBadge(systemName: "figure.walk")
-                    }
-                    RowDivider()
-                    OptionRow(title: "Pinch runner", end: .chevron, action: { pinchRunning = true }) {
-                        IconBadge(systemName: "figure.run")
+                if context.situation.runners.isEmpty {
+                    EmptyNote("Nobody is on base.")
+                } else {
+                    chooseRunners
+                    actionGrid
+                    SectionLabel("Also")
+                    Card {
+                        OptionRow(title: "Took the base, no throw", detail: "Defensive indifference: not a stolen base",
+                                  end: .chevron, action: { reason = .defensiveIndifference }) {
+                            IconBadge(systemName: "figure.walk")
+                        }
+                        RowDivider()
+                        OptionRow(title: "Pinch runner", end: .chevron, action: { pinchRunning = true }) {
+                            IconBadge(systemName: "figure.run")
+                        }
                     }
                 }
-            }
             }
             // The next pages open inside this sheet's own navigation stack.
             .navigationDestination(item: $reason) { reason in
@@ -127,6 +127,7 @@ public struct RunnerActionSheet: View {
                         }
                     }
                     .multilineTextAlignment(.center)
+                    .minimumScaleFactor(0.7)
                     .foregroundStyle(ScorebookColor.textPrimary)
                     .frame(maxWidth: .infinity, minHeight: 60)
                     .padding(.horizontal, Spacing.small)
@@ -137,6 +138,9 @@ public struct RunnerActionSheet: View {
             }
         }
         .padding(.top, Spacing.medium)
+        // Two buttons share each row, so their words stop growing at a large accessibility
+        // size instead of breaking in the middle of a word.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility1)
     }
 
     /// "2nd", "3rd" or "home": the next base for a single chosen runner, for "Stole 3rd".
