@@ -8,7 +8,7 @@ The other files in this folder hold the detail. [architecture.md](architecture.m
 
 **Walk-up songs.** Song clips live on the phone, imported from the Files app. Each player on our roster has a song, with a start point so a full track can begin at the hook. When one of our hitters comes up, that player’s song is cued on the batting screen: one tap plays it, and it fades out by itself after 12 seconds of song, or sooner with a second tap. The phone ignores the silent switch and plays through a Bluetooth speaker, including with the screen locked.
 
-**Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Mikey records each player’s introduction in his own impression, straight into the app from that player’s page, and the app adds a stadium echo. A player without a recording yet can use the iPhone’s built-in voice, slowed to that cadence. One tap plays the introduction and then the song. This is a nice-to-have, built after the walk-up songs work.
+**Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Mikey records each player’s introduction in his own impression, straight into the app from that player’s page, and the app adds a stadium echo. A player without a recording yet can use the iPhone’s built-in voice, slowed to that cadence. One tap plays the introduction with the song fading in underneath it, reaching full volume at the hook as the announcer finishes. This is a nice-to-have, built after the walk-up songs work.
 
 **Pitcher warm-up music.** Each of our pitchers can pick a warm-up song. When we take the field, the music button plays the current pitcher’s song until it is stopped or the first pitch is recorded. Nothing plays while the other team warms up.
 
@@ -90,6 +90,13 @@ Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten thi
 ## What Mikey has to do
 
 1. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
+<<<<<<< HEAD
 2. Put the song files (MP3 or M4A) in the Dropbox folder `baseball/songs/`, named for the player they belong to. On the Mac, an agent can trim each to the hook and even out the loudness; on the phone, the app imports them from Dropbox through the Files app.
 3. Record the announcer introductions in the app, once it can record.
 4. Score a televised game as the dress rehearsal.
+=======
+2. Send the full-size Diamond Dogs logo, for the app icon, to the Dropbox folder `baseball/branding/`.
+3. Collect each player’s song and the time it should start, into [team/roster.csv](../team/roster.csv). On the Mac, `python3 tools/walkup_songs.py` downloads each song, cuts a clip around the hook, evens out the loudness, and saves it to the Dropbox folder `baseball/songs/`; on the phone, the app imports them from Dropbox through the Files app.
+4. Record the announcer introductions in the app, once it can record.
+5. Score a televised game as the dress rehearsal.
+>>>>>>> f50b88472db27b9a82b6811c1b13b212bcb50633
