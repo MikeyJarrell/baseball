@@ -12,11 +12,11 @@
 
 The sheets that slide up from the batting screen for anything other than a pitch or a ball in play. Each one is handed the situation and the relevant team’s batting order and roster, and hands back one event or a cancel.
 
-The batting screen has one substitution button. It opens a short list of every kind of change, the first six items below: pitcher, fielders, pinch hitter, pinch runner or courtesy runner, runner for a designated non-runner, add a hitter. Each opens its own sheet.
+The batting screen has one substitution button. It opens a short list of every kind of change, the first six items below: pitcher, fielders, pinch hitter, pinch runner, runner for a designated non-runner, add a hitter. Each opens its own sheet.
 
 1. **Pitching change.** Choose the new pitcher from the fielding team’s roster or add a new player, with throwing hand. Shows the outgoing pitcher’s pitch count.
 2. **Pinch hitter.** Choose who bats in the current slot. Players already taken out of the game appear too, marked as re-entering, since our league allows re-entry.
-3. **Pinch runner, courtesy runner, runner for a designated non-runner.** Tap the runner, choose the replacement. A courtesy runner and a runner for a designated non-runner leave the batting order as it was. When a designated non-runner reaches base, this sheet opens by itself, asking who is running.
+3. **Pinch runner, runner for a designated non-runner.** Tap the runner, choose the replacement. A pinch runner replaces the player in the batting order; a runner for a designated non-runner leaves the batting order as it was. When a designated non-runner reaches base, this sheet opens by itself, asking who is running.
 4. **Defensive changes.** Move players between positions and bring players in from the bench, as one batch.
 5. **Defense check.** Each time our team takes the field, a compact list of the nine positions with who is at each. One tap confirms; tapping a position swaps in another player. Shows for our team only; the opponent’s fielders are tracked by position.
 6. **Add a hitter.** Pick a player from the roster or add a new one, and a position or “extra hitter.” Shows where in the order they will bat and when they will next be up.

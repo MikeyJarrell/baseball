@@ -81,7 +81,7 @@ This is the agreement between builders. The foundation job writes it as real Swi
 | Error with no advance | An error charged to a fielder with nobody moving, such as a dropped foul pop-up |
 | Substitution | Pinch hitter, pinch runner, defensive replacement, position switch. Several fielding changes made at once are one event. |
 | Defense confirmed | The scorer checked our fielders at the start of a half-inning and nothing had changed. Changes found during the check are recorded as a substitution. |
-| Courtesy runner | A runner who replaces a player on base without a substitution: a courtesy runner, or the runner for a designated non-runner. The original player stays in the batting order and is credited with the run if the runner scores. Stolen bases and caught stealing go to whoever actually ran. |
+| Runner for a designated non-runner | A runner who takes the base each time a designated non-runner reaches, without a substitution. The designated non-runner stays in the batting order and is credited with the run if the runner scores. Stolen bases and caught stealing go to whoever actually ran. A pinch runner is an ordinary substitution. |
 | Pitching change | New pitcher for the fielding team |
 | Add hitter | Appends a slot to a team’s batting order |
 | Manual adjustment | Set outs, score, runners or count directly, for when the field and the book disagree and nobody can say why |
