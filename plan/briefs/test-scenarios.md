@@ -25,7 +25,7 @@ Cover, at least:
 - Pitching change mid-at-bat: pitches before and after go to the right pitchers; a walk after a change at 3-1 belongs to the first pitcher.
 - Inherited runners: a reliever comes in with a runner on second who later scores; the run is charged to the first pitcher.
 - Foul tip for strike three; dropped third strike with the batter thrown out and with the batter reaching.
-- A courtesy runner who scores (the run goes to the player they ran for) and one who steals second (the steal goes to the runner); a designated non-runner reaching base; a starter re-entering the game.
+- The runner for a designated non-runner who scores (the run goes to the designated non-runner) and one who steals second (the steal goes to the runner); a pinch runner who scores (the run goes to the pinch runner); a starter re-entering the game.
 - Fielders switching positions mid-game, with a later error charged to the right player.
 - An error with no runner moving.
 - An opponent with an unknown lineup cycling back to the top.

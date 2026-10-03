@@ -30,3 +30,7 @@ SESSLOG:[2026-10-03 13:30]
 
 ### Context
 The session turned Mikey’s app vision into a plan the agent team can execute in parallel. A fresh-eyes review caught gaps the first draft had (runs charged to the wrong pitcher after a pitching change, no way to record a foul tip for strike three or an error with no runner moving, an unknown opponent lineup that never cycled back to the top, the in-play screen needing baseball arithmetic it was forbidden to do); all are fixed in the briefs. Xcode 27 and the iOS 27 simulator are installed.
+
+## [2026-10-03 14:02] No courtesy runners
+
+Mikey corrected the league rules: there are no courtesy runners. Runner replacements are a pinch runner (an ordinary substitution) or the runner for a designated non-runner, whose runs are credited to the designated non-runner. The plan and the running foundation and design jobs were updated.
