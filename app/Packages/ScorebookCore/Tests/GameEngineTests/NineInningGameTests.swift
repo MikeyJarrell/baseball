@@ -115,11 +115,12 @@ struct NineInningGameTests {
         w.pa("", ground("m2", 4, 3))
         w.pa("BBB", last: "B")
         w.pa("", fly("m4", 7))
-        // Bottom 8: single, fly out, double (1 run), ground out.
+        // Bottom 8: single, fly out, double (1 run), two ground outs.
         w.pa("", hit(.single, "d2", to: 7))
         w.pa("", fly("d3", 8))
         w.pa("", hit(.double, "d4", to: 7, others: [mv("d2", .first, .scored)], rbi: 1))
         w.pa("", ground("d5", 5, 3))
+        w.pa("", ground("d6", 4, 3))
 
         // Top 9: home run (1 run), ground out, fly out, strikeout.
         w.pa("", hit(.homeRun, "m5", to: 8, rbi: 1))
@@ -158,7 +159,7 @@ struct NineInningGameTests {
         // Pitch counts, counted by hand and by a separate script.
         #expect(s.tally(for: "d9") == PitcherTally(pitcher: "d9", team: .home, pitches: 42, strikes: 30, battersFaced: 18))
         #expect(s.tally(for: "d12") == PitcherTally(pitcher: "d12", team: .home, pitches: 30, strikes: 22, battersFaced: 17))
-        #expect(s.tally(for: "m9") == PitcherTally(pitcher: "m9", team: .away, pitches: 60, strikes: 42, battersFaced: 32))
+        #expect(s.tally(for: "m9") == PitcherTally(pitcher: "m9", team: .away, pitches: 62, strikes: 44, battersFaced: 33))
 
         // The three runs off Barros's runners: the walk in the fifth was Barros's, and the
         // runners Voss inherited were stranded.
@@ -175,7 +176,7 @@ struct NineInningGameTests {
         #expect(s.gameOverQuestion == .regulation)
         #expect(!s.isFinal && s.isRegulationComplete)
         #expect(s[.away].nextBatterIndex == 8)
-        #expect(s[.home].nextBatterIndex == 5)
+        #expect(s[.home].nextBatterIndex == 6)
 
         game.events.append(GameEvent(id: "end", enteredAt: game.events.last!.enteredAt.addingTimeInterval(20),
                                      kind: .endOfGame(EndOfGame(reason: .regulation, finalScore: Score(away: 5, home: 6)))))
