@@ -36,6 +36,9 @@ struct Replay {
     /// The spot in each team's order whose plate appearance ended most recently, so a hitter
     /// added after the last spot just batted can be put up next.
     private var lastSpotUp: [TeamSide: Int] = [:]
+    /// True once the batter now up has seen any play (a pitch, a steal). A batter who was up
+    /// when a runner made the third out still leads off next time, even with no pitches.
+    private var batterStarted: [TeamSide: Bool] = [:]
     /// Plate appearances completed in each batting spot, for the re-entry rule.
     private var spotAppearances: [TeamSide: [Int]] = [:]
     /// For each batting spot whose starter has been replaced: how many plate appearances the
@@ -195,6 +198,7 @@ struct Replay {
     /// check (if it never happened) is no longer due, and an unanswered "is the game over?"
     /// lapses because the teams played on. A pitch also starts the clock.
     private mutating func startOfPlay(_ event: GameEvent) {
+        batterStarted[s.battingSide] = true
         s.isBetweenHalfInnings = false
         s.defenseCheckDue = false
         s.droppedThirdStrikePossible = false
@@ -384,6 +388,7 @@ struct Replay {
         let spot = s[side].nextBatterIndex
         let count = s[side].battingOrder.count
         lastSpotUp[side] = spot
+        batterStarted[side] = false
         s[side].nextBatterIndex = count == 0 ? 0 : (spot + 1) % count
         s.count = .fresh
         walkChargedTo = nil
@@ -615,8 +620,9 @@ struct Replay {
         spotAppearances[side]?.append(0)
         starterLeftAt[side]?.append(nil)
         spotStarters[side]?.append(nil)
-        let midCount = side == s.battingSide && s.count != .fresh
-        if s[side].nextBatterIndex == 0, lastSpotUp[side] == oldCount - 1, !midCount {
+        // Only if the leadoff hitter has not already come up (a third out on the bases leaves
+        // them up, to lead off next time).
+        if s[side].nextBatterIndex == 0, lastSpotUp[side] == oldCount - 1, batterStarted[side] != true {
             s[side].nextBatterIndex = oldCount
         }
     }
@@ -696,6 +702,7 @@ struct Replay {
             if s[side].battingOrder.slots.indices.contains(index) {
                 s[side].nextBatterIndex = index
                 lastSpotUp[side] = nil
+                batterStarted[side] = false
                 walkChargedTo = nil
             } else {
                 fx.problems.append("The batting order has no spot \(index + 1).")
