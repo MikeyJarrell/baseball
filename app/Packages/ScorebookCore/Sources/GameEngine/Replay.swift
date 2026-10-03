@@ -126,15 +126,26 @@ struct Replay {
         }
 
         // The entry describes the half-inning the event happened in, so it is written before
-        // the sides switch on a third out. A manual adjustment that moved the inning is
-        // described in the inning it moved to.
+        // the sides switch on a third out. A manual adjustment is described as it left the
+        // game (its inning, half and batter); the end of the game names no batter.
         let fielding = s[s.fieldingSide]
         let endsHalf = s.outs >= 3 && !s.isFinal
         if s.outs > 3 { fx.problems.append("More than three outs in the half-inning.") }
         let afterLog = BasesAndOuts(outs: min(s.outs, 3), count: s.count, runners: s.runners)
         let entryInning = s.inning
         let entryHalf = s.half
-        let battingSide = before.battingSide
+        var entryBatter = before.batter
+        var entryBatterIndex: Int? = before[before.battingSide].nextBatterIndex
+        switch event.kind {
+        case .manualAdjustment:
+            entryBatter = s.batter
+            entryBatterIndex = s[s.battingSide].nextBatterIndex
+        case .endOfGame:
+            entryBatter = nil
+            entryBatterIndex = nil
+        default:
+            break
+        }
 
         // The first pitch may have just started the clock.
         refreshClock(at: now)
@@ -157,8 +168,8 @@ struct Replay {
             event: event,
             inning: entryInning,
             half: entryHalf,
-            batter: { if case .endOfGame = event.kind { return nil }; return before.batter }(),
-            batterIndex: { if case .endOfGame = event.kind { return nil }; return before[battingSide].nextBatterIndex }(),
+            batter: entryBatter,
+            batterIndex: entryBatterIndex,
             pitcher: fielding.pitcher,
             fielders: fielding.fielders,
             before: beforeLog,
@@ -185,8 +196,8 @@ struct Replay {
     }
 
     /// True for the events that are part of the action on the field, as opposed to lineup
-    /// changes and bookkeeping. Each one closes any open "who runs?" or "is the game over?"
-    /// question that was not answered, since play went on.
+    /// changes and bookkeeping. Each one ends the changeover between half-innings and lets an
+    /// unanswered "is the game over?" question lapse, since play went on.
     private static func isPlay(_ kind: EventKind) -> Bool {
         switch kind {
         case .pitch, .intentionalWalk, .ballInPlay, .runnerAction, .errorWithNoAdvance, .automaticOut: true
