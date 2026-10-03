@@ -12,7 +12,7 @@ Layout A from the approved mockup, the field view, with Mikey’s later changes:
 
 Top to bottom, all on one screen with no scrolling:
 
-- **The band**, in the batting team’s color (our powder blue, their striped slate): the game menu, “Diamond Dogs batting”, the time limit as a clock time with the time left (“Limit 12:05 PM · 1:48 left”, “Past the limit (12:05 PM)”, or just the limit before the first pitch; tapping it asks to open the time limit), and the Box score button. Under them the scoreboard: inning with ▲ or ▼, both scores with ▸ by the team at bat, a big count, and the outs as dots.
+- **The band**, in the batting team’s color (our powder blue, their striped slate): the game menu, “Diamond Dogs batting”, the time limit as a clock time with the time left (“Limit 12:05 PM · 1:48 left”, “Past the limit (12:05 PM)”, or just the limit before the first pitch; tapping it asks to open the time limit), and the Box score button. Under them the scoreboard: inning with ▲ or ▼, both scores with ▸ by the team at bat, a big count, and the outs in words (“0 outs”, “1 out”, “2 outs”) in the same heavy type as the count (Mikey’s change after acceptance; it replaced the mockup’s dots). The scores always get their full width; the count and the outs shrink to fit beside them at the largest text size.
 - **The field drawing**, zoomed to the infield, with a name tag on every runner. Tapping a runner, or a base with a runner on it, asks for the runner actions. The on-deck hitter sits in the bottom-left corner; the pitcher (“Pitching: Collins (R) · 61 pitches, 38 strikes”) in the bottom-right, and tapping it asks for the pitching change.
 - **Banners** above the field: “Time’s up — finish this inning” in red while the clock says this is the last inning; otherwise, between half-innings, “Middle 3rd” or “End 3rd” with the score, our team first. Either banner carries the Defense button when our defense check is due at a changeover. The banner sits above the drawing and pushes it down, so a runner on second stays visible.
 - **The batter**: number badge, name, “Non-runner” tag for a designated non-runner, “Bats L · Today: 4-3, 1B 7”. On a long day the line keeps the latest plate appearances (“… HR 9, K”). Their hitter known only by number shows “#5 Add name”. Tapping the batter asks for the batter options (pinch hitter, batting side, naming their hitter). The big Subs button sits beside it.
@@ -97,7 +97,7 @@ The brief describes called-or-swinging as a small toggle beside Strike, defaulti
   - `warmup.png`: the changeover when we take the field, with the Defense button and the warm-up song;
   - `timeup.png`: time’s up, last inning, with the runner on second visible below the banner;
   - `question.png`: “Is the game over?”;
-  - `largest.png`: the largest text size right after strike three, Undo on its own row and “DOGS” whole;
+  - `largest.png`: the largest text size right after strike three, Undo on its own row, “DOGS” whole and “1 out” in words;
   - `iphone17-dark.png`: the iPhone 17 in dark mode.
 - **Foul bunt, tried on the simulator:** a tap on Foul, then a one-second hold, recorded a foul and then a foul bunt, two events and no extra foul.
 - **Review:** `feedback/ai/screen-at-bat-review.md`. Every finding is addressed: HBP and IBB stay after strike three, the foul bunt, Undo’s words and Redo, the Defense button on the red banner, the introduction only when the player has one, whole team names, the long day, and realistic undo labels. The count hints stay as a stopgap until the rules engine provides them (request 1).

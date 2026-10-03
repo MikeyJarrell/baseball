@@ -20,6 +20,9 @@ enum AtBatWording {
         }
     }
 
+    /// The outs in words: "0 outs", "1 out", "2 outs".
+    static func outs(_ outs: Int) -> String { outs == 1 ? "1 out" : "\(outs) outs" }
+
     /// The count written balls first with a dash: "1–1".
     static func count(_ count: Count) -> String { "\(count.balls)–\(count.strikes)" }
 
