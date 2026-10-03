@@ -16,7 +16,7 @@
 ## Scoring decisions
 
 - **Credit follows the play log.** A plate appearance goes to the batter and to the pitcher the play log charges (so a walk after a 3-1 pitching change is the first pitcher’s), pitches and strikes to the pitcher on the mound, a run to whoever the log credits and to the pitcher responsible for that runner, and putouts, assists and errors to whoever the log says was at that position. Runs batted in are the scorer’s number on the play, never recomputed.
-- **Outs recorded** are the outs listed on each entry, charged to the pitcher on the mound. A batting hole’s automatic out counts; outs set by a manual adjustment do not, since nobody made them.
+- **Outs recorded** are the outs listed on each entry, charged to the pitcher on the mound. A batting hole’s automatic out counts; outs set by a manual adjustment do not, since nobody made them. Nobody gets the putout on a batting hole’s automatic out, since it is not a real play (coordinator’s decision after review), so a team’s putouts can add up to fewer than its outs.
 - **A pitcher who comes back keeps one pitching line**, placed where they first pitched.
 - **A pickoff is not caught stealing.** Only moves marked `caughtStealing` count. Official rule 9.07(h) also counts a runner picked off while trying to steal, but the vocabulary cannot tell the two apart; the scorer can mark that case `caughtStealing`.
 - **One assist per fielder per out**, even after handling the ball twice in a rundown (rule 9.10).
@@ -48,7 +48,7 @@ The rules engine is being built on another branch, and its type has no name yet.
 static let engine: (any RulesEngine)? = nil
 ```
 
-While it is `nil`, the three scenario tests are skipped with the reason “Skipped until the rules engine lands”, and show as skipped in the test run. **When the engine is merged, whoever merges it changes `nil` to the engine (for example `GameRulesEngine()`).** That one line switches the tests on. A stand-in that returns an empty play log is treated as no engine, so plugging one in also skips the tests. Swift cannot look up a type that may not exist without naming it, so this one edit cannot be avoided.
+While it is `nil`, the three scenario tests are skipped with the reason “Skipped until the rules engine lands”, and show as skipped in the test run. **When the engine is merged, whoever merges it changes `nil` to the engine (for example `GameRulesEngine()`).** That one line switches the tests on. With an engine plugged in the tests always run, so a broken engine fails them; they also check that the play log has one entry per event. Swift cannot look up a type that may not exist without naming it, so this one edit cannot be avoided.
 
 ## What the stats engine needs from the rules engine’s play log
 
