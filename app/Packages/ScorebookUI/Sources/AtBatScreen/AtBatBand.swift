@@ -1,7 +1,7 @@
 // The band across the top of the batting screen, in the batting team's color (our powder blue,
 // or their striped slate): the game menu button, "Diamond Dogs batting", the time limit with
 // the time left, the Box score button, and under them the scoreboard: inning, score, a big
-// count and the outs.
+// count and the outs in words.
 
 import SwiftUI
 import Model
@@ -117,20 +117,13 @@ struct Scoreboard: View {
             }
             .frame(maxWidth: .infinity)
             divider
-            // The outs, as three dots with the outs filled in.
-            VStack(spacing: 2) {
-                HStack(spacing: 4) {
-                    ForEach(0..<3, id: \.self) { i in
-                        Circle()
-                            .fill(i < s.outs ? info.look.onFill : Color.clear)
-                            .overlay(Circle().strokeBorder(info.look.onFill, lineWidth: 2))
-                            .frame(width: 14, height: 14)
-                    }
-                }
-                Text(s.outs == 1 ? "1 out" : "\(s.outs) outs")
-                    .font(ScorebookFont.caption)
-            }
-            .frame(minWidth: 64)
+            // The outs in words, in the same heavy type as the count: "0 outs", "1 out", "2 outs".
+            Text(AtBatWording.outs(s.outs))
+                .font(ScorebookFont.scoreboard)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .padding(.horizontal, Spacing.extraSmall)
+                .frame(maxWidth: .infinity)
         }
         .padding(.vertical, Spacing.small)
         .padding(.horizontal, Spacing.extraSmall)
@@ -173,7 +166,7 @@ struct Scoreboard: View {
         let score = "\(info.setup.away.name) \(s.score.away), \(info.setup.home.name) \(s.score.home)"
         let balls = s.count.balls == 1 ? "1 ball" : "\(s.count.balls) balls"
         let strikes = s.count.strikes == 1 ? "1 strike" : "\(s.count.strikes) strikes"
-        let outs = s.outs == 1 ? "1 out" : "\(s.outs) outs"
+        let outs = AtBatWording.outs(s.outs)
         return "\(half) of the \(AtBatWording.ordinal(s.inning)). \(score). \(balls), \(strikes). \(outs)."
     }
 }
