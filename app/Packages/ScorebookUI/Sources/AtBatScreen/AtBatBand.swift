@@ -93,6 +93,8 @@ struct Scoreboard: View {
                     .font(ScorebookFont.scoreboardSmall)
                 Text(s.half == .top ? "top" : "bottom")
                     .font(ScorebookFont.caption)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
             .frame(minWidth: 52)
             divider
@@ -102,8 +104,8 @@ struct Scoreboard: View {
                 scoreRow(.home)
             }
             .padding(.horizontal, Spacing.small)
-            .frame(maxWidth: .infinity)
-            // The score gets its room first; the count and the outs shrink to fit beside it.
+            // The score gets the room it needs first; the count and the outs shrink to fit beside it.
+            .fixedSize(horizontal: true, vertical: false)
             .layoutPriority(1)
             divider
             // The count, big.
