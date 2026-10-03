@@ -691,7 +691,7 @@ let S = null;           // the game situation
 let P = null;           // a ball in play being entered
 let route = 'home', sheet = null, undo = [], taps = 0, lastPA = null, coach = null, toastTimer = null, lastKey = '', prevSheet = null, curHash = 'home';
 const ui = {ovTab:'line', stab:'bat', sort:{k:'avg',d:-1}, minPA:true, song:false, music:false, autoFade:false, rec:'idle', recT:0, theirMode:'names', theirN:9,
-  home:true, limit:true, innings:9, def:null, defOpen:null, defChanged:{}, nrBase:1, nrPick:null, prBase:null, prPick:null, prType:'courtesy', phPick:null,
+  home:true, limit:true, innings:9, def:null, defOpen:null, defChanged:{}, nrBase:1, nrPick:null, prBase:null, prPick:null, phPick:null,
   addPick:'price', addPos:'EH', pitchPick:null, newHand:'R', player:'kow', songSel:'s3', start:42.0, vol:90, fade:2, more:false, runnerBase:2, playEdit:null,
   songTab:'walk', opp:'mud', pickPitch:{us:'fisch',them:'mor'}, posFor:null, ourHand:'R'};
 
@@ -1435,7 +1435,7 @@ function sheetWrap(title, body, o={}){
 }
 SHEETS.subs = () => {
   const items=[['pitch','ball','Pitching change',`${S.pit[fieldTeam()].name} has thrown ${S.pit[fieldTeam()].p}`],['fielders','shield','Fielders','Move players or bring them in'],['ph','hand','Pinch hitter',`Bat for ${nm(batter())}`],
-    ['pr','run','Pinch runner or courtesy runner','Replace a runner on base'],['nr','run','Runner for a non-runner','For a designated non-runner on base'],['add','addp','Add a hitter','To the bottom of the order']];
+    ['pr','run','Pinch runner','Takes over a runner’s spot in the order'],['nr','run','Runner for a non-runner','For a designated non-runner on base'],['add','addp','Add a hitter','To the bottom of the order']];
   return sheetWrap('Changes', `<div class="card">${items.map(([v,i,t,d])=>`<button class="opt" data-a="sheet" data-v="${v}"><span class="oic">${ic(i)}</span><div class="grow"><div class="t1">${t}</div><div class="t2">${esc(d)}</div></div>${ic('chevr',18)}</button>`).join('')}</div>`, {sub:`${batTeam()==='us'?'Cardinals':'Mudcats'} batting`});
 };
 SHEETS.pitch = () => {
@@ -1459,11 +1459,10 @@ SHEETS.ph = () => {
 };
 SHEETS.pr = () => {
   const bases=[1,2,3].filter(i=>S.bases[i]); if(ui.prBase==null||!S.bases[ui.prBase]) ui.prBase=bases[0]||null;
-  if(!bases.length) return sheetWrap('Pinch or courtesy runner', `<div class="empty">Nobody is on base.</div>`);
-  const cands = batTeam()==='us' ? roster().filter(q=>![1,2,3].some(i=>S.bases[i]&&S.bases[i].id===q.id) && q.id!==batter().id) : [];
-  return sheetWrap('Pinch or courtesy runner', `<div class="sec" style="margin-top:4px">Replace</div><div style="display:flex;gap:8px;flex-wrap:wrap">${bases.map(i=>`<button class="chipbtn ${ui.prBase===i?'on':''}" data-a="prBase" data-v="${i}">${esc(nm(S.bases[i]))} on ${BASEN[i]}</button>`).join('')}</div>
-    <div class="sec">Kind</div><div class="seg"><button class="${ui.prType==='pinch'?'on':''}" data-a="prType" data-v="pinch">Pinch runner</button><button class="${ui.prType==='courtesy'?'on':''}" data-a="prType" data-v="courtesy">Courtesy runner</button></div>
-    <div style="font-size:14px;color:var(--ink3);margin:8px 4px">${ui.prType==='pinch'?'The runner takes his place in the batting order.':'He stays in the batting order and gets the run if the runner scores.'}</div>
+  if(!bases.length) return sheetWrap('Pinch runner', `<div class="empty">Nobody is on base.</div>`);
+  const cands = batTeam()==='us' ? BENCH : [];
+  return sheetWrap('Pinch runner', `<div class="sec" style="margin-top:4px">Replace</div><div style="display:flex;gap:8px;flex-wrap:wrap">${bases.map(i=>`<button class="chipbtn ${ui.prBase===i?'on':''}" data-a="prBase" data-v="${i}">${esc(nm(S.bases[i]))} on ${BASEN[i]}</button>`).join('')}</div>
+    <div class="info">The runner takes over ${esc(nm(S.bases[ui.prBase]))}’s spot in the batting order, and ${esc(nm(S.bases[ui.prBase]))} leaves the game.</div>
     <div class="sec">Runner</div><div class="card">${cands.map(q=>`<button class="opt ${ui.prPick===q.id?'on':''}" data-a="prPick" data-v="${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${q.pos==='BN'?'Bench':'In the lineup, '+POSN[q.pos]}</div></div><span class="radio">${ui.prPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>`,
     {foot:`<button class="btn pri" data-a="doPR" ${ui.prPick?'':'disabled'}>Confirm</button>`});
 };
@@ -1471,7 +1470,7 @@ SHEETS.nr = () => {
   const b=ui.nrBase, r=S.bases[b];
   if(!r) return sheetWrap('Runner for a non-runner', `<div class="empty">No designated non-runner is on base right now. This sheet opens by itself when one reaches.</div>`);
   const cands = [...BENCH.map(q=>[q,'Bench']), [OURS.find(q=>q.id==='fisch'),'Pitcher, made the last out'], ...OURS.filter(q=>!['fisch','sull'].includes(q.id) && ![1,2,3].some(i=>S.bases[i]&&S.bases[i].id===q.id) && q.id!==batter().id).slice(0,4).map(q=>[q,'In the lineup'])];
-  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. He stays in the batting order and gets credit if his runner scores.</div>
+  return sheetWrap(`Who’s running for ${esc(r.short)}?`, `<div class="info"><b>${esc(r.name)}</b> is a designated non-runner and just reached ${BASEN[b]}. He stays in the batting order, and if his runner scores, the run is his.</div>
     <div class="card">${cands.map(([q,why])=>`<button class="opt ${ui.nrPick===q.id?'on':''}" data-a="nrPick" data-v="${q.id}" data-k="nr-${q.id}"><div class="num" style="width:36px;height:36px;font-size:15px">${q.n}</div><div class="grow"><div class="t1">${esc(q.name)}</div><div class="t2">${why}</div></div><span class="radio">${ui.nrPick===q.id?ic('check',16):''}</span></button>`).join('')}</div>`,
     {foot:`<button class="btn pri" data-a="doNR" data-k="nr-ok" ${ui.nrPick?'':'disabled'}>${ui.nrPick?esc(findP(ui.nrPick).short)+' runs':'Pick a runner'}</button>`, modal:true, noCancel:true, sub:'Asked automatically'});
 };
@@ -1501,7 +1500,7 @@ SHEETS.runner = () => {
   const others=[1,2,3].filter(i=>i!==b&&S.bases[i]);
   return sheetWrap(`${esc(nm(r))} on ${BASEN[b]}`, `<div class="agrid">${acts.map(([v,t,s])=>`<button data-a="runAct" data-v="${v}">${t}${s?`<small>${s}</small>`:''}</button>`).join('')}</div>
     ${others.length?`<div class="info" style="margin-top:12px">Double steal? Tap <b>${others.map(i=>esc(nm(S.bases[i]))).join(' and ')}</b> too, then pick once.</div>`:''}
-    <div class="sec">Also</div><div class="card"><button class="opt" data-a="sheet" data-v="pr"><span class="oic">${ic('run')}</span><div class="grow"><div class="t1">Pinch or courtesy runner</div></div>${ic('chevr',18)}</button></div>`);
+    <div class="sec">Also</div><div class="card"><button class="opt" data-a="sheet" data-v="pr"><span class="oic">${ic('run')}</span><div class="grow"><div class="t1">Pinch runner</div></div>${ic('chevr',18)}</button></div>`);
 };
 SHEETS.menu = () => sheetWrap('Game', `<div class="card">
   <button class="opt"><span class="oic">${ic('sliders')}</span><div class="grow"><div class="t1">Manual adjustment</div><div class="t2">Set outs, count, score or runners</div></div>${ic('chevr',18)}</button>
@@ -1632,8 +1631,11 @@ ACT.doPitch = () => { const ft=fieldTeam(), id=ui.pitchPick; let name='New pitch
   pushUndo('pitching change'); S.pit[ft]={name,hand,p:0,st:0}; sheet=null; toast(`${name} (${hand}) is pitching`); };
 ACT.phPick = v => ui.phPick=v;
 ACT.doPH = () => { const q=findP(ui.phPick), i=S.idx.us%OURS.length, old=OURS[i]; pushUndo('pinch hitter'); const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); BENCH.push(Object.assign(old,{pos:'BN'})); OURS[i]=Object.assign(q,{pos:old.pos==='BN'?'EH':old.pos}); sheet=null; ui.phPick=null; toast(`${q.short} bats for ${old.short}`); };
-ACT.prBase = v => ui.prBase=+v; ACT.prType = v => ui.prType=v; ACT.prPick = v => ui.prPick=v;
-ACT.doPR = () => { const q=findP(ui.prPick), old=S.bases[ui.prBase]; pushUndo(ui.prType==='pinch'?'pinch runner':'courtesy runner'); S.bases[ui.prBase]=clone(q); sheet=null; ui.prPick=null; toast(`${q.short} runs for ${nm(old)}`); };
+ACT.prBase = v => ui.prBase=+v; ACT.prPick = v => ui.prPick=v;
+ACT.doPR = () => { // an ordinary substitution: the runner takes the slot in the order, the player he replaces leaves
+  const q=findP(ui.prPick), old=S.bases[ui.prBase]; pushUndo('pinch runner');
+  const i=OURS.findIndex(x=>x.id===old.id); if(i>=0){ const bi=BENCH.findIndex(x=>x.id===q.id); BENCH.splice(bi,1); const gone=OURS[i]; q.pos=gone.pos; OURS[i]=q; BENCH.push(Object.assign(gone,{pos:'BN'})); }
+  S.bases[ui.prBase]=clone(q); sheet=null; ui.prPick=null; toast(`${q.short} pinch-runs for ${nm(old)}`); };
 ACT.nrPick = v => ui.nrPick=v;
 ACT.doNR = () => { const q=findP(ui.nrPick), old=S.bases[ui.nrBase]; pushUndo('runner for '+old.short); S.bases[ui.nrBase]=Object.assign(clone(q),{runsFor:old.short}); sheet=null; toast(`${q.short} running for ${old.short}`); };
 ACT.addPick = v => ui.addPick=v; ACT.addPos = v => ui.addPos = v==='EH'?'EH':+v;
@@ -1666,7 +1668,7 @@ const INDEX = [
   ['Pregame', [['The game','pg-game'],['Our lineup','pg-ours'],['Their lineup','pg-theirs'],['Starting pitchers','pg-pitchers'],['Review and play ball','pg-review']]],
   ['Batting screen', [['A · our hitter, with song','bat-a-ours'],['A · their hitter','bat-a-theirs'],['A · our hitter, no song','bat-a-nosong'],['B · our hitter, with song','bat-b-ours'],['B · their hitter','bat-b-theirs'],['B · our hitter, no song','bat-b-nosong']]],
   ['In-play steps (jump straight in)', [['What happened','step-result'],['Fielders: 6-3','step-63'],['Fielders: 5-4-3 double play','step-dp'],['Where a single landed','step-where'],['Runners: single, runner on 2nd','step-runners'],['Error by the shortstop','step-e6'],['Dropped third strike','step-k3']]],
-  ['Changes', [['Changes menu','sheet-subs'],['Pitching change','sheet-pitch'],['Pinch hitter','sheet-ph'],['Pinch or courtesy runner','sheet-pr'],['Non-runner prompt','sheet-nr'],['Add a hitter','sheet-add'],['Defense check','sheet-defense'],['Runner actions','sheet-runner'],['Game menu','sheet-menu'],['Changeover','changeover']]],
+  ['Changes', [['Changes menu','sheet-subs'],['Pitching change','sheet-pitch'],['Pinch hitter','sheet-ph'],['Pinch runner','sheet-pr'],['Non-runner prompt','sheet-nr'],['Add a hitter','sheet-add'],['Defense check','sheet-defense'],['Runner actions','sheet-runner'],['Game menu','sheet-menu'],['Changeover','changeover']]],
   ['Game and season', [['Game overview','overview'],['Box so far','overview/box'],['Pitchers','overview/pitch'],['Play-by-play','overview/plays'],['End of game','final'],['Season stats','season'],['Games list','games']]],
 ];
 function openHash(h){
