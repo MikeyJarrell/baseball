@@ -17,4 +17,4 @@ Read [README.md](README.md) for the folder map and [PROJECT_INDEX.md](PROJECT_IN
 
 ## Current focus
 
-The project is ready for its first substantive task. Track scope and status in [PROJECT_INDEX.md](PROJECT_INDEX.md). Shared deadlines, when assigned, live in `~/.claude-assistant/config/goals.yaml`.
+Building the scorebook iPhone app. Start with [plan/README.md](plan/README.md); builders follow [plan/rules-for-agents.md](plan/rules-for-agents.md) and their brief in `plan/briefs/`. Track scope and status in [PROJECT_INDEX.md](PROJECT_INDEX.md). Shared deadlines, when assigned, live in `~/.claude-assistant/config/goals.yaml`.

@@ -1,0 +1,97 @@
+# Scorebook app — the plan
+
+An iPhone app for the bench: it keeps the book pitch by pitch, plays each of our hitters’ walk-up songs, and turns every game into a box score and season stats. “Scorebook” is a working name.
+
+The other files in this folder hold the detail. [architecture.md](architecture.md) is the technical skeleton the builders share, [rules-for-agents.md](rules-for-agents.md) is the standing orders every builder follows, and [briefs/](briefs/) holds one set of marching orders per job.
+
+## What the app does
+
+**Walk-up songs.** Song clips live on the phone, imported from the Files app. Each player on our roster has a song, with a start point so a full track can begin at the hook. When one of our hitters comes up, that player’s song is cued on the batting screen: one tap plays it, a second tap fades it out. The phone ignores the silent switch and plays through a Bluetooth speaker, including with the screen locked.
+
+**Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Each player’s introduction is either a recording imported like a song (a teammate doing the impression into Voice Memos) or spoken by the iPhone’s built-in voice, slowed to that cadence and given a stadium echo. One tap plays the introduction and then the song. This is a nice-to-have, built after the walk-up songs work.
+
+**Between-innings music.** A playlist that plays during the changeover at the tap of a button and fades out when the next half-inning’s first pitch is recorded.
+
+**Keeping the book.** The main screen is the batter at the plate. Four big buttons do most of the work: ball, strike, foul, in play. Four balls and three strikes take care of themselves. Tapping “in play” opens a short sequence: what happened to the batter (out, hit, error, fielder’s choice), then for an out, the fielders tapped on a drawing of the field in the order they touched the ball, so tapping the shortstop and then the first baseman writes “6-3.” The app then shows where it thinks every runner ended up, using the obvious default (runners forced along on a walk, runners moving up as far as the batter on a hit), and the scorer fixes anything that went differently by tapping that runner. A 5-4-3 with a runner on first is three taps on the field and a confirm.
+
+After the play is saved, the next batter appears. After the third out, the screen flips to the other team’s next hitter. Undo is always one tap away, because the scorer will hit the wrong button with a beer in the other hand.
+
+**Checking the situation.** The top of the batting screen always shows the inning, score, outs, count, runners on base, who is up and who is on deck, the pitcher with throwing hand and pitch count, and what this batter has done earlier today (“6-3, walk, single to left”). A second screen, a swipe away, shows the full box score so far.
+
+**Lineups and changes.** Before the game: pick the opponent, who bats first, the number of innings, both batting orders and both starting pitchers. Our lineup comes from our roster. Their lineup can be names and numbers, numbers alone, or nothing, in which case their hitters are filled in as they come up. During the game, from the batting screen: change pitchers, pinch-hit, pinch-run, move fielders around, and add a hitter to the bottom of the batting order at any point. Batters and pitchers can be marked right- or left-handed.
+
+**Stats.** Every finished game becomes a box score and joins the season totals: batting average, on-base percentage, slugging, and the counting stats behind them, for every player on our team, plus pitching lines. At the end of a game the app produces an old-newspaper-style box score as a picture, ready to text to the group. A public stats website comes later.
+
+## How it fits together
+
+Every game is stored as a running list of everything that happened, in order: this pitch was a ball, this one was a foul, this ball in play was a 6-3, this pitcher came in. Nothing else is saved. The score, the count, the runners and every stat are worked out fresh from that list whenever they are needed.
+
+Three things follow from that. Undo means deleting the last entry. A mistake from three innings ago is fixed by correcting that one entry, and everything after it recalculates. And the pieces of the app can be built separately, because each one only has to understand the list: the part that tracks the game situation, the part that computes stats, and the part that prints a box score all read the same list and never talk to each other.
+
+The app is built as a set of separate pieces, each owned by one builder:
+
+| Piece | What it does | Needs a screen? |
+|---|---|---|
+| Shared vocabulary | The agreed definitions every other piece uses: what a player is, what a pitch is, what a play is | No |
+| Rules engine | Reads the list of events and works out the situation: count, outs, runners, score, who is up | No |
+| Stats | Turns games into box scores and box scores into season totals | No |
+| Box score printer | Lays out a finished box score as a newspaper-style picture and as text | No |
+| Storage | Saves every event the moment it is entered, and reopens a game in progress if the app closes | No |
+| Walk-up audio | Imports songs, stores start points, plays and fades | No |
+| Look and graphics | Colors, type, buttons, the drawing of the field, the app icon | Yes |
+| Screens | One builder per group of screens | Yes |
+
+The screens never do baseball arithmetic. A screen is handed a situation to display and hands back whatever the scorer tapped. That is what lets the batting screen be built and tested with made-up game situations while the rules engine is still being written.
+
+The pieces that need no screen can be built and tested on Mikey’s Mac today. The screens need Xcode, Apple’s app-building program, which is not installed yet.
+
+## Build order
+
+**Before any code.** Mikey installs Xcode from the Mac App Store and answers the remaining questions in [OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md).
+
+**Foundation.** One builder sets up the empty project, writes the shared vocabulary, and writes a set of made-up teams and game situations for everyone else to build against. Before finishing, it writes out twenty of the hardest plays in baseball scoring (a dropped third strike, a run scored by a runner the previous pitcher put on base, a double steal with a throwing error) in that vocabulary, and fixes the vocabulary until every one fits. This is the one job that has to finish before the rest start. At the same time, the designer starts on screen mockups, since those need no code.
+
+**Mockup approval.** The designer publishes clickable mockups of every screen as a private web page Mikey can open on his phone. Mikey approves or marks up the batting screen and the in-play sequence before anyone builds them, because those two screens are the app.
+
+**Building in parallel.** Once the foundation lands, every other job runs at the same time, each in its own copy of the project: rules engine, stats, box score printer, storage, walk-up audio, test scenarios, look and graphics, and the screen groups. No two jobs edit the same files.
+
+**Wiring.** One builder connects the screens to the rules engine, storage and audio, so tapping “ball” actually changes the count and the song actually plays. At the end of this stage the app works end to end in the iPhone simulator on the Mac.
+
+**Dress rehearsal.** Mikey scores a televised game with the app on his phone, start to finish, and writes down everything that was slow, confusing or wrong. Then the same thing at a real game of ours.
+
+**Later.** The stats website, an iPad layout, and two phones sharing one game. The first version runs on one phone, which both keeps the book and plays the music.
+
+## The team
+
+Each job below has its own brief in [briefs/](briefs/). A brief says what the job delivers, which files it owns, what it may read but not change, and how to tell it is finished.
+
+| Job | Brief | Starts when |
+|---|---|---|
+| Lead builder: foundation, then wiring the pieces together and merging everyone’s work | [foundation](briefs/foundation.md), [wiring and dress rehearsal](briefs/wiring-and-dress-rehearsal.md) | First; wiring after the parallel build |
+| Designer: mockups, colors and type, the field drawing, the app icon, the newspaper look | [design and mockups](briefs/design-and-mockups.md) | Right away |
+| Rules engine builder | [game rules engine](briefs/game-rules-engine.md) | After foundation |
+| Stats builder | [stats engine](briefs/stats-engine.md) | After foundation |
+| Box score printer | [box score printer](briefs/box-score-printer.md) | After foundation |
+| Storage builder | [storage](briefs/storage.md) | After foundation |
+| Audio builder | [walk-up audio](briefs/walk-up-audio.md) | After foundation |
+| Test writer: a library of game situations with known right answers, used to check the rules engine and stats | [test scenarios](briefs/test-scenarios.md) | After foundation |
+| Screen builder: teams, rosters and song assignments | [teams and songs screens](briefs/screen-teams-and-songs.md) | After foundation and mockup approval |
+| Screen builder: pregame lineups | [pregame screens](briefs/screen-pregame.md) | After foundation and mockup approval |
+| Screen builder: the batting screen | [batting screen](briefs/screen-at-bat.md) | After foundation and mockup approval |
+| Screen builder: the in-play sequence | [in-play sequence](briefs/screen-play-entry.md) | After foundation and mockup approval |
+| Screen builder: substitutions, pitching changes, added hitters, steals and other runner moves | [in-game changes](briefs/screen-in-game-changes.md) | After foundation and mockup approval |
+| Screen builder: the game-so-far screen and batter history | [game overview](briefs/screen-game-overview.md) | After foundation and mockup approval |
+| Screen builder: end of game and season stats | [postgame and season screens](briefs/screen-postgame-and-season.md) | After foundation and mockup approval |
+| Reviewer: a fresh reader who checks each job before it is accepted | [rules-for-agents.md](rules-for-agents.md) | As each job finishes |
+| Website builder | [stats website](briefs/stats-website.md) | Later |
+
+Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten things at once. A good first wave is foundation and design together; then the rules engine and test scenarios together, with stats, storage and the box score printer; then audio and the screens once Xcode is installed and the mockups are approved.
+
+## What Mikey has to do
+
+1. Install Xcode from the Mac App Store. It is free and large, and needs his Apple ID.
+2. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
+3. Answer the remaining league-rules questions in [OPEN_QUESTIONS.md](../OPEN_QUESTIONS.md).
+4. Approve the batting screen and in-play mockups.
+5. Collect the song clips, as audio files (MP3 or M4A) in a folder on the phone or in iCloud Drive, and decide each player’s song.
+6. Score a televised game as the dress rehearsal.

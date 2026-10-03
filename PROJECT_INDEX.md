@@ -5,6 +5,9 @@
 | Item | Status |
 |---|---|
 | Repository and project notes | Ready |
-| Project scope and first task | To be specified |
+| Scorebook iPhone app: plan, roles and task briefs | Drafted in [plan/](plan/README.md) |
+| Scorebook app: questions for Mikey | Open, in [OPEN_QUESTIONS.md](OPEN_QUESTIONS.md) |
+| Scorebook app: Xcode installed on the Mac | Not yet |
+| Scorebook app: foundation and design jobs | Not started |
 
 No deadlines have been assigned.
