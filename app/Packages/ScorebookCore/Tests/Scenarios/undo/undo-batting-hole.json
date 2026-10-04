@@ -1,0 +1,69 @@
+{
+  "description": "Undo a batting hole. Ortiz flies out, then Ruiz has to leave with nobody to replace them, so the second spot becomes a batting hole, which is up now. Undoing it gives the spot back to Ruiz as an ordinary batter.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "battingHole": {
+        "team": "away",
+        "spotIndex": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "outs": 1,
+          "batter": "m2",
+          "isBattingHoleUp": false,
+          "battingSlots": [
+            {
+              "team": "away",
+              "index": 1,
+              "isHole": false
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "batter": "m2",
+      "isBattingHoleUp": true,
+      "battingSlots": [
+        {
+          "team": "away",
+          "index": 1,
+          "isHole": true
+        }
+      ]
+    }
+  }
+}

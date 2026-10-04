@@ -1,0 +1,101 @@
+{
+  "description": "Ortiz singles to left. Ruiz grounds to short; Tate throws to Moreno at second to force Ortiz, too late to get Ruiz at first. A fielder's choice: an at-bat for Ruiz, no hit.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "fieldersChoice",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          4
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              6,
+              4
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3"
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "FC 6-4"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0,
+        "runsBattedIn": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 2,
+        "hits": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d2",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d1",
+        "putouts": 1,
+        "assists": 0
+      }
+    ]
+  }
+}

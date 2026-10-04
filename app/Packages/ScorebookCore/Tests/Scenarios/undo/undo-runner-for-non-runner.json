@@ -1,0 +1,141 @@
+{
+  "description": "Undo the runner for a designated non-runner. Moreno, the designated non-runner, singles and Barros runs for them. Undoing the runner puts Moreno back on first and opens the question of who runs again, with Barros offered.",
+  "setupFile": "designated-non-runner",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "runnerForNonRunner": {
+        "runner": "d9",
+        "replacing": "d1"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "first",
+              "runner": "d1",
+              "responsiblePitcher": "m9"
+            }
+          ],
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d1",
+          "suggestedRunner": "d9"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "runners": [
+        {
+          "base": "first",
+          "runner": "d9",
+          "responsiblePitcher": "m9",
+          "standingInFor": "d1"
+        }
+      ],
+      "isRunnerChoiceOpen": false,
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 0,
+          "players": [
+            "d1"
+          ]
+        }
+      ]
+    }
+  }
+}

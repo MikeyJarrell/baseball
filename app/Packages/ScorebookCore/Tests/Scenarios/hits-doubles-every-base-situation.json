@@ -1,0 +1,455 @@
+{
+  "description": "Eight Mudcats doubles in a row, one with each arrangement of runners (set by a manual adjustment before each). Every runner moves up two bases: runners on second and third score, a runner on first goes to third.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "manualAdjustment": {
+        "runners": {
+          "first": "m1"
+        },
+        "note": "Set the runners: a runner on first."
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "manualAdjustment": {
+        "runners": {
+          "second": "m1"
+        },
+        "note": "Set the runners: a runner on second."
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "manualAdjustment": {
+        "runners": {
+          "third": "m1"
+        },
+        "note": "Set the runners: a runner on third."
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "manualAdjustment": {
+        "runners": {
+          "first": "m2",
+          "second": "m1"
+        },
+        "note": "Set the runners: runners on first and second."
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "m5",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e10",
+      "enteredAt": "2026-05-02T18:08:20Z",
+      "manualAdjustment": {
+        "runners": {
+          "first": "m2",
+          "third": "m1"
+        },
+        "note": "Set the runners: runners on first and third."
+      }
+    },
+    {
+      "id": "e11",
+      "enteredAt": "2026-05-02T18:08:40Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "m6",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    },
+    {
+      "id": "e12",
+      "enteredAt": "2026-05-02T18:09:00Z",
+      "manualAdjustment": {
+        "runners": {
+          "second": "m2",
+          "third": "m1"
+        },
+        "note": "Set the runners: runners on second and third."
+      }
+    },
+    {
+      "id": "e13",
+      "enteredAt": "2026-05-02T18:09:20Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m7",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 2
+      }
+    },
+    {
+      "id": "e14",
+      "enteredAt": "2026-05-02T18:09:40Z",
+      "manualAdjustment": {
+        "runners": {
+          "first": "m3",
+          "second": "m2",
+          "third": "m1"
+        },
+        "note": "Set the runners: the bases loaded."
+      }
+    },
+    {
+      "id": "e15",
+      "enteredAt": "2026-05-02T18:10:00Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m3",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "m8",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 2
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m2"
+            },
+            {
+              "base": "third",
+              "runner": "m1"
+            }
+          ],
+          "score": {
+            "away": 0,
+            "home": 0
+          }
+        }
+      }
+    },
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m3"
+            }
+          ],
+          "score": {
+            "away": 1,
+            "home": 0
+          }
+        }
+      }
+    },
+    {
+      "afterEvent": "e9",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m5"
+            },
+            {
+              "base": "third",
+              "runner": "m2"
+            }
+          ],
+          "score": {
+            "away": 3,
+            "home": 0
+          }
+        }
+      }
+    },
+    {
+      "afterEvent": "e13",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "second",
+              "runner": "m7"
+            }
+          ],
+          "score": {
+            "away": 6,
+            "home": 0
+          }
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "score": {
+        "away": 8,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m8",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "third",
+          "runner": "m3",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m9",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 8,
+          "strikes": 8,
+          "battersFaced": 8
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e3",
+        "notation": "2B 8"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "hits": 1,
+        "doubles": 1,
+        "runs": 6,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m2",
+        "doubles": 1,
+        "runs": 2,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m3",
+        "doubles": 1,
+        "runs": 0,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m4",
+        "doubles": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m5",
+        "doubles": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m6",
+        "doubles": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "m7",
+        "doubles": 1,
+        "runsBattedIn": 2
+      },
+      {
+        "player": "m8",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 1,
+        "doubles": 1,
+        "runsBattedIn": 2
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "hits": 8,
+        "runs": 8,
+        "battersFaced": 8
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 8,
+        "hits": 8
+      }
+    ]
+  }
+}

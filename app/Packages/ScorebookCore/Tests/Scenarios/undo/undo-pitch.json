@@ -1,0 +1,119 @@
+{
+  "description": "Undo a pitch. Ortiz goes to 1-2, then swings through strike three. Undoing the strikeout pitch puts Ortiz back at the plate at 1-2 with nobody out, and takes the pitch, the strikeout and the catcher's putout back off.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "outs": 0,
+          "count": {
+            "balls": 1,
+            "strikes": 2
+          },
+          "batter": "m1",
+          "droppedThirdStrikePossible": false,
+          "pitchers": [
+            {
+              "pitcher": "d9",
+              "pitches": 3,
+              "strikes": 2,
+              "battersFaced": 0
+            }
+          ]
+        },
+        "batting": [
+          {
+            "player": "m1",
+            "plateAppearances": 0,
+            "strikeouts": 0
+          }
+        ],
+        "pitching": [
+          {
+            "pitcher": "d9",
+            "strikeouts": 0,
+            "outsRecorded": 0,
+            "pitches": 3
+          }
+        ],
+        "fielding": [
+          {
+            "player": "d8",
+            "putouts": 0
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "m2",
+      "droppedThirdStrikePossible": true,
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 4,
+          "strikes": 3,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "strikeouts": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "strikeouts": 1,
+        "outsRecorded": 1,
+        "pitches": 4
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1
+      }
+    ]
+  }
+}

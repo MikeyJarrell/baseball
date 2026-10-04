@@ -5,11 +5,12 @@
 | Item | Status |
 |---|---|
 | Plan, roles and job briefs | Accepted, in [plan/](plan/README.md); league rules in [notes/league-rules.md](notes/league-rules.md) |
-| Xcode and iPhone simulator | Installed (Xcode 27, iOS 27 simulator) |
-| Foundation: shared vocabulary, sample data, app shell | Accepted |
-| Clickable mockups | Approved and accepted ([plan/mockups/](plan/mockups/README.md)) |
-| Rules engine, test scenarios, stats, storage, box score printer, design system code | In progress |
-| Walk-up audio and the screens | Not started |
-| Full-size Diamond Dogs logo for the app icon | Waiting on Mikey |
+| Foundation, vocabulary pass, app icon | Accepted |
+| Rules engine, stats, storage, box score printer, design system, 106 test scenarios | Accepted; 197 game-logic tests pass |
+| Batting screen, in-game changes sheets | Accepted |
+| In-play sequence | Built; in review |
+| Walk-up audio | Built; fixing review findings |
+| Teams and songs, pregame, game overview, postgame and season screens | In progress |
+| Wiring the app together, dress rehearsal | Not started |
 
 No deadlines have been assigned.
