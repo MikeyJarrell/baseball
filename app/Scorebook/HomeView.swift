@@ -10,6 +10,7 @@ import SwiftUI
 import Model
 import DesignSystem
 import Scoring
+import TeamScreens
 
 /// The pages that slide in from the home screen.
 enum HomeRoute: Hashable {
@@ -73,6 +74,8 @@ struct HomeView: View {
             .navigationDestination(for: HomeRoute.self) { route in
                 HomeDestination(route: route, path: $path)
             }
+            // The teams and songs pages link to each other on this same stack.
+            .teamScreenDestinations(app.teamScreensData, onRequest: app.handleTeams)
         }
         .tint(ScorebookColor.inPlay)
         .fullScreenCover(isPresented: $settingUpGame, onDismiss: {
@@ -97,6 +100,10 @@ struct HomeView: View {
         } message: {
             Text(app.problem ?? "")
         }
+        // A recording that stopped by itself (the 30-second limit, a phone call) is collected,
+        // so the recording sheet offers Listen and Keep.
+        .onChange(of: app.audio?.isRecording) { _, _ in app.collectRecordingThatStopped() }
+        .onChange(of: app.audio?.pendingRecording) { _, _ in app.collectRecordingThatStopped() }
         .task {
             // Resume: if the app was closed in the middle of a game, go straight back to it.
             guard !checkedForGameInProgress else { return }
