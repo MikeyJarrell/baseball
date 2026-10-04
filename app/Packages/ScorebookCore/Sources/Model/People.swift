@@ -177,12 +177,6 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
         "announcer-number-\(number).m4a"
     }
 
-    /// "Number twenty-two." said to end the introduction, voice falling. Optional: without
-    /// it, the mid-sentence recording is used again.
-    public static func closingNumberFile(_ number: String) -> String {
-        "announcer-closing-\(number).m4a"
-    }
-
     /// A player's name recording, from the plain file name stem "aidan-kurt".
     public static func nameFile(_ stem: String) -> String {
         "announcer-name-\(stem).m4a"
