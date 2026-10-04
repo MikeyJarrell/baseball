@@ -149,7 +149,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Goes up by one every time something new starts or stops. A message from the audio
     /// system about an older play carries an older number and is ignored.
     @ObservationIgnored private var playNumber = 0
-    /// The 20-times-a-second heartbeat that runs fades and updates the countdown.
+    /// The 50-times-a-second heartbeat that runs fades and updates the countdown.
     @ObservationIgnored private var ticker: Task<Void, Never>?
     /// The current play's timing, in seconds on the phone's audio clock.
     @ObservationIgnored private var timing = Timing()
@@ -190,7 +190,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
     /// When the parts of the current play start and stop, on the audio clock.
     private struct Timing {
-        /// When the song part starts (after any introduction).
+        /// When the song starts sounding: with an introduction, the same moment as the voice.
         var songStart: Double?
         /// Seconds into the track where the song starts.
         var songOffset: TimeInterval = 0
@@ -203,6 +203,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         var loopLength: TimeInterval?
         /// When the introduction finishes.
         var introductionEnd: Double?
+        /// While the song fades in under the announcer: when the fade-in started and how long
+        /// the introduction is (the song is at full volume when it ends).
+        var fadeInStart: Double?
+        var fadeInLength: TimeInterval = 0
         /// When an introduction played on its own, echo tail included, is over.
         var introductionOnlyEnd: Double?
         /// When the current fade started, how long it lasts, and the volume it started from.
@@ -287,7 +291,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         let level = min(max(volume, 0), 1)
         changeSong(song) { $0.volume = level }
         // Turn it up or down right away if it is the song playing now.
-        if nowPlaying == song, activity != .introduction { graph.songNode.volume = Float(level) }
+        // (While it fades in under the announcer, the next heartbeat uses the new level.)
+        if nowPlaying == song, activity != .introduction, timing.fadeInStart == nil {
+            graph.songNode.volume = Float(level)
+        }
     }
 
     public func setAnnouncerEcho(_ amount: Double) {
@@ -531,7 +538,12 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         return playNumber
     }
 
-    /// Plays the introduction, then the song right after it, timed to the sample.
+    /// Plays a walk-up. With an introduction, the song starts at the same moment as the
+    /// voice, from early enough that it reaches its start point just as the announcer
+    /// finishes: silent at first, about a third of full volume under the voice, full volume at
+    /// the end of the introduction (see `WalkUpMath.walkUpPlan` and `fadeInVolume`). Then the
+    /// usual length of song plays. Without one, the song starts at its start point at full
+    /// volume. Timed to the sample.
     private func startWalkUp(song: Song?, introduction: AVAudioPCMBuffer?) {
         currentIntroduction = introduction
         let file = song.flatMap { openFile(for: $0) }
@@ -542,22 +554,30 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         // Start a twentieth of a second from now, so the introduction and the song share
         // one clock reading.
         let begin = Self.audioClockNow() + 0.05
-        var songStart = begin
+        var introductionLength: TimeInterval = 0
         if let introduction {
             graph.connectIntroPlayer(format: introduction.format)
             graph.introNode.scheduleBuffer(introduction, at: nil, options: [], completionCallbackType: .dataPlayedBack) { @Sendable _ in }
             graph.introNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: begin)))
-            let seconds = Double(introduction.frameLength) / introduction.format.sampleRate
-            timing.introductionEnd = begin + seconds
+            introductionLength = Double(introduction.frameLength) / introduction.format.sampleRate
+            timing.introductionEnd = begin + introductionLength
             isPlayingIntroduction = true
-            // A short breath after “Number two.” before the music hits.
-            songStart = begin + seconds + 0.3
         }
         if let song, let file {
-            let length = WalkUpMath.songLength(for: song, walkUpLength: walkUpLength)
-            scheduleSong(song, file: file, from: song.startTime, length: length, repeating: false,
-                         startingAt: songStart)
-            graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: songStart)))
+            let plan = WalkUpMath.walkUpPlan(
+                startPoint: song.startTime, introductionLength: introductionLength,
+                songLength: WalkUpMath.songLength(for: song, walkUpLength: walkUpLength))
+            // The whole walk-up is one stretch of song: from where it starts under the voice,
+            // for the introduction plus the usual length. The countdown and the automatic fade
+            // at the end work on that stretch.
+            scheduleSong(song, file: file, from: plan.startsAt, length: plan.totalLength, repeating: false,
+                         startingAt: begin)
+            if introduction != nil {
+                graph.songNode.volume = 0   // silent at first; `tick` raises it
+                timing.fadeInStart = begin
+                timing.fadeInLength = plan.fullVolumeAfter
+            }
+            graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: begin)))
         } else {
             // An introduction with no song: done once the echo dies away.
             timing.introductionOnlyEnd = (timing.introductionEnd ?? begin) + 1.5
@@ -726,8 +746,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
         switch activity {
         case .walkUp:
-            if let start = old.songStart, now >= start, let length = old.songLength, let song = currentSong {
-                // In the song: carry on with the time that was left.
+            let inIntroduction = old.introductionEnd.map { now < $0 } ?? false
+            if !inIntroduction, let start = old.songStart, now >= start, let length = old.songLength,
+               let song = currentSong {
+                // Past the announcer: carry on with the time that was left, at full volume.
                 let intoSong = now - start
                 let left = length - intoSong
                 guard left > 0.5 else { finish(); return }
@@ -761,13 +783,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         startTicker()
     }
 
-    /// Runs `tick` twenty times a second while something is playing or recording.
+    /// Runs `tick` fifty times a second while something is playing or recording, often enough
+    /// that fades sound smooth.
     private func startTicker() {
         guard ticker == nil else { return }
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 self?.tick()
-                try? await Task.sleep(for: .milliseconds(50))
+                try? await Task.sleep(for: .milliseconds(20))
             }
         }
     }
@@ -796,9 +819,18 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             return
         }
 
-        // The introduction has finished and the song has begun.
+        // The introduction has finished and the song is at full volume.
         if isPlayingIntroduction, let end = timing.introductionEnd, now >= end {
             isPlayingIntroduction = false
+        }
+
+        // The song fading in under the announcer: raise it a step. Its own volume level (from
+        // the song library) is the top.
+        if let fadeInStart = timing.fadeInStart {
+            let fullLevel = Float(currentSong.flatMap { library.song($0.id)?.volume } ?? 1)
+            let shape = WalkUpMath.fadeInVolume(elapsed: now - fadeInStart, introductionLength: timing.fadeInLength)
+            graph.songNode.volume = fullLevel * shape
+            if shape >= 1 { timing.fadeInStart = nil }   // done: full volume from here
         }
 
         // An introduction on its own (or with no song after it) is over once its echo fades.
