@@ -23,6 +23,10 @@
 
 Mikey’s decision: every score line lists the visitors first. The resume card, the changeover banner, the “Is the game over?” pop-up (both copies), the game menu and the end-of-game screen now do. The newspaper headline keeps the winner first, as newspapers print it, and the games list keeps “W 7–5”, our runs first, as a result.
 
+### Rules engine fix
+
+A change recorded at the changeover before the defense check (a new pitcher, a substitution) now goes into the check’s suggestion (`Replay.carry`), so the check no longer opens proposing to put the old pitcher back. Found by the walkthrough; checked by `Tests/GameEngineTests/DefenseCheckTests.swift`.
+
 ### Second vocabulary pass
 
 All in `notes/vocabulary-requests.md` under “Done in the second pass”. In short: the printer prints decisions, “HBP—by”, runners for non-runners, the game’s length and lettered pinch-hitter footnotes; runner suggestions around the scorer’s fixed runners; results, record and pitchers’ wins and losses from stats; the play log’s inning breaks, out bases and stolen bases; `Player.usualPosition`, `usualRole` and `usuallyLeadsOff`; `Song.artist`; the `fadesAt` comment.
@@ -31,8 +35,8 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 
 - AtBatScreen: `AtBatScreen.swift` (new `countAfter` input), `AtBatControls.swift`, `AtBatBand.swift`, `AtBatWording.swift` (hints from the rules engine, `displayShortName`, visitors first).
 - PregameScreens: `OurLineup.swift`, `PregameBuilder.swift`, `PregameInput.swift` (`UsualRole` and `usualRoles` removed; the first lineup reads `Player`), `PregameSamples.swift`.
-- PlayEntry: `PlayEntry.swift`, `PlayEntryModel.swift` (fixed runners and re-suggestion).
-- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first).
+- PlayEntry: `PlayEntry.swift`, `PlayEntryModel.swift` (fixed runners and re-suggestion); `RunnersStep.swift` (fixed accessibility names on each runner row and its two questions, for the simulator tests).
+- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first); `PitchingChangeSheet.swift` (the new pitcher can take any batting spot or none, from a menu that lists the old pitcher’s spot first, in place of the switch that offered only the old pitcher’s spot; found by the walkthrough, where a reliever took the spot of the pinch hitter who had batted for the starter).
 - GameOverview: `OverviewWording.swift` (reads the play log’s inning break, out base and stolen base); `Tests/GameOverviewTests/MoreLogsTests.swift` (two suites run on the main thread, which clears the build warnings).
 - PostgameScreens: `PostgameWording.swift`, `StatColumns.swift`, `SeasonStatsScreen.swift` (the record comes from the totals, so its `games:` input is gone), `PlayerSeasonScreen.swift`, `GamesListScreen.swift`, `PreviewSeason.swift`, `Previews.swift`.
 - BoxScorePicture: `BoxScorePicture.swift` (pinch-hitter footnotes).
