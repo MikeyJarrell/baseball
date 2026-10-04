@@ -195,7 +195,7 @@ public struct FieldDrawing: View {
             .fill(ScorebookColor.fieldGrass)
             // The infield dirt: a fan from behind home plate out past the bases.
             Path { p in
-                p.move(to: map.point(CGPoint(x: 160, y: 296)))
+                p.move(to: map.point(CGPoint(x: 160, y: 282)))
                 p.addLine(to: map.point(CGPoint(x: 62, y: 198)))
                 p.addQuadCurve(to: map.point(CGPoint(x: 258, y: 198)), control: map.point(CGPoint(x: 160, y: 34)))
                 p.closeSubpath()
@@ -203,14 +203,14 @@ public struct FieldDrawing: View {
             .fill(ScorebookColor.fieldDirt)
             // The infield grass inside the base paths.
             Path { p in
-                p.addLines([CGPoint(x: 160, y: 261), CGPoint(x: 216, y: 205), CGPoint(x: 160, y: 149), CGPoint(x: 104, y: 205)].map(map.point))
+                p.addLines([CGPoint(x: 160, y: 251), CGPoint(x: 206, y: 205), CGPoint(x: 160, y: 159), CGPoint(x: 114, y: 205)].map(map.point))
                 p.closeSubpath()
             }
             .fill(ScorebookColor.fieldGrassInfield)
             // The dirt circle around home plate.
             Circle().fill(ScorebookColor.fieldDirt)
-                .frame(width: 34 * map.scale, height: 34 * map.scale)
-                .position(map.point(Layout.home))
+                .frame(width: 40 * map.scale, height: 40 * map.scale)
+                .position(map.point(Layout.homePlateCenter))
             // The foul lines.
             Path { p in
                 p.move(to: map.point(Layout.leftFoulPole)); p.addLine(to: map.point(Layout.home))
@@ -237,16 +237,16 @@ public struct FieldDrawing: View {
     /// The three bases and home plate. A lit base takes the batting team's color.
     private func bases(_ map: Mapper) -> some View {
         let lit = FieldLogic.litBases(occupied: occupiedBases, baseRunners: runnersOnBases, markers: runnerMarkers)
-        let side = 16 * map.scale
+        let side = Layout.baseSize * map.scale
         return ZStack(alignment: .topLeading) {
-            // Home plate, drawn as the five-sided plate.
+            // Home plate, drawn as the five-sided plate, its back point where the foul lines meet.
             Path { p in
-                p.addLines([CGPoint(x: 152, y: 271), CGPoint(x: 168, y: 271), CGPoint(x: 168, y: 277), CGPoint(x: 160, y: 284), CGPoint(x: 152, y: 277)].map(map.point))
+                p.addLines(Layout.homePlate.map(map.point))
                 p.closeSubpath()
             }
             .fill(ScorebookColor.baseEmpty)
             .overlay(Path { p in
-                p.addLines([CGPoint(x: 152, y: 271), CGPoint(x: 168, y: 271), CGPoint(x: 168, y: 277), CGPoint(x: 160, y: 284), CGPoint(x: 152, y: 277)].map(map.point))
+                p.addLines(Layout.homePlate.map(map.point))
                 p.closeSubpath()
             }.stroke(ScorebookColor.fieldOutline, lineWidth: 1))
             ForEach([Base.first, .second, .third], id: \.self) { base in
@@ -256,7 +256,9 @@ public struct FieldDrawing: View {
                     // An occupied base is filled in the batting team's color with a thick dark
                     // outline; an empty base is only an outline, so the two differ in sun.
                     square.fill(isLit ? runnerFill : Color.clear)
-                        .overlay(square.stroke(isLit ? ScorebookColor.baseOccupiedOutline : ScorebookColor.baseEmptyOutline,
+                        // The outline is drawn inside the bag's edge, so a bag on the foul line
+                        // does not spill over it.
+                        .overlay(square.strokeBorder(isLit ? ScorebookColor.baseOccupiedOutline : ScorebookColor.baseEmptyOutline,
                                                lineWidth: isLit ? max(2.5, 3.5 * map.scale) : max(1.5, 2 * map.scale)))
                         .frame(width: side, height: side)
                         .rotationEffect(.degrees(45))
@@ -515,15 +517,50 @@ enum Layout {
     static let wholeFieldArea = CGRect(x: 0, y: 0, width: 320, height: 322)
     static let infieldArea = CGRect(x: 22, y: 90, width: 276, height: 224)
 
-    /// Where each base is.
+    // MARK: Bases, placed the way a real field is laid out
+
+    /// How long a side of each base bag is drawn. Real bags are 18 inches; the drawing makes
+    /// them bigger so they can be seen and tapped.
+    static let baseSize: CGFloat = 16
+    /// The distance from the back point of home plate to the back corner of first or third base:
+    /// 90 feet on a real field.
+    static let baseDistance: CGFloat = 100
+
+    /// One step along the first-base foul line, away from home (up and to the right).
+    private static let alongFirstBaseLine = CGPoint(x: 0.5.squareRoot(), y: -(0.5.squareRoot()))
+    /// One step along the third-base foul line, away from home (up and to the left).
+    private static let alongThirdBaseLine = CGPoint(x: -(0.5.squareRoot()), y: -(0.5.squareRoot()))
+
+    /// Where a bag sits on a foul line: entirely in fair territory, with its outside edge along
+    /// the line and its back corner `baseDistance` from home, as on a real field. Its middle is
+    /// half a bag back toward home along the line, and half a bag in from the line toward fair
+    /// ground (the direction of the other foul line).
+    private static func bagOnFoulLine(along line: CGPoint, inward: CGPoint) -> CGPoint {
+        let alongLine = baseDistance - baseSize / 2, inFromLine = baseSize / 2
+        return CGPoint(x: home.x + line.x * alongLine + inward.x * inFromLine,
+                       y: home.y + line.y * alongLine + inward.y * inFromLine)
+    }
+
+    /// Where the middle of each base is. Home is the back point of home plate, where the foul
+    /// lines meet. First and third sit inside the foul lines. Second is centered on the line
+    /// from home through the pitcher's mound, at the far corner of the diamond.
     static func base(_ base: Base) -> CGPoint {
         switch base {
         case .home: home
-        case .first: CGPoint(x: 231, y: 205)
-        case .second: CGPoint(x: 160, y: 134)
-        case .third: CGPoint(x: 89, y: 205)
+        case .first: bagOnFoulLine(along: alongFirstBaseLine, inward: alongThirdBaseLine)
+        case .second: CGPoint(x: home.x, y: home.y - baseDistance * 2.0.squareRoot())
+        case .third: bagOnFoulLine(along: alongThirdBaseLine, inward: alongFirstBaseLine)
         }
     }
+
+    /// Home plate's five corners: the back point at the corner where the foul lines meet, its
+    /// two back edges running along the foul lines, and its flat front edge facing the pitcher.
+    static let homePlate: [CGPoint] = [
+        CGPoint(x: home.x - 8, y: home.y - 14), CGPoint(x: home.x + 8, y: home.y - 14),
+        CGPoint(x: home.x + 8, y: home.y - 8), home, CGPoint(x: home.x - 8, y: home.y - 8),
+    ]
+    /// The middle of home plate, for the dirt circle drawn around it.
+    static let homePlateCenter = CGPoint(x: home.x, y: home.y - 8)
 
     /// Where each fielder stands.
     static func position(_ position: Position) -> CGPoint {
@@ -545,11 +582,11 @@ enum Layout {
     /// baseman, and the tag for home sits in front of the plate, clear of the catcher.
     static func tagSpot(_ base: Base, fieldersShown: Bool = false) -> CGPoint {
         switch base {
-        case .first: CGPoint(x: 244, y: 240)
+        case .first: CGPoint(x: 236, y: 238)
         case .second: CGPoint(x: 160, y: fieldersShown ? 94 : 110)
-        case .third: CGPoint(x: 76, y: 240)
+        case .third: CGPoint(x: 84, y: 238)
         // With the fielders drawn, the catcher stands behind the plate, so the tag sits in front of it.
-        case .home: CGPoint(x: 160, y: fieldersShown ? 252 : 297)
+        case .home: CGPoint(x: 160, y: fieldersShown ? 246 : 297)
         }
     }
 
