@@ -58,6 +58,7 @@ struct RecordIntroductionSheet: View {
                 }
                 .padding(.horizontal, Spacing.large)
                 .padding(.top, Spacing.small)
+                .readableWidth()
             }
             .teamPageBackground()
             .safeAreaInset(edge: .bottom) {

@@ -56,6 +56,7 @@ public struct PlayerPage: View {
             }
             .padding(.horizontal, Spacing.large)
             .padding(.bottom, Spacing.huge)
+            .readableWidth()
         }
         .teamPageBackground()
         .navigationTitle("")

@@ -127,43 +127,26 @@ public enum IntroductionRecording: Equatable, Sendable {
     }
 }
 
-/// A player's usual spot on the team: where they normally field and what they normally do in
-/// the lineup. Pregame starts from it. A stand-in until `Player` carries these itself.
+/// A player's usual spot on the team: where they usually field, whether they usually lead off,
+/// and whether they usually start on the bench. Pregame builds the first game's lineup from it.
+/// A stand-in until `Player` carries these itself; it has the same three parts as the pregame
+/// screens' `UsualRole`, so the app shell can keep one copy and hand it to both.
 public struct PlayerUsuals: Codable, Equatable, Hashable, Sendable {
-    /// Where they usually field, if anywhere.
+    /// The position they usually play. Missing means they usually only bat.
     public var position: Position?
-    /// What they usually do in the lineup.
-    public var role: UsualRole?
+    /// True for the usual leadoff hitter.
+    public var leadsOff: Bool
+    /// True for a player who usually starts on the bench.
+    public var startsOnBench: Bool
 
-    public init(position: Position? = nil, role: UsualRole? = nil) {
+    public init(position: Position? = nil, leadsOff: Bool = false, startsOnBench: Bool = false) {
         self.position = position
-        self.role = role
+        self.leadsOff = leadsOff
+        self.startsOnBench = startsOnBench
     }
 
     /// True when nothing is set.
-    public var isEmpty: Bool { position == nil && role == nil }
-}
-
-/// What a player usually does in the lineup.
-public enum UsualRole: String, Codable, CaseIterable, Sendable {
-    /// Bats first.
-    case leadsOff
-    /// Bats without fielding.
-    case batsOnly
-    /// Fields without batting, like a pitcher who does not hit.
-    case fieldsOnly
-    /// Starts the game on the bench.
-    case startsOnBench
-
-    /// The words in the role picker: "Leads off".
-    public var label: String {
-        switch self {
-        case .leadsOff: "Leads off"
-        case .batsOnly: "Bats only"
-        case .fieldsOnly: "Fields only"
-        case .startsOnBench: "Starts on the bench"
-        }
-    }
+    public var isEmpty: Bool { position == nil && !leadsOff && !startsOnBench }
 }
 
 /// Which of a player's two songs is meant.

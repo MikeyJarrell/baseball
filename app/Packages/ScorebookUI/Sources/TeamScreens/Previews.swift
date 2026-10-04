@@ -30,12 +30,12 @@ public struct TeamScreensDemoState: Equatable, Sendable {
 
     /// Usual positions and roles for the sample Diamond Dogs, as the scorer might set them.
     public static let sampleUsuals: [PlayerID: PlayerUsuals] = [
-        "d1": PlayerUsuals(position: .centerField, role: .leadsOff), "d2": PlayerUsuals(position: .shortstop),
+        "d1": PlayerUsuals(position: .centerField, leadsOff: true), "d2": PlayerUsuals(position: .shortstop),
         "d3": PlayerUsuals(position: .firstBase), "d4": PlayerUsuals(position: .leftField),
         "d5": PlayerUsuals(position: .thirdBase), "d6": PlayerUsuals(position: .catcher),
         "d7": PlayerUsuals(position: .secondBase), "d8": PlayerUsuals(position: .rightField),
-        "d9": PlayerUsuals(position: .pitcher, role: .fieldsOnly), "d10": PlayerUsuals(role: .batsOnly),
-        "d11": PlayerUsuals(role: .startsOnBench), "d12": PlayerUsuals(position: .pitcher, role: .startsOnBench),
+        "d9": PlayerUsuals(position: .pitcher), "d10": PlayerUsuals(),
+        "d11": PlayerUsuals(startsOnBench: true), "d12": PlayerUsuals(position: .pitcher, startsOnBench: true),
     ]
 
     /// Changes the state the way the app shell would for this request.

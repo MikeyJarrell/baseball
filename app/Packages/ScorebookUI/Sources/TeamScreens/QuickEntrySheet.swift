@@ -41,6 +41,7 @@ struct QuickEntrySheet: View {
                 }
                 .padding(.horizontal, Spacing.large)
                 .padding(.vertical, Spacing.small)
+                .readableWidth()
             }
             .scrollDismissesKeyboard(.never)
             .teamPageBackground()

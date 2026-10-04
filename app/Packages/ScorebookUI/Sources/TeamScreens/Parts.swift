@@ -346,6 +346,12 @@ extension View {
         background(ScorebookColor.background.ignoresSafeArea())
     }
 
+    /// Keeps a page's cards at a comfortable width on an iPad, centered, instead of stretching
+    /// across a wide screen. On an iPhone it changes nothing.
+    func readableWidth() -> some View {
+        frame(maxWidth: 640).frame(maxWidth: .infinity)
+    }
+
     /// The look of a list on these pages: grouped white cards on the gray page.
     func teamListStyle() -> some View {
         listStyle(.insetGrouped)
