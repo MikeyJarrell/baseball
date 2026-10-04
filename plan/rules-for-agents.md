@@ -20,6 +20,8 @@ Read this, then [architecture.md](architecture.md), then your brief in [briefs/]
 
 **Preview what has a screen.** Every screen has SwiftUI previews driven by `SampleData`, covering at least the situations your brief lists, in light and dark mode and at the largest accessibility text size. Check it on an iPad too, upright and sideways: the app installs on iPads, and an iPad window can be any shape ([notes/ipad-check.md](../notes/ipad-check.md)).
 
+**Use the simulators that already exist.** Run everything on the standard `iPhone 17`, `iPhone 17e` (the smallest current iPhone), `iPad Pro 13-inch (M5)` and `iPad mini (A17 Pro)` simulators. Never create, clone, rename or delete a simulator, and never wipe one with `simctl erase`: the app asks Mikey to click Allow the first time Claude touches each simulator, so every new one is another popup. Several builders can share one simulator at once. Give a throwaway harness app its own bundle id, and remove it with `xcrun simctl uninstall` when you finish.
+
 **Keep it plain.** Use the names in the design system for colors, type and spacing. No outside code libraries without the lead builder’s approval. No images downloaded from the internet: icons come from Apple’s built-in SF Symbols set, and anything else is drawn in code by the designer.
 
 ## Finishing

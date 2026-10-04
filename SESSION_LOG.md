@@ -93,3 +93,23 @@ SESSLOG:[2026-10-03 17:33]
 
 ### Context
 The batting screen and in-game change sheets were run on the 13-inch iPad Pro and iPad mini simulators. Upright they worked; the fixes were oversized runner tags on the big iPad and a squashed field when sideways. The simulator cannot be rotated from the command line here (no Simulator app, and asking iOS to rotate from code did nothing), so sideways was tested by drawing the screen at sideways size in a throwaway harness.
+
+---
+
+## [2026-10-03 19:58] Stopping the simulator permission popups
+SESSLOG:[2026-10-03 19:58]
+
+**Project(s):** baseball
+
+### Decisions
+- Builders use only the existing `iPhone 17`, `iPhone 17e`, `iPad Pro 13-inch (M5)` and `iPad mini (A17 Pro)` simulators, and never create, clone, rename, delete or erase one (`plan/rules-for-agents.md`).
+- Throwaway harness apps get their own bundle id and are uninstalled when the builder finishes; several builders may share one simulator.
+
+### Follow-ups
+- [ ] Builders already running when this landed (the teams-and-songs screen) may still make their own simulator; Mikey can click Cancel on popups naming a made-up simulator.
+
+### Files
+- [modified] `plan/rules-for-agents.md` — simulator rule
+
+### Context
+The app asks Mikey to click Allow the first time Claude controls each simulator. Builders had been making a fresh, uniquely named simulator per job (“GameChanges iPhone 17”, “GOReview2 iPhone 17”, “Overview harness iPhone 17”), so every job set off a new popup. Reusing a fixed set should mean one Allow per simulator, going by the popup’s wording; that it stays allowed across sessions has not been confirmed.
