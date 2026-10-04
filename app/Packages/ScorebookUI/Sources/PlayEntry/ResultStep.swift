@@ -6,7 +6,8 @@ import Model
 import DesignSystem
 
 /// "What happened to the batter?": batter out, the four hits, reached on error, fielder's
-/// choice, and "More" for sacrifices, dropped third strike and catcher's interference.
+/// choice, and "More" for sacrifices and catcher's interference. A dropped third strike is not
+/// here: it opens only from the batting screen's chip after strike three.
 struct ResultStep: View {
     let model: PlayEntryModel
 
@@ -42,16 +43,13 @@ struct ResultStep: View {
                         answer(.sacrificeBunt, "Sacrifice bunt", kind: .light)
                     }
                     GridRow {
-                        Button { model.perform(.pickDroppedThirdStrike) } label: {
-                            BigChoiceLabel(title: "Dropped 3rd strike")
-                        }
-                        .buttonStyle(BigChoiceButtonStyle(kind: .light))
                         answer(.catchersInterference, "Catcher’s interference", kind: .light)
+                            .gridCellColumns(2)
                     }
                 } else {
                     GridRow {
                         Button { model.perform(.showMore) } label: {
-                            BigChoiceLabel(title: "More: sacrifice, dropped 3rd strike, interference")
+                            BigChoiceLabel(title: "More: sacrifice, interference")
                         }
                         .buttonStyle(BigChoiceButtonStyle(kind: .quiet))
                         .gridCellColumns(2)

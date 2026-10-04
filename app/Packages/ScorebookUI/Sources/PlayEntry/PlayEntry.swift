@@ -7,8 +7,8 @@
 // event, the dropped-third-strike play, or a cancel that records nothing.
 //
 // The screen does no baseball arithmetic. Notation, outs, runs, runs batted in, "inning over"
-// and where the runners went all come from the two rules-engine functions it is handed in
-// `PlayEntryRules`. Until wiring, previews and demos use the stand-in rules engine from SampleData.
+// and where the runners went all come from the rules-engine functions it is handed in
+// `PlayEntryRules`. Until wiring, previews and demos use SampleData's rules engine.
 //
 // This file holds what the rest of the app sees: the view to show, what it is handed, and
 // what it hands back. The steps themselves are in the other files of this folder.
@@ -18,39 +18,40 @@ import Model
 import SampleData
 import DesignSystem
 
-/// The two rules-engine functions the in-play sequence needs while the scorer is tapping.
-/// The app hands in the real rules engine's; previews hand in the stand-in's.
+/// The rules-engine functions the in-play sequence needs while the scorer is tapping.
+/// The app hands in the real rules engine's; previews hand in SampleData's.
 public struct PlayEntryRules: Sendable {
     /// Where every runner, batter included, most likely ended up, and the runs batted in,
-    /// given what the scorer has picked so far (including any runners they have moved).
+    /// given what the scorer has picked so far. `draft.runners` holds only the runners the
+    /// scorer has placed themselves, so the engine is free to move everyone else.
     public var suggestRunners: @Sendable (PlayDraft, Situation) -> RunnerSuggestion
     /// The play so far: its notation ("6", then "6-3"), the outs and runs it would produce,
     /// and whether it ends the half-inning or the game.
     public var preview: @Sendable (PlayDraft, Situation) -> PlayPreview
+    /// A guess at the kind of batted ball from the fielders tapped so far, for the dashed chip.
+    public var suggestBattedBall: @Sendable (PlayDraft) -> BattedBallType?
 
     public init(
         suggestRunners: @escaping @Sendable (PlayDraft, Situation) -> RunnerSuggestion,
-        preview: @escaping @Sendable (PlayDraft, Situation) -> PlayPreview
+        preview: @escaping @Sendable (PlayDraft, Situation) -> PlayPreview,
+        suggestBattedBall: @escaping @Sendable (PlayDraft) -> BattedBallType?
     ) {
         self.suggestRunners = suggestRunners
         self.preview = preview
+        self.suggestBattedBall = suggestBattedBall
     }
 
-    /// Takes both functions from a rules engine, such as the real one from GameEngine.
+    /// Takes the functions from a rules engine, such as the real one from GameEngine.
     public init(engine: some RulesEngine) {
         self.init(
             suggestRunners: { draft, situation in engine.suggestRunners(for: draft, in: situation) },
-            preview: { draft, situation in engine.preview(draft, in: situation) }
+            preview: { draft, situation in engine.preview(draft, in: situation) },
+            suggestBattedBall: { draft in engine.suggestedBattedBall(for: draft) }
         )
     }
 
-    /// The stand-in rules engine from SampleData, exactly as it is. Its notation and runs
-    /// batted in are rough (a single has no notation at all), so demos use `demo` instead.
+    /// SampleData's rules engine, for previews and simulator demos.
     public static var standIn: PlayEntryRules { PlayEntryRules(engine: SampleRulesEngine()) }
-
-    /// The stand-in rules engine with its notation and runs batted in filled in, for previews
-    /// and simulator demos only (see DemoRulesEngine.swift). Never for a real game.
-    public static var demo: PlayEntryRules { PlayEntryRules(engine: DemoRulesEngine()) }
 }
 
 /// How the sequence was opened.
@@ -69,8 +70,7 @@ public enum PlayEntryOutcome: Equatable, Sendable {
     case ballInPlay(GameEvent)
     /// A dropped third strike: the play to put on the strike-three pitch
     /// (`Pitch.droppedThirdStrike`). The wiring replaces the strike-three event with the same
-    /// pitch carrying this play. Comes back whether the sequence was opened from the
-    /// "Dropped 3rd strike" button or from "More" on the first step.
+    /// pitch carrying this play. Only the "Dropped 3rd strike" button opens this path.
     case droppedThirdStrike(Play)
     /// The scorer backed out. Nothing is recorded.
     case cancelled
@@ -89,7 +89,7 @@ public struct PlayEntryView: View {
     ///     strike, just before the strike-three pitch).
     ///   - setup: the game's setup, for player names.
     ///   - start: which button opened the sequence.
-    ///   - rules: the rules engine's two functions.
+    ///   - rules: the rules engine's functions.
     ///   - onFinish: called once, with the event to record or a cancel.
     public init(
         situation: Situation,
