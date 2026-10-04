@@ -108,15 +108,23 @@ struct SectionHeader: View {
     var title: String
     var trailing: Text? = nil
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
-        HStack(alignment: .firstTextBaseline) {
+        // At the largest text sizes the right-hand words go on a second line, so nothing is cut off.
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.extraSmall))
+            : AnyLayout(HStackLayout(alignment: .firstTextBaseline))
+        layout {
             Text(title.uppercased())
                 .font(ScorebookFont.sectionLabel)
                 .tracking(0.6)
+                .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
-            Spacer(minLength: Spacing.small)
+            if !typeSize.isAccessibilitySize { Spacer(minLength: Spacing.small) }
             if let trailing {
                 trailing.font(ScorebookFont.caption)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .foregroundStyle(ScorebookColor.textSecondary)

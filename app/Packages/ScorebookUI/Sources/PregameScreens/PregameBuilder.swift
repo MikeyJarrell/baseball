@@ -194,6 +194,10 @@ public struct PregameDraft: Equatable, Sendable {
         for position in ours.emptyPositions {
             notes.append("Nobody is playing \(position.name).")
         }
+        // Turns by inning can leave a position empty in even innings only.
+        for position in ours.emptyPositions(inInning: 2) where !ours.emptyPositions.contains(position) {
+            notes.append("Nobody plays \(position.name) in even innings.")
+        }
         if ours.nonRunners.count > nonRunnerLimit {
             notes.append("\(ours.nonRunners.count) designated non-runners; the league allows \(nonRunnerLimit).")
         }

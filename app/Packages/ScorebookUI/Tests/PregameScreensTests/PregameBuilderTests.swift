@@ -211,6 +211,38 @@ struct AlternatingTests {
         #expect(lineup.alternates[.firstBase] == nil)
     }
 
+    @Test("Ford, who starts in left, takes first in even innings: left is empty then, and the review says so")
+    func starterTakesATurnElsewhere() {
+        var draft = PregameSamples.draft(against: "mudcats")
+        draft.ours.setAlternate("d6", at: .firstBase)
+        #expect(draft.ours.emptyPositions(inInning: 1).isEmpty)
+        #expect(draft.ours.emptyPositions(inInning: 2) == [.leftField])
+        #expect(draft.notes == ["Nobody plays left field in even innings."])
+        // Quinn taking left in even innings makes it a real flip-flop: nobody missing.
+        draft.ours.setAlternate("d4", at: .leftField)
+        #expect(draft.ours.emptyPositions(inInning: 2).isEmpty)
+        #expect(draft.notes.isEmpty)
+    }
+
+    @Test("Nash picked for even innings at a second position gives up the first one")
+    func oneEvenTurnEach() {
+        var lineup = OurLineup.fromLastGame(SampleSetups.mudcatsAtDiamondDogsAlternatingFirstBase.home, roster: roster)
+        lineup.setAlternate("d11", at: .rightField)
+        #expect(lineup.alternates == [.rightField: "d11"])
+        #expect(lineup.emptyPositions(inInning: 2).isEmpty)
+    }
+
+    @Test("Nash, who takes first in even innings, made our starting pitcher: the review notes nobody pitching then")
+    func turnTakerPitches() {
+        var draft = PregameDraft(input: PregameSamples.input)
+        draft.chooseOpponent(.saved("mudcats"))
+        draft.ours.setAlternate("d11", at: .firstBase)
+        draft.ours.assign("d11", to: .pitcher)
+        #expect(draft.ours.emptyPositions(inInning: 2) == [.pitcher])
+        #expect(draft.notes == ["Nobody plays pitcher in even innings."])
+        #expect(draft.missing == nil)   // a note, never a block
+    }
+
     @Test("Emptying a shared position ends the turns too")
     func emptied() {
         var lineup = OurLineup.fromLastGame(SampleSetups.mudcatsAtDiamondDogsAlternatingFirstBase.home, roster: roster)

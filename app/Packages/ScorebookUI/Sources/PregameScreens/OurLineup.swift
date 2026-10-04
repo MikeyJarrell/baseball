@@ -152,10 +152,25 @@ public struct OurLineup: Equatable, Sendable {
     }
 
     /// Shares a position by turns: the starter there plays odd innings and this player plays even
-    /// ones. `nil` stops sharing it.
+    /// ones. A player takes only one position in even innings, so any other even-inning turn they
+    /// had ends. `nil` stops sharing it.
     public mutating func setAlternate(_ id: PlayerID?, at position: Position) {
+        if let id {
+            for (other, second) in alternates where second == id && other != position {
+                alternates[other] = nil
+            }
+        }
         alternates[position] = id
         tidyAlternates()
+    }
+
+    /// Positions nobody plays in an inning once the turns are applied, in scorebook order. A
+    /// player who starts at one position and takes a turn at another leaves the first one empty
+    /// in even innings unless someone takes turns there too.
+    public func emptyPositions(inInning inning: Int) -> [Position] {
+        let team = gameTeam(for: Team(id: "lineup-check", name: ""))
+        let filled = Set(team.defense(forInning: inning, from: team.defense).map(\.position))
+        return Position.allCases.filter { !filled.contains($0) }
     }
 
     /// Drops any shared position that no longer makes sense: nobody starting there, or the same

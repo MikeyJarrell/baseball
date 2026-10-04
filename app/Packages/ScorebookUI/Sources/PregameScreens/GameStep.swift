@@ -92,7 +92,7 @@ struct GameStep: View {
             } header: {
                 SectionHeader(title: "Game")
             } footer: {
-                Text("No new inning starts after the time limit. It starts three hours after the scheduled start and moves to three hours after the first pitch. The plate umpire keeps the official time, so it stays editable during the game.")
+                Text("No new inning starts after the time limit. It starts three hours after the scheduled start and moves to three hours after the first pitch. The plate umpire keeps the official time, so it stays editable during the game. The app keeps the time from the start to the limit, so a late first pitch moves the limit later by the same amount (league rule 9.1 G).")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
             }
