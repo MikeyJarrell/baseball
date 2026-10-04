@@ -44,7 +44,7 @@ public enum PregameWording {
     }
 
     /// Where one of our hitters plays, under their name in the batting order: "Shortstop",
-    /// "First base, odd innings", "Bats only".
+    /// "First base, odd innings", or "DH" for a hitter who does not field.
     public static func fieldingLine(for id: PlayerID, in lineup: OurLineup) -> String {
         var parts: [String] = []
         if let position = lineup.position(of: id) {
@@ -53,7 +53,39 @@ public enum PregameWording {
         if let position = lineup.alternatePosition(of: id) {
             parts.append(positionName(position) + ", even innings")
         }
-        return parts.isEmpty ? "Bats only" : parts.joined(separator: " · ")
+        return parts.isEmpty ? "DH" : parts.joined(separator: " · ")
+    }
+
+    /// "1st", "2nd", "3rd", "4th", "11th", "22nd".
+    public static func ordinal(_ n: Int) -> String {
+        let suffix: String
+        switch (n % 100, n % 10) {
+        case (11...13, _): suffix = "th"
+        case (_, 1): suffix = "st"
+        case (_, 2): suffix = "nd"
+        case (_, 3): suffix = "rd"
+        default: suffix = "th"
+        }
+        return "\(n)\(suffix)"
+    }
+
+    /// Where one of our players is now, for the fielding step's player list: "Shortstop · bats
+    /// 2nd", "Pitcher · doesn’t bat", "DH · bats 10th", "First base, even innings", "Bench".
+    public static func status(of id: PlayerID, in lineup: OurLineup) -> String {
+        var parts: [String] = []
+        if let position = lineup.position(of: id) {
+            parts.append(positionName(position) + (lineup.alternates[position] != nil ? ", odd innings" : ""))
+        }
+        if let position = lineup.alternatePosition(of: id) {
+            parts.append(positionName(position) + ", even innings")
+        }
+        if let spot = lineup.battingOrder.firstIndex(of: id) {
+            if parts.isEmpty { parts.append("DH") }
+            parts.append("bats \(ordinal(spot + 1))")
+        } else if !parts.isEmpty {
+            parts.append("doesn’t bat")
+        }
+        return parts.isEmpty ? "Bench" : parts.joined(separator: " · ")
     }
 
     /// When one of our pitchers last pitched: "Pitched last game, Sep 26", "Relieved Sep 19",
@@ -90,17 +122,6 @@ public enum PregameWording {
         case .left: "L"
         case nil: nil
         }
-    }
-
-    /// Where our lineup started: "Starting from last game’s lineup (Sat, May 2 vs Mudcats)." or
-    /// the roster's usual positions before our first game.
-    public static func lineupSource(_ game: GameSetup?, calendar: Calendar = .current) -> String {
-        guard let game, let side = game.ourSide else {
-            return "Starting from the roster: everyone at their usual position, the leadoff hitter first, and the usual bench on the bench."
-        }
-        let opponent = game[side.opponent].name
-        let preposition = side == .home ? "vs" : "at"
-        return "Starting from last game’s lineup (\(day(game.scheduledStart, calendar: calendar)) \(preposition) \(opponent))."
     }
 
     /// A player's jersey number for a badge, or "?" when unknown.

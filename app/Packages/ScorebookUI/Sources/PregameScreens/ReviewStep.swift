@@ -1,4 +1,4 @@
-// Step five of five: one look at the game and both lineups, including fielders who don't bat
+// Step six of six: one look at the game and both lineups, including fielders who don't bat
 // and positions shared by turns, then "Play ball". Anything odd (an empty position, a third
 // non-runner) is a note, never a block.
 
@@ -18,7 +18,7 @@ struct ReviewStep: View {
     private var setup: GameSetup? { draft.setup() }
 
     var body: some View {
-        StepPage(step: 5, title: "Review", buttonTitle: "Play ball", blockedReason: draft.missing,
+        StepPage(step: 6, title: "Review", buttonTitle: "Play ball", blockedReason: draft.missing,
                  isPlayBall: true, onButton: { if let setup { onPlayBall(setup) } }) {
             Section {
                 VStack(alignment: .leading, spacing: Spacing.extraSmall) {
