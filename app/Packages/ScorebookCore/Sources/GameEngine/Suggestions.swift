@@ -14,22 +14,90 @@ enum Suggestions {
     // MARK: - Ball in play
 
     /// Where every runner most likely ended up on the play the scorer is entering. Runners
-    /// the scorer has already placed (in `draft.runners`) are kept as the scorer has them.
+    /// the scorer has already placed (in `draft.runners`) are kept as the scorer has them,
+    /// and everyone else is placed around them.
     static func runners(for draft: PlayDraft, in s: Situation) -> RunnerSuggestion {
+        runners(for: draft, in: s, keeping: Set(draft.runners.map(\.runner)))
+    }
+
+    /// Where every runner most likely ended up, keeping the runners named in `fixed` exactly
+    /// where `draft.runners` has them (the ones the scorer moved by hand) and placing everyone
+    /// else around them: a runner the scorer did not touch is pushed ahead of a batter or runner
+    /// the scorer sent past them, and held short of a runner the scorer held. Runs batted in
+    /// and the credited hit are worked out again from where everyone ends up.
+    static func runners(for draft: PlayDraft, in s: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion {
         var moves = defaultMoves(for: draft, in: s)
+        // The runners the scorer placed, by id, as they ended up in the list below.
+        var placed: Set<PlayerID> = []
         // The scorer's own choices win over the guess, runner by runner.
-        for chosen in draft.runners {
+        for chosen in draft.runners where fixed.contains(chosen.runner) {
             if let i = moves.firstIndex(where: { $0.runner == chosen.runner || ($0.isBatter && chosen.isBatter) }) {
                 moves[i] = chosen
             } else {
                 moves.append(chosen)
             }
+            placed.insert(chosen.runner)
         }
+        moves = makingRoom(moves, around: placed)
         let rbi = draft.batterResult.map { runsBattedIn(result: $0, draft: draft, moves: moves, in: s) } ?? 0
         // On a game-ending hit, the hit the batter is credited with may be smaller.
         let credited = draft.batterResult.map { creditedHit($0, moves: moves, in: s) }
         return RunnerSuggestion(runners: moves, rbi: rbi,
                                 batterResult: credited == draft.batterResult ? nil : credited)
+    }
+
+    /// Moves the runners the scorer has not placed so that nobody shares a base with, or
+    /// passes, the runner ahead of them. The runners in `placed` stay exactly where the scorer
+    /// put them, and runners put out are left alone. Any number of runners can score.
+    ///
+    /// - Pushed ahead: working from the batter forward, a runner the scorer has not placed
+    ///   moves up to one base past the furthest any runner behind them got. On a single with a
+    ///   runner on first, sending the batter to second sends the runner from first to third;
+    ///   if a runner behind them scored, they score too.
+    /// - Held back: working from the lead runner back, a runner the scorer has not placed who
+    ///   would reach or pass a runner ahead still on base stops one base short of that runner,
+    ///   but never behind the base they started on (first base, for the batter). On a double
+    ///   with runners on first and second, holding the runner from second at third stops the
+    ///   runner from first at second.
+    ///
+    /// When the scorer's own placements cannot all fit, a runner may still end up sharing a
+    /// base; the runner step says so and the scorer fixes it.
+    static func makingRoom(_ moves: [RunnerMove], around placed: Set<PlayerID>) -> [RunnerMove] {
+        guard !placed.isEmpty else { return moves }
+        var result = moves
+        // Positions in the list from the trailing runner (the batter) to the lead runner.
+        let trailingFirst = result.indices.sorted { result[$0].from < result[$1].from }
+
+        // Pushed ahead. `furthestBehind` is how far round the bases the runners already looked
+        // at got: 0 for nobody yet, 1 to 3 for a base, 4 for scored.
+        var furthestBehind = 0
+        for i in trailingFirst where result[i].to != .out {
+            var reached = BaseMath.order(of: result[i].to)
+            if !placed.contains(result[i].runner), furthestBehind > 0, reached <= furthestBehind {
+                reached = min(4, furthestBehind + 1)
+                result[i].to = BaseMath.advance(.home, by: reached)
+            }
+            furthestBehind = max(furthestBehind, reached)
+        }
+
+        // Held back. `nearestAhead` is the base of the closest runner ahead still on base:
+        // 4 means nobody ahead is still on base, so there is nothing to stop short of.
+        var nearestAhead = 4
+        for i in trailingFirst.reversed() where result[i].to != .out {
+            var reached = BaseMath.order(of: result[i].to)
+            if !placed.contains(result[i].runner), nearestAhead < 4, reached >= nearestAhead {
+                // The batter can go back no further than first; a runner no further than
+                // the base they started on.
+                let lowest = max(1, result[i].from.order)
+                let shortOfAhead = nearestAhead - 1
+                if shortOfAhead >= lowest {
+                    reached = shortOfAhead
+                    result[i].to = BaseMath.advance(.home, by: reached)
+                }
+            }
+            if reached < 4 { nearestAhead = min(nearestAhead, reached) }
+        }
+        return result
     }
 
     /// The hit the batter is credited with on a game-ending hit: only as many bases as the

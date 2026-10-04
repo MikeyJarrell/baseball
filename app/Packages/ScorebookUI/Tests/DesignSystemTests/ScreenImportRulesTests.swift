@@ -11,7 +11,7 @@ final class ScreenImportRulesTests: XCTestCase {
                                 "GameChanges", "GameOverview", "PostgameScreens"]
 
     /// Modules no screen may import: the app shell connects screens to these.
-    static let forbidden = ["GameEngine", "Stats", "Storage", "WalkUpAudio"]
+    static let forbidden = ["GameEngine", "Stats", "Storage", "Scoring", "WalkUpAudio"]
 
     func testScreensImportOnlyWhatTheyMay() throws {
         // This file is in ScorebookUI/Tests/DesignSystemTests; the sources are in ScorebookUI/Sources.

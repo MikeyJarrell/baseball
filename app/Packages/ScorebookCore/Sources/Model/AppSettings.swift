@@ -16,21 +16,35 @@ public struct AppSettings: Codable, Equatable, Hashable, Sendable {
     public var playIntroductions: Bool
     /// Keep the screen from locking itself while a game is open.
     public var keepScreenAwakeDuringGames: Bool
+    /// The season stats hitters' filter: hitters with fewer plate appearances than this show a
+    /// dash for their averages. 0 shows everyone's. Remembered from the last time the scorer
+    /// picked one on the season screen.
+    public var minimumPlateAppearances: Int
+    /// The season stats pitchers' filter: pitchers with fewer innings pitched than this show a
+    /// dash for their per-inning rates. 0 shows everyone's. Remembered the same way.
+    public var minimumInnings: Int
 
     public init(
         walkUpSongSeconds: TimeInterval = 12,
         fadeSongOnFirstPitch: Bool = false,
         playIntroductions: Bool = true,
-        keepScreenAwakeDuringGames: Bool = true
+        keepScreenAwakeDuringGames: Bool = true,
+        minimumPlateAppearances: Int = 10,
+        minimumInnings: Int = 3
     ) {
         self.walkUpSongSeconds = walkUpSongSeconds
         self.fadeSongOnFirstPitch = fadeSongOnFirstPitch
         self.playIntroductions = playIntroductions
         self.keepScreenAwakeDuringGames = keepScreenAwakeDuringGames
+        self.minimumPlateAppearances = minimumPlateAppearances
+        self.minimumInnings = minimumInnings
     }
 
     // Reading from JSON: any setting missing from an older file takes its default.
-    private enum CodingKeys: String, CodingKey { case walkUpSongSeconds, fadeSongOnFirstPitch, playIntroductions, keepScreenAwakeDuringGames }
+    private enum CodingKeys: String, CodingKey {
+        case walkUpSongSeconds, fadeSongOnFirstPitch, playIntroductions, keepScreenAwakeDuringGames
+        case minimumPlateAppearances, minimumInnings
+    }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         let defaults = AppSettings()
@@ -39,5 +53,8 @@ public struct AppSettings: Codable, Equatable, Hashable, Sendable {
         playIntroductions = try c.decodeIfPresent(Bool.self, forKey: .playIntroductions) ?? defaults.playIntroductions
         keepScreenAwakeDuringGames = try c.decodeIfPresent(Bool.self, forKey: .keepScreenAwakeDuringGames)
             ?? defaults.keepScreenAwakeDuringGames
+        minimumPlateAppearances = try c.decodeIfPresent(Int.self, forKey: .minimumPlateAppearances)
+            ?? defaults.minimumPlateAppearances
+        minimumInnings = try c.decodeIfPresent(Int.self, forKey: .minimumInnings) ?? defaults.minimumInnings
     }
 }

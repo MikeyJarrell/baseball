@@ -1,5 +1,6 @@
-// Tests of the words on the postgame screens: results and the season record from the games
-// list, game lengths, the order of games and game logs, and the box score notes.
+// Tests of the words on the postgame screens: results and the season record as the stats
+// engine supplies them, game log lines, game lengths, the order of games and game logs, and
+// the box score notes.
 
 import Foundation
 import Testing
@@ -11,7 +12,7 @@ import SampleData
 struct ResultWordingTests {
     let games = PreviewSeason.games
 
-    @Test("Wins, losses and a tie are read from our side of the score, home or away")
+    @Test("Wins, losses and a tie are read from each game's result, with our score first, home or away")
     func outcomes() {
         // g1: at River Rats, we scored 11 as visitors. g2: vs Hammerheads at home, 2–3.
         let g1 = games.first { $0.id == "g1" }!
@@ -26,18 +27,50 @@ struct ResultWordingTests {
         #expect(PostgameWording.outcome(of: g7) == .tie)
     }
 
-    @Test("A game still going has no result and does not count in the record")
+    @Test("The result shown is the one handed over, not worked out again from the score")
+    func resultIsRead() {
+        // A summary whose result disagrees with its score shows the result it was handed.
+        let odd = GameSummary(id: "odd", date: PreviewSeason.day(0), opponentName: "Mudcats", weAreHome: true,
+                              finalScore: Score(away: 1, home: 2), isFinished: true, result: .tie)
+        #expect(PostgameWording.outcome(of: odd) == .tie)
+    }
+
+    @Test("A game still going has no result, and the record comes from the season totals")
     func unfinished() {
         let g15 = games.first { $0.id == "g15" }!
         #expect(PostgameWording.outcome(of: g15) == nil)
-        #expect(PostgameWording.record(games) == "9 wins, 4 losses, 1 tie")
-        #expect(PostgameWording.record([g15]) == nil)
+        #expect(PostgameWording.record(PreviewSeason.fourteenGames) == "9 wins, 4 losses, 1 tie")
+        #expect(PostgameWording.record(PreviewSeason.morenoThreeGames) == "2 wins, 1 loss")
+        // No game finished yet: no record.
+        let none = SeasonTotals(teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 1,
+                                batting: [], pitching: [], fielding: [])
+        #expect(PostgameWording.record(none) == nil)
     }
 
     @Test("The sample game is a 5–3 Diamond Dogs win at home")
     func sampleGame() {
-        #expect(PostgameWording.record(SampleSeason.games) == "1 win, 0 losses")
+        #expect(PostgameWording.record(SampleSeason.totals) == "1 win, 0 losses")
+        #expect(PostgameWording.outcome(of: SampleSeason.games[0]) == .win)
         #expect(PostgameWording.scoreOursFirst(SampleSeason.games[0]) == "5–3")
+    }
+
+    @Test("A game log line says home or away and how it came out")
+    func gameLogLines() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+        let log = PreviewSeason.morenoLog
+        let date = PostgameWording.shortDate(log[1].date, calendar: calendar)
+        #expect(PostgameWording.logGame(log[1], calendar: calendar) == "\(date) at Bombers, W 8–1")
+        #expect(PostgameWording.logGame(log[2], calendar: calendar).hasSuffix(" vs Mudcats, L 5–6"))
+        // The sample season's log, from the shared sample data.
+        let moreno = SampleSeason.totals.batting.first { $0.player == "d1" }!.gameLog[0]
+        #expect(PostgameWording.logGame(moreno, calendar: calendar).hasSuffix(" vs Mudcats, W 5–3"))
+        // A game still going, and an older log that does not say home or away.
+        let going = GameLogEntry(gameID: "g", date: log[0].date, opponentName: "Bombers", weAreHome: false,
+                                 stats: BattingCounts())
+        #expect(PostgameWording.logGame(going, calendar: calendar).hasSuffix(" at Bombers"))
+        let older = GameLogEntry(gameID: "g", date: log[0].date, opponentName: "Bombers", stats: BattingCounts())
+        #expect(PostgameWording.logGame(older, calendar: calendar) == PostgameWording.shortDate(log[0].date, calendar: calendar) + " Bombers")
     }
 
     @Test("The games list shows the newest game first")

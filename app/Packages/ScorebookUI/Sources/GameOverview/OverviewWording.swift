@@ -112,11 +112,8 @@ public enum OverviewWording {
     /// says which break it is: "Middle 3rd" or "End 3rd".
     public static func rightNow(_ situation: Situation) -> String {
         if situation.isFinal { return "Final" }
-        if situation.isBetweenHalfInnings {
-            // After the third out the situation is already the next half-inning.
-            if situation.half == .bottom { return "Middle \(ordinal(situation.inning))" }
-            return "End \(ordinal(max(1, situation.inning - 1)))"
-        }
+        // Between half-innings, the play log's own name for the break.
+        if let inningBreak = situation.inningBreak { return inningBreak.shortLabel }
         return "\(halfInning(situation.half, situation.inning)), \(outs(situation.outs)), \(runners(situation.occupiedBases))"
     }
 
@@ -177,16 +174,6 @@ public enum OverviewWording {
         case .first: "first"
         case .second: "second"
         case .third: "third"
-        }
-    }
-
-    /// The base one ahead of this one: a runner caught stealing from first was going to second.
-    static func nextBase(after base: Base) -> Base {
-        switch base {
-        case .home: .first
-        case .first: .second
-        case .second: .third
-        case .third: .home
         }
     }
 
@@ -388,10 +375,8 @@ public enum OverviewWording {
     /// One runner's move between pitches: "Park stole second", "Webb was caught stealing
     /// second", "Bell to third on a wild pitch".
     ///
-    /// The base a runner was put out at comes from the event or the play log when either says.
-    /// Two things are still worked out here until the play log carries them (see the handoff's
-    /// vocabulary requests): the base a stolen base was of (the next base, since a stolen base
-    /// is always one base) and, when nobody recorded it, the base a runner was caught stealing.
+    /// The base a runner was put out at comes from the event or the play log, which fills it in
+    /// when the scorer did not; the base a stolen base was of comes from the move itself.
     static func describe(_ move: RunnerMove, name: (PlayerID) -> String, loggedOutAt: Base? = nil) -> String {
         let runner = name(move.runner)
         let destination: String = {
@@ -401,15 +386,18 @@ public enum OverviewWording {
             default: return "to \(move.to.base.map(baseName) ?? "")"
             }
         }()
-        let outAt = baseName(move.outAt ?? loggedOutAt ?? nextBase(after: move.from))
+        let outBase = move.outAt ?? loggedOutAt
+        let outAt = outBase.map(baseName) ?? ""
         switch move.reason {
         case .stolenBase:
-            let stolen = move.to == .scored && !move.advancedOnError ? "home" : baseName(nextBase(after: move.from))
+            let stolen = move.baseStolen.map(baseName) ?? ""
             return "\(runner) stole \(stolen)" + (move.advancedOnError ? ", \(destination) on the error" : "")
         case .caughtStealing:
-            return "\(runner) was caught stealing \(outAt)"
+            return outBase == nil ? "\(runner) was caught stealing" : "\(runner) was caught stealing \(outAt)"
         case .pickoff:
-            if move.to == .out { return "\(runner) was picked off \(baseName(move.outAt ?? loggedOutAt ?? move.from))" }
+            if move.to == .out {
+                return outBase.map { "\(runner) was picked off \(baseName($0))" } ?? "\(runner) was picked off"
+            }
             return "\(runner) \(destination) on a pickoff throw"
         case .wildPitch: return "\(runner) \(destination) on a wild pitch"
         case .passedBall: return "\(runner) \(destination) on a passed ball"

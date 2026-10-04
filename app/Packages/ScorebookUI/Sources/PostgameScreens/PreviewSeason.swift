@@ -27,10 +27,11 @@ enum PreviewSeason {
                                  games: g, stats: stats, gameLog: [])
     }
 
-    /// A pitching line typed in from the mockup.
-    private static func pitcher(_ player: Player, _ g: Int, outs: Int, bf: Int, h: Int, r: Int, bb: Int, k: Int,
-                                hr: Int, hbp: Int, pitches: Int, strikes: Int) -> SeasonPitchingLine {
+    /// A pitching line typed in from the mockup, with wins and losses.
+    private static func pitcher(_ player: Player, _ g: Int, w: Int, l: Int, outs: Int, bf: Int, h: Int, r: Int,
+                                bb: Int, k: Int, hr: Int, hbp: Int, pitches: Int, strikes: Int) -> SeasonPitchingLine {
         SeasonPitchingLine(player: player.id, name: player.displayName, number: player.number, games: g,
+                           wins: w, losses: l,
                            stats: PitchingCounts(outsRecorded: outs, battersFaced: bf, hits: h, runs: r, walks: bb,
                                                  strikeouts: k, homeRuns: hr, hitBatters: hbp,
                                                  pitches: pitches, strikes: strikes),
@@ -42,11 +43,12 @@ enum PreviewSeason {
         SampleTeams.diamondDogs.roster.first { $0.id.rawValue == id }!
     }
 
-    /// A fourteen-game season for the twelve Diamond Dogs. Nash has
-    /// three plate appearances (under the averages filter) and Voss none (only pitched).
+    /// A fourteen-game season for the twelve Diamond Dogs: nine wins, four losses and a tie, as
+    /// in the games list below. Nash has three plate appearances (under the averages filter) and
+    /// Voss none (only pitched). The pitchers' wins and losses add up to the record.
     /// The game logs are left empty; the player page previews use the logs below.
     static let fourteenGames = SeasonTotals(
-        teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 14,
+        teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 14, wins: 9, losses: 4, ties: 1,
         batting: [
             hitter(dog("d1"), 14, 52, 14, 19, 4, 1, 1, 8, 9, 6, 1, 0),
             hitter(dog("d2"), 14, 55, 10, 16, 3, 0, 0, 5, 4, 9, 0, 1),
@@ -62,24 +64,28 @@ enum PreviewSeason {
             hitter(dog("d12"), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
         ],
         pitching: [
-            pitcher(dog("d9"), 10, outs: 175, bf: 251, h: 51, r: 27, bb: 14, k: 47, hr: 3, hbp: 2,
+            pitcher(dog("d9"), 10, w: 6, l: 2, outs: 175, bf: 251, h: 51, r: 27, bb: 14, k: 47, hr: 3, hbp: 2,
                     pitches: 912, strikes: 571),
-            pitcher(dog("d12"), 8, outs: 63, bf: 96, h: 19, r: 10, bb: 9, k: 18, hr: 1, hbp: 1,
+            pitcher(dog("d12"), 8, w: 2, l: 2, outs: 63, bf: 96, h: 19, r: 10, bb: 9, k: 18, hr: 1, hbp: 1,
                     pitches: 340, strikes: 205),
-            pitcher(dog("d4"), 1, outs: 0, bf: 4, h: 3, r: 2, bb: 1, k: 0, hr: 0, hbp: 0,
+            pitcher(dog("d4"), 1, w: 1, l: 0, outs: 0, bf: 4, h: 3, r: 2, bb: 1, k: 0, hr: 0, hbp: 0,
                     pitches: 17, strikes: 8),
         ],
         fielding: []
     )
 
-    /// Alex Moreno's three games, oldest first, for the player page's game log.
+    /// Alex Moreno's three games, oldest first, for the player page's game log: the sample game
+    /// (a 5–3 home win), a win at the Bombers and a home loss to the Mudcats.
     static let morenoLog: [GameLogEntry<BattingCounts>] = [
-        GameLogEntry(gameID: SampleGame.id, date: day(0), opponentName: "Mudcats",
+        GameLogEntry(gameID: SampleGame.id, date: day(0), opponentName: "Mudcats", weAreHome: true,
+                     finalScore: Score(away: 3, home: 5), result: .win,
                      stats: BattingCounts(plateAppearances: 3, atBats: 2, runs: 1, hits: 1, runsBattedIn: 1, walks: 1)),
-        GameLogEntry(gameID: "preview-bombers", date: day(7), opponentName: "Bombers",
+        GameLogEntry(gameID: "preview-bombers", date: day(7), opponentName: "Bombers", weAreHome: false,
+                     finalScore: Score(away: 8, home: 1), result: .win,
                      stats: BattingCounts(plateAppearances: 5, atBats: 5, runs: 2, hits: 3, doubles: 1, homeRuns: 1,
                                           runsBattedIn: 3, strikeouts: 1)),
-        GameLogEntry(gameID: "preview-mudcats-2", date: day(14), opponentName: "Mudcats",
+        GameLogEntry(gameID: "preview-mudcats-2", date: day(14), opponentName: "Mudcats", weAreHome: true,
+                     finalScore: Score(away: 6, home: 5), result: .loss,
                      stats: BattingCounts(plateAppearances: 4, atBats: 4, strikeouts: 2)),
     ]
 
@@ -89,7 +95,7 @@ enum PreviewSeason {
         let stats = morenoLog.reduce(BattingCounts()) { $0 + $1.stats }
         let player = dog("d1")
         return SeasonTotals(
-            teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 3,
+            teamID: "diamond-dogs", teamName: "Diamond Dogs", games: 3, wins: 2, losses: 1,
             batting: [SeasonBattingLine(player: player.id, name: player.displayName, number: player.number,
                                         games: 3, stats: stats, gameLog: morenoLog)],
             pitching: [],
@@ -122,6 +128,7 @@ enum PreviewSeason {
                                 us: Int, them: Int) -> GameSummary {
         let score = home ? Score(away: them, home: us) : Score(away: us, home: them)
         return GameSummary(id: GameID(rawValue: id), date: day(days), opponentName: opponent,
-                           weAreHome: home, finalScore: score, isFinished: true)
+                           weAreHome: home, finalScore: score, isFinished: true,
+                           result: GameResult(ourRuns: us, theirRuns: them))
     }
 }

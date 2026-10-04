@@ -232,18 +232,21 @@ public struct OurLineup: Equatable, Sendable {
         return lineup
     }
 
-    /// Today's lineup, started from the roster before our first game: everyone at their usual
-    /// position (the first player listed wins a position two people usually play), the usual
-    /// leadoff hitter first, then everyone else who does not usually start on the bench, in
-    /// roster order. Players who usually start on the bench are on the bench.
-    public static func fromRoster(_ roster: [Player], usual: [PlayerID: UsualRole]) -> OurLineup {
+    /// Today's lineup, started from the roster before our first game, from what each player
+    /// usually does (`Player.usualPosition`, `usualRole` and `usuallyLeadsOff`): the usual
+    /// leadoff hitter first, then everyone else who usually bats, in roster order; everyone who
+    /// usually fields at their usual position (the first player listed wins a position two
+    /// people usually play). Players who usually start on the bench are on the bench. A player
+    /// with no role set bats, and fields too if they have a usual position.
+    public static func fromRoster(_ roster: [Player]) -> OurLineup {
         var lineup = OurLineup(roster: roster)
-        let starters = roster.filter { !(usual[$0.id]?.startsOnBench ?? false) }
-        let leadoff = starters.filter { usual[$0.id]?.leadsOff ?? false }
-        let others = starters.filter { !(usual[$0.id]?.leadsOff ?? false) }
+        let role: (Player) -> UsualRole = { $0.usualRole ?? .batsAndFields }
+        let hitters = roster.filter { role($0) == .batsAndFields || role($0) == .batsOnly }
+        let leadoff = hitters.filter(\.usuallyLeadsOff)
+        let others = hitters.filter { !$0.usuallyLeadsOff }
         lineup.battingOrder = (leadoff + others).map(\.id)
-        for player in starters {
-            if let position = usual[player.id]?.position, lineup.defense[position] == nil {
+        for player in roster where role(player) == .batsAndFields || role(player) == .fieldsOnly {
+            if let position = player.usualPosition, lineup.defense[position] == nil {
                 lineup.defense[position] = player.id
             }
         }

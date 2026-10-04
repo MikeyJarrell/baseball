@@ -22,10 +22,6 @@ public struct PregameInput: Equatable, Sendable {
     /// The app shell can fill it from box scores, which include relievers; if it is left
     /// empty, the starting pitchers in `recentGames` are used.
     public var pitchingHistory: [PitchingAppearance]
-    /// Each of our players' usual position and role, for the very first game, when there is no
-    /// last game to start from. A stand-in until `Player` carries these itself (a request in
-    /// the handoff note); leave it empty once it does.
-    public var usualRoles: [PlayerID: UsualRole]
     /// Today: the game's date unless the scorer changes it.
     public var today: Date
 
@@ -34,14 +30,12 @@ public struct PregameInput: Equatable, Sendable {
         opponents: [Team],
         recentGames: [GameSetup] = [],
         pitchingHistory: [PitchingAppearance] = [],
-        usualRoles: [PlayerID: UsualRole] = [:],
         today: Date = Date()
     ) {
         self.ourTeam = ourTeam
         self.opponents = opponents
         self.recentGames = recentGames
         self.pitchingHistory = pitchingHistory
-        self.usualRoles = usualRoles
         self.today = today
     }
 
@@ -74,24 +68,6 @@ public struct PitchingAppearance: Equatable, Hashable, Sendable {
         self.player = player
         self.date = date
         self.started = started
-    }
-}
-
-/// A player's usual place on the team, from the roster: where they usually field, whether they
-/// usually lead off, and whether they usually start on the bench. Used only before our first
-/// game, to build a lineup from the roster.
-public struct UsualRole: Equatable, Hashable, Sendable {
-    /// The position they usually play, if any. Missing means they usually only bat.
-    public var position: Position?
-    /// True for the usual leadoff hitter.
-    public var leadsOff: Bool
-    /// True for a player who usually starts on the bench.
-    public var startsOnBench: Bool
-
-    public init(position: Position? = nil, leadsOff: Bool = false, startsOnBench: Bool = false) {
-        self.position = position
-        self.leadsOff = leadsOff
-        self.startsOnBench = startsOnBench
     }
 }
 

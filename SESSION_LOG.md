@@ -113,3 +113,28 @@ SESSLOG:[2026-10-03 19:58]
 
 ### Context
 The app asks Mikey to click Allow the first time Claude controls each simulator. Builders had been making a fresh, uniquely named simulator per job (“GameChanges iPhone 17”, “GOReview2 iPhone 17”, “Overview harness iPhone 17”), so every job set off a new popup. Reusing a fixed set should mean one Allow per simulator, going by the popup’s wording; that it stays allowed across sessions has not been confirmed.
+
+---
+
+## [2026-10-03 20:08] Darin’s and Aidan’s walk-up songs
+SESSLOG:[2026-10-03 20:08]
+
+**Project(s):** baseball
+
+### Decisions
+- Darin: “Big Poppa” by The Notorious B.I.G., the *Ready to Die* album audio, hook at 1:06.
+- Aidan: “Mary Jane” by Rick James, the official upload from a greatest-hits album, the same length as the original album track, hook at 0:20. No official upload of the original album was found.
+
+### Follow-ups
+- [ ] Import the two new clips on the phone and set each start point to 0:20.
+
+### Files
+- [modified] `team/roster.csv` — the two songs, their sources and clip details
+- [created] `aidan-kurt.m4a` and `darin-dietrich.m4a` in `~/Dropbox/baseball/songs/`
+
+### Context
+Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
+
+## [2026-10-03 22:31] The app is built
+
+Every job in the plan is built, reviewed by a fresh reader, fixed and accepted: the rules engine, stats, storage, box score printer, design system, walk-up audio, every screen, and the wiring. Two full games (the sample game and Astros at Yankees, June 23, 2019) were scored through the real screens in the simulator and their box scores match. Mikey decided along the way: layout A, outs written as words, visitors first in every score line, a powder-blue icon from the original logo, a 12-second walk-up fade, no courtesy runners, the SDABL rule book as the source of league rules (nothing enforced), and alternating fielders by inning. Next: Mikey installs it on his phone and scores a televised game as the dress rehearsal.

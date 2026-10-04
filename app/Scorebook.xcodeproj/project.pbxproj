@@ -23,10 +23,18 @@
 		66F6F025F23E59807C51B867 /* GameChanges in Frameworks */ = {isa = PBXBuildFile; productRef = D584782B09732B49596F2964 /* GameChanges */; };
 		AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */ = {isa = PBXBuildFile; productRef = C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */; };
 		928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = F1776B435852E7A7A42C154E /* PostgameScreens */; };
+		5C0A11E2B7D04F6A9E31C201 /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C202 /* Scoring */; };
+		5C0A11E2B7D04F6A9E31C300 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C301 /* Model */; };
+		5C0A11E2B7D04F6A9E31C302 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C303 /* SampleData */; };
+		5C0A11E2B7D04F6A9E31C304 /* GameEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C305 /* GameEngine */; };
+		5C0A11E2B7D04F6A9E31C306 /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C307 /* Stats */; };
+		5C0A11E2B7D04F6A9E31C308 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */; };
+		5C0A11E2B7D04F6A9E31C30A /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C30B /* Scoring */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7F6D01D6546BCD07518D8398 /* Scorebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scorebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScorebookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -35,7 +43,22 @@
 			path = Scorebook;
 			sourceTree = "<group>";
 		};
+		5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScorebookUITests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		5C0A11E2B7D04F6A9E31C212 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 46F86FAA6BBF9AC94A7E4595 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 42AEFBAE01D2DFD981F7DA7D;
+			remoteInfo = Scorebook;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		059DB2086B49B680F85B3555 /* Frameworks */ = {
@@ -58,6 +81,20 @@
 				66F6F025F23E59807C51B867 /* GameChanges in Frameworks */,
 				AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */,
 				928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */,
+				5C0A11E2B7D04F6A9E31C201 /* Scoring in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C0A11E2B7D04F6A9E31C213 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5C0A11E2B7D04F6A9E31C300 /* Model in Frameworks */,
+				5C0A11E2B7D04F6A9E31C302 /* SampleData in Frameworks */,
+				5C0A11E2B7D04F6A9E31C304 /* GameEngine in Frameworks */,
+				5C0A11E2B7D04F6A9E31C306 /* Stats in Frameworks */,
+				5C0A11E2B7D04F6A9E31C308 /* BoxScoreText in Frameworks */,
+				5C0A11E2B7D04F6A9E31C30A /* Scoring in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				74C61EEF9C048939045A3EDA /* Scorebook */,
+				5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */,
 				0A2C978E52A76F0AA9F68BB5 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				7F6D01D6546BCD07518D8398 /* Scorebook.app */,
+				5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -116,10 +155,40 @@
 				D584782B09732B49596F2964 /* GameChanges */,
 				C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */,
 				F1776B435852E7A7A42C154E /* PostgameScreens */,
+				5C0A11E2B7D04F6A9E31C202 /* Scoring */,
 			);
 			productName = Scorebook;
 			productReference = 7F6D01D6546BCD07518D8398 /* Scorebook.app */;
 			productType = "com.apple.product-type.application";
+		};
+		5C0A11E2B7D04F6A9E31C214 /* ScorebookUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5C0A11E2B7D04F6A9E31C215 /* Build configuration list for PBXNativeTarget "ScorebookUITests" */;
+			buildPhases = (
+				5C0A11E2B7D04F6A9E31C216 /* Sources */,
+				5C0A11E2B7D04F6A9E31C213 /* Frameworks */,
+				5C0A11E2B7D04F6A9E31C217 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5C0A11E2B7D04F6A9E31C218 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */,
+			);
+			name = ScorebookUITests;
+			packageProductDependencies = (
+				5C0A11E2B7D04F6A9E31C301 /* Model */,
+				5C0A11E2B7D04F6A9E31C303 /* SampleData */,
+				5C0A11E2B7D04F6A9E31C305 /* GameEngine */,
+				5C0A11E2B7D04F6A9E31C307 /* Stats */,
+				5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */,
+				5C0A11E2B7D04F6A9E31C30B /* Scoring */,
+			);
+			productName = ScorebookUITests;
+			productReference = 5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
 
@@ -133,6 +202,10 @@
 				TargetAttributes = {
 					42AEFBAE01D2DFD981F7DA7D = {
 						CreatedOnToolsVersion = 27.0;
+					};
+					5C0A11E2B7D04F6A9E31C214 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = 42AEFBAE01D2DFD981F7DA7D;
 					};
 				};
 			};
@@ -155,12 +228,20 @@
 			projectRoot = "";
 			targets = (
 				42AEFBAE01D2DFD981F7DA7D /* Scorebook */,
+				5C0A11E2B7D04F6A9E31C214 /* ScorebookUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B9C6EB6F79FC54535ACB3053 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5C0A11E2B7D04F6A9E31C217 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -177,7 +258,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		5C0A11E2B7D04F6A9E31C216 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5C0A11E2B7D04F6A9E31C218 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 42AEFBAE01D2DFD981F7DA7D /* Scorebook */;
+			targetProxy = 5C0A11E2B7D04F6A9E31C212 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		F25EF7827B5210B4D9103995 /* Debug */ = {
@@ -239,7 +335,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Scorebook-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -269,7 +368,10 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Scorebook-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -290,6 +392,40 @@
 			};
 			name = Release;
 		};
+		5C0A11E2B7D04F6A9E31C219 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Scorebook;
+			};
+			name = Debug;
+		};
+		5C0A11E2B7D04F6A9E31C21A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Scorebook;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -307,6 +443,15 @@
 			buildConfigurations = (
 				9551FA205EEDB822C0C0C876 /* Debug */,
 				B13417540F0CA686AB156AEE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5C0A11E2B7D04F6A9E31C215 /* Build configuration list for PBXNativeTarget "ScorebookUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C0A11E2B7D04F6A9E31C219 /* Debug */,
+				5C0A11E2B7D04F6A9E31C21A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -404,6 +549,41 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
 			productName = PostgameScreens;
+		};
+		5C0A11E2B7D04F6A9E31C202 /* Scoring */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Scoring;
+		};
+		5C0A11E2B7D04F6A9E31C301 /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Model;
+		};
+		5C0A11E2B7D04F6A9E31C303 /* SampleData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = SampleData;
+		};
+		5C0A11E2B7D04F6A9E31C305 /* GameEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = GameEngine;
+		};
+		5C0A11E2B7D04F6A9E31C307 /* Stats */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Stats;
+		};
+		5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = BoxScoreText;
+		};
+		5C0A11E2B7D04F6A9E31C30B /* Scoring */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Scoring;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

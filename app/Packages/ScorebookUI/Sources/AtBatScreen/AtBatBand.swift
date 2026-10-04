@@ -144,7 +144,7 @@ struct Scoreboard: View {
         let batting = info.situation.battingSide == side
         return HStack(spacing: Spacing.extraSmall) {
             Text(batting ? "▸" : " ").font(ScorebookFont.caption.weight(.heavy))
-            Text(AtBatWording.shortTeamName(info.setup[side].name))
+            Text(info.setup[side].displayShortName)
                 .font(ScorebookFont.chip)
                 // Always whole ("DOGS", never "DO…"): the count beside it shrinks instead.
                 .fixedSize()
