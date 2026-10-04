@@ -79,6 +79,12 @@ struct GameScreen: View {
     /// True right after Undo or Redo, so stepping back over a changeover does not start the
     /// warm-up song again.
     @State private var lastChangeWasUndo = false
+    /// The warm-up songs each of our pitchers has heard this game, oldest first, so his later
+    /// innings shuffle through his extra songs without repeats.
+    @State private var warmUpsPlayed: [PlayerID: [SongID]] = [:]
+    /// The warm-up song picked for the changeover now, for the pitcher it was picked for. The
+    /// song button shows and plays this one.
+    @State private var thisWarmUp: (pitcher: PlayerID, song: SongID)?
 
     var body: some View {
         Group {
@@ -117,7 +123,7 @@ struct GameScreen: View {
     private var batting: some View {
         AtBatScreen(
             // Our players' songs and introductions as the saved team has them now.
-            setup: app.withSavedSongs(session.setup),
+            setup: withThisWarmUp(app.withSavedSongs(session.setup)),
             situation: session.situation,
             batterHistory: session.batterHistory,
             songs: app.audio?.library ?? SongLibrary(),
@@ -387,14 +393,40 @@ struct GameScreen: View {
         app.cueOurNextHitter()
     }
 
-    /// Plays our pitcher's warm-up song, if they have one.
+    /// Picks our pitcher's warm-up song for this changeover (his main song his first inning,
+    /// then his extra songs in turn) and plays it, if he has one.
     private func playWarmUp() {
         guard let ours = session.setup.ourSide,
               let pitcher = session.situation[ours].pitcher,
               let saved = session.setup.player(pitcher) else { return }
-        let player = app.withSavedSongs(saved)
-        guard player.warmUpSongID != nil else { return }
+        var player = app.withSavedSongs(saved)
+        guard let song = WarmUpRotation.nextSong(for: player, alreadyPlayed: warmUpsPlayed[pitcher] ?? [])
+        else { return }
+        warmUpsPlayed[pitcher, default: []].append(song)
+        thisWarmUp = (pitcher, song)
+        player.warmUpSongID = song
         app.audio?.playWarmUp(for: player)
+    }
+
+    /// The setup with our pitcher's warm-up song set to the one picked for this changeover, so
+    /// the song button names it and plays it again if tapped.
+    private func withThisWarmUp(_ setup: GameSetup) -> GameSetup {
+        guard let (pitcher, song) = thisWarmUp, let side = setup.ourSide else { return setup }
+        var updated = setup
+        switch side {
+        case .away: updated.away.roster = setup.away.roster.map { $0.id == pitcher ? $0.withWarmUp(song) : $0 }
+        case .home: updated.home.roster = setup.home.roster.map { $0.id == pitcher ? $0.withWarmUp(song) : $0 }
+        }
+        return updated
+    }
+}
+
+extension Player {
+    /// This player with a different warm-up song.
+    func withWarmUp(_ song: SongID) -> Player {
+        var copy = self
+        copy.warmUpSongID = song
+        return copy
     }
 }
 

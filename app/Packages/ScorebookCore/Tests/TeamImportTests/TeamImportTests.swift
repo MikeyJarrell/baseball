@@ -96,6 +96,32 @@ struct TeamImportTests {
         #expect(!second.teamsToSave.contains { !$0.isOurs })
     }
 
+    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load replaces the list")
+    func extraWarmUps() throws {
+        let (roster, opponents) = try realRows()
+        let extras = ExtraWarmUpRow.read("""
+            player,song,artist,source,file
+            Chris Strong,Thunderstruck,AC/DC,https://example.com/a,chris-strong-warmup-2.m4a
+            Chris Strong,Eye of the Tiger,Survivor,https://example.com/b,chris-strong-warmup-3.m4a
+            Chris Strong,Not Cut Yet,Nobody,https://example.com/c,
+            """)
+        let first = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents,
+                                     extraWarmUps: extras)
+        let ours = try #require(first.teamsToSave.first { $0.isOurs })
+        let chris = try #require(ours.roster.first { $0.name == "Chris Strong" })
+        let titles = chris.extraWarmUpSongIDs.compactMap { first.library.song($0)?.title }
+        #expect(titles == ["Thunderstruck", "Eye of the Tiger"])
+        #expect(first.audioFiles.contains("chris-strong-warmup-2.m4a"))
+        // His main warm-up song is untouched, and nobody else gets extras.
+        #expect(first.library.song(chris.warmUpSongID ?? "")?.title == "Sweet Home Alabama")
+        #expect(ours.roster.filter { !$0.extraWarmUpSongIDs.isEmpty }.map(\.name) == ["Chris Strong"])
+        // Loading again with one row gone drops that song from his list but keeps its id in the library.
+        let again = TeamImport.merge(teams: first.teamsToSave, library: first.library, roster: roster,
+                                     opponents: opponents, extraWarmUps: Array(extras.prefix(1)))
+        let chrisAgain = try #require(again.teamsToSave.first { $0.isOurs }?.roster.first { $0.id == chris.id })
+        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0]])
+    }
+
     @Test("Times, sides and positions read as the app's words")
     func words() {
         #expect(RosterWords.seconds("1:06") == 66)

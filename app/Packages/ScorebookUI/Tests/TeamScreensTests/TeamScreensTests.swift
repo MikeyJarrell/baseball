@@ -159,6 +159,10 @@ struct SongWordingTests {
         let shared = dogs.assigning("song-01", as: .walkUp, to: "d8").assigning("song-01", as: .warmUp, to: "d12")
         #expect(TeamWording.usageText(of: "song-01", in: shared) == "walk-up: Moreno, Fisk · warm-up: Voss")
         #expect(TeamWording.usageText(of: "song-01", in: nil) == "unassigned")
+        // An extra warm-up song counts as in use too, so nobody mistakes it for a spare.
+        var extras = dogs
+        extras.roster[extras.roster.firstIndex { $0.id == "d9" }!].extraWarmUpSongIDs = ["song-15"]
+        #expect(TeamWording.usageText(of: "song-15", in: extras) == "warm-up: Barros")
     }
 
     @Test("Times on screen")

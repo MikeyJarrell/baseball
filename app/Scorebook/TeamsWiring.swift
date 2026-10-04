@@ -187,6 +187,7 @@ extension AppModel {
         var updated = player
         updated.walkUpSongID = saved.walkUpSongID
         updated.warmUpSongID = saved.warmUpSongID
+        updated.extraWarmUpSongIDs = saved.extraWarmUpSongIDs
         updated.introduction = saved.introduction
         return updated
     }
