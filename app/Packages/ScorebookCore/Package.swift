@@ -24,6 +24,8 @@ let package = Package(
         .library(name: "BoxScoreText", targets: ["BoxScoreText"]),
         .library(name: "Storage", targets: ["Storage"]),
         .library(name: "Scoring", targets: ["Scoring"]),
+        .library(name: "TeamImport", targets: ["TeamImport"]),
+        .executable(name: "TeamLoader", targets: ["TeamLoader"]),
     ],
     targets: [
         // The shared vocabulary: players, teams, events, plays, the situation, box scores.
@@ -52,6 +54,14 @@ let package = Package(
         // is open.
         .target(name: "Scoring", dependencies: ["Model", "GameEngine", "Stats"]),
 
+        // Turning the roster files in the repository's team/ folder into saved teams and
+        // songs, merged with whatever the app already has.
+        .target(name: "TeamImport", dependencies: ["Model"]),
+
+        // The Mac command the loader script (tools/load_team.sh) runs on a copy of the
+        // phone's saved files.
+        .executableTarget(name: "TeamLoader", dependencies: ["Model", "Storage", "TeamImport"]),
+
         // Test helper: bundles the Tests/Scenarios folder and loads a scenario in one line.
         // It lives under Tests/ so the scenario files sit beside the tests that use them.
         // The test folders are excluded so this module only picks up its own code.
@@ -61,7 +71,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "ModelTests", "GameEngineTests", "StatsTests",
-                "BoxScoreTextTests", "StorageTests", "ScoringTests",
+                "BoxScoreTextTests", "StorageTests", "ScoringTests", "TeamImportTests",
             ],
             sources: ["TestSupport"],
             resources: [.copy("Scenarios")]
@@ -84,6 +94,9 @@ let package = Package(
 
         // Tests of scoring a game: saving each event, undo and redo, automatic outs, and whole
         // games scored event by event matching their box scores.
+        // Tests of reading the roster files and merging them with saved teams.
+        .testTarget(name: "TeamImportTests", dependencies: ["TeamImport", "Model"]),
+
         .testTarget(name: "ScoringTests", dependencies: ["Scoring", "Storage", "GameEngine", "Stats", "Model", "SampleData", "TestSupport"]),
     ]
 )
