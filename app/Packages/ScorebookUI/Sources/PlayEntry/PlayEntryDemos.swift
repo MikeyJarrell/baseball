@@ -26,7 +26,7 @@ struct PlayEntryDemo: Identifiable, Sendable {
     var expected: (notation: String, outs: Int, runs: Int, rbi: Int)
 
     /// A fresh sequence for this demo with the first `count` taps already made (all of them
-    /// when `count` is missing), using the demo rules engine.
+    /// when `count` is missing), using SampleData's rules engine.
     @MainActor
     func model(afterTaps count: Int? = nil, onFinish: @escaping (PlayEntryOutcome) -> Void = { _ in }) -> PlayEntryModel {
         let model = PlayEntryModel(situation: sample.situation, setup: sample.setup, start: start,
@@ -169,7 +169,7 @@ enum PlayEntryDemos {
         sample: diamondDogs("Webb up, 1-2, one out", outs: 1, batterSpot: 2, count: Count(balls: 1, strikes: 2)),
         start: .droppedThirdStrike,
         taps: [.droppedThirdStrikeSafe, .save],
-        expected: ("K", 0, 0, 0))
+        expected: ("K, safe", 0, 0, 0))
 
     static let droppedThirdStrikeOut = PlayEntryDemo(
         id: "k3-out", title: "Dropped third strike, thrown out (K 2-3)",

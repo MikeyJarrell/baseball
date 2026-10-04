@@ -230,7 +230,7 @@ struct RunnersButton: View {
 enum ChipState {
     /// Not picked.
     case off
-    /// The screen's own guess, not yet confirmed: a dashed outline.
+    /// The rules engine's guess, not yet confirmed: a dashed outline.
     case guess
     /// Picked by the scorer: filled in.
     case on

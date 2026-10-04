@@ -1,5 +1,5 @@
 // Previews of the in-play sequence, each one a demo play from PlayEntryDemos.swift stopped
-// part way through, using the demo rules engine. Light, dark and the largest text size.
+// part way through, using SampleData's rules engine. Light, dark and the largest text size.
 
 import SwiftUI
 import Model
@@ -68,6 +68,14 @@ private struct DemoPreview: View {
 
 #Preview("Single plus the left fielder’s error: 1B 7, E7") {
     DemoPreview(demo: PlayEntryDemos.singlePlusError, taps: 6)
+}
+
+#Preview("F9, E9: runner scores on the right fielder’s error") {
+    DemoPreview(demo: PlayEntryDemos.flyOutThrowingError, taps: 6)
+}
+
+#Preview("Runner doubled off: who made the out?") {
+    DemoPreview(demo: PlayEntryDemos.flyOutDoubledOff, taps: 4)
 }
 
 #Preview("Dropped third strike") {
