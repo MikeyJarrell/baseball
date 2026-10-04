@@ -38,9 +38,12 @@ final class AnnouncerVoice {
         var phrases = [AnnouncerPhrase(words: "Now batting,", pauseAfter: 0.55)]
         if hasNumber, let number {
             let spoken = spokenNumber(number)
-            phrases.append(AnnouncerPhrase(words: "number \(spoken),", pauseAfter: 0.5))
             if hasName, let name {
+                phrases.append(AnnouncerPhrase(words: "number \(spoken),", pauseAfter: 0.5))
                 phrases.append(AnnouncerPhrase(words: "\(name).", pauseAfter: 0.9))
+            } else {
+                // No name: the number ends the sentence, then comes once more.
+                phrases.append(AnnouncerPhrase(words: "number \(spoken).", pauseAfter: 0.9))
             }
             phrases.append(AnnouncerPhrase(words: "Number \(spoken).", pauseAfter: 0))
         } else if let name {

@@ -121,7 +121,7 @@ public struct WalkUpAudioTestScreen: View {
     private var announcerSection: some View {
         Section("Announcer") {
             LabeledContent("Introduction", value: introductionDescription)
-            Button("Use the phone's voice") { replaceIntroduction(with: AnnouncerIntroduction(source: .phoneVoice)) }
+            Button("Use the phone’s voice") { replaceIntroduction(with: AnnouncerIntroduction(source: .phoneVoice)) }
             if player.isRecording {
                 Button("Stop recording (\(String(format: "%.1f", player.recordingSeconds)) s)") {
                     newRecording = player.stopRecordingIntroduction()
@@ -197,7 +197,7 @@ public struct WalkUpAudioTestScreen: View {
 
     private var introductionDescription: String {
         switch batter.introduction?.source {
-        case .phoneVoice: "Phone's voice"
+        case .phoneVoice: "Phone’s voice"
         case .recorded: "Recorded"
         case .imported: "Imported"
         case nil: "None"
