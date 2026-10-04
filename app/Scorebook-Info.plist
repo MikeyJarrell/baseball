@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The app's settings that Xcode cannot write from the project's build settings.
+  Xcode adds everything else (the app’s name, the microphone question, opening files in place)
+  when it builds; see project.pbxproj.
+
+  UIBackgroundModes / audio: walk-up and warm-up songs keep playing when the phone locks
+  or the scorer switches apps.
+  UIFileSharingEnabled: the Files app shows the app's Documents folder, which holds only
+  the backups folder (the live files are kept privately, in Application Support).
+-->
 <plist version="1.0">
 <dict>
 	<key>UIBackgroundModes</key>
