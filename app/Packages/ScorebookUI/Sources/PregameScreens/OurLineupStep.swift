@@ -24,6 +24,7 @@ struct OurLineupStep: View {
     @State private var openPosition: Position?
     /// A hitter waiting on the "past the league's limit" question.
     @State private var pendingNonRunner: PlayerID?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var lineup: OurLineup { draft.ours }
 
@@ -108,23 +109,38 @@ struct OurLineupStep: View {
     /// One hitter: spot, drag handle, name and number, where they field, the non-runner switch, minus.
     private func hitterRow(_ player: Player, spot: Int) -> some View {
         let isNonRunner = lineup.isNonRunner(player.id)
-        return HStack(spacing: Spacing.small) {
-            OrderNumber(spot: spot)
-            Grip()
-            VStack(alignment: .leading, spacing: 2) {
-                (Text(player.displayName) + Text(player.number.map { "  #\($0)" } ?? "").foregroundStyle(ScorebookColor.textSecondary))
-                    .font(ScorebookFont.headline)
-                Text(PregameWording.fieldingLine(for: player.id, in: lineup))
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
+        // The name and where they field.
+        let name = VStack(alignment: .leading, spacing: 2) {
+            (Text(player.displayName) + Text(player.number.map { "  #\($0)" } ?? "").foregroundStyle(ScorebookColor.textSecondary))
+                .font(ScorebookFont.headline)
+            Text(PregameWording.fieldingLine(for: player.id, in: lineup))
+                .font(ScorebookFont.caption)
+                .foregroundStyle(ScorebookColor.textSecondary)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        // The non-runner switch and the minus button.
+        let buttons = HStack(spacing: Spacing.small) {
             Button(isNonRunner ? "Non-runner" : "Runs") { tapNonRunner(player.id) }
                 .buttonStyle(ChipStyle(isOn: isNonRunner, onColor: ScorebookColor.sequenceBadge, onText: ScorebookColor.onStrike))
+                .fixedSize()
                 .accessibilityLabel(Text("Designated non-runner"))
                 .accessibilityValue(Text(isNonRunner ? "On" : "Off"))
             RemoveButton(label: "Take \(player.displayName) out of the batting order") {
                 draft.ours.removeFromOrder(player.id)
+            }
+        }
+        return HStack(spacing: Spacing.small) {
+            OrderNumber(spot: spot)
+            Grip()
+            // At the largest text sizes the name gets its own line, with the buttons under it.
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                    name
+                    buttons
+                }
+            } else {
+                name
+                buttons
             }
         }
         .accessibilityElement(children: .contain)
@@ -141,9 +157,12 @@ struct OurLineupStep: View {
         }
     }
 
-    /// " ss" or " bench" after a name on a chip.
+    /// Where a player is now, after their name on a chip: " ss", " bats only", " 1b even" (a
+    /// turn in even innings only), or " bench" for someone who neither bats nor fields.
     private func chipPosition(_ id: PlayerID) -> String {
         if let position = lineup.position(of: id) { return " " + position.abbreviation }
+        if let position = lineup.alternatePosition(of: id) { return " \(position.abbreviation) even" }
+        if lineup.isBatting(id) { return " bats only" }
         return " bench"
     }
 
@@ -229,7 +248,11 @@ struct OurLineupStep: View {
                     Button("Nobody else") { draft.ours.setAlternate(nil, at: position) }
                         .buttonStyle(ChipStyle(isOn: lineup.alternates[position] == nil))
                     ForEach(lineup.roster.filter { $0.id != starter }) { player in
-                        Button(player.lastName) { draft.ours.setAlternate(player.id, at: position) }
+                        Button {
+                            draft.ours.setAlternate(player.id, at: position)
+                        } label: {
+                            Text("\(player.lastName)\(Text(chipPosition(player.id)).foregroundStyle(lineup.alternates[position] == player.id ? Color.white.opacity(0.8) : ScorebookColor.textSecondary))")
+                        }
                             .buttonStyle(ChipStyle(isOn: lineup.alternates[position] == player.id))
                             .accessibilityLabel(Text("\(player.displayName) plays \(position.name) in even innings"))
                     }
