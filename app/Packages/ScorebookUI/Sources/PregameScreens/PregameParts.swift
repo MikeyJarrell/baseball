@@ -296,6 +296,8 @@ struct ValueStepper: View {
                 stepButton("minus", minusLabel, onMinus)
                 Text(value)
                     .font(ScorebookFont.headline.monospacedDigit())
+                    .lineLimit(1)
+                    .fixedSize()   // "9:00 AM" stays on one line
                     .frame(minWidth: 60)
                     .padding(.horizontal, Spacing.small)
                 stepButton("plus", plusLabel, onPlus)

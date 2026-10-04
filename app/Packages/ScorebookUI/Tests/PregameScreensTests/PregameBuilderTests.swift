@@ -294,15 +294,17 @@ struct TheirLineupTests {
 
 @Suite("Starting pitchers, most recent first")
 struct PitcherTests {
-    @Test("Ours: Voss started last game, Barros the game before, then everyone else in roster order")
+    @Test("Ours: Barros started last game and Voss relieved him, then everyone else in roster order")
     func ourOrder() {
         let draft = PregameDraft(input: PregameSamples.input)
         let choices = draft.ourPitcherChoices
-        #expect(choices.prefix(3).map(\.id) == ["d12", "d9", "d1"])
+        #expect(choices.prefix(3).map(\.id) == ["d9", "d12", "d1"])
         #expect(choices.count == roster.count)
         let last = PregameSamples.input.lastGame?.scheduledStart
         #expect(PregameWording.ourPitcherLine(choices[0].lastPitched, lastGame: last, calendar: pacific) == "Pitched last game, May 9")
-        #expect(PregameWording.ourPitcherLine(choices[1].lastPitched, lastGame: last, calendar: pacific) == "Pitched May 2")
+        #expect(PregameWording.ourPitcherLine(choices[1].lastPitched, lastGame: last, calendar: pacific) == "Relieved last game, May 9")
+        let older = PitchingAppearance(player: "d9", date: SampleSetups.gameDay)
+        #expect(PregameWording.ourPitcherLine(older, lastGame: last, calendar: pacific) == "Pitched May 2")
         #expect(PregameWording.ourPitcherLine(nil, lastGame: last) == "Hasn’t pitched this season")
     }
 

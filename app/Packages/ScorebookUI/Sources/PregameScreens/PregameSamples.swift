@@ -26,7 +26,8 @@ public enum PregameSamples {
     public static let pitchingHistory: [PitchingAppearance] = [
         PitchingAppearance(player: "d9", date: mudcatsGame.scheduledStart, started: true),
         PitchingAppearance(player: "d12", date: mudcatsGame.scheduledStart, started: false),
-        PitchingAppearance(player: "d12", date: bombersGame.scheduledStart, started: true),
+        PitchingAppearance(player: "d9", date: bombersGame.scheduledStart, started: true),
+        PitchingAppearance(player: "d12", date: bombersGame.scheduledStart, started: false),
         PitchingAppearance(player: "m9", date: mudcatsGame.scheduledStart, started: true),
         PitchingAppearance(player: "m12", date: mudcatsGame.scheduledStart, started: false),
         PitchingAppearance(player: "b11", date: bombersGame.scheduledStart, started: true),
