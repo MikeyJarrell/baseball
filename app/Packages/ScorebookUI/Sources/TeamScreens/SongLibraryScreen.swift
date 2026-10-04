@@ -64,7 +64,7 @@ public struct SongLibraryScreen: View {
                             .listRowBackground(ScorebookColor.surface)
                     }
                 } header: {
-                    Text(songs.count == 1 ? "1 song" : "\(songs.count) songs")
+                    ListHeader(songs.count == 1 ? "1 song" : "\(songs.count) songs")
                 }
             }
         }
@@ -74,7 +74,10 @@ public struct SongLibraryScreen: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button { showsImporter = true } label: {
-                    Label("Import", systemImage: "folder").labelStyle(.titleAndIcon)
+                    HStack(spacing: Spacing.extraSmall) {
+                        Image(systemName: "folder")
+                        Text("Import")
+                    }
                 }
                 .fontWeight(.bold)
                 .disabled(data.audio.isImporting)

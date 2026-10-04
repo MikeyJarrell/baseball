@@ -53,6 +53,22 @@ struct SectionLabel: View {
     }
 }
 
+/// A list section's header in small capitals, like the mockup's `.sec`: "OUR TEAM".
+struct ListHeader: View {
+    var title: String
+
+    init(_ title: String) { self.title = title }
+
+    var body: some View {
+        Text(title.uppercased())
+            .font(ScorebookFont.sectionLabel)
+            .tracking(0.6)
+            .foregroundStyle(ScorebookColor.textSecondary)
+            .lineLimit(1)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+    }
+}
+
 /// A gray box of plain information, like the mockup's `.info`.
 struct InfoBox: View {
     var text: String
@@ -161,6 +177,9 @@ struct ChipLabel: View {
             .padding(.horizontal, Spacing.large - 2)
             .frame(minHeight: Spacing.minimumTapSize)
             .background(ScorebookColor.surfaceSecondary, in: Capsule())
+            .lineLimit(1)
+            // Chips sit side by side, so their words stop growing at the largest ordinary size.
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 }
 
@@ -182,6 +201,25 @@ struct SongPlayButton: View {
         }
         .buttonStyle(.borderless)
         .accessibilityLabel(isPlaying ? "Stop" : "Play")
+    }
+}
+
+// MARK: - Largest text sizes
+
+/// A row that turns into a column at the accessibility text sizes, so two buttons or a picture
+/// and its words never squeeze each other into one letter per line.
+struct AdaptiveStack<Content: View>: View {
+    var spacing: CGFloat = Spacing.small
+    @ViewBuilder var content: Content
+
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        if typeSize.isAccessibilitySize {
+            VStack(alignment: .leading, spacing: spacing) { content }
+        } else {
+            HStack(spacing: spacing) { content }
+        }
     }
 }
 
@@ -210,9 +248,12 @@ struct SongLine: View {
     var title: String
     var details: String
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
         HStack(spacing: Spacing.medium) {
-            SongArt()
+            // At the accessibility text sizes the words need the whole width.
+            if !typeSize.isAccessibilitySize { SongArt() }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(ScorebookFont.headline).foregroundStyle(ScorebookColor.textPrimary)
                 Text(details).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)

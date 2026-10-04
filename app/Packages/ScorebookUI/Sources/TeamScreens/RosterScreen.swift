@@ -20,6 +20,7 @@ public struct RosterScreen: View {
     /// The player waiting for "Remove" to be confirmed.
     @State private var removing: Player?
     @State private var showsRename = false
+    @State private var showsSongs = false
     @State private var renameText = ""
 
     public init(teamID: TeamID, data: TeamScreensData, onRequest: @escaping (TeamScreensRequest) -> Void) {
@@ -63,10 +64,14 @@ public struct RosterScreen: View {
                     }
                 } header: {
                     HStack {
-                        Text(TeamWording.playerCount(team.roster.count))
+                        ListHeader(TeamWording.playerCount(team.roster.count))
                         Spacer()
                         Text(team.isOurs ? "Songs and intro on each page" : "Tap a player to edit")
-                            .textCase(nil)
+                            .font(ScorebookFont.caption.weight(.semibold))
+                            .foregroundStyle(ScorebookColor.textSecondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     }
                 }
             }
@@ -94,6 +99,9 @@ public struct RosterScreen: View {
                 }
                 .accessibilityLabel("Add a player")
             }
+        }
+        .navigationDestination(isPresented: $showsSongs) {
+            SongLibraryScreen(data: data, onRequest: onRequest)
         }
         .sheet(item: $editing) { draft in
             PlayerEditSheet(draft: draft, team: team, onRequest: onRequest)
@@ -128,7 +136,7 @@ public struct RosterScreen: View {
     /// The logo or letter, the team name and its summary, and the chips.
     private func header(_ team: Team) -> some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
-            HStack(spacing: Spacing.large - 2) {
+            AdaptiveStack(spacing: Spacing.large - 2) {
                 TeamBadge(team: team, size: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(team.name)
@@ -146,7 +154,8 @@ public struct RosterScreen: View {
                 }
                 .buttonStyle(.plain)
                 if team.isOurs {
-                    NavigationLink(value: TeamScreensRoute.songs) {
+                    // A plain button rather than a link, so the rest of the header row is not a link.
+                    Button { showsSongs = true } label: {
                         ChipLabel(title: "Songs", systemImage: "music.note")
                     }
                     .buttonStyle(.plain)

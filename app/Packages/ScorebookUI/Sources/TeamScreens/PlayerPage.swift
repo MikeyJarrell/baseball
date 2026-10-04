@@ -58,7 +58,7 @@ public struct PlayerPage: View {
             .padding(.bottom, Spacing.huge)
         }
         .teamPageBackground()
-        .navigationTitle(player.displayName)
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -99,7 +99,7 @@ public struct PlayerPage: View {
 
     /// The big number badge, the name, and "Shortstop · Bats R · Throws R".
     private func header(_ player: Player) -> some View {
-        HStack(spacing: Spacing.large - 2) {
+        AdaptiveStack(spacing: Spacing.large - 2) {
             NumberBadge(player: player, look: .ours, size: 72)
             VStack(alignment: .leading, spacing: 2) {
                 Text(player.displayName)
@@ -127,7 +127,7 @@ public struct PlayerPage: View {
                 } else {
                     SongLine(title: "No song yet", details: "Pick one from the library")
                 }
-                HStack(spacing: Spacing.small) {
+                AdaptiveStack {
                     Button {
                         if isPlaying {
                             onRequest(.stopPlaying)
@@ -179,7 +179,7 @@ public struct PlayerPage: View {
                           systemImage: "mic.fill")
                 }
                 .buttonStyle(WideButtonStyle(kind: .record))
-                HStack(spacing: Spacing.small) {
+                AdaptiveStack {
                     Button {
                         onRequest(isListening ? .stopPlaying : .playIntroduction(player))
                     } label: {

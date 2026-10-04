@@ -43,7 +43,7 @@ public struct TeamsListScreen: View {
                     }
                 }
             } header: {
-                Text("Our team")
+                ListHeader("Our team")
             }
 
             Section {
@@ -56,7 +56,7 @@ public struct TeamsListScreen: View {
                     ForEach(opponents) { teamRow($0) }
                 }
             } header: {
-                Text("Opponents")
+                ListHeader("Opponents")
             }
 
             Section {

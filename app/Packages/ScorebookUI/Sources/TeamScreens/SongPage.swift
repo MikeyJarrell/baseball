@@ -43,7 +43,7 @@ public struct SongPage: View {
         let isPlaying = data.audio.isPlayingSong(song.id)
         return ScrollView {
             VStack(alignment: .leading, spacing: 0) {
-                HStack(spacing: Spacing.medium) {
+                AdaptiveStack(spacing: Spacing.medium) {
                     SongArt(size: 64)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(song.title).font(ScorebookFont.title).foregroundStyle(ScorebookColor.textPrimary)
@@ -56,13 +56,14 @@ public struct SongPage: View {
                 ProblemsBox(problems: data.audio.problems) { onRequest(.dismissProblems) }
                     .padding(.top, Spacing.small)
 
-                SectionLabel("Start point", trailing: nil)
-                    .overlay(alignment: .bottomTrailing) {
-                        Text(TeamWording.clockTenths(start))
-                            .font(ScorebookFont.scoreboardSmall)
-                            .foregroundStyle(ScorebookColor.textPrimary)
-                            .padding(.bottom, Spacing.extraSmall)
-                    }
+                HStack(alignment: .lastTextBaseline) {
+                    SectionLabel("Start point")
+                    Spacer(minLength: Spacing.small)
+                    Text(TeamWording.clockTenths(start))
+                        .font(ScorebookFont.scoreboardSmall)
+                        .foregroundStyle(ScorebookColor.textPrimary)
+                        .padding(.bottom, Spacing.small)
+                }
                 TrackDrawing(song: song, start: start, playhead: isPlaying ? data.audio.position : nil) { seconds, finished in
                     let clamped = TeamWording.clampedStart(seconds, in: song)
                     if finished {
@@ -84,7 +85,7 @@ public struct SongPage: View {
             .padding(.bottom, Spacing.huge)
         }
         .teamPageBackground()
-        .navigationTitle(song.title)
+        .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -115,6 +116,8 @@ public struct SongPage: View {
                     onRequest(.setStartPoint(TeamWording.clampedStart(start + step, in: song), for: song.id))
                 }
                 .buttonStyle(WideButtonStyle(kind: .quiet, compact: true))
+                .lineLimit(1)
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                 .accessibilityLabel(step < 0 ? "Start \(abs(step).formatted()) seconds earlier" : "Start \(step.formatted()) seconds later")
             }
         }

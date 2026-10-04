@@ -133,7 +133,7 @@ struct RecordIntroductionSheet: View {
     /// Listen to the new recording, or throw it away and record again.
     private func listenAndRedo(_ pending: AnnouncerIntroduction) -> some View {
         let isListening = data.audio.playback.phase == .introduction
-        return HStack(spacing: Spacing.small) {
+        return AdaptiveStack {
             Button {
                 if isListening {
                     onRequest(.stopPlaying)
