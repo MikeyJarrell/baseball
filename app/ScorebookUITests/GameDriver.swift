@@ -90,7 +90,7 @@ final class GameDriver {
             }
         }
         guard last == expected.events.count else { return nil }
-        return app.readout["box"] as? String
+        return readNow()["box"] as? String
     }
 
     // MARK: - Checking the app after each event
@@ -99,11 +99,11 @@ final class GameDriver {
     /// event it recorded with the book.
     private func check(after index: Int) throws {
         let wanted = index + 1 + automaticOuts
-        var readout = app.readout
+        var readout = readNow()
         let deadline = Date().addingTimeInterval(10)
         while (readout["count"] as? Int ?? -1) < wanted, Date() < deadline {
             Thread.sleep(forTimeInterval: 0.15)
-            readout = app.readout
+            readout = readNow()
         }
         let count = readout["count"] as? Int ?? -1
         guard count >= wanted else {
@@ -131,6 +131,16 @@ final class GameDriver {
         if Self.allFacts(recorded) != Self.allFacts(want) {
             detailNotes.append("Event \(index): details differ (not in the box score).\n  app:      \(Self.allFacts(recorded))\n  expected: \(Self.allFacts(want))")
         }
+    }
+
+    /// The game screen's hidden readout (see `XCUIApplication.readout`), read without the
+    /// one-second pause `waitForExistence` makes even when the readout is already there.
+    private func readNow() -> [String: Any] {
+        let element = app.descendants(matching: .any)["test-readout"]
+        guard element.exists || element.waitForExistence(timeout: 5),
+              let data = element.label.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return [:] }
+        return object
     }
 
     /// The app's last event, from the readout.
@@ -195,6 +205,8 @@ final class GameDriver {
         var kind = kind
         switch kind {
         case .ballInPlay(var play):
+            // A runner who stayed on their base may be listed or left out: it means the same.
+            play.runners.removeAll { $0.to == .safe(at: $0.from) && !$0.isBatter && $0.reason == nil && !$0.advancedOnError }
             play.runners.sort { $0.runner.rawValue < $1.runner.rawValue }
             play.errors.sort { $0.fielder.rawValue < $1.fielder.rawValue }
             kind = .ballInPlay(play)
@@ -258,11 +270,11 @@ final class GameDriver {
         case .foulBunt:
             // Holding Foul down for half a second records a foul bunt.
             let foul = app.buttons["Foul"]
-            guard foul.waitForExistence(timeout: 5) else { throw missing("the Foul button") }
+            guard appears(foul, within: 5) else { throw missing("the Foul button") }
             foul.press(forDuration: 0.8)
         case .foulTip:
             let chip = app.buttons["Foul tip"]
-            guard chip.waitForExistence(timeout: 3) else {
+            guard appears(chip, within: 3) else {
                 throw DriverStop(description: "the Foul tip chip is not on the batting screen (count \(before.count.balls)-\(before.count.strikes))")
             }
             chip.tap()
@@ -291,7 +303,7 @@ final class GameDriver {
                 if let kind = play.battedBall { try tap(app.buttons[Self.chipTitle(kind)], "the \(kind) chip") }
                 if let multi = play.multiOut {
                     let chip = app.buttons[multi == .doublePlay ? "Double play" : "Triple play"]
-                    guard chip.waitForExistence(timeout: 3) else { throw missing("the \(multi) chip") }
+                    guard appears(chip, within: 3) else { throw missing("the \(multi) chip") }
                     if !chip.isSelected { chip.tap() }
                 }
             } else if play.multiOut != nil {
@@ -322,14 +334,14 @@ final class GameDriver {
     /// On the runner step: puts every runner where the play left them, answers "Who put them
     /// out?" and "How did they get there?", and sets the runs batted in.
     private func placeRunners(_ play: Play) throws {
-        guard app.staticTexts["RUNS BATTED IN"].waitForExistence(timeout: 5) else { throw missing("the runner step") }
+        guard appears(app.staticTexts["RUNS BATTED IN"], within: 5) else { throw missing("the runner step") }
         // Lead runner first, batter last, so moving one never pushes a runner already placed.
         let moves = play.runners.sorted { $0.from > $1.from }
         for _ in 0..<3 {
             var changed = false
             for move in moves {
                 let row = app.otherElements["runner-row-\(move.runner.rawValue)"]
-                guard row.waitForExistence(timeout: 3) else { throw missing("the runner row for \(name(move.runner))") }
+                guard appears(row, within: 3) else { throw missing("the runner row for \(name(move.runner))") }
                 let end = row.buttons[Self.endLabel(move.to)]
                 guard end.exists else { throw missing("the \(Self.endLabel(move.to)) button for \(name(move.runner))") }
                 if !end.isSelected {
@@ -464,7 +476,7 @@ final class GameDriver {
     /// The defense check when our team takes the field: nobody moved.
     private func confirmDefense() throws {
         let confirm = app.buttons["Everyone’s where they were"]
-        if !confirm.waitForExistence(timeout: 3) {
+        if !appears(confirm, within: 3) {
             // The check is not open by itself: open it from the Defense button on the banner.
             try tap(app.buttons["Defense"], "the Defense button")
         }
@@ -474,7 +486,7 @@ final class GameDriver {
     /// Who runs for a designated non-runner who just reached: the prompt opens by itself.
     private func enterRunnerForNonRunner(_ choice: RunnerForNonRunner) throws {
         let row = button(containing: player(choice.runner)?.displayName ?? choice.runner.rawValue)
-        if !row.waitForExistence(timeout: 3) {
+        if !appears(row, within: 3) {
             try tap(app.buttons["Substitutions"], "the Subs button")
             try tap(button(startingWith: "Runner for a non-runner"), "\"Runner for a non-runner\"")
         }
@@ -499,7 +511,7 @@ final class GameDriver {
         if let spotOf = change.takesBattingSpotOf {
             if spotOf == outgoing {
                 let toggle = app.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "Bats in")).firstMatch
-                guard toggle.waitForExistence(timeout: 3) else { throw missing("the \"Bats in …’s spot\" switch") }
+                guard appears(toggle, within: 3) else { throw missing("the \"Bats in …’s spot\" switch") }
                 if (toggle.value as? String) != "1" {
                     // The switch itself sits at the right-hand end of its row.
                     toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
@@ -527,7 +539,7 @@ final class GameDriver {
     /// The end of the game: "End game" on the "Is the game over?" pop-up when it asks, or else
     /// the game menu's End game with the reason.
     private func endGame(_ end: EndOfGame) throws {
-        if app.buttons["Keep playing"].waitForExistence(timeout: 2) {
+        if appears(app.buttons["Keep playing"], within: 2) {
             try tap(app.buttons["End game"], "\"End game\" on \"Is the game over?\"")
             return
         }
@@ -546,8 +558,14 @@ final class GameDriver {
 
     /// Waits for an element and taps it, or stops naming what was missing.
     private func tap(_ element: XCUIElement, _ what: String) throws {
-        guard element.waitForExistence(timeout: 5) else { throw missing(what) }
+        // `exists` first: `waitForExistence` always pauses about a second before looking.
+        guard element.exists || element.waitForExistence(timeout: 5) else { throw missing(what) }
         element.tap()
+    }
+
+    /// True when the element is on screen now, or shows up within this many seconds.
+    private func appears(_ element: XCUIElement, within seconds: TimeInterval) -> Bool {
+        element.exists || element.waitForExistence(timeout: seconds)
     }
 
     /// A stop for a button that is not on the screen.
