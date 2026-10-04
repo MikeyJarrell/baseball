@@ -120,6 +120,29 @@ struct PitchingSortTests {
         let barros = fourteen.first { $0.player == "d9" }!
         #expect(PitchingColumn.walksAndHitsPerInning.text(barros.stats) == "1.11")
     }
+
+    @Test("Wins and losses print as 6-2 and sort by wins, then fewer losses")
+    func winsAndLosses() {
+        // Barros 6-2, Voss 2-2, Quinn 1-0.
+        let sorted = StatSorting.pitching(fourteen, by: SortChoice(column: .winsAndLosses, descending: true), minimumInnings: 0)
+        #expect(lastNames(sorted) == ["Barros", "Voss", "Quinn"])
+        #expect(sorted.map { PitchingColumn.winsAndLosses.text($0) } == ["6-2", "2-2", "1-0"])
+        // Same wins: fewer losses goes first.
+        let a = SeasonPitchingLine(player: "a", name: "A Two", games: 5, wins: 3, losses: 2, stats: PitchingCounts(), gameLog: [])
+        let b = SeasonPitchingLine(player: "b", name: "B One", games: 5, wins: 3, losses: 1, stats: PitchingCounts(), gameLog: [])
+        let tied = StatSorting.pitching([a, b], by: SortChoice(column: .winsAndLosses, descending: true), minimumInnings: 0)
+        #expect(tied.map(\.player) == ["b", "a"])
+        // Every other column prints a season line the same as its counts.
+        let barros = fourteen.first { $0.player == "d9" }!
+        #expect(PitchingColumn.innings.text(barros) == "58.1")
+        #expect(PitchingColumn.games.text(barros) == "10")
+    }
+
+    @Test("The sample season's winning pitcher is 1-0")
+    func sampleWinner() {
+        let barros = SampleSeason.totals.pitching.first { $0.player == "d9" }!
+        #expect(PitchingColumn.winsAndLosses.text(barros) == "1-0")
+    }
 }
 
 @Suite("The pitchers' minimum innings")

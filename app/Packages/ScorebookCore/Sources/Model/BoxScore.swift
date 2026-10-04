@@ -215,7 +215,8 @@ public struct PitchingLine: Codable, Equatable, Sendable {
 ///   outs, then the fewest runs charged, then the earliest.
 /// - Loss: the pitcher charged with the run that gave the other team the lead for good.
 ///
-/// Saves and won-lost records are not kept.
+/// Saves are not kept. Each pitcher's season wins and losses are counted from these
+/// (`SeasonPitchingLine.wins`, `losses`).
 public enum PitchingDecision: String, Codable, Sendable, CaseIterable {
     case win
     case loss

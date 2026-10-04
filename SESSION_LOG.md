@@ -96,6 +96,26 @@ The batting screen and in-game change sheets were run on the 13-inch iPad Pro an
 
 ---
 
+## [2026-10-03 19:58] Stopping the simulator permission popups
+SESSLOG:[2026-10-03 19:58]
+
+**Project(s):** baseball
+
+### Decisions
+- Builders use only the existing `iPhone 17`, `iPhone 17e`, `iPad Pro 13-inch (M5)` and `iPad mini (A17 Pro)` simulators, and never create, clone, rename, delete or erase one (`plan/rules-for-agents.md`).
+- Throwaway harness apps get their own bundle id and are uninstalled when the builder finishes; several builders may share one simulator.
+
+### Follow-ups
+- [ ] Builders already running when this landed (the teams-and-songs screen) may still make their own simulator; Mikey can click Cancel on popups naming a made-up simulator.
+
+### Files
+- [modified] `plan/rules-for-agents.md` — simulator rule
+
+### Context
+The app asks Mikey to click Allow the first time Claude controls each simulator. Builders had been making a fresh, uniquely named simulator per job (“GameChanges iPhone 17”, “GOReview2 iPhone 17”, “Overview harness iPhone 17”), so every job set off a new popup. Reusing a fixed set should mean one Allow per simulator, going by the popup’s wording; that it stays allowed across sessions has not been confirmed.
+
+---
+
 ## [2026-10-03 20:08] Darin’s and Aidan’s walk-up songs
 SESSLOG:[2026-10-03 20:08]
 
@@ -114,3 +134,7 @@ SESSLOG:[2026-10-03 20:08]
 
 ### Context
 Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
+
+## [2026-10-03 22:31] The app is built
+
+Every job in the plan is built, reviewed by a fresh reader, fixed and accepted: the rules engine, stats, storage, box score printer, design system, walk-up audio, every screen, and the wiring. Two full games (the sample game and Astros at Yankees, June 23, 2019) were scored through the real screens in the simulator and their box scores match. Mikey decided along the way: layout A, outs written as words, visitors first in every score line, a powder-blue icon from the original logo, a 12-second walk-up fade, no courtesy runners, the SDABL rule book as the source of league rules (nothing enforced), and alternating fielders by inning. Next: Mikey installs it on his phone and scores a televised game as the dress rehearsal.

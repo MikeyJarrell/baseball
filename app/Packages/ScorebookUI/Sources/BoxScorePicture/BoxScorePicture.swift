@@ -84,7 +84,8 @@ public struct BoxScorePicture: View {
 // MARK: - Tables
 
 /// One team's batting lines: a heading row with the team name and "ab r h bi", a row per
-/// batter, and the totals in bold.
+/// batter, the totals in bold, and under them the footnotes for any pinch hitters and
+/// pinch runners ("a-popped out for Collins in the 4th.").
 struct BattingTableView: View {
     let table: NewspaperTable
 
@@ -93,6 +94,10 @@ struct BattingTableView: View {
             HeadingRow(title: table.title, columns: table.columns)
             ForEach(Array(table.rows.enumerated()), id: \.offset) { _, row in
                 NumberRow(row: row)
+            }
+            if !table.footnotes.isEmpty {
+                Paragraph(text: table.footnotes.joined(separator: " "))
+                    .padding(.top, 2)
             }
         }
     }

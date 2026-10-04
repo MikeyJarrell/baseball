@@ -16,7 +16,7 @@ struct AtBatControls: View {
             if let redo = info.redoLabel { RedoBar(redoLabel: redo, onAction: onAction) }
             BatterRow(info: info, onAction: onAction)
             ChipRow(info: info, onAction: onAction)
-            CountButtons(count: info.situation.count, onAction: onAction)
+            CountButtons(count: info.situation.count, countAfter: info.countAfter, onAction: onAction)
             SongButton(info: info, onAction: onAction)
         }
     }
@@ -260,6 +260,8 @@ struct WarningChipStyle: ButtonStyle {
 /// swinging strike; the small Called button on it records a called strike in one tap.
 struct CountButtons: View {
     var count: Count
+    /// What each pitch would do to the count, from the rules engine.
+    var countAfter: (PitchResult) -> CountChange
     var onAction: (AtBatAction) -> Void
 
     /// True between a long press on Foul (a foul bunt) and the finger lifting, so the lift does
@@ -275,24 +277,24 @@ struct CountButtons: View {
         Grid(horizontalSpacing: Spacing.screenEdge, verticalSpacing: Spacing.screenEdge) {
             GridRow {
                 Button { pitch(.ball) } label: {
-                    CountButtonLabel("Ball", hint: AtBatWording.ballHint(count))
+                    CountButtonLabel("Ball", hint: AtBatWording.hint(countAfter(.ball)))
                 }
                 .buttonStyle(CountButtonStyle.ball)
                 .accessibilityLabel(Text("Ball"))
-                .accessibilityHint(Text(AtBatWording.ballHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.ball))))
 
                 Button { pitch(.swingingStrike) } label: {
                     // The words keep clear of the Called button: an empty space its width sits
                     // beside them, so they shrink to fit the rest at large text sizes.
                     HStack(spacing: 0) {
-                        CountButtonLabel("Strike", hint: AtBatWording.strikeHint(count))
+                        CountButtonLabel("Strike", hint: AtBatWording.hint(countAfter(.swingingStrike)))
                             .frame(maxWidth: .infinity)
                         Color.clear.frame(width: calledWidth + Spacing.small)
                     }
                 }
                 .buttonStyle(CountButtonStyle.strike)
                 .accessibilityLabel(Text("Strike, swinging"))
-                .accessibilityHint(Text(AtBatWording.strikeHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.swingingStrike))))
                 .overlay(alignment: .trailing) { calledButton }
             }
             GridRow {
@@ -302,7 +304,7 @@ struct CountButtons: View {
                 Button {
                     if heldForBunt { heldForBunt = false } else { pitch(.foul) }
                 } label: {
-                    CountButtonLabel("Foul", hint: AtBatWording.foulHint(count))
+                    CountButtonLabel("Foul", hint: AtBatWording.hint(countAfter(.foul), isFoul: true))
                 }
                 .buttonStyle(CountButtonStyle.foul)
                 .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
@@ -312,7 +314,7 @@ struct CountButtons: View {
                 })
                 .sensoryFeedback(.impact, trigger: buntCount)
                 .accessibilityLabel(Text("Foul"))
-                .accessibilityHint(Text(AtBatWording.foulHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.foul), isFoul: true)))
                 .accessibilityAction(named: Text("Foul bunt")) { pitch(.foulBunt) }
 
                 Button { onAction(.openInPlay(.ballInPlay)) } label: {
@@ -347,7 +349,7 @@ struct CountButtons: View {
         .padding(.bottom, Spacing.extraSmall)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .accessibilityLabel(Text("Called strike"))
-        .accessibilityHint(Text(AtBatWording.strikeHint(count)))
+        .accessibilityHint(Text(AtBatWording.hint(countAfter(.swingingStrike))))
     }
 
     /// Hands back one pitch to record.

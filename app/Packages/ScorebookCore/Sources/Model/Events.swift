@@ -343,6 +343,22 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
     /// True when this move is the batter's.
     public var isBatter: Bool { from == .home }
 
+    /// For a stolen base: the base stolen, always the next one along, since a stolen base is
+    /// one base and anything past it came from an error. `.home` for a steal of home (from
+    /// third). Missing for every other kind of move.
+    public var baseStolen: Base? {
+        guard reason == .stolenBase else { return nil }
+        switch from {
+        case .home: return nil
+        case .first: return .second
+        case .second: return .third
+        case .third: return .home
+        }
+    }
+
+    /// True for a steal of home: a runner from third credited with stealing home.
+    public var isStealOfHome: Bool { baseStolen == .home }
+
     // Reading from JSON: `outBy`, `advancedOnError` and `wasStealing` may be left out.
     private enum CodingKeys: String, CodingKey { case runner, from, to, reason, outBy, outAt, advancedOnError, wasStealing }
     public init(from decoder: Decoder) throws {
