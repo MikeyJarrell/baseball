@@ -68,9 +68,9 @@ public struct PregameFlow: View {
                     case .pitchers:
                         PitchersStep(draft: $draft, onNext: { path.append(.review) })
                     case .review:
-                        ReviewStep(draft: draft, onPlayBall: {
-                            if let setup = draft.setup() { onFinish(.playBall(setup)) }
-                        })
+                        // A binding, not a copy: a pushed screen keeps whatever it was first
+                        // handed, so a plain copy could miss choices made on earlier steps.
+                        ReviewStep(draft: $draft, onPlayBall: { setup in onFinish(.playBall(setup)) })
                     }
                 }
         }

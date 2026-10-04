@@ -8,8 +8,9 @@ import DesignSystem
 
 /// The last pregame step: review and "Play ball".
 struct ReviewStep: View {
-    var draft: PregameDraft
-    var onPlayBall: () -> Void
+    @Binding var draft: PregameDraft
+    /// Hands back the finished setup.
+    var onPlayBall: (GameSetup) -> Void
 
     @Environment(\.dynamicTypeSize) private var typeSize
 
@@ -18,7 +19,7 @@ struct ReviewStep: View {
 
     var body: some View {
         StepPage(step: 5, title: "Review", buttonTitle: "Play ball", blockedReason: draft.missing,
-                 isPlayBall: true, onButton: onPlayBall) {
+                 isPlayBall: true, onButton: { if let setup { onPlayBall(setup) } }) {
             Section {
                 VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                     Text("\(draft.input.ourTeam.name) \(draft.details.weAreHome ? "vs" : "at") \(draft.opponentName)")
