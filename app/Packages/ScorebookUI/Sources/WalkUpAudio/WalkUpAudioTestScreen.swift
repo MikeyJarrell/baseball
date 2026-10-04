@@ -23,9 +23,15 @@ public struct WalkUpAudioTestScreen: View {
     @State private var newRecording: AnnouncerIntroduction?
     /// Messages for the scorer, such as import problems.
     @State private var messages: [String] = []
-    /// Whether the Files picker is showing, and what it is picking.
-    @State private var pickingSongs = false
-    @State private var pickingIntroduction = false
+    /// What the Files picker is picking, while it is showing. One picker serves both
+    /// buttons, because SwiftUI may ignore a second picker on the same screen.
+    @State private var picking: PickerPurpose?
+
+    /// What the Files picker is for.
+    private enum PickerPurpose {
+        case songs
+        case introduction
+    }
 
     public init(player: StadiumAudioPlayer) {
         self.player = player
@@ -47,12 +53,22 @@ public struct WalkUpAudioTestScreen: View {
                 }
             }
             .navigationTitle("Audio test")
-            .fileImporter(isPresented: $pickingSongs, allowedContentTypes: [.audio],
-                          allowsMultipleSelection: true) { result in
-                if case .success(let files) = result { importSongs(files) }
+            .fileImporter(isPresented: Binding(get: { picking != nil }, set: { if !$0 { picking = nil } }),
+                          allowedContentTypes: [.audio],
+                          allowsMultipleSelection: picking == .songs) { result in
+                let purpose = picking
+                picking = nil
+                guard case .success(let files) = result else { return }
+                switch purpose {
+                case .songs: importSongs(files)
+                case .introduction: if let file = files.first { importIntroduction(file) }
+                case nil: break
+                }
             }
-            .fileImporter(isPresented: $pickingIntroduction, allowedContentTypes: [.audio]) { result in
-                if case .success(let file) = result { importIntroduction(file) }
+            // A recording that stopped by itself (the 30-second limit, or a call) is
+            // collected here, ready for listen, keep or redo.
+            .onChange(of: player.pendingRecording) { _, waiting in
+                if waiting != nil { newRecording = player.stopRecordingIntroduction() }
             }
         }
     }
@@ -130,7 +146,7 @@ public struct WalkUpAudioTestScreen: View {
                     self.newRecording = nil
                 }
             }
-            Button("Import a recording") { pickingIntroduction = true }
+            Button("Import a recording") { picking = .introduction }
             Button("Play the introduction alone") { player.playIntroduction(for: batter) }
             VStack(alignment: .leading) {
                 Text("Stadium echo: \(Int(player.library.announcerEcho * 100))%")
@@ -143,7 +159,7 @@ public struct WalkUpAudioTestScreen: View {
     /// The song library: import, preview, start points, loudness.
     private var songsSection: some View {
         Section("Songs") {
-            Button("Import songs from Files") { pickingSongs = true }
+            Button("Import songs from Files") { picking = .songs }
             Button("Make three test songs") { makeTestSongs() }
             ForEach(player.library.songs) { song in
                 SongTestRow(player: player, song: song)
@@ -205,6 +221,8 @@ public struct WalkUpAudioTestScreen: View {
             do {
                 try player.startRecordingIntroduction()
             } catch let problem as WalkUpAudioError {
+                messages.append(problem.message)
+            } catch let problem as RecordingProblem {
                 messages.append(problem.message)
             } catch {
                 messages.append("Recording could not start: \(error.localizedDescription)")

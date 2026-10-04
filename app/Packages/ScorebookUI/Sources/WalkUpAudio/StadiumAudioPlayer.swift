@@ -7,7 +7,8 @@
 //   12 seconds of song (the walk-up length setting), or sooner when the button is tapped
 //   again, with a fade of about two seconds.
 // - When our team takes the field, it plays the pitcher's warm-up song over and over until
-//   it is stopped or the first pitch is recorded.
+//   it is stopped or the first pitch is recorded, and fades by itself after five minutes in
+//   case nobody stops it.
 // - It keeps the song library: imports, names, start points, loudness, the announcer echo.
 //
 // How it behaves on the phone:
@@ -17,6 +18,9 @@
 // - A phone call or Siri stops the music; afterward the player is ready to play again.
 // - If the Bluetooth speaker disconnects mid-song, the song stops at once, so it does not
 //   carry on through the phone's own speaker.
+// - If the iPhone switches speakers some other way mid-song (a speaker connecting, or the
+//   phone changing its sound settings for a new speaker), the song picks up where it was.
+//   If that fails, it stops with the message “The speaker changed. Tap again.”
 // - `cue(for:)` loads the next batter's song and introduction ahead of time, so the play
 //   button starts instantly.
 //
@@ -60,10 +64,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     public private(set) var isRecording = false
     /// Seconds recorded so far, for a timer on the record button.
     public private(set) var recordingSeconds: TimeInterval = 0
+    /// A finished recording waiting to be collected with `stopRecordingIntroduction()`, when
+    /// the recording ended by itself: it reached 30 seconds, or a call or Siri cut it off.
+    /// The record screen should watch this and offer “listen, keep or redo” when it appears.
+    public private(set) var pendingRecording: AnnouncerIntroduction?
     /// How loud the sound coming out is right now, 0 (silence) to about 1. For a level meter.
     public private(set) var outputLevel: Double = 0
-    /// The latest thing that went wrong, in words for the scorer, such as a song file that
-    /// is missing. Cleared when something plays successfully.
+    /// The latest thing to tell the scorer, such as a song file that is missing or a
+    /// recording that stopped at its limit. Cleared when something new starts playing.
     public private(set) var lastProblem: String?
 
     /// Called whenever something stops playing for any reason, with the song that was playing.
@@ -78,8 +86,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     public var walkUpLength: TimeInterval = 12
     /// How long a fade takes, in seconds.
     public var fadeLength: TimeInterval = 2
-    /// The longest introduction recording allowed, in seconds.
-    public var longestRecording: TimeInterval = 30
+    /// The longest a warm-up song plays before fading by itself, in seconds: five minutes,
+    /// in case the first pitch is never recorded and nobody taps stop.
+    public var longestWarmUp: TimeInterval = 300
+    /// The longest an introduction may be, recorded or imported, in seconds.
+    public nonisolated static let longestIntroduction: TimeInterval = 30
 
     /// The folder holding the song and introduction files: storage's `songs/audio/` folder.
     public nonisolated let audioFolder: URL
@@ -107,6 +118,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     @ObservationIgnored private var openFiles: [String: AVAudioFile] = [:]
     /// Introductions already turned into sound, by player, so they start instantly.
     @ObservationIgnored private var readyIntroductions: [PlayerID: ReadyIntroduction] = [:]
+    /// Introductions being made right now, by player, so a tap during `cue` waits for the
+    /// same job instead of starting a second one.
+    @ObservationIgnored private var introductionJobs: [PlayerID: IntroductionJob] = [:]
     /// Goes up by one every time something new starts or stops. A message from the audio
     /// system about an older play carries an older number and is ignored.
     @ObservationIgnored private var playNumber = 0
@@ -114,16 +128,32 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     @ObservationIgnored private var ticker: Task<Void, Never>?
     /// The current play's timing, in seconds on the phone's audio clock.
     @ObservationIgnored private var timing = Timing()
+    /// What the current play is made of, so it can be picked up again after a speaker change.
+    @ObservationIgnored private var currentSong: Song?
+    @ObservationIgnored private var currentIntroduction: AVAudioPCMBuffer?
+    /// When the current play began, on the audio clock (for the warm-up time limit).
+    @ObservationIgnored private var playStartedAt: Double?
+    /// How many times the current play has been picked up again after a speaker change.
+    @ObservationIgnored private var restartsThisPlay = 0
     /// The microphone recorder, while recording.
     @ObservationIgnored private var recorder: AVAudioRecorder?
     /// The listeners for phone calls, speaker changes and audio resets.
     @ObservationIgnored private var listeners: [NSObjectProtocol] = []
+
+    /// What the scorer sees when a speaker change stops a song that could not be picked up.
+    private static let speakerChangedMessage = "The speaker changed. Tap again."
 
     /// A ready-to-play introduction, and what it was made from (so a renamed player or a new
     /// recording makes a fresh one).
     private struct ReadyIntroduction {
         var madeFrom: IntroductionRecipe
         var sound: AVAudioPCMBuffer
+    }
+
+    /// An introduction being made, and what it is being made from.
+    private struct IntroductionJob {
+        var madeFrom: IntroductionRecipe
+        var task: Task<SoundBox, Never>
     }
 
     /// Everything that decides how an introduction sounds.
@@ -141,8 +171,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         var songOffset: TimeInterval = 0
         /// Seconds of song before it goes quiet by itself; missing means until stopped.
         var songLength: TimeInterval?
-        /// The playable part of the track after the offset, for repeating warm-ups.
-        var trackRemaining: TimeInterval?
+        /// For repeating warm-ups: the length of the first pass (from the offset to the end of
+        /// the track), and where each later pass begins and how long it lasts.
+        var firstPass: TimeInterval?
+        var loopStart: TimeInterval = 0
+        var loopLength: TimeInterval?
         /// When the introduction finishes.
         var introductionEnd: Double?
         /// When an introduction played on its own, echo tail included, is over.
@@ -164,6 +197,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         try? FileManager.default.createDirectory(at: audioFolder, withIntermediateDirectories: true)
         AudioSessionSettings.usePlayback()
         listenForInterruptions()
+        voice.findVoice()   // in the background, so the first introduction is not delayed
     }
 
     /// A player for previews and the test screen, keeping its files in a temporary folder.
@@ -256,32 +290,42 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     public func playWalkUp(for player: Player, withIntroduction: Bool) {
         stopAtOnce()   // a new song stops the current one
         let song = player.walkUpSongID.flatMap { library.song($0) }
+        // The player has a song, but it is no longer in the library (deleted or never saved).
+        let songMissing = player.walkUpSongID != nil && song == nil
+        let missingMessage = "\(player.displayName)'s walk-up song is no longer in the song library. Pick a song for them again."
         let wantsIntroduction = withIntroduction && player.introduction != nil
-        guard song != nil || wantsIntroduction else { return }
+        guard song != nil || wantsIntroduction else {
+            if songMissing { lastProblem = missingMessage }
+            return
+        }
 
         // The introduction is usually ready already (cued). If not, show the button as
-        // playing straight away and start as soon as it is made.
+        // playing straight away and start as soon as it is made, but wait no more than
+        // three seconds: after that the song plays on its own, so the button never sits
+        // silent. The introduction carries on being made, ready for next time.
         if wantsIntroduction, readyIntroduction(for: player) == nil {
-            let number = beginPlay(.walkUp, song: song?.id)
+            let number = beginPlay(.walkUp, song: song)
+            if songMissing { lastProblem = missingMessage }
             Task {
-                let introduction = await introductionSound(for: player)
+                let introduction = await introductionSound(for: player, waitingAtMost: 3)
                 guard number == playNumber else { return }   // stopped or replaced meanwhile
+                if introduction == nil, lastProblem == nil, song != nil {
+                    lastProblem = "The introduction was not ready, so the song played without it."
+                }
                 startWalkUp(song: song, introduction: introduction)
             }
             return
         }
-        beginPlay(.walkUp, song: song?.id)
+        beginPlay(.walkUp, song: song)
+        if songMissing { lastProblem = missingMessage }
         startWalkUp(song: song, introduction: wantsIntroduction ? readyIntroduction(for: player) : nil)
     }
 
     public func playPreview(_ song: SongID, from seconds: TimeInterval) {
         stopAtOnce()
-        guard let song = library.song(song), let file = openFile(for: song) else { return }
-        beginPlay(.preview, song: song.id)
-        guard startEngine() else { return }
-        let start = scheduleSong(song, file: file, from: seconds, length: nil, repeating: false)
-        graph.songNode.play(at: start.map { AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: $0)) })
-        startTicker()
+        guard let song = library.song(song) else { return }
+        beginPlay(.preview, song: song)
+        startSong(song, from: seconds, length: nil, repeating: false)
     }
 
     public func fadeOut() {
@@ -298,12 +342,13 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
     public func playWarmUp(for pitcher: Player) {
         stopAtOnce()
-        guard let id = pitcher.warmUpSongID, let song = library.song(id), let file = openFile(for: song) else { return }
-        beginPlay(.warmUp, song: song.id)
-        guard startEngine() else { return }
-        let start = scheduleSong(song, file: file, from: song.startTime, length: nil, repeating: true)
-        graph.songNode.play(at: start.map { AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: $0)) })
-        startTicker()
+        guard let id = pitcher.warmUpSongID else { return }
+        guard let song = library.song(id) else {
+            lastProblem = "\(pitcher.displayName)'s warm-up song is no longer in the song library. Pick a song for them again."
+            return
+        }
+        beginPlay(.warmUp, song: song)
+        startSong(song, from: song.startTime, length: nil, repeating: true)
     }
 
     // MARK: - Announcer introductions
@@ -319,53 +364,81 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         case .granted:
             break
         case .undetermined:
-            // Ask now; the scorer taps record again once they have answered.
+            // iOS is about to ask the scorer for the first time; they tap record again after
+            // answering. (Better: call `requestMicrophoneAccess()` first.)
             Task { _ = await AVAudioApplication.requestRecordPermission() }
-            throw WalkUpAudioError.microphoneNotAllowed
+            throw RecordingProblem.askingForPermission
         default:
             throw WalkUpAudioError.microphoneNotAllowed
         }
-        if isRecording { _ = stopRecordingIntroduction() }
+        // A take still recording, or finished but never collected, is replaced by this one.
+        if recorder != nil { finishRecording(note: nil) }
+        if let old = pendingRecording {
+            discardIntroduction(old)
+            pendingRecording = nil
+        }
         stopAtOnce()   // nothing plays while recording
 
-        try AudioSessionSettings.useRecording()
-        try FileManager.default.createDirectory(at: audioFolder, withIntermediateDirectories: true)
         let file = audioFolder.appending(path: "intro-\(UUID().uuidString).m4a")
-        // A good-quality, one-channel compressed recording: plenty for a voice.
-        let settings: [String: Any] = [
-            AVFormatIDKey: kAudioFormatMPEG4AAC,
-            AVSampleRateKey: 44_100,
-            AVNumberOfChannelsKey: 1,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
-        ]
-        let recorder = try AVAudioRecorder(url: file, settings: settings)
-        guard recorder.record(forDuration: longestRecording) else {
+        do {
+            try AudioSessionSettings.useRecording()
+            try FileManager.default.createDirectory(at: audioFolder, withIntermediateDirectories: true)
+            // A good-quality, one-channel compressed recording: plenty for a voice.
+            let settings: [String: Any] = [
+                AVFormatIDKey: kAudioFormatMPEG4AAC,
+                AVSampleRateKey: 44_100,
+                AVNumberOfChannelsKey: 1,
+                AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue,
+            ]
+            let recorder = try AVAudioRecorder(url: file, settings: settings)
+            guard recorder.record(forDuration: Self.longestIntroduction) else {
+                throw RecordingProblem.couldNotStart("The microphone did not start.")
+            }
+            self.recorder = recorder
+        } catch {
+            // Back to ordinary playback, so the next song plays normally and other apps'
+            // music can resume.
             AudioSessionSettings.usePlayback()
-            throw WalkUpAudioError.cannotImport(fileName: "Recording", reason: "The microphone could not start.")
+            AudioSessionSettings.deactivate()
+            try? FileManager.default.removeItem(at: file)
+            if let problem = error as? RecordingProblem { throw problem }
+            throw RecordingProblem.couldNotStart(error.localizedDescription)
         }
-        self.recorder = recorder
         isRecording = true
         recordingSeconds = 0
+        lastProblem = nil
         startTicker()
     }
 
     public func stopRecordingIntroduction() -> AnnouncerIntroduction? {
-        guard let recorder else { return nil }
+        finishRecording(note: nil)
+        defer { pendingRecording = nil }
+        return pendingRecording
+    }
+
+    /// Ends the recording, however it ended: switches the phone back to ordinary playback,
+    /// and keeps the take in `pendingRecording` if it is at least half a second long
+    /// (otherwise deletes its file). `note` is shown to the scorer, for takes that ended by
+    /// themselves.
+    private func finishRecording(note: String?) {
+        guard let recorder else { return }
         recorder.stop()
         self.recorder = nil
         isRecording = false
-        stopTicker()
         AudioSessionSettings.usePlayback()
         AudioSessionSettings.deactivate()
+        if !isPlaying { stopTicker() }
 
-        // Keep it only if something was actually recorded (at least half a second).
         let file = recorder.url
         let seconds = (try? AVAudioFile(forReading: file)).map { Double($0.length) / $0.processingFormat.sampleRate } ?? 0
-        guard seconds >= 0.5 else {
+        if seconds >= 0.5 {
+            pendingRecording = AnnouncerIntroduction(source: .recorded, fileName: file.lastPathComponent)
+            if let note { lastProblem = note }
+        } else {
             try? FileManager.default.removeItem(at: file)
-            return nil
+            pendingRecording = nil
+            if note != nil { lastProblem = "The recording was cut off before anything was recorded. Try again." }
         }
-        return AnnouncerIntroduction(source: .recorded, fileName: file.lastPathComponent)
     }
 
     /// Throws away an introduction the scorer did not keep (“redo”), or one being replaced,
@@ -374,10 +447,20 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         guard introduction.source != .phoneVoice, let name = introduction.fileName else { return }
         try? FileManager.default.removeItem(at: audioFolder.appending(path: name))
         readyIntroductions = readyIntroductions.filter { $0.value.madeFrom.introduction != introduction }
+        if pendingRecording == introduction { pendingRecording = nil }
     }
 
     @concurrent nonisolated public func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction {
         let copy = try await SoundFileImporter.copyIn(file, to: audioFolder, prefix: "intro-")
+        // An introduction is a few seconds of announcer; a whole song picked by mistake would
+        // take a lot of memory and play for minutes before the walk-up song.
+        guard copy.duration <= Self.longestIntroduction else {
+            try? FileManager.default.removeItem(at: audioFolder.appending(path: copy.fileName))
+            throw WalkUpAudioError.cannotImport(
+                fileName: file.lastPathComponent,
+                reason: "It is \(Int(copy.duration.rounded())) seconds long, and an introduction can be at most \(Int(Self.longestIntroduction)) seconds. Pick the announcer recording, not a song."
+            )
+        }
         return AnnouncerIntroduction(source: .imported, fileName: copy.fileName)
     }
 
@@ -391,9 +474,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             startIntroductionOnly(ready)
         } else {
             Task {
-                let sound = await introductionSound(for: player)
+                let sound = await introductionSound(for: player, waitingAtMost: 10)
                 guard number == playNumber else { return }
-                if let sound { startIntroductionOnly(sound) } else { finish() }
+                if let sound {
+                    startIntroductionOnly(sound)
+                } else {
+                    if lastProblem == nil { lastProblem = "The introduction was not ready. Try again in a moment." }
+                    finish()
+                }
             }
         }
     }
@@ -402,24 +490,29 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
     /// Marks the start of something new: the button shows playing at once.
     @discardableResult
-    private func beginPlay(_ kind: Activity, song: SongID?) -> Int {
+    private func beginPlay(_ kind: Activity, song: Song?) -> Int {
         playNumber += 1
         activity = kind
-        nowPlaying = song
+        currentSong = song
+        currentIntroduction = nil
+        nowPlaying = song?.id
         isPlaying = true
         isFadingOut = false
         lastProblem = nil
         timing = Timing()
-        if let song, let start = library.song(song)?.startTime { playbackPosition = start }
+        playStartedAt = Self.audioClockNow()
+        restartsThisPlay = 0
+        if let song { playbackPosition = song.startTime }
         return playNumber
     }
 
     /// Plays the introduction, then the song right after it, timed to the sample.
     private func startWalkUp(song: Song?, introduction: AVAudioPCMBuffer?) {
-        guard startEngine() else { return }
+        currentIntroduction = introduction
         let file = song.flatMap { openFile(for: $0) }
         // Nothing to play: the song file is missing and there is no introduction.
         if file == nil, introduction == nil { finish(); return }
+        guard startEngine() else { return }
 
         // Start a twentieth of a second from now, so the introduction and the song share
         // one clock reading.
@@ -437,8 +530,8 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         }
         if let song, let file {
             let length = song.playLength ?? walkUpLength
-            _ = scheduleSong(song, file: file, from: song.startTime, length: length, repeating: false,
-                             startingAt: songStart)
+            scheduleSong(song, file: file, from: song.startTime, length: length, repeating: false,
+                         startingAt: songStart)
             graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: songStart)))
         } else {
             // An introduction with no song: done once the echo dies away.
@@ -449,6 +542,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
     /// Plays an introduction with no song after it.
     private func startIntroductionOnly(_ sound: AVAudioPCMBuffer) {
+        currentIntroduction = sound
         guard startEngine() else { return }
         let begin = Self.audioClockNow() + 0.05
         graph.connectIntroPlayer(format: sound.format)
@@ -461,16 +555,28 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         startTicker()
     }
 
+    /// Plays part of a song straight away: a preview, a warm-up, or a song picked up again
+    /// after a speaker change.
+    private func startSong(_ song: Song, from seconds: TimeInterval, length: TimeInterval?, repeating: Bool,
+                           failureMessage: String? = nil) {
+        guard let file = openFile(for: song) else { finish(); return }
+        guard startEngine(failureMessage: failureMessage) else { return }
+        let start = scheduleSong(song, file: file, from: seconds, length: length, repeating: repeating)
+        graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: start)))
+        startTicker()
+    }
+
     /// Lines up part of a song on the song player. Returns when the song will start on the
     /// audio clock.
     /// - Parameters:
     ///   - seconds: where in the track to start.
     ///   - length: seconds of song to play; missing plays to the end of the track.
-    ///   - repeating: go back to `seconds` at the end of the track and keep going (warm-ups).
+    ///   - repeating: at the end of the track, go back to the song's start point and keep
+    ///     going (warm-ups).
     ///   - startingAt: when it will start on the audio clock; missing means right away.
     @discardableResult
     private func scheduleSong(_ song: Song, file: AVAudioFile, from seconds: TimeInterval,
-                              length: TimeInterval?, repeating: Bool, startingAt: Double? = nil) -> Double? {
+                              length: TimeInterval?, repeating: Bool, startingAt: Double? = nil) -> Double {
         let rate = file.processingFormat.sampleRate
         let startFrame = min(max(0, AVAudioFramePosition(seconds * rate)), max(0, file.length - 1))
         let available = AVAudioFrameCount(file.length - startFrame)
@@ -483,15 +589,23 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
         let number = playNumber
         if repeating {
-            // Line up the track twice; each time one finishes, line up another, so there is
-            // always one waiting and the loop never has a gap.
-            for _ in 0..<2 { queueWarmUpLoop(file: file, startFrame: startFrame, frames: frames, number: number) }
+            // The first pass runs from here to the end of the track; each later pass from the
+            // song's start point. One pass is always lined up ahead, so the loop has no gap.
+            let loopFrame = min(max(0, AVAudioFramePosition(song.startTime * rate)), max(0, file.length - 1))
+            let loopFrames = AVAudioFrameCount(file.length - loopFrame)
+            queueWarmUpPass(file: file, startFrame: startFrame, frames: frames,
+                            loopFrame: loopFrame, loopFrames: loopFrames, number: number)
+            queueWarmUpPass(file: file, startFrame: loopFrame, frames: loopFrames,
+                            loopFrame: loopFrame, loopFrames: loopFrames, number: number)
+            timing.firstPass = playSeconds
+            timing.loopStart = Double(loopFrame) / rate
+            timing.loopLength = Double(loopFrames) / rate
         } else {
+            // The audio system calls this from its own thread (`@Sendable`), so it hops back
+            // to the main thread first. At the end of the track (or of the walk-up length),
+            // finish, if this is still the current play.
             graph.songNode.scheduleSegment(file, startingFrame: startFrame, frameCount: frames, at: nil,
                                            completionCallbackType: .dataPlayedBack) { @Sendable [weak self] _ in
-                // The end of the track (or of the walk-up length): finish, if this is still
-                // the current play. The audio system calls this from its own thread
-                // (`@Sendable`), so it hops back to the main thread first.
                 Task { @MainActor in
                     guard let self, self.playNumber == number else { return }
                     self.finish()
@@ -503,34 +617,107 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         timing.songStart = start
         timing.songOffset = Double(startFrame) / rate
         timing.songLength = length.map { min($0, playSeconds) }
-        timing.trackRemaining = playSeconds
         return start
     }
 
-    /// Lines up one more time through the warm-up song.
-    private func queueWarmUpLoop(file: AVAudioFile, startFrame: AVAudioFramePosition,
-                                 frames: AVAudioFrameCount, number: Int) {
+    /// Lines up one pass through the warm-up song; when it has been read, lines up the next.
+    private func queueWarmUpPass(file: AVAudioFile, startFrame: AVAudioFramePosition, frames: AVAudioFrameCount,
+                                 loopFrame: AVAudioFramePosition, loopFrames: AVAudioFrameCount, number: Int) {
         graph.songNode.scheduleSegment(file, startingFrame: startFrame, frameCount: frames, at: nil,
                                        completionCallbackType: .dataConsumed) { @Sendable [weak self] _ in
             Task { @MainActor in
                 guard let self, self.playNumber == number, self.activity == .warmUp else { return }
-                self.queueWarmUpLoop(file: file, startFrame: startFrame, frames: frames, number: number)
+                self.queueWarmUpPass(file: file, startFrame: loopFrame, frames: loopFrames,
+                                     loopFrame: loopFrame, loopFrames: loopFrames, number: number)
             }
         }
     }
 
     /// Switches the sound system on: claims the speaker (stopping other apps' music) and
     /// starts the engine. On failure, says why and stops.
-    private func startEngine() -> Bool {
+    private func startEngine(failureMessage: String? = nil) -> Bool {
         do {
             try AudioSessionSettings.activate()
             if !graph.engine.isRunning { try graph.engine.start() }
             return true
         } catch {
-            lastProblem = "The iPhone would not start playing sound (\(error.localizedDescription)). Try again."
+            lastProblem = failureMessage
+                ?? "The iPhone would not start playing sound (\(error.localizedDescription)). Try again."
             finish()
             return false
         }
+    }
+
+    // MARK: - Speaker changes
+
+    /// The audio engine stopped by itself mid-play, which iOS does when the speaker changes
+    /// (a speaker connecting, or the phone's sound settings changing to suit a new one).
+    /// Wait a moment first: if the speaker was disconnected, that news arrives now and stops
+    /// the song for good, which is what should happen.
+    private func engineStoppedByItself() {
+        // Only if sound had actually started. While a walk-up is still waiting for its
+        // introduction to be made, nothing has started yet, and the start to come switches
+        // the engine on by itself.
+        let started = timing.songStart != nil || timing.introductionEnd != nil
+        guard isPlaying, started, !graph.engine.isRunning else { return }
+        let number = playNumber
+        Task {
+            try? await Task.sleep(for: .milliseconds(300))
+            guard number == playNumber, isPlaying else { return }
+            pickUpAfterSpeakerChange()
+        }
+    }
+
+    /// Starts the engine again and carries on from where the play was: a walk-up song from
+    /// the same point with the same time left, a walk-up still in its introduction from the
+    /// top, a warm-up or preview from the same point. Never ends silently: if it cannot, it
+    /// stops with “The speaker changed. Tap again.”
+    private func pickUpAfterSpeakerChange() {
+        // Already fading: it was ending anyway.
+        if isFadingOut { finish(); return }
+        // Give up after two tries, rather than flickering on and off.
+        guard restartsThisPlay < 2 else {
+            lastProblem = Self.speakerChangedMessage
+            finish()
+            return
+        }
+        restartsThisPlay += 1
+
+        let now = Self.audioClockNow()
+        let old = timing
+        let position = playbackPosition
+        // Forget the old line-up: messages about it are ignored from here on.
+        playNumber += 1
+        graph.songNode.stop()
+        graph.introNode.stop()
+        graph.engine.mainMixerNode.outputVolume = 1
+        timing = Timing()
+        isPlayingIntroduction = false
+
+        switch activity {
+        case .walkUp:
+            if let start = old.songStart, now >= start, let length = old.songLength, let song = currentSong {
+                // In the song: carry on with the time that was left.
+                let intoSong = now - start
+                let left = length - intoSong
+                guard left > 0.5 else { finish(); return }
+                startSong(song, from: old.songOffset + intoSong, length: left, repeating: false,
+                          failureMessage: Self.speakerChangedMessage)
+            } else {
+                // Still in the introduction: start the walk-up over.
+                startWalkUp(song: currentSong, introduction: currentIntroduction)
+            }
+        case .preview, .warmUp:
+            guard let song = currentSong else { finish(); return }
+            startSong(song, from: position ?? song.startTime, length: nil, repeating: activity == .warmUp,
+                      failureMessage: Self.speakerChangedMessage)
+        case .introduction:
+            if let sound = currentIntroduction { startIntroductionOnly(sound) } else { finish() }
+        case .idle:
+            return
+        }
+        // Whatever went wrong above, the scorer is told.
+        if !isPlaying, lastProblem == nil { lastProblem = Self.speakerChangedMessage }
     }
 
     // MARK: - Fades, the countdown, and stopping
@@ -560,16 +747,19 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         ticker = nil
     }
 
-    /// One heartbeat: move any fade along, start the automatic fade when a walk-up's time is
-    /// nearly up, finish when it is over, and update the countdown, position and meter.
+    /// One heartbeat: move any fade along, start the automatic fade when a walk-up's or
+    /// warm-up's time is nearly up, finish when it is over, and update the countdown,
+    /// position and meter. Also notices a recording that stopped by itself.
     private func tick() {
         let now = Self.audioClockNow()
         setIfChanged(\.outputLevel, Double(graph.meter.current))
 
         if let recorder {
             setIfChanged(\.recordingSeconds, recorder.currentTime.rounded(toPlaces: 1))
-            // It stops by itself at the longest allowed length; show that.
-            if !recorder.isRecording { setIfChanged(\.isRecording, false) }
+            // It stops by itself at the longest allowed length: hand the take back.
+            if !recorder.isRecording {
+                finishRecording(note: "The recording stopped at the \(Int(Self.longestIntroduction))-second limit. Listen to it, then keep it or redo it.")
+            }
         }
         guard isPlaying else {
             if recorder == nil { stopTicker() }
@@ -597,6 +787,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             }
         }
 
+        // A warm-up nobody stopped: fade it after the longest warm-up time.
+        if activity == .warmUp, !isFadingOut, let began = playStartedAt, now - began >= longestWarmUp - fadeLength {
+            beginFade(over: fadeLength)
+        }
+
         // Move the fade along. The volume follows a curve that drops gently at first and
         // faster at the end, which sounds smoother than a straight line.
         if isFadingOut, let fadeStart = timing.fadeStart {
@@ -611,13 +806,19 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
         // The countdown and the position in the track.
         setIfChanged(\.timeLeft, countdown(at: now)?.rounded(toPlaces: 1))
-        if let start = timing.songStart {
-            var intoSong = max(0, now - start)
-            if activity == .warmUp, let loop = timing.trackRemaining, loop > 0 {
-                intoSong = intoSong.truncatingRemainder(dividingBy: loop)
-            }
-            setIfChanged(\.playbackPosition, (timing.songOffset + intoSong).rounded(toPlaces: 1))
+        if let start = timing.songStart, now >= start {
+            setIfChanged(\.playbackPosition, trackPosition(intoSong: now - start).rounded(toPlaces: 1))
         }
+    }
+
+    /// Where in the track the song is, given how long it has been playing. A warm-up goes
+    /// back to the start point each time it reaches the end.
+    private func trackPosition(intoSong: TimeInterval) -> TimeInterval {
+        guard activity == .warmUp, let first = timing.firstPass, let loop = timing.loopLength, loop > 0,
+              intoSong >= first else {
+            return timing.songOffset + intoSong
+        }
+        return timing.loopStart + (intoSong - first).truncatingRemainder(dividingBy: loop)
     }
 
     /// Seconds until the walk-up is silent: the rest of the fade once one has started,
@@ -641,7 +842,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     }
 
     /// Stops all sound, resets the button, gives other apps their music back, and tells the
-    /// app what ended.
+    /// app what ended. Leaves `lastProblem` alone, so a reason for stopping stays on screen.
     private func finish() {
         let ended = nowPlaying
         let wasPlaying = isPlaying
@@ -656,6 +857,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             stopTicker()
         }
         timing = Timing()
+        currentSong = nil
+        currentIntroduction = nil
+        playStartedAt = nil
         activity = .idle
         isPlaying = false
         isPlayingIntroduction = false
@@ -693,36 +897,70 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         return ready.madeFrom == recipe ? ready.sound : nil
     }
 
-    /// Makes the player's introduction into sound (reading the recording, or having the
-    /// phone's voice speak it) and keeps it ready for next time.
+    /// The player's introduction as sound: ready already, being made already (then it waits
+    /// for that job), or made now. A good result is kept ready for next time; a failed one
+    /// (a missing file, or the phone's voice cut short) is not kept, so the next try starts
+    /// fresh.
     private func introductionSound(for player: Player) async -> AVAudioPCMBuffer? {
         if let ready = readyIntroduction(for: player) { return ready }
         guard let introduction = player.introduction else { return nil }
-        let sound: AVAudioPCMBuffer?
-        switch introduction.source {
-        case .phoneVoice:
-            sound = await voice.render(for: player)
-        case .recorded, .imported:
-            sound = introduction.fileName.flatMap { readWholeFile(audioFolder.appending(path: $0)) }
+        let recipe = IntroductionRecipe(introduction: introduction, name: player.name, number: player.number)
+
+        let job: Task<SoundBox, Never>
+        if let running = introductionJobs[player.id], running.madeFrom == recipe {
+            job = running.task
+        } else {
+            job = Task { SoundBox(sound: await self.makeIntroductionSound(for: player)) }
+            introductionJobs[player.id] = IntroductionJob(madeFrom: recipe, task: job)
         }
+        let sound = await job.value.sound
+        if introductionJobs[player.id]?.madeFrom == recipe { introductionJobs[player.id] = nil }
+
         guard let sound else {
             lastProblem = introduction.source == .phoneVoice
-                ? "The phone's voice needs a name or number to read for \(player.displayName)."
-                : "The introduction recording for \(player.displayName) is missing. Record it again."
+                ? "The phone's voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
+                : "The introduction recording for \(player.displayName) is missing or too long. Record it again."
             return nil
         }
         // Keep a modest number ready: plenty for a whole lineup.
         if readyIntroductions.count >= 30 { readyIntroductions.removeAll() }
-        readyIntroductions[player.id] = ReadyIntroduction(
-            madeFrom: IntroductionRecipe(introduction: introduction, name: player.name, number: player.number),
-            sound: sound
-        )
+        readyIntroductions[player.id] = ReadyIntroduction(madeFrom: recipe, sound: sound)
         return sound
     }
 
-    /// Reads a whole (short) sound file into memory.
-    private func readWholeFile(_ url: URL) -> AVAudioPCMBuffer? {
+    /// The player's introduction as sound, but giving up waiting after `seconds`. The job
+    /// itself carries on and keeps its result ready for next time.
+    private func introductionSound(for player: Player, waitingAtMost seconds: Double) async -> AVAudioPCMBuffer? {
+        let job = Task { SoundBox(sound: await self.introductionSound(for: player)) }
+        // Two racers: the job and a timer. The first to answer decides; the other's answer is
+        // ignored. (A Swift task group would wait for both, which is the wait to avoid.)
+        let winner = await withCheckedContinuation { (continuation: CheckedContinuation<SoundBox, Never>) in
+            let race = FirstAnswer(continuation)
+            Task { race.give(await job.value) }
+            Task {
+                try? await Task.sleep(for: .seconds(seconds))
+                race.give(SoundBox(sound: nil))   // the timer won
+            }
+        }
+        return winner.sound
+    }
+
+    /// Turns an introduction into sound: reads the recording, or has the phone's voice speak.
+    private func makeIntroductionSound(for player: Player) async -> AVAudioPCMBuffer? {
+        guard let introduction = player.introduction else { return nil }
+        switch introduction.source {
+        case .phoneVoice:
+            return await voice.render(for: player)
+        case .recorded, .imported:
+            return introduction.fileName.flatMap { readIntroductionFile(audioFolder.appending(path: $0)) }
+        }
+    }
+
+    /// Reads a short introduction file into memory. Refuses anything much longer than the
+    /// longest introduction, so a whole song saved as an introduction cannot fill the memory.
+    private func readIntroductionFile(_ url: URL) -> AVAudioPCMBuffer? {
         guard let file = try? AVAudioFile(forReading: url),
+              Double(file.length) / file.processingFormat.sampleRate <= Self.longestIntroduction + 5,
               let buffer = AVAudioPCMBuffer(pcmFormat: file.processingFormat, frameCapacity: AVAudioFrameCount(file.length))
         else { return nil }
         do {
@@ -745,12 +983,17 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         // A phone call or Siri. When it begins, iOS has already silenced us: tidy up so the
         // button shows stopped. When it ends there is nothing to resume (a walk-up song
         // should not start again by itself); the next tap starts the engine afresh.
+        // A late notice about the app having been paused in the background is old news
+        // and is ignored, so it cannot stop a song started since. (Apple says iOS 16 and
+        // later no longer send that kind; the check stays as a guard. It compares the
+        // reason's number, 1, because Apple has retired the reason's name.)
         listeners.append(center.addObserver(forName: AVAudioSession.interruptionNotification,
                                             object: session, queue: .main) { [weak self] note in
             let type = (note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt)
                 .flatMap(AVAudioSession.InterruptionType.init(rawValue:))
+            let wasSuspendedNotice = (note.userInfo?[AVAudioSessionInterruptionReasonKey] as? UInt) == 1
             MainActor.assumeIsolated {
-                guard let self, type == .began else { return }
+                guard let self, type == .began, !wasSuspendedNotice else { return }
                 self.handleInterruption()
             }
         })
@@ -774,6 +1017,8 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
                                             object: session, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
                 guard let self else { return }
+                if self.isPlaying { self.lastProblem = Self.speakerChangedMessage }
+                self.finishRecording(note: "The iPhone reset its sound system and the recording stopped.")
                 self.finish()
                 self.graph = AudioGraph()
                 self.graph.setEcho(self.library.announcerEcho)
@@ -782,22 +1027,22 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             }
         })
 
-        // The engine itself stopped because the audio hardware changed (a speaker connected
-        // mid-song, for example). Stop cleanly; the next tap starts it again.
+        // The engine itself stopped because the audio hardware changed. Pick the song up
+        // again (see `engineStoppedByItself`).
         listeners.append(center.addObserver(forName: .AVAudioEngineConfigurationChange,
-                                            object: nil, queue: .main) { [weak self] _ in
+                                            object: nil, queue: .main) { [weak self] note in
+            let source = note.object.map { ObjectIdentifier($0 as AnyObject) }
             MainActor.assumeIsolated {
-                guard let self, self.isPlaying, !self.graph.engine.isRunning else { return }
-                self.finish()
+                guard let self, source == ObjectIdentifier(self.graph.engine) else { return }
+                self.engineStoppedByItself()
             }
         })
     }
 
     /// A call or Siri took over the audio.
     private func handleInterruption() {
-        if let recorder, recorder.isRecording {
-            recorder.pause()   // the recording so far is kept; stopping returns it
-            isRecording = false
+        if recorder != nil {
+            finishRecording(note: "A call or Siri stopped the recording. Listen to what was recorded, then keep it or redo it.")
         }
         if isPlaying { finish() }
     }
@@ -826,6 +1071,54 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     private func setIfChanged<Value: Equatable>(_ key: ReferenceWritableKeyPath<StadiumAudioPlayer, Value>, _ value: Value) {
         if self[keyPath: key] != value { self[keyPath: key] = value }
     }
+}
+
+#if DEBUG
+extension StadiumAudioPlayer {
+    /// For testing only (debug builds): acts out what iOS does when the speaker changes
+    /// mid-song: stops the audio engine and sends the “engine reconfigured” notice. The
+    /// player should pick the song up where it was.
+    public func actOutSpeakerChangeForTesting() {
+        graph.engine.stop()
+        NotificationCenter.default.post(name: .AVAudioEngineConfigurationChange, object: graph.engine)
+    }
+}
+#endif
+
+/// Problems starting a recording, in words the scorer can act on.
+public enum RecordingProblem: Error, Equatable, Sendable {
+    /// iOS is asking the scorer, for the first time, whether the app may use the microphone.
+    case askingForPermission
+    /// The microphone could not start, with the iPhone's reason.
+    case couldNotStart(String)
+
+    /// A sentence to show the scorer.
+    public var message: String {
+        switch self {
+        case .askingForPermission:
+            return "Answer the iPhone's question about the microphone, then tap record again."
+        case .couldNotStart(let reason):
+            return "Recording could not start. \(reason)"
+        }
+    }
+}
+
+/// Passes on the first answer it is given and ignores the rest. Used on the main thread only.
+@MainActor
+private final class FirstAnswer {
+    private var continuation: CheckedContinuation<SoundBox, Never>?
+    init(_ continuation: CheckedContinuation<SoundBox, Never>) { self.continuation = continuation }
+
+    func give(_ answer: SoundBox) {
+        continuation?.resume(returning: answer)
+        continuation = nil
+    }
+}
+
+/// An introduction's sound, passed from the job that makes it to whoever is waiting for it.
+/// Both sides are on the main thread; the label only satisfies Swift's thread checks.
+private struct SoundBox: @unchecked Sendable {
+    var sound: AVAudioPCMBuffer?
 }
 
 /// How the app uses the iPhone's audio, set in one place.

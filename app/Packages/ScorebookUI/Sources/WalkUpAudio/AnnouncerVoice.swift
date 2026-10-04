@@ -57,9 +57,27 @@ final class AnnouncerVoice {
         return number
     }
 
+    /// The chosen voice's identifier, looked up once in the background (see `findVoice`).
+    private var voiceLookup: Task<String?, Never>?
+
+    /// Starts choosing the voice in the background. The player calls it when it is made:
+    /// the first time an iPhone lists its voices it can take a long while (minutes, on a
+    /// freshly set-up simulator), and doing that on the main thread would freeze the screen.
+    func findVoice() {
+        _ = voiceLookupTask()
+    }
+
+    private func voiceLookupTask() -> Task<String?, Never> {
+        if let voiceLookup { return voiceLookup }
+        let lookup = Task.detached(priority: .utility) { Self.bestVoiceIdentifier() }
+        voiceLookup = lookup
+        return lookup
+    }
+
     /// The voice to use: the best-quality American English voice on the phone, a male one
     /// if there is a choice, skipping Apple's novelty voices (the ones that sing or whisper).
-    static func bestVoice() -> AVSpeechSynthesisVoice? {
+    /// Slow the first time, so it runs in the background.
+    nonisolated static func bestVoiceIdentifier() -> String? {
         let candidates = AVSpeechSynthesisVoice.speechVoices().filter { voice in
             voice.language == "en-US"
                 && !voice.identifier.contains("speech.synthesis.voice")   // novelty voices
@@ -69,14 +87,18 @@ final class AnnouncerVoice {
             if a.quality != b.quality { return a.quality.rawValue > b.quality.rawValue }
             return (a.gender == .male ? 1 : 0) > (b.gender == .male ? 1 : 0)
         }
-        return ranked.first ?? AVSpeechSynthesisVoice(language: "en-US")
+        return ranked.first?.identifier
     }
 
     /// Makes the whole introduction as one piece of sound, pauses included. Returns nothing
-    /// if the player has no name or number, or the phone could not make speech.
+    /// if the player has no name or number, or the phone could not make all of the speech
+    /// (a clipped introduction is worse than none, and would otherwise be kept and replayed).
     func render(for player: Player) async -> AVAudioPCMBuffer? {
         guard let phrases = Self.phrases(for: player) else { return nil }
-        let voice = Self.bestVoice()
+        // Wait (without blocking the screen) for the background voice lookup.
+        let identifier = await voiceLookupTask().value
+        let voice = identifier.flatMap { AVSpeechSynthesisVoice(identifier: $0) }
+            ?? AVSpeechSynthesisVoice(language: "en-US")
         var pieces: [AVAudioPCMBuffer] = []
         for phrase in phrases {
             let utterance = AVSpeechUtterance(string: phrase.words)
@@ -95,21 +117,24 @@ final class AnnouncerVoice {
     }
 
     /// Turns one phrase into sound in memory. Gives up after a few seconds, so a phone with
-    /// no voices installed never leaves the play button waiting forever.
+    /// no voices installed never leaves the play button waiting forever; a phrase that did
+    /// not finish in time counts as failed.
     private func speak(_ utterance: AVSpeechUtterance) async -> AVAudioPCMBuffer? {
         let collector = SpeechCollector()
-        return await withCheckedContinuation { (continuation: CheckedContinuation<SpeechPieces, Never>) in
+        let pieces = await withCheckedContinuation { (continuation: CheckedContinuation<SpeechPieces, Never>) in
             collector.whenDone { continuation.resume(returning: $0) }
             // The speech engine calls this from its own thread, hence `@Sendable`.
             synthesizer.write(utterance) { @Sendable buffer in
                 collector.add(buffer)
             }
-            // The safety net: finish with whatever arrived after six seconds.
+            // The safety net: give up after six seconds.
             Task {
                 try? await Task.sleep(for: .seconds(6))
-                collector.finish()
+                collector.finish(complete: false)
             }
-        }.joinedAsFloat()
+        }
+        guard pieces.complete else { return nil }
+        return pieces.joinedAsFloat()
     }
 
     /// A stretch of silence the same shape as `buffer`.
@@ -145,6 +170,8 @@ final class AnnouncerVoice {
 /// them on its own thread, so this is passed between threads by hand.
 struct SpeechPieces: @unchecked Sendable {
     var buffers: [AVAudioPCMBuffer] = []
+    /// True when the speech engine said it had finished; false when the safety net fired.
+    var complete = false
 
     /// Joins the slices into one piece of sound in the standard floating-point shape the
     /// audio engine expects (the speech engine often delivers whole numbers instead).
@@ -171,7 +198,7 @@ struct SpeechPieces: @unchecked Sendable {
 }
 
 /// Collects speech slices as they arrive and reports once, when the last one comes (an
-/// empty slice) or the safety net fires, whichever is first.
+/// empty slice, meaning complete) or the safety net fires (incomplete), whichever is first.
 private final class SpeechCollector: @unchecked Sendable {
     private let lock = NSLock()
     private var pieces = SpeechPieces()
@@ -184,14 +211,15 @@ private final class SpeechCollector: @unchecked Sendable {
 
     func add(_ buffer: AVAudioBuffer) {
         guard let pcm = buffer as? AVAudioPCMBuffer else { return }
-        if pcm.frameLength == 0 { finish(); return }   // an empty slice means "that's all"
+        if pcm.frameLength == 0 { finish(complete: true); return }   // an empty slice means "that's all"
         lock.withLock { if !finished { pieces.buffers.append(pcm) } }
     }
 
-    func finish() {
+    func finish(complete: Bool) {
         let report: ((SpeechPieces) -> Void)? = lock.withLock {
             guard !finished else { return nil }
             finished = true
+            pieces.complete = complete
             return done
         }
         report?(lock.withLock { pieces })
