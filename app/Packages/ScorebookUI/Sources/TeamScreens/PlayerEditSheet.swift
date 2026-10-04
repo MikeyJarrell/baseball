@@ -73,17 +73,13 @@ struct PlayerEditSheet: View {
 
                 Section {
                     Picker("Usual position", selection: $draft.usuals.position) {
-                        Text("None").tag(Position?.none)
+                        Text("None (bats only)").tag(Position?.none)
                         ForEach(Position.allCases, id: \.self) { position in
                             Text("\(position.number) · \(position.name.capitalizedFirst)").tag(Position?.some(position))
                         }
                     }
-                    Picker("Usual role", selection: $draft.usuals.role) {
-                        Text("None").tag(UsualRole?.none)
-                        ForEach(UsualRole.allCases, id: \.self) { role in
-                            Text(role.label).tag(UsualRole?.some(role))
-                        }
-                    }
+                    Toggle("Leads off", isOn: $draft.usuals.leadsOff)
+                    Toggle("Starts on the bench", isOn: $draft.usuals.startsOnBench)
                 } footer: {
                     Text("Pregame starts the lineup from these.")
                 }

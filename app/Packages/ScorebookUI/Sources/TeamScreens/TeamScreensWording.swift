@@ -99,21 +99,13 @@ public enum TeamWording {
     }
 
     /// What a player usually does, for the roster and their page: "Center field",
-    /// "Shortstop, leads off", "Pitcher, doesn’t bat", "Bats only", "Bench". Empty when
-    /// nothing is set.
+    /// "Shortstop, leads off", "Bats only, starts on the bench". Empty when nothing is set.
     public static func usualText(_ usuals: PlayerUsuals) -> String {
-        let place = usuals.position.map { $0.name.capitalizedFirst }
-        switch (place, usuals.role) {
-        case (nil, nil): return ""
-        case let (place?, nil): return place
-        case let (place?, .leadsOff?): return "\(place), leads off"
-        case let (place?, .fieldsOnly?): return "\(place), doesn’t bat"
-        case let (place?, .startsOnBench?): return "\(place), starts on the bench"
-        case (_, .batsOnly?): return "Bats only"
-        case (nil, .leadsOff?): return "Leads off"
-        case (nil, .fieldsOnly?): return "Fields only"
-        case (nil, .startsOnBench?): return "Bench"
-        }
+        guard !usuals.isEmpty else { return "" }
+        var parts = [usuals.position.map { $0.name.capitalizedFirst } ?? "Bats only"]
+        if usuals.leadsOff { parts.append("leads off") }
+        if usuals.startsOnBench { parts.append("starts on the bench") }
+        return parts.joined(separator: ", ")
     }
 
     /// "Bats L · Throws R", leaving out whatever is unknown. Empty when both are.
