@@ -45,18 +45,23 @@ public struct DefenseSheet: View {
     ///   - purpose: `.check` when our team takes the field, `.changes` from the changes menu.
     ///   - side: The team. Leave it out for our team on a check, or the fielding team for changes.
     ///   - suggestion: A planned defense to lay over the one on the field, with reasons. Used only
-    ///     when it is for this team and `purpose` is `.check`.
+    ///     when it is for this team and `purpose` is `.check`. Leave it out to use the rules
+    ///     engine's suggested defense from the situation.
     ///   - onFinish: Called once with the event to record, or `.cancel` ("Later").
     public init(context: GameChangeContext, purpose: Purpose = .check, side: TeamSide? = nil,
                 suggestion: DefenseSuggestion? = nil, onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
         self.purpose = purpose
-        self.suggestion = suggestion
         self.onFinish = onFinish
         let team = side ?? (purpose == .check ? context.ourSide : nil) ?? context.situation.fieldingSide
+        // A plan handed in wins; otherwise the defense check uses the rules engine's suggestion
+        // (`Situation.suggestedDefense`, with the team's alternating fielders applied).
+        self.suggestion = suggestion ?? (purpose == .check
+            ? DefenseBuilder.engineSuggestion(situation: context.situation, team: context.setup[team], side: team)
+            : nil)
         _side = State(initialValue: team)
         _draft = State(initialValue: DefenseBuilder.startingDraft(
-            current: context.state(team).fielders, plan: suggestion, side: team, isCheck: purpose == .check))
+            current: context.state(team).fielders, plan: self.suggestion, side: team, isCheck: purpose == .check))
     }
 
     /// The plan, when it applies to this sheet: that team's defense check only.
