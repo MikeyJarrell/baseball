@@ -34,3 +34,4 @@ Made in the vocabulary pass; `plan/handoffs/vocabulary-pass.md` has the details.
 - **Walk-up audio:** reword the comment on `AudioPlayback.fadesAt`: the fade starts at that time; the song ends about two seconds later.
 - **Postgame and season screens:** the stats engine should supply each game’s result for our team (win, loss, tie) and the season record, so the screens don’t compute them and the record always agrees with the games count.
 - **Game overview:** the play log should supply the wording the overview now works out itself: “stole home,” the base where a runner was out, and “Middle” or “End” of an inning.
+- **Pregame screens:** add a usual position and a usual role to `Player` (bats and fields, bats only, fields but doesn’t bat) for the first game’s lineup; the pregame screens take them as separate data until then.
