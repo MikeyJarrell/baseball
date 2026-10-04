@@ -50,6 +50,7 @@ public enum TeamWording {
         case .recorded: return "Recorded in your voice · \(echoWords)"
         case .imported: return "Imported recording · \(echoWords)"
         case .phoneVoice: return "Using the iPhone voice, slowed to stadium pace"
+        case .pieced: return "Your voice, pieced together with their number · \(echoWords)"
         case nil: return "Nothing yet. Until there is, the song plays alone."
         }
     }
@@ -60,6 +61,7 @@ public enum TeamWording {
         case .recorded: "intro recorded"
         case .imported: "intro imported"
         case .phoneVoice: "iPhone voice intro"
+        case .pieced: "intro recorded"
         case nil: "no intro"
         }
     }
