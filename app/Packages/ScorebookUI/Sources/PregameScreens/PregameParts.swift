@@ -10,10 +10,10 @@ import DesignSystem
 
 // MARK: - The page
 
-/// One pregame step: a list of cards on the gray background, the title with five step dots
+/// One pregame step: a list of cards on the gray background, the title with six step dots
 /// under it, and the big button pinned to the bottom edge.
 struct StepPage<Content: View>: View {
-    /// Which step this is, 1 to 5, for the dots.
+    /// Which step this is, 1 to 6, for the dots.
     var step: Int
     var title: String
     /// The words on the big button: "Next: our lineup".
@@ -45,7 +45,7 @@ struct StepPage<Content: View>: View {
                     StepDots(step: step)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("\(title), step \(step) of 5"))
+                .accessibilityLabel(Text("\(title), step \(step) of \(StepDots.count)"))
                 .accessibilityAddTraits(.isHeader)
             }
         }
@@ -84,13 +84,15 @@ struct StepPage<Content: View>: View {
     }
 }
 
-/// Five small dots under the title, filled up to the current step.
+/// Six small dots under the title, filled up to the current step.
 struct StepDots: View {
+    /// How many pregame steps there are.
+    static let count = 6
     var step: Int
 
     var body: some View {
         HStack(spacing: 5) {
-            ForEach(1...5, id: \.self) { i in
+            ForEach(1...Self.count, id: \.self) { i in
                 Capsule()
                     .fill(i <= step ? ScorebookColor.highlight : ScorebookColor.divider)
                     .frame(width: i == step ? 16 : 6, height: 6)
