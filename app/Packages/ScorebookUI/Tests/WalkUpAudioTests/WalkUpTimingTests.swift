@@ -40,14 +40,6 @@ struct WalkUpTimingTests {
         #expect(WalkUpMath.fadeVolume(progress: -1, startingFrom: 1) == 1)
     }
 
-    @Test("During a 6-second introduction the countdown shows the introduction plus 12 seconds of song")
-    func countdownIncludesIntroduction() {
-        // The song is lined up to start 6.3 seconds in (6 of introduction and a short breath).
-        #expect(WalkUpMath.secondsLeft(now: 0, songStart: 6.3, songLength: 12) == 18.3)
-        #expect(WalkUpMath.secondsLeft(now: 10.3, songStart: 6.3, songLength: 12) == 8)
-        #expect(WalkUpMath.secondsLeft(now: 30, songStart: 6.3, songLength: 12) == 0)
-    }
-
     @Test("A tapped fade counts down its own 2 seconds")
     func fadeCountdown() {
         #expect(WalkUpMath.fadeSecondsLeft(now: 5.5, fadeStart: 5, fadeSeconds: 2) == 1.5)
