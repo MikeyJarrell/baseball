@@ -1,0 +1,157 @@
+{
+  "description": "Bottom of the ninth, tied 3-3, one out, Webb on first. Quinn homers to right on a 1-0 pitch. On a home run every run counts, not just the winning one, so the Diamond Dogs win 5-3 and the app asks whether the game is over. The scorer ends it.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 1,
+        "score": {
+          "away": 3,
+          "home": 3
+        },
+        "runners": {
+          "first": "d3"
+        },
+        "batterIndex": 3,
+        "note": "Start in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "hitLocation": 9,
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 2
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "endOfGame": {
+        "reason": "regulation",
+        "finalScore": {
+          "away": 3,
+          "home": 5
+        }
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "batter": "d4",
+          "isGameOverQuestionOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e3",
+      "expected": {
+        "situation": {
+          "score": {
+            "away": 3,
+            "home": 5
+          },
+          "outs": 1,
+          "runners": [],
+          "gameOverQuestion": "regulation",
+          "isFinal": false
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "score": {
+        "away": 3,
+        "home": 5
+      },
+      "isFinal": true,
+      "isRegulationComplete": true
+    },
+    "batting": [
+      {
+        "player": "d4",
+        "hits": 1,
+        "homeRuns": 1,
+        "runsBattedIn": 2,
+        "runs": 1
+      },
+      {
+        "player": "d3",
+        "runs": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 2,
+        "homeRuns": 1,
+        "hits": 1,
+        "pitches": 2,
+        "strikes": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "runs": 5,
+        "hits": 1,
+        "leftOnBase": 0,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          5
+        ]
+      },
+      {
+        "team": "away",
+        "runs": 3,
+        "lineScore": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          3
+        ]
+      }
+    ]
+  }
+}

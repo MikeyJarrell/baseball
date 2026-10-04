@@ -1,0 +1,80 @@
+{
+  "description": "Ortiz takes two called strikes, a ball, and a called strike three.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "m2",
+      "droppedThirdStrikePossible": true,
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 4,
+          "strikes": 3,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e4",
+        "notation": "ꓘ"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "strikeouts": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "strikeouts": 1,
+        "outsRecorded": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1
+      }
+    ]
+  }
+}

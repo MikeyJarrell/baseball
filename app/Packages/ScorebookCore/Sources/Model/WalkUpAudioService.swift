@@ -31,6 +31,9 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// Called whenever something stops playing for any reason (stopped, faded, reached its
     /// play length, the end of the track, an interruption), with the song that was playing.
     var onPlaybackEnded: ((SongID?) -> Void)? { get set }
+    /// What is playing now, and when a walk-up song will start fading by itself, for the
+    /// song button's countdown. Players that do not report it say only playing or not.
+    var playback: AudioPlayback { get }
 
     /// Hands the player the saved library when the app opens.
     func load(_ library: SongLibrary)
@@ -90,6 +93,42 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     @concurrent nonisolated func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction
     /// Plays a player's introduction on its own, to check it.
     func playIntroduction(for player: Player)
+}
+
+extension WalkUpAudioPlayer {
+    /// A plain reading for players that do not report more: a song while something is playing.
+    public var playback: AudioPlayback {
+        isPlaying ? AudioPlayback(phase: .song, song: nowPlaying) : AudioPlayback(phase: .idle)
+    }
+}
+
+/// What the walk-up audio player is doing now.
+public struct AudioPlayback: Codable, Equatable, Hashable, Sendable {
+    /// The part of the walk-up that is playing.
+    public enum Phase: String, Codable, Sendable, CaseIterable {
+        /// Nothing is playing.
+        case idle
+        /// The announcer introduction, before the song.
+        case introduction
+        /// A walk-up song, or a song previewed in the library.
+        case song
+        /// Our pitcher's warm-up song.
+        case warmUp
+    }
+
+    public var phase: Phase
+    /// The song playing or coming next after the introduction.
+    public var song: SongID?
+    /// When the walk-up song starts fading out by itself: 2 seconds before the walk-up length
+    /// (or the song's own play length) is up, so the song is silent exactly at the end of it.
+    /// Missing during the introduction, for a warm-up song, and when nothing is playing.
+    public var fadesAt: Date?
+
+    public init(phase: Phase, song: SongID? = nil, fadesAt: Date? = nil) {
+        self.phase = phase
+        self.song = song
+        self.fadesAt = fadesAt
+    }
 }
 
 /// What can go wrong with audio, in words the scorer can act on.

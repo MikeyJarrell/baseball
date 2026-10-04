@@ -49,7 +49,8 @@ public enum SampleSetups {
                  roster: SampleTeams.diamondDogs.roster,
                  battingOrder: diamondDogsBattingOrder,
                  defense: diamondDogsDefense,
-                 designatedNonRunners: designatedNonRunner.map { [$0] } ?? [])
+                 designatedNonRunners: designatedNonRunner.map { [$0] } ?? [],
+                 shortName: SampleTeams.diamondDogs.shortName)
     }
 
     /// The sample game: Mudcats at Diamond Dogs, under the league's rules (nine innings, a
@@ -58,9 +59,18 @@ public enum SampleSetups {
     public static let mudcatsAtDiamondDogs = GameSetup(
         scheduledStart: gameDay,
         away: GameTeam(teamID: SampleTeams.mudcats.id, name: "Mudcats", isOurs: false,
-                       roster: SampleTeams.mudcats.roster, battingOrder: mudcatsBattingOrder, defense: mudcatsDefense),
+                       roster: SampleTeams.mudcats.roster, battingOrder: mudcatsBattingOrder, defense: mudcatsDefense,
+                       shortName: SampleTeams.mudcats.shortName),
         home: diamondDogs(designatedNonRunner: "d4")
     )
+
+    /// The sample game's setup with first base shared by turns: Pat Quinn in odd innings and
+    /// Robin Nash, who does not bat, in even ones.
+    public static let mudcatsAtDiamondDogsAlternatingFirstBase: GameSetup = {
+        var setup = mudcatsAtDiamondDogs
+        setup.home.fieldingRotations = [FieldingRotation(position: .firstBase, players: ["d4", "d11"])]
+        return setup
+    }()
 
     /// Diamond Dogs at the Bombers, who are known only by jersey numbers. Their fielders are
     /// unknown except their pitcher, number 44, who does not bat.

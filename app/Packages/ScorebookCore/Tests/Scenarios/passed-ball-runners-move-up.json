@@ -1,0 +1,128 @@
+{
+  "description": "Ortiz and Ruiz single, putting runners on first and second. Hale takes a called strike that gets past catcher Fisk: a passed ball, and both runners move up. No error, no stolen bases.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "third",
+            "reason": "passedBall"
+          },
+          {
+            "runner": "m2",
+            "from": "first",
+            "to": "second",
+            "reason": "passedBall"
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 1
+      },
+      "score": {
+        "away": 0,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "third",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 3,
+          "battersFaced": 2
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "stolenBases": 0
+      },
+      {
+        "player": "m2",
+        "stolenBases": 0
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "errors": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 0
+      }
+    ]
+  }
+}

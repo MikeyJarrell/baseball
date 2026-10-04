@@ -15,9 +15,9 @@ Mikey chose layout A, the field view, in the approved mockup.
 
 The screen the scorer looks at for nearly the whole game. It takes a situation, the batter’s plate appearances earlier in the game, the on-deck hitter, and the batter’s song if the batter is ours with one assigned, and hands back what was tapped.
 
-**Always visible, no scrolling:** inning and half, both teams’ scores, outs, balls and strikes, runners on the field drawing, batter (name, number, batting side, earlier today in scorebook notation), on-deck hitter, current pitcher (name, throwing hand, pitches and strikes so far).
+**Always visible, no scrolling:** inning and half, both teams’ scores, outs written as words (“2 outs”), balls and strikes, runners on the field drawing, batter (name, number, batting side, earlier today in scorebook notation), on-deck hitter, current pitcher (name, throwing hand, pitches and strikes so far).
 
-**Big buttons:** ball, strike, foul, in play. Strike asks nothing more; called or swinging is a small toggle beside it, defaulting to swinging.
+**Big buttons:** ball, strike, foul, in play. Strike records a swinging strike; a small “Called” button inside it records a called strike, one tap either way.
 
 **One tap away:** undo (with what it will undo shown, “Undo: ball”), hit by pitch, intentional walk, foul tip, the song button. After strike three, a “dropped third strike” button stays up until the next pitch, and opens that version of the in-play sequence.
 
@@ -34,7 +34,7 @@ The screen the scorer looks at for nearly the whole game. It takes a situation, 
 
 **The song button** shows only for our hitters with a song assigned. It shows the song name, and toggles between play and stop; play runs the announcer introduction first when the player has one. When our team takes the field, the same spot holds the pitcher’s warm-up music button. The song fades out by itself after 12 seconds of song (the length is a setting), with a small countdown on the button; tapping stops it early. A second setting, off by default, also fades it when the first pitch is recorded. For their hitters, the same spot is an empty gray bar.
 
-**Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Diamond Dogs 4, Mudcats 2”) and the next team’s batter.
+**Changeovers.** After a third out, the screen shows a short banner (“Middle 3rd — Mudcats 2, Diamond Dogs 4” when we are home; every score line in the app lists the visiting team first) and the next team’s batter.
 
 ## Finish line
 

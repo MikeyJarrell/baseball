@@ -40,6 +40,15 @@ public struct PlayLog: Codable, Equatable, Sendable {
         self.isFinal = isFinal
     }
 
+    /// True when the entry before `index` is a strikeout in the given half-inning: the only
+    /// place a runner action's `completesStrikeoutDoublePlay` counts. Used by the rules engine
+    /// (which flags the mark anywhere else) and by stats (which ignores it there).
+    public static func isStrikeoutJustBefore(_ index: Int, in entries: [PlayLogEntry], half: HalfInning, inning: Int) -> Bool {
+        guard index > 0, entries.indices.contains(index - 1) else { return false }
+        let previous = entries[index - 1]
+        return previous.plateAppearance?.outcome == .strikeout && previous.half == half && previous.inning == inning
+    }
+
     /// One team's final batting order, by side.
     public func battingOrder(_ side: TeamSide) -> BattingOrder {
         side == .away ? awayOrder : homeOrder
@@ -145,6 +154,12 @@ public struct PlayLogEntry: Codable, Equatable, Sendable {
         self.reviewNote = reviewNote
     }
 
+    /// The break that follows this event when it made the third out: "Middle of the 3rd"
+    /// after the top, "End of the 3rd" after the bottom. Missing for every other event.
+    public var breakAfter: InningBreak? {
+        endsHalfInning ? InningBreak(after: half, of: inning) : nil
+    }
+
     /// The team at bat during this event.
     public var battingSide: TeamSide { half.battingSide }
     /// The team in the field during this event.
@@ -190,7 +205,10 @@ public struct OutMade: Codable, Equatable, Hashable, Sendable {
     public var putout: PlayerID?
     /// The fielders credited with assists.
     public var assists: [PlayerID]
-    /// The base where the out was made, if known.
+    /// The base where the out was made, if known: the base the scorer named, or, when they did
+    /// not, the base the rules engine's replay fills in for a runner caught stealing (the base
+    /// they were stealing) or picked off (their own base). Missing when nobody can tell, such
+    /// as a strikeout or a fly out. Older saved play logs without it still read.
     public var at: Base?
 
     public init(runner: PlayerID, putout: PlayerID?, assists: [PlayerID] = [], at: Base? = nil) {
@@ -227,14 +245,24 @@ public struct PlateAppearanceResult: Codable, Equatable, Hashable, Sendable {
     /// True when the batter ended up safe on base or scored (a hit, a walk, an error,
     /// a dropped third strike).
     public var batterReachedBase: Bool
+    /// The batter the box score charges with this plate appearance, when it is not the one who
+    /// finished it. A pinch hitter who comes in with two strikes and strikes out: the strikeout
+    /// and the at-bat go to the batter they replaced (Official Baseball Rules 9.15(b)). Missing
+    /// almost always, meaning `batter`. The rules engine fills it in.
+    public var chargedBatter: PlayerID?
 
-    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0, batterReachedBase: Bool) {
+    public init(batter: PlayerID, pitcher: PlayerID?, outcome: PlateAppearanceOutcome, rbi: Int = 0,
+                batterReachedBase: Bool, chargedBatter: PlayerID? = nil) {
         self.batter = batter
         self.pitcher = pitcher
         self.outcome = outcome
         self.rbi = rbi
         self.batterReachedBase = batterReachedBase
+        self.chargedBatter = chargedBatter
     }
+
+    /// The batter whose line in the box score gets this plate appearance.
+    public var batterCharged: PlayerID { chargedBatter ?? batter }
 }
 
 /// The ways a plate appearance can end.
@@ -255,4 +283,67 @@ public enum PlateAppearanceOutcome: String, Codable, Sendable, CaseIterable {
     case reachedOnError
     case fieldersChoice
     case catchersInterference
+}
+
+/// The pause between two half-innings, by name: the middle of an inning (after the top) or
+/// the end of one (after the bottom).
+public struct InningBreak: Codable, Equatable, Hashable, Sendable {
+    /// Which pause it is.
+    public enum Kind: String, Codable, Sendable {
+        /// After the top half, before the home team bats.
+        case middle
+        /// After the bottom half, before the next inning starts.
+        case end
+    }
+
+    /// Middle or end.
+    public var kind: Kind
+    /// The inning the pause belongs to: the 3rd for both "Middle of the 3rd" and "End of the 3rd".
+    public var inning: Int
+
+    public init(kind: Kind, inning: Int) {
+        self.kind = kind
+        self.inning = inning
+    }
+
+    /// The pause that follows a half-inning: after the top of the 3rd, the middle of the 3rd;
+    /// after the bottom of the 3rd, the end of the 3rd.
+    public init(after half: HalfInning, of inning: Int) {
+        self.init(kind: half == .top ? .middle : .end, inning: inning)
+    }
+
+    /// The pause as people say it: "Middle of the 3rd", "End of the 3rd".
+    public var label: String {
+        "\(kind == .middle ? "Middle" : "End") of the \(Self.ordinal(inning))"
+    }
+
+    /// The short form for tight spaces: "Middle 3rd", "End 3rd".
+    public var shortLabel: String {
+        "\(kind == .middle ? "Middle" : "End") \(Self.ordinal(inning))"
+    }
+
+    /// A number as people say it in innings: 1 is "1st", 2 "2nd", 3 "3rd", 11 "11th", 21 "21st".
+    public static func ordinal(_ n: Int) -> String {
+        let lastTwo = n % 100
+        if (11...13).contains(lastTwo) { return "\(n)th" }
+        switch n % 10 {
+        case 1: return "\(n)st"
+        case 2: return "\(n)nd"
+        case 3: return "\(n)rd"
+        default: return "\(n)th"
+        }
+    }
+}
+
+extension Situation {
+    /// The pause the game is in right now, between half-innings: "Middle of the 3rd" or "End
+    /// of the 3rd". After the third out the situation has already moved on to the next half,
+    /// so the bottom of the 3rd coming up means the middle of the 3rd, and the top of the 4th
+    /// coming up means the end of the 3rd. Missing while a half-inning is under way and once
+    /// the game is over.
+    public var inningBreak: InningBreak? {
+        guard isBetweenHalfInnings, !isFinal else { return nil }
+        if half == .bottom { return InningBreak(kind: .middle, inning: inning) }
+        return InningBreak(kind: .end, inning: max(1, inning - 1))
+    }
 }

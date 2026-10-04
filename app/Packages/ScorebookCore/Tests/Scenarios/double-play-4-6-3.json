@@ -1,0 +1,127 @@
+{
+  "description": "Ortiz singles to center. Ruiz grounds to second: Moreno to Tate covering second for the force on Ortiz, on to Quinn at first for Ruiz. 4-6-3 double play.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "outBy": [
+              4,
+              6
+            ],
+            "outAt": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "multiOut": "doublePlay",
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 2,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 2,
+          "strikes": 2,
+          "battersFaced": 2
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "4-6-3 DP"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0,
+        "runsBattedIn": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 2,
+        "battersFaced": 2,
+        "hits": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d1",
+        "putouts": 0,
+        "assists": 1
+      },
+      {
+        "player": "d2",
+        "putouts": 1,
+        "assists": 1
+      },
+      {
+        "player": "d4",
+        "putouts": 1,
+        "assists": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "doublePlays": 1,
+        "triplePlays": 0,
+        "errors": 0
+      }
+    ]
+  }
+}

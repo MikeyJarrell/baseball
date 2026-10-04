@@ -125,6 +125,9 @@ public struct ExpectedSituation: Codable, Sendable {
     public var isLastInning: Bool?
     /// Whether the batter due up holds a batting hole, so the app should record an automatic out.
     public var isBattingHoleUp: Bool?
+    /// The defense the rules engine suggests for the defense check, exactly. An empty list means
+    /// no suggestion (the defense check is not due).
+    public var suggestedDefense: [ExpectedFielder]?
     public var isFinal: Bool?
 }
 
@@ -205,6 +208,9 @@ public struct ExpectedBatting: Codable, Sendable {
     public var sacrificeBunts: Int?
     public var stolenBases: Int?
     public var caughtStealing: Int?
+    /// The positions on the batter's line, in order, as the box score prints them: ["ph", "2b"].
+    /// An empty list means a batter who only batted.
+    public var positions: [String]?
 }
 
 /// A pitcher's expected box score numbers. Names match `PitchingCounts`.
@@ -220,6 +226,10 @@ public struct ExpectedPitching: Codable, Sendable {
     public var hitBatters: Int?
     public var pitches: Int?
     public var strikes: Int?
+    /// The pitcher's decision: "win" or "loss". Use `hasDecision: false` to check for none.
+    public var decision: PitchingDecision?
+    /// Whether the pitcher has any decision.
+    public var hasDecision: Bool?
 }
 
 /// A fielder's expected putouts, assists and errors.
@@ -244,4 +254,7 @@ public struct ExpectedTeam: Codable, Sendable {
     public var doublePlays: Int?
     /// Triple plays this team turned in the field.
     public var triplePlays: Int?
+    /// The players on the team's batting lines, in the order the box score lists them,
+    /// substitutes under the player they replaced.
+    public var battingLines: [PlayerID]?
 }

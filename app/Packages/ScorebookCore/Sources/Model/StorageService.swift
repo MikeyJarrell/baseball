@@ -49,7 +49,10 @@ public protocol ScorebookStorage: Sendable {
     func makeBackup() async throws -> URL
     /// Replaces everything except audio with the contents of a backup file.
     func restoreBackup(from file: URL) async throws
+    /// Every backup file, newest first, for a restore screen.
+    func listBackups() async throws -> [URL]
 }
+
 
 /// A list read from several files: everything that read cleanly, and every file that did
 /// not. One damaged game file shows up in `damaged` and the other games still load.
@@ -93,10 +96,17 @@ public actor InMemoryStorage: ScorebookStorage {
     private var games: [GameID: Game] = [:]
     private var library = SongLibrary()
     private var settings = AppSettings()
+    /// The order games were last saved in, standing in for a saved file's time.
+    private var lastSaved: [GameID: Int] = [:]
+    private var saves = 0
 
     public init(teams: [Team] = [], games: [Game] = [], library: SongLibrary = SongLibrary()) {
         for team in teams { self.teams[team.id] = team }
-        for game in games { self.games[game.id] = game }
+        for (i, game) in games.enumerated() {
+            self.games[game.id] = game
+            lastSaved[game.id] = i + 1
+        }
+        saves = games.count
         self.library = library
     }
 
@@ -117,17 +127,34 @@ public actor InMemoryStorage: ScorebookStorage {
         return game
     }
 
-    public func saveGame(_ game: Game) async throws { games[game.id] = game }
+    public func saveGame(_ game: Game) async throws {
+        games[game.id] = game
+        noteSaved(game.id)
+    }
+
+    /// Remembers that a game was just saved.
+    private func noteSaved(_ id: GameID) {
+        saves += 1
+        lastSaved[id] = saves
+    }
 
     public func appendEvent(_ event: GameEvent, toGame id: GameID) async throws {
         guard games[id] != nil else { throw StorageError.notFound(id.rawValue) }
         games[id]?.events.append(event)
+        noteSaved(id)
     }
 
     public func deleteGame(_ id: GameID) async throws { games[id] = nil }
 
+    /// The same choice the real storage makes: among unfinished games, the one with the latest
+    /// event; if none has started, the one saved most recently.
     public func gameInProgress() async throws -> Game? {
-        games.values.filter { !$0.isFinished }.max { $0.setup.scheduledStart < $1.setup.scheduledStart }
+        let unfinished = games.values.filter { !$0.isFinished }
+        if let started = unfinished.filter({ !$0.events.isEmpty })
+            .max(by: { ($0.events.last!.enteredAt, $0.id.rawValue) < ($1.events.last!.enteredAt, $1.id.rawValue) }) {
+            return started
+        }
+        return unfinished.max { (lastSaved[$0.id] ?? 0, $0.id.rawValue) < (lastSaved[$1.id] ?? 0, $1.id.rawValue) }
     }
 
     public func finishedGames() async throws -> LoadedList<Game> {
@@ -149,4 +176,7 @@ public actor InMemoryStorage: ScorebookStorage {
     public func restoreBackup(from file: URL) async throws {
         throw StorageError.unsupported("The in-memory stand-in does not read backup files.")
     }
+
+    /// The stand-in keeps no backups.
+    public func listBackups() async throws -> [URL] { [] }
 }

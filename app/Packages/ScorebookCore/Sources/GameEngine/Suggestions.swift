@@ -1,0 +1,403 @@
+// Suggestions: the engine's best guess at what happened to the runners, for the scorer to
+// confirm or correct. Nothing here is recorded until the scorer saves the play.
+//
+// - On a ball in play: where every runner (batter included) most likely ended up, and the
+//   runs batted in under the official scoring rules.
+// - While the play is being entered: its notation so far, and the outs and runs it would make.
+// - Between pitches: where the chosen runners went on a steal, pickoff, wild pitch or balk.
+// - When a designated non-runner reaches: who the league's rule says should run for them.
+
+import Foundation
+import Model
+
+enum Suggestions {
+    // MARK: - Ball in play
+
+    /// Where every runner most likely ended up on the play the scorer is entering. Runners
+    /// the scorer has already placed (in `draft.runners`) are kept as the scorer has them,
+    /// and everyone else is placed around them.
+    static func runners(for draft: PlayDraft, in s: Situation) -> RunnerSuggestion {
+        runners(for: draft, in: s, keeping: Set(draft.runners.map(\.runner)))
+    }
+
+    /// Where every runner most likely ended up, keeping the runners named in `fixed` exactly
+    /// where `draft.runners` has them (the ones the scorer moved by hand) and placing everyone
+    /// else around them: a runner the scorer did not touch is pushed ahead of a batter or runner
+    /// the scorer sent past them, and held short of a runner the scorer held. Runs batted in
+    /// and the credited hit are worked out again from where everyone ends up.
+    static func runners(for draft: PlayDraft, in s: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion {
+        var moves = defaultMoves(for: draft, in: s)
+        // The runners the scorer placed, by id, as they ended up in the list below.
+        var placed: Set<PlayerID> = []
+        // The scorer's own choices win over the guess, runner by runner.
+        for chosen in draft.runners where fixed.contains(chosen.runner) {
+            if let i = moves.firstIndex(where: { $0.runner == chosen.runner || ($0.isBatter && chosen.isBatter) }) {
+                moves[i] = chosen
+            } else {
+                moves.append(chosen)
+            }
+            placed.insert(chosen.runner)
+        }
+        moves = makingRoom(moves, around: placed)
+        let rbi = draft.batterResult.map { runsBattedIn(result: $0, draft: draft, moves: moves, in: s) } ?? 0
+        // On a game-ending hit, the hit the batter is credited with may be smaller.
+        let credited = draft.batterResult.map { creditedHit($0, moves: moves, in: s) }
+        return RunnerSuggestion(runners: moves, rbi: rbi,
+                                batterResult: credited == draft.batterResult ? nil : credited)
+    }
+
+    /// Moves the runners the scorer has not placed so that nobody shares a base with, or
+    /// passes, the runner ahead of them. The runners in `placed` stay exactly where the scorer
+    /// put them, and runners put out are left alone. Any number of runners can score.
+    ///
+    /// - Pushed ahead: working from the batter forward, a runner the scorer has not placed
+    ///   moves up to one base past the furthest any runner behind them got. On a single with a
+    ///   runner on first, sending the batter to second sends the runner from first to third;
+    ///   if a runner behind them scored, they score too.
+    /// - Held back: working from the lead runner back, a runner the scorer has not placed who
+    ///   would reach or pass a runner ahead still on base stops one base short of that runner,
+    ///   but never behind the base they started on (first base, for the batter). On a double
+    ///   with runners on first and second, holding the runner from second at third stops the
+    ///   runner from first at second.
+    ///
+    /// When the scorer's own placements cannot all fit, a runner may still end up sharing a
+    /// base; the runner step says so and the scorer fixes it.
+    static func makingRoom(_ moves: [RunnerMove], around placed: Set<PlayerID>) -> [RunnerMove] {
+        guard !placed.isEmpty else { return moves }
+        var result = moves
+        // Positions in the list from the trailing runner (the batter) to the lead runner.
+        let trailingFirst = result.indices.sorted { result[$0].from < result[$1].from }
+
+        // Pushed ahead. `furthestBehind` is how far round the bases the runners already looked
+        // at got: 0 for nobody yet, 1 to 3 for a base, 4 for scored.
+        var furthestBehind = 0
+        for i in trailingFirst where result[i].to != .out {
+            var reached = BaseMath.order(of: result[i].to)
+            if !placed.contains(result[i].runner), furthestBehind > 0, reached <= furthestBehind {
+                reached = min(4, furthestBehind + 1)
+                result[i].to = BaseMath.advance(.home, by: reached)
+            }
+            furthestBehind = max(furthestBehind, reached)
+        }
+
+        // Held back. `nearestAhead` is the base of the closest runner ahead still on base:
+        // 4 means nobody ahead is still on base, so there is nothing to stop short of.
+        var nearestAhead = 4
+        for i in trailingFirst.reversed() where result[i].to != .out {
+            var reached = BaseMath.order(of: result[i].to)
+            if !placed.contains(result[i].runner), nearestAhead < 4, reached >= nearestAhead {
+                // The batter can go back no further than first; a runner no further than
+                // the base they started on.
+                let lowest = max(1, result[i].from.order)
+                let shortOfAhead = nearestAhead - 1
+                if shortOfAhead >= lowest {
+                    reached = shortOfAhead
+                    result[i].to = BaseMath.advance(.home, by: reached)
+                }
+            }
+            if reached < 4 { nearestAhead = min(nearestAhead, reached) }
+        }
+        return result
+    }
+
+    /// The hit the batter is credited with on a game-ending hit: only as many bases as the
+    /// winning run needed, and no more than the batter reached (Official Baseball Rules
+    /// 9.06(f)). A single stays a single, a home run stays a home run, and anything that is
+    /// not a game-ending hit is left as it is. `s` is the situation before the play.
+    static func creditedHit(_ result: BatterResult, moves: [RunnerMove], in s: Situation) -> BatterResult {
+        let bases: [BatterResult: Int] = [.single: 1, .double: 2, .triple: 3]
+        guard let hitBases = bases[result], hitBases > 1, s.isWalkOffInning, s.score.home <= s.score.away else {
+            return result
+        }
+        let needed = s.score.away - s.score.home + 1
+        // Runners score lead runner first; the batter scores last.
+        let scorers = moves.filter { $0.to == .scored }.sorted { $0.from > $1.from }
+        guard scorers.count >= needed else { return result }
+        let winningRunBases = BaseMath.distance(from: scorers[needed - 1].from, to: .scored)
+        let batterBases = moves.first(where: \.isBatter).map { BaseMath.distance(from: .home, to: $0.to) } ?? hitBases
+        let credited = max(1, min(hitBases, winningRunBases, batterBases))
+        return [1: .single, 2: .double, 3: .triple][credited] ?? result
+    }
+
+    /// The plain guess, before the scorer changes anything. Runners are listed lead runner
+    /// first, then the batter.
+    static func defaultMoves(for draft: PlayDraft, in s: Situation) -> [RunnerMove] {
+        let onBase = BaseMath.leadFirst(s.runners)
+        let holdAll = onBase.map { RunnerMove(runner: $0.runner, from: $0.base, to: .safe(at: $0.base)) }
+        guard let result = draft.batterResult, let batter = s.batter else { return holdAll }
+
+        let forced = BaseMath.forcedBases(s.runners)
+        let fielders = draft.fielders
+        var moves: [RunnerMove] = []
+
+        /// Every runner moves up `bases` bases and so does the batter.
+        func everyoneUp(_ bases: Int, batterOnError: Bool = false) {
+            for r in onBase {
+                moves.append(RunnerMove(runner: r.runner, from: r.base, to: BaseMath.advance(r.base, by: bases)))
+            }
+            moves.append(RunnerMove(runner: batter, from: .home, to: BaseMath.advance(.home, by: bases),
+                                    advancedOnError: batterOnError))
+        }
+
+        /// Forced runners move up one base, everyone else holds; the batter ends at `batterEnd`.
+        func forcedUp(except out: Set<PlayerID> = [], batterEnd: RunnerMove) {
+            for r in onBase where !out.contains(r.runner) {
+                let to: RunnerEnd = forced.contains(r.base) ? BaseMath.advance(r.base, by: 1) : .safe(at: r.base)
+                moves.append(RunnerMove(runner: r.runner, from: r.base, to: to))
+            }
+            moves.append(batterEnd)
+        }
+
+        let batterOutAtFirst = RunnerMove(runner: batter, from: .home, to: .out, outBy: fielders, outAt: .first)
+        let airBall = Self.isAirBall(draft.battedBall)
+
+        switch result {
+        case .single: everyoneUp(1)
+        case .double: everyoneUp(2)
+        case .triple: everyoneUp(3)
+        case .homeRun: everyoneUp(4)
+
+        case .reachedOnError:
+            // Batter safe at first on the error, runners up one.
+            everyoneUp(1, batterOnError: true)
+
+        case .catchersInterference, .reachedOnDroppedThirdStrike:
+            forcedUp(batterEnd: RunnerMove(runner: batter, from: .home, to: .first))
+
+        case .fieldersChoice:
+            // The lead forced runner is out at the next base; with nobody forced, the lead runner.
+            // The batter is safe at first.
+            if let lead = onBase.first(where: { forced.contains($0.base) }) ?? onBase.first {
+                moves.append(RunnerMove(runner: lead.runner, from: lead.base, to: .out, outBy: fielders,
+                                        outAt: BaseMath.nextBase(after: lead.base)))
+                forcedUp(except: [lead.runner], batterEnd: RunnerMove(runner: batter, from: .home, to: .first))
+            } else {
+                moves.append(RunnerMove(runner: batter, from: .home, to: .first))
+            }
+
+        case .sacrificeFly:
+            // The runner on third scores; everyone else holds.
+            for r in onBase {
+                moves.append(RunnerMove(runner: r.runner, from: r.base, to: r.base == .third ? .scored : .safe(at: r.base)))
+            }
+            moves.append(RunnerMove(runner: batter, from: .home, to: .out, outBy: fielders))
+
+        case .sacrificeBunt:
+            // The runners on first and second move up; the runner on third only if forced.
+            for r in onBase {
+                let moves1 = r.base != .third || forced.contains(.third)
+                moves.append(RunnerMove(runner: r.runner, from: r.base, to: moves1 ? BaseMath.advance(r.base, by: 1) : .safe(at: r.base)))
+            }
+            moves.append(batterOutAtFirst)
+
+        case .out:
+            moves = outMoves(draft: draft, batter: batter, onBase: onBase, forced: forced, isAirBall: airBall)
+        }
+
+        // A play that makes the third out: nobody else moves and no run is suggested.
+        let outs = moves.filter { $0.to == .out }.count
+        if s.outs + outs >= 3 {
+            moves = moves.map { m in
+                guard !m.isBatter, m.to != .out else { return m }
+                return RunnerMove(runner: m.runner, from: m.from, to: .safe(at: m.from))
+            }
+        }
+
+        if [.single, .double, .triple].contains(result) {
+            moves = limitedToWinningRun(moves, in: s)
+        }
+        return moves
+    }
+
+    /// An out on a ball in play.
+    /// - In the air: the batter is out and runners hold; on a double play the lead runner is
+    ///   doubled off their base.
+    /// - On the ground, marked a double play or handled by three or more fielders with a runner
+    ///   on first: the runner from first is forced at second and the batter is out at first.
+    ///   Otherwise forced runners move up one and the batter is out.
+    private static func outMoves(
+        draft: PlayDraft, batter: PlayerID, onBase: [BaseRunner], forced: Set<Base>, isAirBall: Bool
+    ) -> [RunnerMove] {
+        let fielders = draft.fielders
+        var moves: [RunnerMove] = []
+        if isAirBall {
+            let doubledOff = draft.multiOut != nil ? doubledOffRunner(fielders: fielders, onBase: onBase) : nil
+            for r in onBase {
+                if r.runner == doubledOff?.runner {
+                    // A runner put out by the catcher was trying to score; anyone else is doubled
+                    // off their own base.
+                    let at: Base = fielders.last == .catcher ? .home : r.base
+                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: .out, outBy: fielders, outAt: at))
+                } else {
+                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: .safe(at: r.base)))
+                }
+            }
+            let catcher = fielders.first.map { [$0] } ?? []
+            moves.append(RunnerMove(runner: batter, from: .home, to: .out, outBy: draft.multiOut != nil ? catcher : fielders))
+            return moves
+        }
+
+        let runnerOnFirst = onBase.first { $0.base == .first }
+        if isGroundDoublePlay(draft, runners: onBase), let forcedAtSecond = runnerOnFirst ?? onBase.first(where: { forced.contains($0.base) }) ?? onBase.first {
+            // 5-4-3: the runner is out 5-4 at second, the batter 4-3 at first.
+            let runnerOutBy = fielders.count >= 2 ? Array(fielders.dropLast()) : fielders
+            let batterOutBy = Array(fielders.suffix(2))
+            for r in onBase {
+                if r.runner == forcedAtSecond.runner {
+                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: .out, outBy: runnerOutBy,
+                                            outAt: BaseMath.nextBase(after: r.base)))
+                } else {
+                    let to: RunnerEnd = forced.contains(r.base) ? BaseMath.advance(r.base, by: 1) : .safe(at: r.base)
+                    moves.append(RunnerMove(runner: r.runner, from: r.base, to: to))
+                }
+            }
+            moves.append(RunnerMove(runner: batter, from: .home, to: .out, outBy: batterOutBy, outAt: .first))
+            return moves
+        }
+
+        for r in onBase {
+            let to: RunnerEnd = forced.contains(r.base) ? BaseMath.advance(r.base, by: 1) : .safe(at: r.base)
+            moves.append(RunnerMove(runner: r.runner, from: r.base, to: to))
+        }
+        moves.append(RunnerMove(runner: batter, from: .home, to: .out, outBy: fielders,
+                                outAt: draft.battedBall == nil && fielders.count == 1 ? nil : .first))
+        return moves
+    }
+
+    /// True when a ground out is taken to be a double play: the scorer marked it one, or three
+    /// or more fielders handled the ball with a runner on first (a 6-4-3). The runner suggestion
+    /// and the runs-batted-in default use this same test.
+    static func isGroundDoublePlay(_ draft: PlayDraft, runners: [BaseRunner]) -> Bool {
+        guard draft.batterResult == .out, !isAirBall(draft.battedBall) else { return false }
+        return draft.multiOut != nil || (draft.fielders.count >= 3 && runners.contains { $0.base == .first })
+    }
+
+    /// True for a fly ball, line drive or pop-up.
+    static func isAirBall(_ type: BattedBallType?) -> Bool {
+        [.flyBall, .lineDrive, .popUp].contains(type)
+    }
+
+    /// On a double play off a ball caught in the air, the runner put out is the one at the base
+    /// the last fielder covers: first base for the first baseman, second for the second baseman
+    /// or shortstop, third for the third baseman, and the runner from third, trying to score,
+    /// for the catcher. Otherwise the runner on first, and failing that the lead runner.
+    static func doubledOffRunner(fielders: [Position], onBase: [BaseRunner]) -> BaseRunner? {
+        let covered: [Base]
+        switch fielders.last {
+        case .firstBase: covered = [.first]
+        case .secondBase, .shortstop: covered = [.second]
+        case .thirdBase, .catcher: covered = [.third]
+        default: covered = []
+        }
+        for base in covered + [.first] {
+            if let r = onBase.first(where: { $0.base == base }) { return r }
+        }
+        return onBase.first
+    }
+
+    /// A game-ending hit in the bottom of the last inning or later: only the winning run scores,
+    /// and nobody, batter included, moves more bases than that runner did (rule 9.06(f)).
+    /// A home run is left alone.
+    static func limitedToWinningRun(_ moves: [RunnerMove], in s: Situation) -> [RunnerMove] {
+        guard s.isWalkOffInning, s.score.home <= s.score.away else { return moves }
+        let needed = s.score.away - s.score.home + 1
+        // Runners score lead runner first.
+        let scorers = moves.filter { $0.to == .scored }.sorted { $0.from > $1.from }
+        guard scorers.count >= needed else { return moves }
+        let winning = scorers[needed - 1]
+        let bases = BaseMath.distance(from: winning.from, to: .scored)
+        return moves.map { m in
+            guard m.to != .out, BaseMath.distance(from: m.from, to: m.to) > bases else { return m }
+            var limited = m
+            limited.to = BaseMath.advance(m.from, by: bases)
+            return limited
+        }
+    }
+
+    /// Runs batted in under the official scoring rules: every run that scores on the play,
+    /// except a runner marked as scoring because of an error, and except:
+    /// - none on a dropped third strike or a ground-ball double play [OBR 9.04(b)(1)];
+    /// - on an error, only the runner from third with fewer than two outs, when the scorer has
+    ///   not marked that runner's advance as caused by the error [OBR 9.04(a)(3)]. Whether the
+    ///   runner "would have scored anyway" (a fly ball deep enough, a slow roller) cannot be read
+    ///   from the play, so the scorer's error mark decides, and the scorer confirms the number.
+    static func runsBattedIn(result: BatterResult, draft: PlayDraft, moves: [RunnerMove], in s: Situation) -> Int {
+        let earned = moves.filter { $0.to == .scored && !$0.advancedOnError }
+        switch result {
+        case .reachedOnDroppedThirdStrike:
+            return 0
+        case .reachedOnError:
+            return s.outs < 2 ? earned.filter { $0.from == .third }.count : 0
+        case .out where isGroundDoublePlay(draft, runners: s.runners):
+            return 0
+        default:
+            return earned.count
+        }
+    }
+
+    // MARK: - Preview
+
+    /// What a play in progress would do: notation so far, outs, runs, and whether it ends the
+    /// half-inning or (in a walk-off inning) puts the home team ahead.
+    static func preview(_ draft: PlayDraft, in s: Situation) -> PlayPreview {
+        let moves = draft.runners.isEmpty ? runners(for: draft, in: s).runners : draft.runners
+        let outs = moves.filter { $0.to == .out }.count
+        let runs = moves.filter { $0.to == .scored }.count
+        let outsAfter = min(3, s.outs + outs)
+        let endsHalf = outsAfter >= 3
+        let endsGame = !endsHalf && s.isWalkOffInning && s.score.home <= s.score.away
+            && s.score.home + runs > s.score.away
+        return PlayPreview(
+            notation: Notation.draft(draft, runners: moves),
+            outsOnPlay: outs, runsOnPlay: runs, outsAfter: outsAfter,
+            endsHalfInning: endsHalf, endsGame: endsGame
+        )
+    }
+
+    // MARK: - Between pitches
+
+    /// Where the chosen runners most likely ended up on a move between pitches. A caught
+    /// stealing is out at the next base and a pickoff at the runner's own base; a balk, wild
+    /// pitch or passed ball moves every runner up one; anything else moves the chosen runners
+    /// up one. One move per runner, lead runner first.
+    static func runnerAction(_ reason: RunnerMoveReason, runners chosen: [PlayerID], in s: Situation) -> [RunnerMove] {
+        let movesEveryone: Bool = [.balk, .wildPitch, .passedBall].contains(reason)
+        let picked = BaseMath.leadFirst(s.runners.filter { movesEveryone || chosen.contains($0.runner) })
+        return picked.map { r in
+            switch reason {
+            case .caughtStealing:
+                RunnerMove(runner: r.runner, from: r.base, to: .out, reason: reason, outAt: BaseMath.nextBase(after: r.base))
+            case .pickoff, .outOnAppeal:
+                RunnerMove(runner: r.runner, from: r.base, to: .out, reason: reason, outAt: r.base)
+            default:
+                RunnerMove(runner: r.runner, from: r.base, to: BaseMath.advance(r.base, by: 1), reason: reason)
+            }
+        }
+    }
+
+    // MARK: - Designated non-runners
+
+    /// The runner the league's rule names for a designated non-runner who has just reached
+    /// base [9.11 D to G]: the batting team's last recorded out, skipping the batter now at bat,
+    /// anyone on base, and the non-runner themself. An automatic out at a batting hole is not a
+    /// recorded out: that player has left the game. Before the team's first out, the last batter
+    /// in the batting order [9.11 E].
+    static func suggestedRunner(for nonRunner: PlayerID, entries: [PlayLogEntry], situation s: Situation) -> PlayerID? {
+        let side = s.battingSide
+        let atBat = s.batter
+        let onBase = Set(s.runners.map(\.runner))
+        let unavailable = onBase.union([nonRunner]).union(atBat.map { [$0] } ?? [])
+
+        // Every out the team has made, oldest first.
+        let outs = entries.filter { $0.battingSide == side }.flatMap { entry -> [PlayerID] in
+            if case .automaticOut = entry.event.kind { return [] }
+            return entry.outs.map(\.runner)
+        }
+        if let last = outs.last(where: { !unavailable.contains($0) }) { return last }
+        guard outs.isEmpty else { return nil }
+        return s[side].battingOrder.slots.last { slot in
+            guard let current = slot.current else { return false }
+            return !unavailable.contains(current) && !slot.isHole
+        }?.current
+    }
+}

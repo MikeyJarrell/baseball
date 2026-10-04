@@ -1,0 +1,304 @@
+{
+  "description": "The Diamond Dogs have two designated non-runners, Moreno and Quinn (the most the 18-and-over division allows, league rule 9.11 J). Moreno flies out and Tate grounds out. Webb singles and Quinn singles, Webb to second. The app offers Tate, the last recorded out (league rule 9.11 D), to run for Quinn, and Tate runs. Shaw singles: Webb scores and Tate goes first to third, still standing in for Quinn.",
+  "setupFile": "two-designated-non-runners",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "d4",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e8",
+      "enteredAt": "2026-05-02T18:07:40Z",
+      "runnerForNonRunner": {
+        "runner": "d2",
+        "replacing": "d4"
+      }
+    },
+    {
+      "id": "e9",
+      "enteredAt": "2026-05-02T18:08:00Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "d3",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "d2",
+            "from": "first",
+            "to": "third"
+          },
+          {
+            "runner": "d5",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "outs": 1,
+          "isRunnerChoiceOpen": false
+        }
+      }
+    },
+    {
+      "afterEvent": "e7",
+      "expected": {
+        "situation": {
+          "outs": 2,
+          "batter": "d5",
+          "isRunnerChoiceOpen": true,
+          "runnerChoiceFor": "d4",
+          "suggestedRunner": "d2",
+          "runners": [
+            {
+              "base": "first",
+              "runner": "d4",
+              "responsiblePitcher": "m9"
+            },
+            {
+              "base": "second",
+              "runner": "d3",
+              "responsiblePitcher": "m9"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 2,
+      "score": {
+        "away": 0,
+        "home": 1
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "d5",
+          "responsiblePitcher": "m9"
+        },
+        {
+          "base": "third",
+          "runner": "d2",
+          "responsiblePitcher": "m9",
+          "standingInFor": "d4"
+        }
+      ],
+      "batter": "d6",
+      "isRunnerChoiceOpen": false,
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 3,
+          "players": [
+            "d4"
+          ]
+        },
+        {
+          "team": "home",
+          "index": 1,
+          "players": [
+            "d2"
+          ]
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "d3",
+        "runs": 1
+      },
+      {
+        "player": "d5",
+        "hits": 1,
+        "runsBattedIn": 1
+      },
+      {
+        "player": "d4",
+        "hits": 1,
+        "runs": 0
+      },
+      {
+        "player": "d2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "m9",
+        "runs": 1,
+        "hits": 3,
+        "outsRecorded": 2,
+        "battersFaced": 5
+      }
+    ]
+  }
+}

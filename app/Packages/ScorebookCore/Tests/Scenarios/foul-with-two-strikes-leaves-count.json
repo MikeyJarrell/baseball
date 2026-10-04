@@ -1,0 +1,100 @@
+{
+  "description": "Ortiz falls behind 0-2, fouls off three straight pitches with the count staying 0-2, then takes a ball. Still batting at 1-2; every foul counts as a strike in the pitch count.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e5",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 0,
+            "strikes": 2
+          },
+          "outs": 0,
+          "batter": "m1"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 1,
+        "strikes": 2
+      },
+      "runners": [],
+      "batter": "m1",
+      "onDeck": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 6,
+          "strikes": 5,
+          "battersFaced": 0
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 0,
+        "atBats": 0,
+        "strikeouts": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "pitches": 6,
+        "strikes": 5,
+        "battersFaced": 0,
+        "strikeouts": 0
+      }
+    ]
+  }
+}
