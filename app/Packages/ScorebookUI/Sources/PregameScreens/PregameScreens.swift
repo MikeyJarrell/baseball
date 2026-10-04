@@ -1,12 +1,13 @@
-// PregameScreens: game setup and lineups, in five steps.
+// PregameScreens: game setup and lineups, in six steps.
 //
-// 1. The game: opponent, date, home or away, innings, the scheduled start and the time limit
-//    as a clock time (`GameStep`).
-// 2. Our lineup: the batting order, the nine fielders and the bench, as three separate lists,
-//    with designated non-runners and positions shared by turns (`OurLineupStep`).
-// 3. Their lineup: names and numbers, numbers only, or unknown (`TheirLineupStep`).
-// 4. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
-// 5. Review and "Play ball" (`ReviewStep`).
+// 1. The game: opponent, date, home or away, innings, and the scheduled start and time limit
+//    on the iOS time wheel (`GameStep`).
+// 2. Our batting order: who bats and in what order, designated non-runners, the bench
+//    (`BattingOrderStep`).
+// 3. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
+// 4. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
+// 5. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
+// 6. Review and "Play ball" (`ReviewStep`).
 //
 // How these screens talk to the rest of the app: `PregameFlow` is handed a `PregameInput`
 // (our team, the saved opponents, recent games, who pitched lately, today) and hands back one
@@ -24,9 +25,9 @@ import Model
 import SampleData
 import DesignSystem
 
-/// The five pregame steps.
+/// The six pregame steps. `ours` is our batting order; `fielding` is where we field.
 public enum PregameStep: Hashable, CaseIterable, Sendable {
-    case game, ours, theirs, pitchers, review
+    case game, ours, fielding, theirs, pitchers, review
 }
 
 /// The pregame sequence, from picking the opponent to "Play ball".
@@ -62,7 +63,9 @@ public struct PregameFlow: View {
                     case .game:
                         EmptyView()
                     case .ours:
-                        OurLineupStep(draft: $draft, onNext: { path.append(.theirs) })
+                        BattingOrderStep(draft: $draft, onNext: { path.append(.fielding) })
+                    case .fielding:
+                        FieldingStep(draft: $draft, onNext: { path.append(.theirs) })
                     case .theirs:
                         TheirLineupStep(draft: $draft, onNext: { path.append(.pitchers) })
                     case .pitchers:
