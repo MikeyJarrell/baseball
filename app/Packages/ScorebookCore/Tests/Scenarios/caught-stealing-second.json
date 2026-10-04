@@ -1,0 +1,96 @@
+{
+  "description": "Ortiz singles to left. Ruiz takes strike one, and Ortiz is thrown out trying to steal second, catcher Fisk to shortstop Tate. One out; Ruiz is still batting at 0-1.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "reason": "caughtStealing",
+            "outBy": [
+              2,
+              6
+            ],
+            "outAt": "second"
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 1
+      },
+      "runners": [],
+      "batter": "m2"
+    },
+    "notation": [
+      {
+        "event": "e3",
+        "notation": "CS2 2-6"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "caughtStealing": 1,
+        "stolenBases": 0
+      },
+      {
+        "player": "m2",
+        "plateAppearances": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d2",
+        "putouts": 1,
+        "assists": 0
+      }
+    ]
+  }
+}

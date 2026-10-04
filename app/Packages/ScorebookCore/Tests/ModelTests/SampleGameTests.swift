@@ -86,8 +86,8 @@ struct SampleGameTests {
         #expect(SampleSituations.theirHitterKnownByNumber.player(SampleSituations.theirHitterKnownByNumber.situation.batter)?.displayName == "#5")
     }
 
-    @Test("The canned rules engine suggests the obvious runner moves")
-    func cannedEngine() {
+    @Test("The sample rules engine, the real one, suggests the obvious runner moves")
+    func sampleEngine() {
         let engine = SampleRulesEngine()
         let situation = SampleSituations.runnerOnFirstOneOut.situation
         let single = engine.suggestRunners(for: PlayDraft(batterResult: .single), in: situation)

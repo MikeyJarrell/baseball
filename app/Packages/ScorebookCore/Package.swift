@@ -30,7 +30,9 @@ let package = Package(
         .target(name: "Model"),
 
         // Made-up teams, situations and one complete game, for building, previews and tests.
-        .target(name: "SampleData", dependencies: ["Model"]),
+        // It also hands screens the real rules engine for previews (`SampleRulesEngine`), so
+        // screens never import GameEngine themselves.
+        .target(name: "SampleData", dependencies: ["Model", "GameEngine"]),
 
         // The rules engine: events in, situation and play log out.
         .target(name: "GameEngine", dependencies: ["Model"]),
@@ -62,8 +64,8 @@ let package = Package(
         // Tests of the shared vocabulary and sample data. Owned by the lead builder.
         .testTarget(name: "ModelTests", dependencies: ["Model", "SampleData", "TestSupport"]),
 
-        // Tests of the rules engine.
-        .testTarget(name: "GameEngineTests", dependencies: ["GameEngine", "Model", "SampleData", "TestSupport"]),
+        // Tests of the rules engine. A few also build a box score, to check what the engine hands stats.
+        .testTarget(name: "GameEngineTests", dependencies: ["GameEngine", "Stats", "Model", "SampleData", "TestSupport"]),
 
         // Tests of the stats. These also use the rules engine, to turn scenario files into play logs.
         .testTarget(name: "StatsTests", dependencies: ["Stats", "GameEngine", "Model", "SampleData", "TestSupport"]),

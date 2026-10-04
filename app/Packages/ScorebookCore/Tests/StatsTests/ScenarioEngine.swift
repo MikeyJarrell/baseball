@@ -17,7 +17,7 @@ import Testing
 
 enum ScenarioEngine {
     /// The rules engine, once there is one.
-    static let engine: (any RulesEngine)? = nil
+    static let engine: (any RulesEngine)? = ScorebookRulesEngine()
 
     /// True once a rules engine is plugged in. The tests skip only while there is none; with
     /// an engine in place they always run, so a broken engine (a play log with the wrong

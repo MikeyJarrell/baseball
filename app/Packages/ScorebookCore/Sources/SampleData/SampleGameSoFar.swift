@@ -93,7 +93,9 @@ extension SampleGame {
             hitByPitch: [],
             doublePlays: [TeamTally(team: .home, name: "Diamond Dogs", count: 2)],
             triplePlays: [],
-            leftOnBase: [TeamTally(team: .away, name: "Mudcats", count: 2), TeamTally(team: .home, name: "Diamond Dogs", count: 3)]
+            leftOnBase: [TeamTally(team: .away, name: "Mudcats", count: 2), TeamTally(team: .home, name: "Diamond Dogs", count: 3)],
+            ranForNonRunners: [NonRunnerRunnerNote(runner: "d3", runnerName: "Jordan Webb", nonRunner: "d4",
+                                                   nonRunnerName: "Pat Quinn", team: .home, innings: [3])]
         ),
         isFinal: false
     )

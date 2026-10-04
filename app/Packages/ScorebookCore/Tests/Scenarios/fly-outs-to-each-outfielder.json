@@ -1,0 +1,146 @@
+{
+  "description": "Ortiz flies out to left, Ruiz to center and Hale to right: three up, three down, and the Diamond Dogs come to bat.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          7
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              7
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          9
+        ],
+        "runners": [
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              9
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "bottom",
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "d1",
+      "onDeck": "d2",
+      "pitcher": "m9",
+      "isBetweenHalfInnings": true,
+      "lineups": [
+        {
+          "team": "away",
+          "nextBatterIndex": 3
+        }
+      ],
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 3,
+          "battersFaced": 3
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e1",
+        "notation": "F7"
+      },
+      {
+        "event": "e2",
+        "notation": "F8"
+      },
+      {
+        "event": "e3",
+        "notation": "F9"
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 3,
+        "battersFaced": 3,
+        "hits": 0
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d6",
+        "putouts": 1
+      },
+      {
+        "player": "d3",
+        "putouts": 1
+      },
+      {
+        "player": "d7",
+        "putouts": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 0,
+        "hits": 0,
+        "leftOnBase": 0
+      }
+    ]
+  }
+}

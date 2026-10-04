@@ -1,0 +1,179 @@
+{
+  "description": "Ortiz grounds out 6-3 to shortstop Tate. Then the Diamond Dogs swap their middle infielders: Tate to second, Moreno to short. Ruiz's grounder to short is booted, so the error is Moreno's, now the shortstop. Hale grounds out 4-3 to Tate at second, Ruiz moving up.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          6,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              6,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "substitution": {
+        "team": "home",
+        "defense": [
+          {
+            "position": 4,
+            "player": "d2"
+          },
+          {
+            "position": 6,
+            "player": "d1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "ballInPlay": {
+        "batterResult": "reachedOnError",
+        "battedBall": "groundBall",
+        "fielders": [
+          6
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 6,
+            "type": "fielding"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m2",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m3",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 2,
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m4",
+      "fielders": [
+        {
+          "team": "home",
+          "position": 4,
+          "player": "d2"
+        },
+        {
+          "team": "home",
+          "position": 6,
+          "player": "d1"
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 0,
+          "players": [
+            "d1"
+          ],
+          "position": 6
+        },
+        {
+          "team": "home",
+          "index": 1,
+          "players": [
+            "d2"
+          ],
+          "position": 4
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e3",
+        "notation": "E6"
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d2",
+        "putouts": 0,
+        "assists": 2,
+        "errors": 0
+      },
+      {
+        "player": "d1",
+        "putouts": 0,
+        "assists": 0,
+        "errors": 1
+      },
+      {
+        "player": "d4",
+        "putouts": 2,
+        "assists": 0,
+        "errors": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      }
+    ]
+  }
+}

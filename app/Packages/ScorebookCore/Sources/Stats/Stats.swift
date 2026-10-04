@@ -35,7 +35,9 @@ public struct StatsEngine: StatsCalculator {
     /// at the plate when the third out was made on the bases has none for that trip.
     public func plateAppearances(of player: PlayerID, in log: PlayLog) -> [PlateAppearanceSummary] {
         log.entries.compactMap { entry in
-            guard let result = entry.plateAppearance, result.batter == player else { return nil }
+            // A pinch hitter's strikeout charged to the batter they replaced is in that
+            // batter's history [9.15(b)].
+            guard let result = entry.plateAppearance, result.batterCharged == player else { return nil }
             return PlateAppearanceSummary(
                 inning: entry.inning,
                 notation: entry.notation,

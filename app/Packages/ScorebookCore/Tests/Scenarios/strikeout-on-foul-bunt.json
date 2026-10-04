@@ -1,0 +1,84 @@
+{
+  "description": "Ortiz takes strike one and swings through strike two, then bunts the 0-2 pitch foul. A foul bunt with two strikes is strike three, unlike an ordinary foul.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "foulBunt"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 0,
+            "strikes": 2
+          },
+          "outs": 0,
+          "batter": "m1"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 3,
+          "strikes": 3,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "strikeouts": 1,
+        "sacrificeBunts": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "strikeouts": 1,
+        "outsRecorded": 1,
+        "pitches": 3,
+        "strikes": 3
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1
+      }
+    ]
+  }
+}

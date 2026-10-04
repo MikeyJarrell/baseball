@@ -73,6 +73,31 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// The latest thing to tell the scorer, such as a song file that is missing or a
     /// recording that stopped at its limit. Cleared when something new starts playing.
     public private(set) var lastProblem: String?
+    /// When the walk-up song's automatic fade begins, by the phone's clock: the song's
+    /// start plus its length, less the 2-second fade (so with 12 seconds of song, 10 seconds
+    /// after the song starts). The song is silent `fadeLength` seconds later. Missing when no
+    /// walk-up song is lined up.
+    private(set) var fadeBeginsAt: Date?
+
+    /// What is playing now, for the song button: the introduction, a song, or a warm-up,
+    /// which song, and (while a walk-up song plays) when its fade begins.
+    public var playback: AudioPlayback {
+        guard isPlaying else { return AudioPlayback(phase: .idle) }
+        switch activity {
+        case .idle:
+            return AudioPlayback(phase: .idle)
+        case .introduction:
+            return AudioPlayback(phase: .introduction)
+        case .walkUp where isPlayingIntroduction:
+            return AudioPlayback(phase: .introduction, song: nowPlaying)
+        case .walkUp:
+            return AudioPlayback(phase: .song, song: nowPlaying, fadesAt: fadeBeginsAt)
+        case .preview:
+            return AudioPlayback(phase: .song, song: nowPlaying)
+        case .warmUp:
+            return AudioPlayback(phase: .warmUp, song: nowPlaying)
+        }
+    }
 
     /// Called whenever something stops playing for any reason, with the song that was playing.
     @ObservationIgnored public var onPlaybackEnded: ((SongID?) -> Void)?
@@ -250,12 +275,8 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     }
 
     public func setStartPoint(_ seconds: TimeInterval, for song: SongID) {
-        changeSong(song) { song in
-            var start = max(0, seconds)
-            // Keep at least a second of song after the start point.
-            if let duration = song.duration { start = min(start, max(0, duration - 1)) }
-            song.startTime = start
-        }
+        // Keep at least a second of song after the start point.
+        changeSong(song) { $0.startTime = WalkUpMath.startPoint(seconds, trackLength: $0.duration) }
     }
 
     public func setPlayLength(_ seconds: TimeInterval?, for song: SongID) {
@@ -500,6 +521,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         isFadingOut = false
         lastProblem = nil
         timing = Timing()
+        fadeBeginsAt = nil
         playStartedAt = Self.audioClockNow()
         restartsThisPlay = 0
         if let song { playbackPosition = song.startTime }
@@ -529,7 +551,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             songStart = begin + seconds + 0.3
         }
         if let song, let file {
-            let length = song.playLength ?? walkUpLength
+            let length = WalkUpMath.songLength(for: song, walkUpLength: walkUpLength)
             scheduleSong(song, file: file, from: song.startTime, length: length, repeating: false,
                          startingAt: songStart)
             graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: songStart)))
@@ -578,9 +600,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     private func scheduleSong(_ song: Song, file: AVAudioFile, from seconds: TimeInterval,
                               length: TimeInterval?, repeating: Bool, startingAt: Double? = nil) -> Double {
         let rate = file.processingFormat.sampleRate
-        let startFrame = min(max(0, AVAudioFramePosition(seconds * rate)), max(0, file.length - 1))
-        let available = AVAudioFrameCount(file.length - startFrame)
-        let frames = length.map { min(AVAudioFrameCount($0 * rate), available) } ?? available
+        let slice = WalkUpMath.slice(from: seconds, length: length, sampleRate: rate, fileFrames: file.length)
+        let startFrame = slice.firstFrame
+        let frames = slice.frameCount
         let playSeconds = Double(frames) / rate
 
         graph.connectSongPlayer(format: file.processingFormat)
@@ -591,8 +613,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         if repeating {
             // The first pass runs from here to the end of the track; each later pass from the
             // song's start point. One pass is always lined up ahead, so the loop has no gap.
-            let loopFrame = min(max(0, AVAudioFramePosition(song.startTime * rate)), max(0, file.length - 1))
-            let loopFrames = AVAudioFrameCount(file.length - loopFrame)
+            let loop = WalkUpMath.slice(from: song.startTime, length: nil, sampleRate: rate, fileFrames: file.length)
+            let loopFrame = loop.firstFrame
+            let loopFrames = loop.frameCount
             queueWarmUpPass(file: file, startFrame: startFrame, frames: frames,
                             loopFrame: loopFrame, loopFrames: loopFrames, number: number)
             queueWarmUpPass(file: file, startFrame: loopFrame, frames: loopFrames,
@@ -617,6 +640,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         timing.songStart = start
         timing.songOffset = Double(startFrame) / rate
         timing.songLength = length.map { min($0, playSeconds) }
+        if let songLength = timing.songLength {
+            let fadeAfter = WalkUpMath.fadeBegins(songLength: songLength, fadeLength: fadeLength)
+            fadeBeginsAt = Date(timeIntervalSinceNow: start + fadeAfter - Self.audioClockNow())
+        }
         return start
     }
 
@@ -781,8 +808,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         // length is up.
         if activity == .walkUp, !isFadingOut, let start = timing.songStart, let length = timing.songLength {
             let songSoFar = now - start
-            let fade = min(fadeLength, length)
-            if songSoFar >= length - fade {
+            if songSoFar >= WalkUpMath.fadeBegins(songLength: length, fadeLength: fadeLength) {
                 beginFade(over: max(0.05, length - songSoFar))
             }
         }
@@ -796,8 +822,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         // faster at the end, which sounds smoother than a straight line.
         if isFadingOut, let fadeStart = timing.fadeStart {
             let progress = min(1, (now - fadeStart) / timing.fadeSeconds)
-            let remaining = Float(1 - progress)
-            graph.engine.mainMixerNode.outputVolume = timing.fadeFrom * remaining * remaining
+            graph.engine.mainMixerNode.outputVolume = WalkUpMath.fadeVolume(progress: progress, startingFrom: timing.fadeFrom)
             if progress >= 1 {
                 finish()
                 return
@@ -814,11 +839,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Where in the track the song is, given how long it has been playing. A warm-up goes
     /// back to the start point each time it reaches the end.
     private func trackPosition(intoSong: TimeInterval) -> TimeInterval {
-        guard activity == .warmUp, let first = timing.firstPass, let loop = timing.loopLength, loop > 0,
-              intoSong >= first else {
-            return timing.songOffset + intoSong
-        }
-        return timing.loopStart + (intoSong - first).truncatingRemainder(dividingBy: loop)
+        WalkUpMath.trackPosition(intoSong: intoSong, offset: timing.songOffset,
+                                 firstPass: activity == .warmUp ? timing.firstPass : nil,
+                                 loopStart: timing.loopStart, loopLength: timing.loopLength)
     }
 
     /// Seconds until the walk-up is silent: the rest of the fade once one has started,
@@ -826,11 +849,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// go on until stopped.
     private func countdown(at now: Double) -> TimeInterval? {
         if isFadingOut, let fadeStart = timing.fadeStart {
-            return max(0, timing.fadeSeconds - (now - fadeStart))
+            return WalkUpMath.fadeSecondsLeft(now: now, fadeStart: fadeStart, fadeSeconds: timing.fadeSeconds)
         }
         guard activity == .walkUp else { return nil }
         if let start = timing.songStart, let length = timing.songLength {
-            return max(0, start + length - now)
+            return WalkUpMath.secondsLeft(now: now, songStart: start, songLength: length)
         }
         if let end = timing.introductionOnlyEnd { return max(0, end - now) }
         return nil
@@ -857,6 +880,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             stopTicker()
         }
         timing = Timing()
+        fadeBeginsAt = nil
         currentSong = nil
         currentIntroduction = nil
         playStartedAt = nil
@@ -932,18 +956,17 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// itself carries on and keeps its result ready for next time.
     private func introductionSound(for player: Player, waitingAtMost seconds: Double) async -> AVAudioPCMBuffer? {
         let job = Task { SoundBox(sound: await self.introductionSound(for: player)) }
-        // Two racers: the job and a timer. Whichever finishes first decides.
-        let first = await withTaskGroup(of: SoundBox?.self) { group in
-            group.addTask { await job.value }
-            group.addTask {
+        // Two racers: the job and a timer. The first to answer decides; the other's answer is
+        // ignored. (A Swift task group would wait for both, which is the wait to avoid.)
+        let winner = await withCheckedContinuation { (continuation: CheckedContinuation<SoundBox, Never>) in
+            let race = FirstAnswer(continuation)
+            Task { race.give(await job.value) }
+            Task {
                 try? await Task.sleep(for: .seconds(seconds))
-                return nil   // the timer won
+                race.give(SoundBox(sound: nil))   // the timer won
             }
-            let winner = await group.next() ?? nil
-            group.cancelAll()
-            return winner
         }
-        return first?.sound
+        return winner.sound
     }
 
     /// Turns an introduction into sound: reads the recording, or has the phone's voice speak.
@@ -1101,6 +1124,18 @@ public enum RecordingProblem: Error, Equatable, Sendable {
         case .couldNotStart(let reason):
             return "Recording could not start. \(reason)"
         }
+    }
+}
+
+/// Passes on the first answer it is given and ignores the rest. Used on the main thread only.
+@MainActor
+private final class FirstAnswer {
+    private var continuation: CheckedContinuation<SoundBox, Never>?
+    init(_ continuation: CheckedContinuation<SoundBox, Never>) { self.continuation = continuation }
+
+    func give(_ answer: SoundBox) {
+        continuation?.resume(returning: answer)
+        continuation = nil
     }
 }
 

@@ -192,6 +192,9 @@ public struct GameTeam: Codable, Equatable, Sendable {
     public var teamID: TeamID
     /// "Mudcats".
     public var name: String
+    /// The short name for the scoreboard, copied from the saved team: "MUD". Missing means the
+    /// app makes one with `ShortTeamName.make(from:)`.
+    public var shortName: String?
     /// True for our team.
     public var isOurs: Bool
     /// Everyone at the field for this game, including players added during it.
@@ -208,6 +211,12 @@ public struct GameTeam: Codable, Equatable, Sendable {
     /// run themselves; the scorer is asked each time [9.11 A, D]. A substitute who is declared
     /// keeps the declaration when they come into the batting order.
     public var designatedNonRunners: [PlayerID]
+    /// Positions shared by turns, inning by inning: one first baseman in odd innings and another
+    /// in even innings, say, often with only one of them batting. Each half-inning this team
+    /// takes the field, the rules engine suggests the defense with these turns applied
+    /// (`Situation.suggestedDefense`) and the defense check starts from it. Nothing changes
+    /// until the scorer confirms it.
+    public var fieldingRotations: [FieldingRotation]
 
     public init(
         teamID: TeamID,
@@ -216,7 +225,9 @@ public struct GameTeam: Codable, Equatable, Sendable {
         roster: [Player],
         battingOrder: [PlayerID],
         defense: [FielderAssignment],
-        designatedNonRunners: [PlayerID] = []
+        designatedNonRunners: [PlayerID] = [],
+        fieldingRotations: [FieldingRotation] = [],
+        shortName: String? = nil
     ) {
         self.teamID = teamID
         self.name = name
@@ -225,19 +236,28 @@ public struct GameTeam: Codable, Equatable, Sendable {
         self.battingOrder = battingOrder
         self.defense = defense
         self.designatedNonRunners = designatedNonRunners
+        self.fieldingRotations = fieldingRotations
+        self.shortName = shortName
     }
 
+    /// The short name to show: the chosen one, or one made from the name.
+    public var displayShortName: String { shortName ?? ShortTeamName.make(from: name) }
+
     // Reading from JSON: `designatedNonRunners` may be left out and means none.
-    private enum CodingKeys: String, CodingKey { case teamID, name, isOurs, roster, battingOrder, defense, designatedNonRunners }
+    private enum CodingKeys: String, CodingKey {
+        case teamID, name, shortName, isOurs, roster, battingOrder, defense, designatedNonRunners, fieldingRotations
+    }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         teamID = try c.decode(TeamID.self, forKey: .teamID)
         name = try c.decode(String.self, forKey: .name)
+        shortName = try c.decodeIfPresent(String.self, forKey: .shortName)
         isOurs = try c.decode(Bool.self, forKey: .isOurs)
         roster = try c.decode([Player].self, forKey: .roster)
         battingOrder = try c.decode([PlayerID].self, forKey: .battingOrder)
         defense = try c.decode([FielderAssignment].self, forKey: .defense)
         designatedNonRunners = try c.decodeIfPresent([PlayerID].self, forKey: .designatedNonRunners) ?? []
+        fieldingRotations = try c.decodeIfPresent([FieldingRotation].self, forKey: .fieldingRotations) ?? []
     }
 
     /// Finds a player on this team by id.
@@ -256,6 +276,19 @@ public struct GameTeam: Codable, Equatable, Sendable {
         defense.first { $0.player == player }?.position
     }
 
+    /// A defense with this team's fielding rotations applied for an inning: each rotated
+    /// position goes to the player whose turn it is, who leaves any other position they had.
+    /// Everyone else stays where they are in `fielders`.
+    public func defense(forInning inning: Int, from fielders: [FielderAssignment]) -> [FielderAssignment] {
+        var result = fielders
+        for rotation in fieldingRotations {
+            guard let player = rotation.player(inInning: inning) else { continue }
+            result.removeAll { $0.position == rotation.position || $0.player == player }
+            result.append(FielderAssignment(position: rotation.position, player: player))
+        }
+        return result.sorted { $0.position < $1.position }
+    }
+
     /// The starting pitcher: whoever starts at position 1.
     public var startingPitcher: PlayerID? {
         defense.first { $0.position == .pitcher }?.player
@@ -264,6 +297,25 @@ public struct GameTeam: Codable, Equatable, Sendable {
     /// True when a player is declared as a designated non-runner.
     public func isDesignatedNonRunner(_ player: PlayerID) -> Bool {
         designatedNonRunners.contains(player)
+    }
+}
+
+/// A fielding position that players take turns at, by inning.
+public struct FieldingRotation: Codable, Equatable, Hashable, Sendable {
+    public var position: Position
+    /// The players in turn: the first plays the first inning, the second the second, and so on,
+    /// starting over after the last. `[a, b]` is a in odd innings and b in even ones. The first
+    /// should be the player at this position in the starting defense.
+    public var players: [PlayerID]
+
+    public init(position: Position, players: [PlayerID]) {
+        self.position = position
+        self.players = players
+    }
+
+    /// The player whose turn it is in an inning (counting from 1).
+    public func player(inInning inning: Int) -> PlayerID? {
+        players.isEmpty ? nil : players[(max(inning, 1) - 1) % players.count]
     }
 }
 
