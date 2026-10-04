@@ -439,8 +439,10 @@ class Converter:
             else:
                 self.half, self.inning = 0, self.inning + 1
 
-    def runner_event(self, basic, advances, batter):
-        """A steal, caught stealing, pickoff, wild pitch, passed ball, balk or the like."""
+    def runner_event(self, basic, advances, batter, after_strikeout=False):
+        """A steal, caught stealing, pickoff, wild pitch, passed ball, balk or the like.
+        `after_strikeout` is true for a runner play on the same pitch as strike three: a runner
+        put out then makes it one double play with the strikeout."""
         moves, errors = [], []
         listed = {a[0] for a in advances}
         for piece in basic.split(';'):
@@ -473,6 +475,8 @@ class Converter:
         details = {'moves': moves}
         if errors:
             details['errors'] = errors
+        if after_strikeout and any(m['to'] == 'out' for m in moves):
+            details['completesStrikeoutDoublePlay'] = True
         self.add('runnerAction', details)
         self.apply_moves(moves)
         self.check_third_out()
@@ -495,11 +499,11 @@ class Converter:
         self.outs += 1
         if extra:
             # Strike three and a runner play on the same pitch (K+SB2, K+PO1(23)/DP): the
-            # strikeout is the pitch, and the runner play follows as its own event. Our
-            # vocabulary cannot mark the two together as a double play.
+            # strikeout is the pitch, and the runner play follows as its own event, marked as
+            # completing a double play with the strikeout when it puts a runner out.
             if self.outs >= 3:
                 raise ConvertError('a runner play after the third out')
-            self.runner_event(extra, [a for a in advances if a[0] != 'B'], batter)
+            self.runner_event(extra, [a for a in advances if a[0] != 'B'], batter, after_strikeout=True)
         elif advances:
             raise ConvertError('runners moving on a plain strikeout are not handled')
 

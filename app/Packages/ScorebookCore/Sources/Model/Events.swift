@@ -256,18 +256,25 @@ public struct RunnerAction: Codable, Equatable, Hashable, Sendable {
     public var moves: [RunnerMove]
     /// Errors charged on this action, such as a catcher's wild throw on a steal.
     public var errors: [ErrorCharge]
+    /// True when a runner was put out on the same pitch as the strikeout just before ("strike
+    /// him out, throw him out": a runner caught stealing or picked off on strike three). The
+    /// strike-three pitch and this action stay two events, and official scoring counts them as
+    /// one double play by the fielding team.
+    public var completesStrikeoutDoublePlay: Bool
 
-    public init(moves: [RunnerMove], errors: [ErrorCharge] = []) {
+    public init(moves: [RunnerMove], errors: [ErrorCharge] = [], completesStrikeoutDoublePlay: Bool = false) {
         self.moves = moves
         self.errors = errors
+        self.completesStrikeoutDoublePlay = completesStrikeoutDoublePlay
     }
 
-    // Reading from JSON: `errors` may be left out and means none.
-    private enum CodingKeys: String, CodingKey { case moves, errors }
+    // Reading from JSON: `errors` and `completesStrikeoutDoublePlay` may be left out.
+    private enum CodingKeys: String, CodingKey { case moves, errors, completesStrikeoutDoublePlay }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         moves = try c.decode([RunnerMove].self, forKey: .moves)
         errors = try c.decodeIfPresent([ErrorCharge].self, forKey: .errors) ?? []
+        completesStrikeoutDoublePlay = try c.decodeIfPresent(Bool.self, forKey: .completesStrikeoutDoublePlay) ?? false
     }
 }
 
@@ -301,6 +308,11 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
     /// True when an error let this runner reach or move up. The error itself is listed once
     /// on the play or runner action, even when it helped several runners.
     public var advancedOnError: Bool
+    /// For a pickoff: the runner was picked off while trying to steal, which official scoring
+    /// counts as caught stealing (Official Baseball Rules 9.07(h)). It counts only when the
+    /// runner was put out; rule 9.07(h) also counts a runner who "would have been put out by
+    /// errorless play", which the scorer can record by marking the move caught stealing.
+    public var wasStealing: Bool
 
     public init(
         runner: PlayerID,
@@ -309,7 +321,8 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
         reason: RunnerMoveReason? = nil,
         outBy: [Position] = [],
         outAt: Base? = nil,
-        advancedOnError: Bool = false
+        advancedOnError: Bool = false,
+        wasStealing: Bool = false
     ) {
         self.runner = runner
         self.from = from
@@ -318,13 +331,20 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
         self.outBy = outBy
         self.outAt = outAt
         self.advancedOnError = advancedOnError
+        self.wasStealing = wasStealing
+    }
+
+    /// True when this move counts as caught stealing in the box score: marked caught stealing,
+    /// or a pickoff of a runner who was trying to steal and was put out.
+    public var countsAsCaughtStealing: Bool {
+        reason == .caughtStealing || (reason == .pickoff && wasStealing && to == .out)
     }
 
     /// True when this move is the batter's.
     public var isBatter: Bool { from == .home }
 
-    // Reading from JSON: `outBy` and `advancedOnError` may be left out.
-    private enum CodingKeys: String, CodingKey { case runner, from, to, reason, outBy, outAt, advancedOnError }
+    // Reading from JSON: `outBy`, `advancedOnError` and `wasStealing` may be left out.
+    private enum CodingKeys: String, CodingKey { case runner, from, to, reason, outBy, outAt, advancedOnError, wasStealing }
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         runner = try c.decode(PlayerID.self, forKey: .runner)
@@ -334,6 +354,7 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
         outBy = try c.decodeIfPresent([Position].self, forKey: .outBy) ?? []
         outAt = try c.decodeIfPresent(Base.self, forKey: .outAt)
         advancedOnError = try c.decodeIfPresent(Bool.self, forKey: .advancedOnError) ?? false
+        wasStealing = try c.decodeIfPresent(Bool.self, forKey: .wasStealing) ?? false
     }
 }
 
@@ -341,6 +362,8 @@ public struct RunnerMove: Codable, Equatable, Hashable, Sendable {
 public enum RunnerMoveReason: String, Codable, Sendable, CaseIterable {
     case stolenBase
     case caughtStealing
+    /// Picked off. Mark the move `wasStealing` when the runner was trying to steal: official
+    /// scoring counts that as caught stealing.
     case pickoff
     case wildPitch
     case passedBall
