@@ -73,7 +73,7 @@ struct PlayerEditSheet: View {
 
                 Section {
                     Picker("Usual position", selection: $draft.usuals.position) {
-                        Text("None (bats only)").tag(Position?.none)
+                        Text("None (DH)").tag(Position?.none)
                         ForEach(Position.allCases, id: \.self) { position in
                             Text("\(position.number) · \(position.name.capitalizedFirst)").tag(Position?.some(position))
                         }

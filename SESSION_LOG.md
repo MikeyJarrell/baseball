@@ -187,3 +187,60 @@ SESSLOG:[2026-10-04 10:28]
 
 ### Context
 Every job in the plan was built, reviewed by a fresh reader, fixed and accepted, then wired into one app; two full games scored through the real screens match their box scores. The app is installed on Mikey’s iPhone 17 Pro with his free Apple account, and the loader put the Diamond Dogs (16 players, 24 songs) and 8 opponents (117 players) onto it. Xcode’s command-line build needs -allowProvisioningDeviceRegistration to register a phone on a free account; the install script does that.
+
+---
+
+## [2026-10-04 11:59] Announcer introductions in Mikey’s voice, pieced together
+SESSLOG:[2026-10-04 11:59]
+
+**Project(s):** baseball
+
+### Decisions
+- Introductions are stitched on the phone from pieces Mikey recorded on the Mac with the ATR2100x: “Now batting,” every number 0–99 and 00, and each player’s name. A new or changed jersey number needs nothing new recorded (Mikey’s design).
+- The introduction ends on the name: “Now batting, number twenty-two, Yered Teodosio.” No repeated number, for the iPhone voice and the player page’s script too; the optional “closing” number set was dropped.
+- A jersey number changed in the app now wins over roster.csv, which only fills in a blank; the loader notes any difference.
+- The loader gives the pieced introduction only to players with none; one chosen in the app is kept.
+- Esteban is said es-te-BAN.
+- Claude runs the install and team-load scripts itself (now in AGENTS.md).
+
+### Follow-ups
+- [ ] Mikey hears an introduction on the phone (player page, “Test: introduction, then song”).
+- [ ] Joaquin Canas needs a jersey number.
+- [ ] Mikey’s number sheet lists different positions for some players (Gaven P, not CF); update the roster if those are current.
+
+### Files
+- [created] tools/record_intros.py, app/Packages/ScorebookUI/Sources/WalkUpAudio/PiecedIntroduction.swift and its tests, plan/handoffs/announcer-pieces.md, feedback/ai/announcer-pieces-review.md
+- [modified] Model/People.swift (pieced introductions), TeamImport, TeamLoader, tools/load_team.sh, AnnouncerVoice, TeamScreensWording, team/roster.csv (15 jersey numbers), team/README.md, PROJECT_INDEX.md, AGENTS.md
+- [created] ~/Dropbox/baseball/intros/ (118 recordings and preview.m4a); [modified] ~/Dropbox/baseball/README.md
+
+### Context
+Mikey wanted to record introductions with his good Mac microphone rather than the phone, and proposed recording every number once so the app could piece them together. A Python recorder trims, filters and levels each take; the app joins the pieces with the same pauses as its phone voice. A fresh review caught that every team load reset numbers changed in the app and re-applied pieced introductions over ones chosen in the app; both fixed. Everything is installed and loaded on the phone, and the check found every piece present, but the stitched introduction has not yet been heard on the phone itself.
+
+---
+
+## [2026-10-04 12:16] Several warm-up songs per pitcher
+SESSLOG:[2026-10-04 12:16]
+
+**Project(s):** baseball
+
+### Decisions
+- A pitcher’s main warm-up song plays the first inning he starts; extra songs shuffle for later innings, each once before repeats, never two innings running (Mikey chose main-first).
+- Mikey sends the extra songs; they live in `team/warmup_extras.csv`, not editable in the app.
+- The song is worked out from the game record each time, not remembered: the first version kept a list in memory, and the review showed reopening a game, undo over a changeover, or a pitching change at the changeover then played the wrong song.
+- Extras so far: Chris (4), Erick (3), Gaven (2). Luis Miguel’s “El Rey” is the live *El Concierto* recording; no studio version by him exists.
+
+### Follow-ups
+- [ ] Reinstall the app (`tools/install_on_phone.sh`) and load the team (`tools/load_team.sh`) so the phone gets the feature and the songs.
+- [ ] More extras for the other pitchers when Mikey sends them.
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/Model/WarmUpRotation.swift`, its tests, `team/warmup_extras.csv`, `plan/handoffs/warmup-rotation.md`, `feedback/ai/warmup-rotation-review.md`
+- [modified] `People.swift`, `TeamImport.swift`, `TeamLoader/main.swift`, `GameScreen.swift`, `TeamsWiring.swift`, player page, `tools/walkup_songs.py`, `team/README.md`, `plan/README.md`, `PROJECT_INDEX.md`
+- [created] nine extra warm-up tracks in `~/Dropbox/baseball/songs/`
+
+### Context
+The feature is built, reviewed twice and tested, but is not on the phone until the next reinstall and team load. Known gaps left on purpose: a half-inning ended before any pitch does not count as started, and a pitching change during a playing warm-up song needs Stop then Play.
+
+## [2026-10-04 12:56] Changes after the first phone install
+
+Pregame got time wheels, a separate fielding step on the diamond, DH in place of “bats only,” and typeable opponent numbers with only the names-and-numbers and numbers-only choices. First and third base now sit in fair territory. Walk-up songs fade in under the announcer and reach full volume at their start point as the announcer finishes. Games can be deleted from the Games list or a box score (the app backs up first), and the game menu has a way home. Installed on the phone except delete-a-game, which goes on at the next install; a test game is still on the phone, and the phone’s files were backed up to Dropbox before any of this.

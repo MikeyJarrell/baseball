@@ -242,6 +242,30 @@ final class AppModel {
         if session?.isFinished == true { session = nil }
     }
 
+    /// Deletes one saved game, after the scorer confirmed: writes a backup of everything first
+    /// (so the game can still be brought back from Backups), then removes that game's file and
+    /// nothing else. Deleting the game in progress closes it, so the home screen stops offering
+    /// to resume it. The games list, the season stats and the last box score read the games
+    /// again.
+    func deleteGame(_ id: GameID) async {
+        guard let storage else { return }
+        do {
+            _ = try await storage.makeBackup()
+        } catch {
+            problem = "The game was not deleted: the backup before it could not be written. (\(error.localizedDescription))"
+            return
+        }
+        do {
+            try await storage.deleteGame(id)
+        } catch {
+            problem = "The game could not be deleted. (\(error.localizedDescription))"
+            return
+        }
+        if session?.game.id == id { session = nil }
+        await reloadGames()
+        deleteIntroductionsNoLongerUsed()
+    }
+
     /// One finished game's box score.
     func boxScore(for game: Game) -> BoxScore {
         stats.boxScore(for: engine.replay(game).log)

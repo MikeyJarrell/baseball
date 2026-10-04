@@ -24,6 +24,9 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var walkUpSongID: SongID?
     /// Their warm-up song, for our pitchers: played while they warm up when our team takes the field.
     public var warmUpSongID: SongID?
+    /// More warm-up songs for our pitchers, shuffled for their later innings. The main
+    /// warm-up song above plays their first inning of each game.
+    public var extraWarmUpSongIDs: [SongID]
     /// The stadium announcer introduction played before their song, if they have one.
     public var introduction: AnnouncerIntroduction?
     /// The position they usually play, for our players: the first game's lineup puts them
@@ -45,6 +48,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         throwsWith: Hand? = nil,
         walkUpSongID: SongID? = nil,
         warmUpSongID: SongID? = nil,
+        extraWarmUpSongIDs: [SongID] = [],
         introduction: AnnouncerIntroduction? = nil,
         usualPosition: Position? = nil,
         usualRole: UsualRole? = nil,
@@ -58,6 +62,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         self.throwsWith = throwsWith
         self.walkUpSongID = walkUpSongID
         self.warmUpSongID = warmUpSongID
+        self.extraWarmUpSongIDs = extraWarmUpSongIDs
         self.introduction = introduction
         self.usualPosition = usualPosition
         self.usualRole = usualRole
@@ -67,12 +72,12 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     // MARK: Reading and writing JSON
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, number, placeholder, bats, throwsWith, walkUpSongID, warmUpSongID, introduction
+        case id, name, number, placeholder, bats, throwsWith, walkUpSongID, warmUpSongID, extraWarmUpSongIDs, introduction
         case usualPosition, usualRole, usuallyLeadsOff
     }
 
     /// Reads a player from a saved file. Files saved before a player had a usual position,
-    /// role or leadoff mark read with none.
+    /// role, leadoff mark or extra warm-up songs read with none.
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(PlayerID.self, forKey: .id)
@@ -83,13 +88,15 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         throwsWith = try c.decodeIfPresent(Hand.self, forKey: .throwsWith)
         walkUpSongID = try c.decodeIfPresent(SongID.self, forKey: .walkUpSongID)
         warmUpSongID = try c.decodeIfPresent(SongID.self, forKey: .warmUpSongID)
+        extraWarmUpSongIDs = try c.decodeIfPresent([SongID].self, forKey: .extraWarmUpSongIDs) ?? []
         introduction = try c.decodeIfPresent(AnnouncerIntroduction.self, forKey: .introduction)
         usualPosition = try c.decodeIfPresent(Position.self, forKey: .usualPosition)
         usualRole = try c.decodeIfPresent(UsualRole.self, forKey: .usualRole)
         usuallyLeadsOff = try c.decodeIfPresent(Bool.self, forKey: .usuallyLeadsOff) ?? false
     }
 
-    /// Writes a player to a file, leaving out the leadoff mark when it is off so files stay short.
+    /// Writes a player to a file, leaving out the leadoff mark when it is off and the extra
+    /// warm-up songs when there are none, so files stay short.
     public func encode(to encoder: Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(id, forKey: .id)
@@ -100,6 +107,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         try c.encodeIfPresent(throwsWith, forKey: .throwsWith)
         try c.encodeIfPresent(walkUpSongID, forKey: .walkUpSongID)
         try c.encodeIfPresent(warmUpSongID, forKey: .warmUpSongID)
+        if !extraWarmUpSongIDs.isEmpty { try c.encode(extraWarmUpSongIDs, forKey: .extraWarmUpSongIDs) }
         try c.encodeIfPresent(introduction, forKey: .introduction)
         try c.encodeIfPresent(usualPosition, forKey: .usualPosition)
         try c.encodeIfPresent(usualRole, forKey: .usualRole)
@@ -151,6 +159,10 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
         case imported
         /// The iPhone's built-in speech voice reads the number and name.
         case phoneVoice
+        /// Put together at play time from short recordings shared by the whole team
+        /// ("Now batting," and every number) and one of this player's name, so a new jersey
+        /// number needs no new recording. `fileName` is the name recording.
+        case pieced
     }
 
     public var source: Source
@@ -160,6 +172,22 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
     public init(source: Source, fileName: String? = nil) {
         self.source = source
         self.fileName = fileName
+    }
+
+    // The shared pieces of a `pieced` introduction, in the app's audio folder. The team
+    // loader copies them in from ~/Dropbox/baseball/intros/.
+
+    /// "Now batting,"
+    public static let nowBattingFile = "announcer-now-batting.m4a"
+
+    /// "Number twenty-two," said mid-sentence, for jersey number "22" (or "00").
+    public static func numberFile(_ number: String) -> String {
+        "announcer-number-\(number).m4a"
+    }
+
+    /// A player's name recording, from the plain file name stem "aidan-kurt".
+    public static func nameFile(_ stem: String) -> String {
+        "announcer-name-\(stem).m4a"
     }
 }
 

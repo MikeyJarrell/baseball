@@ -96,6 +96,52 @@ struct TeamImportTests {
         #expect(!second.teamsToSave.contains { !$0.isOurs })
     }
 
+    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load replaces the list")
+    func extraWarmUps() throws {
+        let (roster, opponents) = try realRows()
+        let extras = ExtraWarmUpRow.read("""
+            player,song,artist,source,file
+            Chris Strong,Thunderstruck,AC/DC,https://example.com/a,chris-strong-warmup-2.m4a
+            Chris Strong,Eye of the Tiger,Survivor,https://example.com/b,chris-strong-warmup-3.m4a
+            Chris Strong,Not Cut Yet,Nobody,https://example.com/c,
+            Chris Strong,Thunderstruck,AC/DC,https://example.com/a,chris-strong-warmup-2.m4a
+            Kris Strong,Misspelled,Nobody,https://example.com/d,kris.m4a
+            """)
+        let first = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents,
+                                     extraWarmUps: extras)
+        let ours = try #require(first.teamsToSave.first { $0.isOurs })
+        let chris = try #require(ours.roster.first { $0.name == "Chris Strong" })
+        let titles = chris.extraWarmUpSongIDs.compactMap { first.library.song($0)?.title }
+        #expect(titles == ["Thunderstruck", "Eye of the Tiger"])
+        #expect(first.audioFiles.contains("chris-strong-warmup-2.m4a"))
+        // His main warm-up song is untouched, and nobody else gets extras.
+        #expect(first.library.song(chris.warmUpSongID ?? "")?.title == "Sweet Home Alabama")
+        #expect(ours.roster.filter { !$0.extraWarmUpSongIDs.isEmpty }.map(\.name) == ["Chris Strong"])
+        // A song listed twice is in his list once; a misspelled name is reported.
+        #expect(chris.extraWarmUpSongIDs.count == 2)
+        #expect(first.notes.contains { $0.contains("Kris Strong") })
+        // Loading again with one row gone drops that song from his list but keeps its id in the library.
+        let again = TeamImport.merge(teams: first.teamsToSave, library: first.library, roster: roster,
+                                     opponents: opponents, extraWarmUps: Array(extras.prefix(1)))
+        let chrisAgain = try #require(again.teamsToSave.first { $0.isOurs }?.roster.first { $0.id == chris.id })
+        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0]])
+    }
+
+    @Test("A warm-up track never takes over a teammate's walk-up clip of the same song")
+    func sameSongTwoFiles() throws {
+        let (roster, opponents) = try realRows()
+        // Aidan walks up to Mary Jane; a pitcher lists the whole track as an extra warm-up song.
+        let extras = ExtraWarmUpRow.read("player,song,artist,source,file\nChris Strong,Mary Jane,Rick James,x,chris-strong-warmup-mary-jane.m4a\n")
+        let first = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents)
+        let second = TeamImport.merge(teams: first.teamsToSave, library: first.library, roster: roster,
+                                      opponents: opponents, extraWarmUps: extras)
+        let ours = try #require(second.teamsToSave.first { $0.isOurs })
+        let aidan = try #require(ours.roster.first { $0.name == "Aidan Kurt" })
+        let chris = try #require(ours.roster.first { $0.name == "Chris Strong" })
+        #expect(second.library.song(aidan.walkUpSongID ?? "")?.fileName == "aidan-kurt.m4a")
+        #expect(second.library.song(chris.extraWarmUpSongIDs.first ?? "")?.fileName == "chris-strong-warmup-mary-jane.m4a")
+    }
+
     @Test("Times, sides and positions read as the app's words")
     func words() {
         #expect(RosterWords.seconds("1:06") == 66)
@@ -104,5 +150,47 @@ struct TeamImportTests {
         #expect(RosterWords.position("SS") == .shortstop)
         #expect(RosterWords.position("DH") == nil)
         #expect(RosterWords.key("Joaquín  Cañas") == RosterWords.key("joaquin canas"))
+    }
+
+    @Test("Players whose names were recorded get a pieced introduction; one recorded in the app is kept")
+    func piecedIntroductions() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        // Mikey recorded Chris's introduction in the app, and switched Darin to the iPhone voice.
+        let chris = try #require(teams[o].roster.firstIndex { $0.name == "Chris Strong" })
+        teams[o].roster[chris].introduction = AnnouncerIntroduction(source: .recorded, fileName: "intro-chris.m4a")
+        let darin = try #require(teams[o].roster.firstIndex { $0.name == "Darin Dietrich" })
+        teams[o].roster[darin].introduction = AnnouncerIntroduction(source: .phoneVoice)
+
+        let result = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents,
+                                      recordedNames: ["aidan-kurt", "chris-strong", "darin-dietrich"])
+        let ours = try #require(result.teamsToSave.first { $0.isOurs })
+        let intro = { (name: String) in ours.roster.first { $0.name == name }?.introduction }
+        #expect(intro("Aidan Kurt") == AnnouncerIntroduction(source: .pieced, fileName: "announcer-name-aidan-kurt.m4a"))
+        #expect(intro("Chris Strong")?.source == .recorded)
+        #expect(intro("Darin Dietrich")?.source == .phoneVoice)
+        #expect(intro("Mikey Jarrell") == nil)
+    }
+
+    @Test("A number changed in the app is kept over the roster file’s; a blank one is filled in")
+    func numbersFromTheApp() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        let aidan = try #require(teams[o].roster.firstIndex { $0.name == "Aidan Kurt" })
+        #expect(teams[o].roster[aidan].number == "3")   // from roster.csv
+        teams[o].roster[aidan].number = "9"
+        let again = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents)
+        let ours = try #require(again.teamsToSave.first { $0.isOurs })
+        #expect(ours.roster[aidan].number == "9")
+        #expect(again.notes.contains { $0.contains("Aidan Kurt wears 9") })
+    }
+
+    @Test("File name stems match the Mac scripts: no accents, words joined by dashes")
+    func fileStems() {
+        #expect(RosterWords.fileStem("Joaquín Cañas") == "joaquin-canas")
+        #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
+        #expect(RosterWords.fileStem("J.T. O'Neil") == "j-t-o-neil")
     }
 }

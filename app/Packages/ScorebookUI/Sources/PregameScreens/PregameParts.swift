@@ -10,10 +10,10 @@ import DesignSystem
 
 // MARK: - The page
 
-/// One pregame step: a list of cards on the gray background, the title with five step dots
+/// One pregame step: a list of cards on the gray background, the title with six step dots
 /// under it, and the big button pinned to the bottom edge.
 struct StepPage<Content: View>: View {
-    /// Which step this is, 1 to 5, for the dots.
+    /// Which step this is, 1 to 6, for the dots.
     var step: Int
     var title: String
     /// The words on the big button: "Next: our lineup".
@@ -22,6 +22,9 @@ struct StepPage<Content: View>: View {
     var blockedReason: String? = nil
     /// The big button's look: the blue "Next" button, or our team's "Play ball" button.
     var isPlayBall: Bool = false
+    /// Hides the big button, while a number is being typed, so the keyboard's Done button
+    /// above it cannot be mistaken for it.
+    var hidesButton: Bool = false
     var onButton: () -> Void
     @ViewBuilder var content: Content
 
@@ -45,12 +48,18 @@ struct StepPage<Content: View>: View {
                     StepDots(step: step)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("\(title), step \(step) of 5"))
+                .accessibilityLabel(Text("\(title), step \(step) of \(StepDots.count)"))
                 .accessibilityAddTraits(.isHeader)
             }
         }
         .toolbarBackground(ScorebookColor.background, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
+            if !hidesButton { footer }
+        }
+    }
+
+    /// The big button pinned to the bottom edge, with why it cannot be tapped yet above it.
+    private var footer: some View {
             VStack(spacing: Spacing.small) {
                 if let blockedReason {
                     Text(blockedReason)
@@ -80,17 +89,18 @@ struct StepPage<Content: View>: View {
             // The button keeps its place at the bottom edge, so its words stop growing at the
             // first accessibility size and leave room for the list.
             .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        }
     }
 }
 
-/// Five small dots under the title, filled up to the current step.
+/// Six small dots under the title, filled up to the current step.
 struct StepDots: View {
+    /// How many pregame steps there are.
+    static let count = 6
     var step: Int
 
     var body: some View {
         HStack(spacing: 5) {
-            ForEach(1...5, id: \.self) { i in
+            ForEach(1...Self.count, id: \.self) { i in
                 Capsule()
                     .fill(i <= step ? ScorebookColor.highlight : ScorebookColor.divider)
                     .frame(width: i == step ? 16 : 6, height: 6)

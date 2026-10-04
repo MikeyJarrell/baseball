@@ -28,6 +28,16 @@ public struct TeamScreensDemoState: Equatable, Sendable {
         usuals: sampleUsuals
     ))
 
+    /// The sample state with Sky Barros given two extra warm-up songs for his later innings.
+    public static var withExtraWarmUps: TeamScreensDemoState {
+        var state = sample
+        if let t = state.data.teams.firstIndex(where: { $0.id == SampleTeams.diamondDogs.id }),
+           let p = state.data.teams[t].roster.firstIndex(where: { $0.id == "d9" }) {
+            state.data.teams[t].roster[p].extraWarmUpSongIDs = ["song-13", "song-14"]
+        }
+        return state
+    }
+
     /// Usual positions and roles for the sample Diamond Dogs, as the scorer might set them.
     public static let sampleUsuals: [PlayerID: PlayerUsuals] = [
         "d1": PlayerUsuals(position: .centerField, leadsOff: true), "d2": PlayerUsuals(position: .shortstop),
@@ -244,6 +254,15 @@ public struct TeamScreensDemo: View {
 
 #Preview("Player: pitcher with warm-up song, largest text") {
     TeamScreensDemo(start: .player(SampleTeams.diamondDogs.id, "d9")).dynamicTypeSize(.accessibility5)
+}
+
+#Preview("Player: pitcher with extra warm-up songs") {
+    TeamScreensDemo(start: .player(SampleTeams.diamondDogs.id, "d9"), state: .withExtraWarmUps)
+}
+
+#Preview("Player: pitcher with extra warm-up songs, dark, largest text") {
+    TeamScreensDemo(start: .player(SampleTeams.diamondDogs.id, "d9"), state: .withExtraWarmUps)
+        .preferredColorScheme(.dark).dynamicTypeSize(.accessibility5)
 }
 
 #Preview("Player: a problem to show") {

@@ -117,7 +117,7 @@ struct GameScreen: View {
     private var batting: some View {
         AtBatScreen(
             // Our players' songs and introductions as the saved team has them now.
-            setup: app.withSavedSongs(session.setup),
+            setup: withThisWarmUp(app.withSavedSongs(session.setup)),
             situation: session.situation,
             batterHistory: session.batterHistory,
             songs: app.audio?.library ?? SongLibrary(),
@@ -216,6 +216,8 @@ struct GameScreen: View {
             sheet = .songSettings
         case .pickSong(let player):
             sheet = .pickSong(player)
+        case .goHome:
+            onLeave()
         case .playWalkUp(let player, let withIntroduction):
             app.audio?.playWalkUp(for: player, withIntroduction: withIntroduction && app.settings.playIntroductions)
         case .playWarmUp(let player):
@@ -387,14 +389,37 @@ struct GameScreen: View {
         app.cueOurNextHitter()
     }
 
-    /// Plays our pitcher's warm-up song, if they have one.
+    /// Plays our pitcher's warm-up song for this changeover, if he has one.
     private func playWarmUp() {
         guard let ours = session.setup.ourSide,
               let pitcher = session.situation[ours].pitcher,
               let saved = session.setup.player(pitcher) else { return }
-        let player = app.withSavedSongs(saved)
+        let player = withThisInningsWarmUp(app.withSavedSongs(saved))
         guard player.warmUpSongID != nil else { return }
         app.audio?.playWarmUp(for: player)
+    }
+
+    /// The setup with our pitcher's warm-up song set to the one for this inning, so the song
+    /// button names it and plays it.
+    private func withThisWarmUp(_ setup: GameSetup) -> GameSetup {
+        guard let side = setup.ourSide, let pitcher = session.situation[side].pitcher else { return setup }
+        var updated = setup
+        switch side {
+        case .away: updated.away.roster = setup.away.roster.map { $0.id == pitcher ? withThisInningsWarmUp($0) : $0 }
+        case .home: updated.home.roster = setup.home.roster.map { $0.id == pitcher ? withThisInningsWarmUp($0) : $0 }
+        }
+        return updated
+    }
+
+    /// Our pitcher with his warm-up song for the inning about to start: his main song the first
+    /// inning he starts, one of his extra songs after that (WarmUpRotation).
+    private func withThisInningsWarmUp(_ pitcher: Player) -> Player {
+        guard let ours = session.setup.ourSide else { return pitcher }
+        let started = WarmUpRotation.inningsStarted(by: pitcher.id, fielding: ours, before: session.situation.inning,
+                                                    session.situation.half, in: session.log)
+        var updated = pitcher
+        updated.warmUpSongID = WarmUpRotation.song(for: pitcher, inningsStarted: started, game: session.game.id)
+        return updated
     }
 }
 

@@ -12,16 +12,16 @@ import SampleData
 
 @Suite("The stadium announcer’s words")
 struct AnnouncerWordingTests {
-    @Test("Name and number: the number, the name, then the number again")
+    @Test("Name and number: the number, then the name")
     func nameAndNumber() {
         let jeter = Player(name: "Derek Jeter", number: "2")
-        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter. Number two.")
+        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter.")
     }
 
     @Test("Only a name, or only a number")
     func partial() {
         #expect(TeamWording.announcerScript(for: Player(name: "Jordan Webb")) == "Now batting, Jordan Webb.")
-        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two. Number twenty-two.")
+        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two.")
         #expect(TeamWording.announcerScript(for: Player(placeholder: "Batter 4")) == "Now batting.")
     }
 
@@ -69,7 +69,7 @@ struct RosterWordingTests {
     func usuals() {
         #expect(TeamWording.usualText(PlayerUsuals(position: .centerField)) == "Center field")
         #expect(TeamWording.usualText(PlayerUsuals(position: .shortstop, leadsOff: true)) == "Shortstop, leads off")
-        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "Bats only, leads off")
+        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "DH, leads off")
         #expect(TeamWording.usualText(PlayerUsuals(position: .pitcher, startsOnBench: true)) == "Pitcher, starts on the bench")
         #expect(TeamWording.usualText(PlayerUsuals()) == "")
     }
@@ -159,6 +159,10 @@ struct SongWordingTests {
         let shared = dogs.assigning("song-01", as: .walkUp, to: "d8").assigning("song-01", as: .warmUp, to: "d12")
         #expect(TeamWording.usageText(of: "song-01", in: shared) == "walk-up: Moreno, Fisk · warm-up: Voss")
         #expect(TeamWording.usageText(of: "song-01", in: nil) == "unassigned")
+        // An extra warm-up song counts as in use too, so nobody mistakes it for a spare.
+        var extras = dogs
+        extras.roster[extras.roster.firstIndex { $0.id == "d9" }!].extraWarmUpSongIDs = ["song-15"]
+        #expect(TeamWording.usageText(of: "song-15", in: extras) == "warm-up: Barros")
     }
 
     @Test("Times on screen")

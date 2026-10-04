@@ -67,6 +67,9 @@ public enum AtBatAction: Equatable, Sendable {
     case openSongSettings
     /// Open the song picker for one of our hitters who has no walk-up song.
     case pickSong(for: PlayerID)
+    /// Go to the home screen (the game menu's Home screen). The game stays in progress, saved,
+    /// and the home screen's Resume scoring brings it back.
+    case goHome
 
     /// Play our hitter's walk-up song, with the announcer introduction first when asked.
     case playWalkUp(Player, withIntroduction: Bool)

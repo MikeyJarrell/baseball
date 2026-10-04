@@ -1,7 +1,9 @@
 #!/bin/bash
 # Loads the Diamond Dogs onto the phone: every player from team/roster.csv (with their usual
-# position and role, walk-up song and its start point, and a pitcher's warm-up song), every
-# opponent from team/opponents.csv, and every song file from ~/Dropbox/baseball/songs/.
+# position and role, walk-up song and its start point, and a pitcher's warm-up songs, with his
+# extra ones from team/warmup_extras.csv), every opponent from team/opponents.csv, every song
+# file from ~/Dropbox/baseball/songs/, and the announcer recordings from ~/Dropbox/baseball/intros/
+# (made with tools/record_intros.py).
 #
 # Run it from anywhere, with the iPhone plugged into the Mac and unlocked:
 #
@@ -27,6 +29,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BUNDLE_ID="com.mikeyjarrell.scorebook"
 SONGS="$HOME/Dropbox/baseball/songs"
+INTROS="$HOME/Dropbox/baseball/intros"
 STAMP="$(date +%Y-%m-%d-%H%M%S)"
 # Where the app keeps its saved files, inside its own folder on the phone.
 DATA_PATH="Library/Application Support/Scorebook"
@@ -55,7 +58,7 @@ if [[ "$MODE" == "simulator" ]]; then
     echo "3. Loading the team"
     mkdir -p "$WORK/Scorebook"
     [[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
-    "$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+    "$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS" "$INTROS"
     echo "4. Copying the teams and songs into the app, and starting it"
     mkdir -p "$CONTAINER/$DATA_PATH"
     cp -R "$WORK/Scorebook/teams" "$WORK/Scorebook/songs" "$CONTAINER/$DATA_PATH/"
@@ -115,7 +118,7 @@ done
 echo "3. Loading the team"
 mkdir -p "$WORK/Scorebook"
 [[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
-"$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+"$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS" "$INTROS"
 
 echo "4. Copying the teams and songs into the app, and starting it"
 # Only the teams and songs folders go back; files already the same are skipped, and nothing
