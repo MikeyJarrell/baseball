@@ -136,6 +136,7 @@ struct WideButtonStyle: ButtonStyle {
         return configuration.label
             .font(compact ? ScorebookFont.chip : ScorebookFont.headline)
             .multilineTextAlignment(.center)
+            .minimumScaleFactor(0.7)
             .foregroundStyle(foreground)
             .padding(.horizontal, Spacing.large)
             .padding(.vertical, Spacing.small)
