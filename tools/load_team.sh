@@ -104,8 +104,13 @@ fi
 
 BACKUP="$HOME/Dropbox/baseball/phone-backups/$STAMP"
 echo "2. Copying everything the app has saved to $BACKUP"
-mkdir -p "$BACKUP"
-xcrun devicectl device copy from "${ON_PHONE[@]}" --source "/" --destination "$BACKUP" >/dev/null
+# The app's own folders: its saved files, the backups folder the Files app shows, and its
+# preferences. (The rest of its folder is the phone's own: screen snapshots and caches, some of
+# them locked while the phone writes them.)
+for folder in "Library/Application Support" "Documents" "Library/Preferences"; do
+    mkdir -p "$BACKUP/$folder"
+    xcrun devicectl device copy from "${ON_PHONE[@]}" --source "$folder" --destination "$BACKUP/$folder" >/dev/null
+done
 
 echo "3. Loading the team"
 mkdir -p "$WORK/Scorebook"
@@ -119,7 +124,10 @@ for folder in teams songs; do
     xcrun devicectl device copy to "${ON_PHONE[@]}" --source "$WORK/Scorebook/$folder" \
         --destination "$DATA_PATH/$folder" >/dev/null
 done
-xcrun devicectl device process launch --device "$DEVICE" --terminate-existing "$BUNDLE_ID" >/dev/null
+if ! xcrun devicectl device process launch --device "$DEVICE" --terminate-existing "$BUNDLE_ID" >/dev/null 2>&1; then
+    # A locked phone will not open apps for the Mac; the files are in place all the same.
+    echo "   The phone is locked, so the app was not started. Unlock it and open Scorebook."
+fi
 
 echo "5. Reading it back off the phone and checking it"
 mkdir -p "$WORK/readback"
