@@ -121,15 +121,22 @@ final class AppModel {
         }
     }
 
-    /// Saves one team (new or changed) and reads the list again.
+    /// Saves one team (new or changed). The list in memory changes at once, before the file
+    /// is written, so a second quick change (the next player in quick entry) builds on this one.
     func saveTeam(_ team: Team) async {
+        if let i = teams.firstIndex(where: { $0.id == team.id }) {
+            teams[i] = team
+        } else {
+            teams.append(team)
+            teams.sort { ($0.isOurs ? 0 : 1, $0.name) < ($1.isOurs ? 0 : 1, $1.name) }
+        }
         guard let storage else { return }
         do {
             try await storage.saveTeam(team)
         } catch {
             problem = "\(team.name) could not be saved. (\(error.localizedDescription))"
+            await reloadTeams()
         }
-        await reloadTeams()
     }
 
     /// Deletes one team and reads the list again.

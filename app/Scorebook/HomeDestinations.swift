@@ -14,7 +14,7 @@ import PostgameScreens
 struct HomeDestination: View {
     @Environment(AppModel.self) private var app
     var route: HomeRoute
-    @Binding var path: [HomeRoute]
+    @Binding var path: NavigationPath
 
     var body: some View {
         switch route {
@@ -56,11 +56,11 @@ struct HomeDestination: View {
                 if let box = await app.boxScore(for: id) { UIPasteboard.general.string = BoxScorePrinter.text(box) }
             }
         case .openSeasonStats:
-            path.append(.season)
+            path.append(HomeRoute.season)
         case .openGame(let id):
-            path.append(.boxScore(id))
+            path.append(HomeRoute.boxScore(id))
         case .openPlayer(let id):
-            path.append(.player(id))
+            path.append(HomeRoute.player(id))
         case .setMinimumPlateAppearances(let n):
             Task { await app.updateSettings { $0.minimumPlateAppearances = n } }
         case .setMinimumInnings(let n):
