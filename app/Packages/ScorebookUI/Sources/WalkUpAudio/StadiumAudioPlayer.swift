@@ -313,7 +313,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         let song = player.walkUpSongID.flatMap { library.song($0) }
         // The player has a song, but it is no longer in the library (deleted or never saved).
         let songMissing = player.walkUpSongID != nil && song == nil
-        let missingMessage = "\(player.displayName)'s walk-up song is no longer in the song library. Pick a song for them again."
+        let missingMessage = "\(player.displayName)’s walk-up song is no longer in the song library. Pick a song for them again."
         let wantsIntroduction = withIntroduction && player.introduction != nil
         guard song != nil || wantsIntroduction else {
             if songMissing { lastProblem = missingMessage }
@@ -365,7 +365,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         stopAtOnce()
         guard let id = pitcher.warmUpSongID else { return }
         guard let song = library.song(id) else {
-            lastProblem = "\(pitcher.displayName)'s warm-up song is no longer in the song library. Pick a song for them again."
+            lastProblem = "\(pitcher.displayName)’s warm-up song is no longer in the song library. Pick a song for them again."
             return
         }
         beginPlay(.warmUp, song: song)
@@ -942,7 +942,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
         guard let sound else {
             lastProblem = introduction.source == .phoneVoice
-                ? "The phone's voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
+                ? "The phone’s voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
                 : "The introduction recording for \(player.displayName) is missing or too long. Record it again."
             return nil
         }
@@ -1120,7 +1120,7 @@ public enum RecordingProblem: Error, Equatable, Sendable {
     public var message: String {
         switch self {
         case .askingForPermission:
-            return "Answer the iPhone's question about the microphone, then tap record again."
+            return "Answer the iPhone’s question about the microphone, then tap record again."
         case .couldNotStart(let reason):
             return "Recording could not start. \(reason)"
         }

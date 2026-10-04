@@ -15,7 +15,7 @@ struct WalkUpTimingTests {
         #expect(WalkUpMath.secondsLeft(now: 12, songStart: 0, songLength: 12) == 0)
     }
 
-    @Test("A song's own play length wins over the walk-up length setting")
+    @Test("A song’s own play length wins over the walk-up length setting")
     func ownPlayLength() {
         let usual = Song(title: "Thunderstruck", fileName: "t.mp3")
         let short = Song(title: "Hells Bells", fileName: "h.mp3", playLength: 8)
@@ -104,7 +104,7 @@ struct WalkUpTimingTests {
     }
 }
 
-@Suite("The stadium announcer's words")
+@Suite("The stadium announcer’s words")
 struct AnnouncerWordsTests {
 
     @Test("Number and name: “Now batting, number two, Derek Jeter. Number two.”")

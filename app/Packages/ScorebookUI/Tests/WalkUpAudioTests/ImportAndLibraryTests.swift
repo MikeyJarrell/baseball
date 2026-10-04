@@ -191,7 +191,7 @@ struct LibraryTests {
         let (player, _, _) = try playerWithSongs()
         player.playWalkUp(for: Player(name: "Derek Jeter", walkUpSongID: "deleted"), withIntroduction: false)
         #expect(player.isPlaying == false)
-        #expect(player.lastProblem == "Derek Jeter's walk-up song is no longer in the song library. Pick a song for them again.")
+        #expect(player.lastProblem == "Derek Jeter’s walk-up song is no longer in the song library. Pick a song for them again.")
         #expect(player.playback == AudioPlayback(phase: .idle))
     }
 
@@ -210,7 +210,7 @@ struct MessageTests {
     @Test("Recording problems say what to do")
     func recordingMessages() {
         #expect(RecordingProblem.askingForPermission.message
-                == "Answer the iPhone's question about the microphone, then tap record again.")
+                == "Answer the iPhone’s question about the microphone, then tap record again.")
         #expect(WalkUpAudioError.microphoneNotAllowed.message.contains("Settings"))
     }
 }
