@@ -131,7 +131,8 @@ struct OurLineupStep: View {
         }
         return HStack(spacing: Spacing.small) {
             OrderNumber(spot: spot)
-            Grip()
+            // The drag handle gives its room to the name at the largest text sizes; rows still drag.
+            if !typeSize.isAccessibilitySize { Grip() }
             // At the largest text sizes the name gets its own line, with the buttons under it.
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: Spacing.extraSmall) {
