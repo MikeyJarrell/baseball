@@ -419,4 +419,29 @@ struct FileStorageTests {
             #expect(json?["formatVersion"] as? Int == ScorebookJSON.formatVersion, "\(file)")
         }
     }
+
+    @Test("Deleting one game removes only its file; the others read back byte for byte, and a deleted game in progress is no longer offered")
+    func deleteOneGame() async throws {
+        let folder = try TemporaryFolder()
+        let storage = try folder.storage()
+        var started = Game(id: "in-progress", setup: SampleSetups.mudcatsAtDiamondDogs)
+        started.events = Array(SampleGame.game.events.prefix(5))
+        try await storage.saveGame(SampleGame.game)
+        try await storage.saveGame(started)
+        #expect(try await storage.gameInProgress()?.id == "in-progress")
+
+        // The other game's file, exactly as saved.
+        let games = storage.dataFolder.appendingPathComponent("games")
+        let otherFile = try #require(try FileManager.default.contentsOfDirectory(at: games, includingPropertiesForKeys: nil)
+            .first { $0.lastPathComponent.contains(SampleGame.id.rawValue) })
+        let before = try Data(contentsOf: otherFile)
+
+        try await storage.deleteGame("in-progress")
+        #expect(try await storage.gameInProgress() == nil)
+        #expect(try await storage.listGames().items.map(\.id) == [SampleGame.id])
+        #expect(try Data(contentsOf: otherFile) == before)
+        // A fresh start reads the same.
+        #expect(try await folder.storage().listGames().items.map(\.id) == [SampleGame.id])
+        #expect(try await folder.storage().loadGame(SampleGame.id) == SampleGame.game)
+    }
 }
