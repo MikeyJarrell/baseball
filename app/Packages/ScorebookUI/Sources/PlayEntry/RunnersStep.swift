@@ -134,7 +134,7 @@ struct RunnerRow: View {
     let move: RunnerMove
 
     var body: some View {
-        let suggested = model.firstSuggestion[move.runner]
+        let suggested = model.firstMoves[move.runner]?.to
         HStack(spacing: Spacing.small) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(model.name(of: move.runner))
