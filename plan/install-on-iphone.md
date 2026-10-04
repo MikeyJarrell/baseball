@@ -18,7 +18,7 @@ The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 
 6. **Install.** In Xcode, at the top middle of the window, click the device name next to “Scorebook” and choose your iPhone from the list. Press the Play button (the triangle at the top left), or Command-R. The first time, Xcode spends a few minutes getting the phone ready; the bar at the top of the window says what it is doing. When it finishes, the Scorebook icon appears on the phone.
 
-7. **Trust yourself as the app’s maker, on the phone.** The first time you tap the Scorebook icon, the phone says “Untrusted Developer” and will not open it. Open Settings, then General, then VPN & Device Management. Under Developer App, tap your Apple account’s email address, tap Trust, then Trust again. The phone checks with Apple at this step, so it needs to be on Wi-Fi or cellular data. Now the app opens.
+7. **Trust yourself as the app’s maker, on the phone, if it asks.** This step may not come up at all: on your phone the app opened the first time. If instead the phone says “Untrusted Developer” and will not open it: Open Settings, then General, then VPN & Device Management. Under Developer App, tap your Apple account’s email address, tap Trust, then Trust again. The phone checks with Apple at this step, so it needs to be on Wi-Fi or cellular data. Now the app opens.
 
 8. **Allow what the app asks for.** The first time you record an announcer introduction, the phone asks to use the microphone: tap Allow.
 
@@ -27,10 +27,28 @@ The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 Seven days after an install, the app shows a message that it is no longer available and will not open. Your games, teams and songs are all still on the phone.
 
 1. Plug the phone into the Mac and unlock it.
-2. Make sure the main project folder has the newest version of the app: ask Claude to bring the baseball project’s main folder up to date (in Terminal, the same thing is `git -C /Users/mikey/projects/personal/baseball pull`). Xcode puts on the phone whatever version that folder holds.
-3. Open `/Users/mikey/projects/personal/baseball/app/Scorebook.xcodeproj` in Xcode (File, then Open Recent usually has it), choose your iPhone at the top middle, and press the Play button.
+2. Make sure the main project folder has the newest version of the app: ask Claude to bring the baseball project’s main folder up to date (in Terminal, the same thing is `git -C /Users/mikey/projects/personal/baseball pull`). The phone gets whatever version that folder holds.
+3. **The easy way:** in Terminal, run
+
+   ```bash
+   /Users/mikey/projects/personal/baseball/tools/install_on_phone.sh
+   ```
+
+   or ask Claude to run it. It builds the app and puts it on the phone, with no clicking in Xcode, and says “Done” when the phone has it.
+
+   **Or with Xcode:** open `/Users/mikey/projects/personal/baseball/app/Scorebook.xcodeproj` (File, then Open Recent usually has it), choose your iPhone at the top middle, and press the Play button.
 
 That is all. It takes a minute or two. Doing it the morning of every game day means it never runs out mid-game.
+
+## Loading the team and songs
+
+The players, their positions, their walk-up and warm-up songs, and every opponent’s players come from the files in the project’s `team` folder and the song files in Dropbox (`baseball/songs`). To put them on the phone, or to update the phone after the roster changes (a new player, a new song, a new start point), plug the phone in, unlock it, and run in Terminal
+
+```bash
+/Users/mikey/projects/personal/baseball/tools/load_team.sh
+```
+
+or ask Claude to run it. It first copies everything the app has saved into Dropbox (`baseball/phone-backups`, one folder for each time), then adds the roster and songs, keeping every game, every number typed into the app and every recorded introduction, and finally reads it all back and lists what the phone now has. Players keep their season stats through every update. A start point set in the roster file replaces one moved in the app, so set start points in one place: the roster file.
 
 ## Keeping your games safe
 

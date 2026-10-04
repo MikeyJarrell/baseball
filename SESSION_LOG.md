@@ -162,3 +162,28 @@ SESSLOG:[2026-10-04 10:05]
 
 ### Context
 The roster’s song list is complete. Searching YouTube Music through the yt-dlp copy returns album tracks directly, which beats ordinary YouTube search for matching Spotify timings, and mlx_whisper gives word-level times when a player cares about a particular line.
+
+---
+
+## [2026-10-04 10:28] Scorebook app on Mikey’s iPhone, with the real team
+SESSLOG:[2026-10-04 10:28]
+
+**Project(s):** baseball
+
+### Decisions
+- Score lines list the visitors first everywhere.
+- Every walk-up song fades over the same two seconds; songs carry an optional artist.
+- The defense check opens by itself every time we take the field, with a “Dropped third strike instead” link after a strikeout third out.
+
+### Follow-ups
+- [ ] Mikey scores a televised game on the phone as the dress rehearsal; problems go in notes/dress-rehearsal-<date>.md.
+- [ ] Record the announcer introductions in the app.
+- [ ] Reinstall weekly with tools/install_on_phone.sh (phone plugged in and unlocked).
+- [ ] Delete ~/Dropbox/baseball/phone-backups/2026-10-04-102329-incomplete (a partial backup from the loader’s first run).
+
+### Files
+- [created] tools/load_team.sh, tools/install_on_phone.sh, plan/handoffs/wiring.md, plan/handoffs/load-team.md
+- [modified] plan/install-on-iphone.md, team/README.md, PROJECT_INDEX.md
+
+### Context
+Every job in the plan was built, reviewed by a fresh reader, fixed and accepted, then wired into one app; two full games scored through the real screens match their box scores. The app is installed on Mikey’s iPhone 17 Pro with his free Apple account, and the loader put the Diamond Dogs (16 players, 24 songs) and 8 opponents (117 players) onto it. Xcode’s command-line build needs -allowProvisioningDeviceRegistration to register a phone on a free account; the install script does that.
