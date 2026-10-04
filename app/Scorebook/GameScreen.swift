@@ -154,12 +154,10 @@ struct GameScreen: View {
     /// A prompt the game raises by itself, when nothing else is open.
     private var prompt: GameSheet? {
         guard cover == nil, !session.isFinished, session.situation.gameOverQuestion == nil else { return nil }
-        // After a strikeout for the third out, the defense check waits, so it does not cover the
-        // "Dropped K" button: the batter may yet be safe and our turn at bat go on. The Defense
-        // button on the changeover banner opens it.
-        if session.showsDefenseCheck, session.setup.ourSide != nil, !session.situation.droppedThirdStrikePossible {
-            return .defenseCheck
-        }
+        // The defense check opens by itself every time our team takes the field. After a
+        // strikeout for the third out it carries a "Dropped third strike instead" link, since the
+        // batter may yet be safe and the half-inning go on.
+        if session.showsDefenseCheck, session.setup.ourSide != nil { return .defenseCheck }
         if session.showsNonRunnerPrompt { return .nonRunner }
         return nil
     }
@@ -195,7 +193,7 @@ struct GameScreen: View {
         case .openInPlay(.ballInPlay):
             cover = .playEntry(.inPlay, session.situation)
         case .openInPlay(.droppedThirdStrike):
-            if let before = session.situationBeforeStrikeThree { cover = .playEntry(.droppedThirdStrike, before) }
+            openDroppedThirdStrike()
         case .openRunnerActions(let runner):
             sheet = .runnerActions(runner)
         case .openPitchingChange:
@@ -229,6 +227,20 @@ struct GameScreen: View {
         }
     }
 
+    /// Opens the dropped-third-strike steps from just before the strike-three pitch. From the
+    /// defense check, the check closes first ("Later" until the next event); if the inning still
+    /// ends, the next event brings it back by itself.
+    private func openDroppedThirdStrike() {
+        guard let before = session.situationBeforeStrikeThree else { return }
+        if sheet == nil, prompt == .defenseCheck { session.postponeDefenseCheck() }
+        sheet = nil
+        // Let the check slide away before the full-screen steps come up.
+        Task {
+            try? await Task.sleep(for: .milliseconds(400))
+            cover = .playEntry(.droppedThirdStrike, before)
+        }
+    }
+
     // MARK: Sheets
 
     /// The setup and situation, as the sheets want them.
@@ -257,7 +269,9 @@ struct GameScreen: View {
         case .timeLimit:
             TimeLimitSheet(context: context, onFinish: done)
         case .defenseCheck:
-            DefenseSheet(context: context, purpose: .check, onFinish: done)
+            DefenseSheet(context: context, purpose: .check,
+                         onDroppedThirdStrike: session.situation.droppedThirdStrikePossible ? { openDroppedThirdStrike() } : nil,
+                         onFinish: done)
         case .nonRunner:
             NonRunnerSheet(context: context, onFinish: done)
         case .manualAdjustment:
@@ -327,6 +341,9 @@ struct GameScreen: View {
                           rules: PlayEntryRules(engine: session.engine)) { outcome in
                 cover = nil
                 lastChangeWasUndo = false
+                // Back from the dropped-third-strike steps (saved or not): if our team still
+                // takes the field, the defense check opens again.
+                if start == .droppedThirdStrike { session.reopenDefenseCheck() }
                 switch outcome {
                 case .ballInPlay(let event): Task { await session.record(event) }
                 case .droppedThirdStrike(let play): Task { await session.addDroppedThirdStrike(play) }
