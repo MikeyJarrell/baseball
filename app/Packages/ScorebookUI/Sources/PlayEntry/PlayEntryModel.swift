@@ -122,7 +122,9 @@ final class PlayEntryModel {
     private(set) var suggestedRBI = 0
     /// On a game-ending hit, the hit the rules engine says to save instead of the scorer's pick.
     private(set) var creditedResult: BatterResult?
-    /// Where the scorer has put runners themselves, overriding the suggestion.
+    /// Where the scorer has put runners themselves, overriding the suggestion. Moving a
+    /// runner fixes them there; going Back off the runner step, or starting the play over,
+    /// un-fixes everyone.
     private(set) var scorerPicks: [PlayerID: RunnerEnd] = [:]
     /// For a runner the scorer put out: the fielders who made the out, in order.
     private(set) var outFielders: [PlayerID: [Position]] = [:]
@@ -230,6 +232,11 @@ final class PlayEntryModel {
         }
         return nil
     }
+
+    /// The runners the scorer has moved by hand. The rules engine keeps them where the scorer
+    /// put them and suggests everyone else again around them, so sending the batter to second
+    /// on a single moves the runner from first on to third without another tap.
+    var fixedRunners: Set<PlayerID> { Set(scorerPicks.keys) }
 
     /// The team at bat, for colors.
     var battingLook: TeamLook { setup.ourSide == situation.battingSide ? .ours : .theirs }
@@ -443,18 +450,19 @@ final class PlayEntryModel {
         askEngineAboutRunners()
     }
 
-    /// Asks the rules engine again. Only the runners the scorer placed go in the question, so
-    /// the engine is free to move everyone else along; its answer is shown with the scorer's
-    /// placements kept exactly as the scorer made them.
+    /// Asks the rules engine again. Only the fixed runners (the ones the scorer placed) go in
+    /// the question, so the engine is free to suggest everyone else again around them, runs
+    /// batted in included; its answer is shown with the scorer's placements kept exactly as
+    /// the scorer made them.
     private func askEngineAboutRunners() {
         draft.errors = composedErrors()
         var question = draft
-        question.runners = engineMoves.filter { scorerPicks[$0.runner] != nil }.map(placedMove)
+        question.runners = engineMoves.filter { fixedRunners.contains($0.runner) }.map(placedMove)
         let suggestion = rules.suggestRunners(question, situation)
         if !suggestion.runners.isEmpty { engineMoves = suggestion.runners }
         suggestedRBI = suggestion.rbi
         creditedResult = suggestion.batterResult
-        draft.runners = engineMoves.map { scorerPicks[$0.runner] == nil ? $0 : placedMove($0) }
+        draft.runners = engineMoves.map { fixedRunners.contains($0.runner) ? placedMove($0) : $0 }
     }
 
     /// A runner the scorer placed: the rules engine's own move for them with only the end

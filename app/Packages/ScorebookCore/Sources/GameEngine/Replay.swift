@@ -507,7 +507,7 @@ struct Replay {
             }
             switch move.to {
             case .out:
-                fx.outs.append(out(runner.runner, by: move.outBy, at: move.outAt))
+                fx.outs.append(out(runner.runner, by: move.outBy, at: move.outAt ?? Self.likelyOutBase(of: move)))
                 s.outs += 1
                 if retiredPitcher == nil { retiredPitcher = .some(runner.responsiblePitcher) }
             case .scored:
@@ -534,6 +534,17 @@ struct Replay {
         }
         s.runners = BaseMath.leadFirst(all)
         return batterEnd
+    }
+
+    /// Where a runner put out between pitches was put out, when the scorer did not say: a
+    /// runner caught stealing at the base they were stealing, a runner picked off at their own
+    /// base. Anything else is left unknown, since the move alone does not say.
+    static func likelyOutBase(of move: RunnerMove) -> Base? {
+        switch move.reason {
+        case .caughtStealing: BaseMath.nextBase(after: move.from)
+        case .pickoff: move.from
+        default: nil
+        }
     }
 
     /// An out with the putout and assists tied to the players at those positions. The last

@@ -23,7 +23,9 @@ import DesignSystem
 public struct PlayEntryRules: Sendable {
     /// Where every runner, batter included, most likely ended up, and the runs batted in,
     /// given what the scorer has picked so far. `draft.runners` holds only the runners the
-    /// scorer has placed themselves, so the engine is free to move everyone else.
+    /// scorer has placed themselves (fixed): the engine keeps them where they are and suggests
+    /// everyone else again around them, pushing a runner ahead of a batter or runner the
+    /// scorer sent past them.
     public var suggestRunners: @Sendable (PlayDraft, Situation) -> RunnerSuggestion
     /// The play so far: its notation ("6", then "6-3"), the outs and runs it would produce,
     /// and whether it ends the half-inning or the game.
@@ -44,7 +46,10 @@ public struct PlayEntryRules: Sendable {
     /// Takes the functions from a rules engine, such as the real one from GameEngine.
     public init(engine: some RulesEngine) {
         self.init(
-            suggestRunners: { draft, situation in engine.suggestRunners(for: draft, in: situation) },
+            // Every runner in the question is one the scorer fixed by hand.
+            suggestRunners: { draft, situation in
+                engine.suggestRunners(for: draft, in: situation, keeping: Set(draft.runners.map(\.runner)))
+            },
             preview: { draft, situation in engine.preview(draft, in: situation) },
             suggestBattedBall: { draft in engine.suggestedBattedBall(for: draft) }
         )
