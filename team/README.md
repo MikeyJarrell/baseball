@@ -14,6 +14,8 @@ It only cuts players who have no clip yet; `--redo` cuts them all again. Each cl
 
 A pitcher’s warm-up song goes in the `warmup_` columns: the song, the artist and its source. It plays until the first pitch, so the script keeps the whole track rather than a clip, saved as `<player>-warmup.m4a`.
 
+A pitcher can also have extra warm-up songs, listed in [warmup_extras.csv](warmup_extras.csv), one row per song: the pitcher (the name he goes by and his last name, “Chris Strong”), the song, the artist and its source. The script keeps each whole track, saved as `<player>-warmup-<song>.m4a`, and fills in `file`. In a game his main warm-up song plays his first inning; each later inning plays one of his extra songs at random, each once before any repeats.
+
 Prefer the album audio on YouTube Music over a music video: video intros shift the timings players read off Spotify.
 
 To find the album audio for a request, search YouTube Music from the command line; each result’s album shows with `--print "%(album)s"`:

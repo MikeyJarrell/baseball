@@ -150,8 +150,13 @@ public struct PlayerPage: View {
 
     /// The pitcher warm-up song and a button to change it.
     private func warmUpCard(_ player: Player) -> some View {
-        let song = player.warmUpSongID.flatMap { data.library.song($0) }
-        let extras = player.extraWarmUpSongIDs.compactMap { data.library.song($0)?.title }
+        // With no main song, his first extra song plays his first inning, so it is shown as his song.
+        let mainID = player.warmUpSongID ?? player.extraWarmUpSongIDs.first
+        let song = mainID.flatMap { data.library.song($0) }
+        var extras: [String] = []
+        for id in player.extraWarmUpSongIDs where id != mainID {
+            if let title = data.library.song(id)?.title, !extras.contains(title) { extras.append(title) }
+        }
         let who = player.lastName
         return VStack(alignment: .leading, spacing: 0) {
             SectionLabel("Pitcher warm-up song")

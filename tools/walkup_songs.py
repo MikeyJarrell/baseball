@@ -7,7 +7,9 @@ and saves it to ~/Dropbox/baseball/songs/ as an M4A file named after the player.
 writes the clip's file name, and where the hook falls inside the clip, back into the roster.
 
 A pitcher's warm-up song plays until the first pitch, so it is kept whole: the full track,
-with its loudness evened out, saved as "<player>-warmup.m4a".
+with its loudness evened out, saved as "<player>-warmup.m4a". A pitcher's extra warm-up
+songs, listed one per row in team/warmup_extras.csv, are kept whole the same way, saved as
+"<player>-warmup-<song>.m4a", and their file names written back into that file.
 
 Run from the repository root:
 
@@ -25,6 +27,7 @@ from pathlib import Path
 # Where things live.
 REPO = Path(__file__).resolve().parent.parent
 ROSTER = REPO / "team" / "roster.csv"
+EXTRAS = REPO / "team" / "warmup_extras.csv"
 SONGS_DIR = Path.home() / "Dropbox" / "baseball" / "songs"
 YT_DLP = Path.home() / ".stacher" / "youtube-dl"  # the yt-dlp copy Stacher keeps up to date
 FFMPEG = "ffmpeg"
@@ -52,13 +55,16 @@ def clock(secs):
     return f"{secs // 60}:{secs % 60:02d}"
 
 
+def slug(text):
+    """Plain lower-case words joined by hyphens: "Tú No Vive Así" becomes "tu-no-vive-asi"."""
+    # Drop accents and anything that is not a letter or digit.
+    text = unicodedata.normalize("NFKD", text.lower()).encode("ascii", "ignore").decode()
+    return "-".join("".join(c if c.isalnum() else " " for c in text).split())
+
+
 def file_name(row):
     """A plain file name from the player's name: "bobby-yabumoto.m4a"."""
-    name = f"{row['goes_by']} {row['last_name']}".lower()
-    # Drop accents and anything that is not a letter or digit.
-    name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
-    words = "".join(c if c.isalnum() else " " for c in name).split()
-    return "-".join(words) + ".m4a"
+    return slug(f"{row['goes_by']} {row['last_name']}") + ".m4a"
 
 
 def download(url, folder):
@@ -177,6 +183,48 @@ def main():
 
     # Write the file names and start points back into the roster.
     with ROSTER.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    extra_warmups(redo)
+
+
+def extra_warmups(redo):
+    """Pitchers' extra warm-up songs from team/warmup_extras.csv, each kept whole."""
+    if not EXTRAS.exists():
+        return
+    with EXTRAS.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        columns = reader.fieldnames
+        rows = list(reader)
+
+    used = set()  # file names given out this run, so two rows never share one file
+    for number, row in enumerate(rows, start=1):
+        who = row["player"]
+        if not who or not row["source"]:
+            continue  # no song chosen yet
+        # Named after the song; a title with no plain letters, or one already used, gets the row number.
+        name = f"{slug(who)}-warmup-{slug(row['song']) or number}"
+        if name in used:
+            name = f"{name}-{number}"
+        used.add(name)
+        out_path = SONGS_DIR / f"{name}.m4a"
+        if out_path.exists() and row["file"] and not redo:
+            print(f"skip   {who}: {out_path.name} already saved")
+            continue
+        print(f"fetch  {who}: extra warm-up song {row['song']}")
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                source = download(row["source"], Path(tmp))
+                keep_whole(source, out_path, f"{who} warm-up: {row['song']}", row["artist"])
+        except (RuntimeError, subprocess.CalledProcessError) as problem:
+            print(f"FAILED {who}: {problem}")
+            continue
+        row["file"] = out_path.name
+        print(f"saved  {out_path.name}")
+
+    with EXTRAS.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=columns)
         writer.writeheader()
         writer.writerows(rows)
