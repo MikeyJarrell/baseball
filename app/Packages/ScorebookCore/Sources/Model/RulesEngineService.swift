@@ -15,7 +15,18 @@ public protocol RulesEngine: Sendable {
 
     /// For the in-play sequence's runner step: where every runner (batter included) most
     /// likely ended up, and the runs batted in, given what the scorer has picked so far.
+    /// Any runner already in `draft.runners` is kept where the scorer has them.
     func suggestRunners(for draft: PlayDraft, in situation: Situation) -> RunnerSuggestion
+
+    /// For the runner step after the scorer moves a runner by hand: the runners named in
+    /// `fixed` stay exactly where `draft.runners` has them, and the engine suggests everyone
+    /// else again around them. A runner the scorer did not touch is pushed ahead of a batter
+    /// or runner the scorer sent past them (on a single with a runner on first, sending the
+    /// batter to second sends the runner from first to third), and the runs batted in are
+    /// worked out again. Runners in `draft.runners` that are not in `fixed` are ignored.
+    /// Engines that do not say otherwise keep only the fixed runners and ask
+    /// `suggestRunners(for:in:)`.
+    func suggestRunners(for draft: PlayDraft, in situation: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion
 
     /// For a play the scorer is still entering: its notation so far, and the outs and runs
     /// it would produce.
@@ -70,6 +81,14 @@ extension RulesEngine {
 
     /// No guess.
     public func suggestedBattedBall(for draft: PlayDraft) -> BattedBallType? { nil }
+
+    /// Keeps only the runners in `fixed` and asks the ordinary runner suggestion, so stand-in
+    /// engines need nothing new.
+    public func suggestRunners(for draft: PlayDraft, in situation: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion {
+        var kept = draft
+        kept.runners = draft.runners.filter { fixed.contains($0.runner) }
+        return suggestRunners(for: kept, in: situation)
+    }
 }
 
 /// What one pitch would do to the count.

@@ -4,12 +4,24 @@ Builders may not edit `Model/` or `SampleData/`. They write requests in their ha
 
 ## Open
 
-- **Box score printer:** print the new box score data: the winning and losing pitcher on their pitching lines, “HBP—by Reyes (Ford)” from `notes.hitBatters`, “Webb ran for Quinn in the 3rd.” from `notes.ranForNonRunners`, “T—3:12” from `gameLength`, and pinch-hitter footnotes (“a-popped out for Collins in the 4th”) from each substitute’s `BattingLine.entered`. The data is in `BoxScore`; the printer does not print it yet. Won-lost records and saves are not kept.
-- **In-play sequence:** delete `DemoRulesEngine.swift` and point `PlayEntryRules.demo` at `SampleRulesEngine`, which is now the real rules engine; take the batted-ball default from `RulesEngine.suggestedBattedBall(for:)`.
-- **In-game changes:** the runner-action sheet must offer “same pitch as the strikeout” (sets `RunnerAction.completesStrikeoutDoublePlay`, for a runner thrown out stealing or picked off on strike three) and “picked off while stealing” (sets `RunnerMove.wasStealing` on a pickoff). Without them real games undercount double plays and caught stealing. The rules engine accepts the double-play mark only on a runner action right after a strikeout in the same half-inning; anywhere else it is ignored and the event is flagged for review.
-- **Batting screen:** take the count hints from `RulesEngine.countAfter(_:in:)`, the song countdown from `WalkUpAudioPlayer.playback.fadesAt`, and short team names from `Team.displayShortName` and `GameTeam.displayShortName`.
+None.
 
-## Done
+## Done in the second pass (the wiring job)
+
+Made during wiring; `plan/handoffs/wiring.md` has the details.
+
+- **Box score printer:** prints the winning and losing pitcher, “HBP—by Reyes (Ford)”, “Webb ran for Quinn in the 3rd.”, “T—3:12”, and lettered pinch-hitter footnotes (“a-popped out for Collins in the 4th.”).
+- **In-play sequence:** `DemoRulesEngine.swift` is gone and the batted-ball default comes from `RulesEngine.suggestedBattedBall(for:)` (done by the in-play job after the first pass).
+- **In-play sequence:** moving one runner keeps that runner where the scorer put them and suggests the others again (`RulesEngine.suggestRunners(for:in:keeping:)`, `PlayEntryModel.fixedRunners`).
+- **In-game changes:** “same pitch as the strikeout” and “picked off while stealing” are on the runner-action sheet (built by the in-game changes job).
+- **Batting screen:** the count hints come from `RulesEngine.countAfter(_:in:)`, the song countdown from `playback.fadesAt`, and the scoreboard’s short team names from `GameTeam.displayShortName`.
+- **Postgame and season screens:** `GameSummary.result` (win, loss or tie for us), `SeasonTotals.wins`, `losses` and `ties`, `SeasonPitchingLine.wins` and `losses`, home or away and the result on a player’s game log entry, and the two stats minimums kept in `AppSettings`.
+- **Game overview:** the play log supplies the break between half-innings (`Situation.inningBreak`, “Middle 3rd”), the base a runner was put out at (`OutMade.at`, filled in by the replay), and the base stolen (`RunnerMove.baseStolen`).
+- **Pregame and teams screens:** `Player.usualPosition`, `Player.usualRole` (bats and fields, bats only, fields only, starts on the bench) and `Player.usuallyLeadsOff`; the first game’s lineup reads them.
+- **Teams and songs screens:** an optional `Song.artist`. Mikey’s decision: no fade length per song; the fade is two seconds for every song.
+- **Walk-up audio:** the comment on `AudioPlayback.fadesAt` now says the fade starts then and the song is silent two seconds later.
+
+## Done in the first pass
 
 Made in the vocabulary pass; `plan/handoffs/vocabulary-pass.md` has the details.
 

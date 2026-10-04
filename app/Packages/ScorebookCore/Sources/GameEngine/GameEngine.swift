@@ -34,6 +34,12 @@ public struct ScorebookRulesEngine: RulesEngine {
         Suggestions.runners(for: draft, in: situation)
     }
 
+    /// The same, after the scorer has moved some runners by hand: the runners in `fixed` stay
+    /// where the scorer put them, and everyone else is suggested again around them.
+    public func suggestRunners(for draft: PlayDraft, in situation: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion {
+        Suggestions.runners(for: draft, in: situation, keeping: fixed)
+    }
+
     /// The play in progress: notation so far, outs and runs, whether it ends the half-inning
     /// or the game.
     public func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview {

@@ -67,3 +67,151 @@ SESSLOG:[2026-10-03 16:46]
 
 ### Context
 The real Diamond Dogs team, schedule and opponents are now in the project, and 8 of 16 walk-up songs are cut and in Dropbox. The league site’s roster tab is broken; each team’s player list is on its home page and loads only after the page opens, so read it in a browser rather than by downloading the page.
+
+---
+
+## [2026-10-03 17:33] iPad check of the scorebook app
+SESSLOG:[2026-10-03 17:33]
+
+**Project(s):** baseball
+
+### Decisions
+- The app stays installable on iPad (it already was). Locking the iPad upright like the iPhone was rejected: Apple is phasing out the setting that lets an iPad app refuse to turn or resize, so every screen must handle any window shape.
+- The batting screen puts the field on the left and the batter and buttons on the right whenever the window is more than 1.2 times wider than tall; the buttons sit at the bottom of their column. The iPhone layout is unchanged.
+- Runner name tags on the field stop growing at 1.6 times their iPhone size.
+- Mikey left the empty space above the buttons in the sideways layout as it is.
+- Every screen builder now checks their screen on an iPad, upright and sideways, before acceptance (`plan/rules-for-agents.md`).
+
+### Follow-ups
+- [ ] The screens still being built get the iPad check before acceptance.
+
+### Files
+- [modified] `app/Packages/ScorebookUI/Sources/AtBatScreen/AtBatScreen.swift` — side-by-side layout when wide
+- [modified] `app/Packages/ScorebookUI/Sources/DesignSystem/FieldDrawing.swift` — runner tag size cap
+- [created] `notes/ipad-check.md` and `notes/ipad-check/` screenshots
+- [modified] `plan/rules-for-agents.md`, `PROJECT_INDEX.md`
+
+### Context
+The batting screen and in-game change sheets were run on the 13-inch iPad Pro and iPad mini simulators. Upright they worked; the fixes were oversized runner tags on the big iPad and a squashed field when sideways. The simulator cannot be rotated from the command line here (no Simulator app, and asking iOS to rotate from code did nothing), so sideways was tested by drawing the screen at sideways size in a throwaway harness.
+
+---
+
+## [2026-10-03 19:58] Stopping the simulator permission popups
+SESSLOG:[2026-10-03 19:58]
+
+**Project(s):** baseball
+
+### Decisions
+- Builders use only the existing `iPhone 17`, `iPhone 17e`, `iPad Pro 13-inch (M5)` and `iPad mini (A17 Pro)` simulators, and never create, clone, rename, delete or erase one (`plan/rules-for-agents.md`).
+- Throwaway harness apps get their own bundle id and are uninstalled when the builder finishes; several builders may share one simulator.
+
+### Follow-ups
+- [ ] Builders already running when this landed (the teams-and-songs screen) may still make their own simulator; Mikey can click Cancel on popups naming a made-up simulator.
+
+### Files
+- [modified] `plan/rules-for-agents.md` — simulator rule
+
+### Context
+The app asks Mikey to click Allow the first time Claude controls each simulator. Builders had been making a fresh, uniquely named simulator per job (“GameChanges iPhone 17”, “GOReview2 iPhone 17”, “Overview harness iPhone 17”), so every job set off a new popup. Reusing a fixed set should mean one Allow per simulator, going by the popup’s wording; that it stays allowed across sessions has not been confirmed.
+
+---
+
+## [2026-10-03 20:08] Darin’s and Aidan’s walk-up songs
+SESSLOG:[2026-10-03 20:08]
+
+**Project(s):** baseball
+
+### Decisions
+- Darin: “Big Poppa” by The Notorious B.I.G., the *Ready to Die* album audio, hook at 1:06.
+- Aidan: “Mary Jane” by Rick James, the official upload from a greatest-hits album, the same length as the original album track, hook at 0:20. No official upload of the original album was found.
+
+### Follow-ups
+- [ ] Import the two new clips on the phone and set each start point to 0:20.
+
+### Files
+- [modified] `team/roster.csv` — the two songs, their sources and clip details
+- [created] `aidan-kurt.m4a` and `darin-dietrich.m4a` in `~/Dropbox/baseball/songs/`
+
+### Context
+Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
+
+## [2026-10-03 22:31] The app is built
+
+Every job in the plan is built, reviewed by a fresh reader, fixed and accepted: the rules engine, stats, storage, box score printer, design system, walk-up audio, every screen, and the wiring. Two full games (the sample game and Astros at Yankees, June 23, 2019) were scored through the real screens in the simulator and their box scores match. Mikey decided along the way: layout A, outs written as words, visitors first in every score line, a powder-blue icon from the original logo, a 12-second walk-up fade, no courtesy runners, the SDABL rule book as the source of league rules (nothing enforced), and alternating fielders by inning. Next: Mikey installs it on his phone and scores a televised game as the dress rehearsal.
+
+---
+
+## [2026-10-04 10:05] Every player’s walk-up and warm-up song
+SESSLOG:[2026-10-04 10:05]
+
+**Project(s):** baseball
+
+### Decisions
+- All 16 players now have a walk-up clip, and all eight pitchers (Gaven, Chris, Erick, Saul, Darin, Allan, Garrett, Mikey) have a warm-up song.
+- Allan keeps “Takedown” for batting; “Stamp on the Ground” is his warm-up song, since he was on the pitchers-without-a-warm-up list.
+- Yered’s hook is 0:12: transcribing the track showed “I wish I was a little bit taller” starts at 12.5 seconds, so the announcer finishes just before it.
+- Sources are the album audio found by searching YouTube Music; where no official upload of the original album exists (“Mary Jane”), an official greatest-hits upload of the same length.
+
+### Follow-ups
+- [ ] Import the new clips and warm-up songs on the phone and set start points: Chris 0:10, Saul 0:14, Yered 0:12, Garrett, Esteban and Kalid 0:00, everyone else 0:20.
+
+### Files
+- [modified] `team/roster.csv` — songs, sources and clip details for Chris, Garrett, Saul, Yered, Esteban, Kalid; warm-up songs for Mikey, Chris, Garrett, Saul, Erick, Allan, Darin
+- [modified] `team/README.md` — how to search YouTube Music for album audio and time a sung line
+- [created] 15 clips and warm-up songs in `~/Dropbox/baseball/songs/`
+
+### Context
+The roster’s song list is complete. Searching YouTube Music through the yt-dlp copy returns album tracks directly, which beats ordinary YouTube search for matching Spotify timings, and mlx_whisper gives word-level times when a player cares about a particular line.
+
+---
+
+## [2026-10-04 10:28] Scorebook app on Mikey’s iPhone, with the real team
+SESSLOG:[2026-10-04 10:28]
+
+**Project(s):** baseball
+
+### Decisions
+- Score lines list the visitors first everywhere.
+- Every walk-up song fades over the same two seconds; songs carry an optional artist.
+- The defense check opens by itself every time we take the field, with a “Dropped third strike instead” link after a strikeout third out.
+
+### Follow-ups
+- [ ] Mikey scores a televised game on the phone as the dress rehearsal; problems go in notes/dress-rehearsal-<date>.md.
+- [ ] Record the announcer introductions in the app.
+- [ ] Reinstall weekly with tools/install_on_phone.sh (phone plugged in and unlocked).
+- [ ] Delete ~/Dropbox/baseball/phone-backups/2026-10-04-102329-incomplete (a partial backup from the loader’s first run).
+
+### Files
+- [created] tools/load_team.sh, tools/install_on_phone.sh, plan/handoffs/wiring.md, plan/handoffs/load-team.md
+- [modified] plan/install-on-iphone.md, team/README.md, PROJECT_INDEX.md
+
+### Context
+Every job in the plan was built, reviewed by a fresh reader, fixed and accepted, then wired into one app; two full games scored through the real screens match their box scores. The app is installed on Mikey’s iPhone 17 Pro with his free Apple account, and the loader put the Diamond Dogs (16 players, 24 songs) and 8 opponents (117 players) onto it. Xcode’s command-line build needs -allowProvisioningDeviceRegistration to register a phone on a free account; the install script does that.
+
+---
+
+## [2026-10-04 11:59] Announcer introductions in Mikey’s voice, pieced together
+SESSLOG:[2026-10-04 11:59]
+
+**Project(s):** baseball
+
+### Decisions
+- Introductions are stitched on the phone from pieces Mikey recorded on the Mac with the ATR2100x: “Now batting,” every number 0–99 and 00, and each player’s name. A new or changed jersey number needs nothing new recorded (Mikey’s design).
+- The introduction ends on the name: “Now batting, number twenty-two, Yered Teodosio.” No repeated number, for the iPhone voice and the player page’s script too; the optional “closing” number set was dropped.
+- A jersey number changed in the app now wins over roster.csv, which only fills in a blank; the loader notes any difference.
+- The loader gives the pieced introduction only to players with none; one chosen in the app is kept.
+- Esteban is said es-te-BAN.
+- Claude runs the install and team-load scripts itself (now in AGENTS.md).
+
+### Follow-ups
+- [ ] Mikey hears an introduction on the phone (player page, “Test: introduction, then song”).
+- [ ] Joaquin Canas needs a jersey number.
+- [ ] Mikey’s number sheet lists different positions for some players (Gaven P, not CF); update the roster if those are current.
+
+### Files
+- [created] tools/record_intros.py, app/Packages/ScorebookUI/Sources/WalkUpAudio/PiecedIntroduction.swift and its tests, plan/handoffs/announcer-pieces.md, feedback/ai/announcer-pieces-review.md
+- [modified] Model/People.swift (pieced introductions), TeamImport, TeamLoader, tools/load_team.sh, AnnouncerVoice, TeamScreensWording, team/roster.csv (15 jersey numbers), team/README.md, PROJECT_INDEX.md, AGENTS.md
+- [created] ~/Dropbox/baseball/intros/ (118 recordings and preview.m4a); [modified] ~/Dropbox/baseball/README.md
+
+### Context
+Mikey wanted to record introductions with his good Mac microphone rather than the phone, and proposed recording every number once so the app could piece them together. A Python recorder trims, filters and levels each take; the app joins the pieces with the same pauses as its phone voice. A fresh review caught that every team load reset numbers changed in the app and re-applied pieced introductions over ones chosen in the app; both fixed. Everything is installed and loaded on the phone, and the check found every piece present, but the stitched introduction has not yet been heard on the phone itself.
