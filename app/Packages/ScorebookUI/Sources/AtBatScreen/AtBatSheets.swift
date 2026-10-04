@@ -32,6 +32,9 @@ struct GameMenuSheet: View {
                     row("Edit this batter", detail: "Name, number, batting side", icon: "pencil") {
                         choose(.openBatterOptions)
                     }
+                    row("Home screen", detail: "Teams, songs, games; the game stays in progress", icon: "house") {
+                        choose(.goHome)
+                    }
                     row("Walk-up song length",
                         detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds of song, then it fades",
                         icon: "speaker.wave.2") {

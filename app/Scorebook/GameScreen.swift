@@ -216,6 +216,8 @@ struct GameScreen: View {
             sheet = .songSettings
         case .pickSong(let player):
             sheet = .pickSong(player)
+        case .goHome:
+            onLeave()
         case .playWalkUp(let player, let withIntroduction):
             app.audio?.playWalkUp(for: player, withIntroduction: withIntroduction && app.settings.playIntroductions)
         case .playWarmUp(let player):
