@@ -105,4 +105,29 @@ struct TeamImportTests {
         #expect(RosterWords.position("DH") == nil)
         #expect(RosterWords.key("Joaquín  Cañas") == RosterWords.key("joaquin canas"))
     }
+
+    @Test("Players whose names were recorded get a pieced introduction; one recorded in the app is kept")
+    func piecedIntroductions() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        // Mikey recorded Chris's introduction in the app.
+        let chris = try #require(teams[o].roster.firstIndex { $0.name == "Chris Strong" })
+        teams[o].roster[chris].introduction = AnnouncerIntroduction(source: .recorded, fileName: "intro-chris.m4a")
+
+        let result = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents,
+                                      recordedNames: ["aidan-kurt", "chris-strong"])
+        let ours = try #require(result.teamsToSave.first { $0.isOurs })
+        let intro = { (name: String) in ours.roster.first { $0.name == name }?.introduction }
+        #expect(intro("Aidan Kurt") == AnnouncerIntroduction(source: .pieced, fileName: "announcer-name-aidan-kurt.m4a"))
+        #expect(intro("Chris Strong")?.source == .recorded)
+        #expect(intro("Mikey Jarrell") == nil)
+    }
+
+    @Test("File name stems match the Mac scripts: no accents, words joined by dashes")
+    func fileStems() {
+        #expect(RosterWords.fileStem("Joaquín Cañas") == "joaquin-canas")
+        #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
+        #expect(RosterWords.fileStem("J.T. O'Neil") == "j-t-o-neil")
+    }
 }

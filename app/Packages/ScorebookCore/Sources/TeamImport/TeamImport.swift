@@ -9,8 +9,10 @@
 // The merge never throws anything away. It matches what is already saved by name: a team by
 // its name, a player by their name within the team, a song by its file name. A match keeps
 // its id (so season stats carry over) and anything the CSV leaves blank (a jersey number
-// typed into the app, an announcer introduction). Players, teams and songs the CSV does not
-// mention stay as they are. Games are never touched.
+// typed into the app). A player whose name was recorded on the Mac (tools/record_intros.py)
+// gets the introduction pieced together from those recordings, unless they already have one
+// recorded or imported in the app, which is never touched. Players, teams and songs the CSV
+// does not mention stay as they are. Games are never touched.
 //
 // The command-line loader (Sources/TeamLoader) reads and writes the files; this module only
 // works out what the teams and the song library should become, so it can be tested.
@@ -166,6 +168,14 @@ public enum RosterWords {
         return parts.reduce(0) { $0 * 60 + $1 }
     }
 
+    /// A plain file name stem from a player's name, as the Mac scripts make them:
+    /// "Joaquín Cañas" is "joaquin-canas".
+    public static func fileStem(_ name: String) -> String {
+        let plain = name.lowercased().folding(options: .diacriticInsensitive, locale: nil)
+        let words = plain.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : " " }
+        return String(words).split(separator: " ").joined(separator: "-")
+    }
+
     /// A name for matching: lower case, no accents, single spaces. "Cañas" matches "Canas".
     public static func key(_ name: String) -> String {
         name.folding(options: [.caseInsensitive, .diacriticInsensitive], locale: nil)
@@ -213,8 +223,11 @@ public enum TeamImport {
     ///   - roster: Our players, from `team/roster.csv`.
     ///   - opponents: Every opponent's players, from `team/opponents.csv`.
     ///   - durations: Each song file's length in seconds, by file name, where known.
+    ///   - recordedNames: The players whose names were recorded for a pieced introduction,
+    ///     by their file name stem ("aidan-kurt").
     public static func merge(teams: [Team], library: SongLibrary, roster: [RosterRow], opponents: [OpponentRow],
-                             durations: [String: TimeInterval] = [:]) -> ImportResult {
+                             durations: [String: TimeInterval] = [:],
+                             recordedNames: Set<String> = []) -> ImportResult {
         var notes: [String] = []
         var library = library
         var audioFiles: [String] = []
@@ -270,6 +283,12 @@ public enum TeamImport {
             }
             if let walkUp { player.walkUpSongID = walkUp }
             if let warmUp { player.warmUpSongID = warmUp }
+            // The pieced introduction, unless the scorer recorded or imported one in the app.
+            let stem = RosterWords.fileStem(row.displayName)
+            let keepsOwn = player.introduction?.source == .recorded || player.introduction?.source == .imported
+            if recordedNames.contains(stem), !keepsOwn {
+                player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
+            }
             if let index {
                 if ours.roster[index] != player { notes.append("Player updated: \(row.displayName)") }
                 ours.roster[index] = player
