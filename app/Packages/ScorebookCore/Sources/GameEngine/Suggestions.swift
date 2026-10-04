@@ -26,7 +26,29 @@ enum Suggestions {
             }
         }
         let rbi = draft.batterResult.map { runsBattedIn(result: $0, draft: draft, moves: moves, in: s) } ?? 0
-        return RunnerSuggestion(runners: moves, rbi: rbi)
+        // On a game-ending hit, the hit the batter is credited with may be smaller.
+        let credited = draft.batterResult.map { creditedHit($0, moves: moves, in: s) }
+        return RunnerSuggestion(runners: moves, rbi: rbi,
+                                batterResult: credited == draft.batterResult ? nil : credited)
+    }
+
+    /// The hit the batter is credited with on a game-ending hit: only as many bases as the
+    /// winning run needed, and no more than the batter reached (Official Baseball Rules
+    /// 9.06(f)). A single stays a single, a home run stays a home run, and anything that is
+    /// not a game-ending hit is left as it is. `s` is the situation before the play.
+    static func creditedHit(_ result: BatterResult, moves: [RunnerMove], in s: Situation) -> BatterResult {
+        let bases: [BatterResult: Int] = [.single: 1, .double: 2, .triple: 3]
+        guard let hitBases = bases[result], hitBases > 1, s.isWalkOffInning, s.score.home <= s.score.away else {
+            return result
+        }
+        let needed = s.score.away - s.score.home + 1
+        // Runners score lead runner first; the batter scores last.
+        let scorers = moves.filter { $0.to == .scored }.sorted { $0.from > $1.from }
+        guard scorers.count >= needed else { return result }
+        let winningRunBases = BaseMath.distance(from: scorers[needed - 1].from, to: .scored)
+        let batterBases = moves.first(where: \.isBatter).map { BaseMath.distance(from: .home, to: $0.to) } ?? hitBases
+        let credited = max(1, min(hitBases, winningRunBases, batterBases))
+        return [1: .single, 2: .double, 3: .triple][credited] ?? result
     }
 
     /// The plain guess, before the scorer changes anything. Runners are listed lead runner

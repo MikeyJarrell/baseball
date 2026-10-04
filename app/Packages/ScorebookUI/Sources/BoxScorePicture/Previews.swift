@@ -1,11 +1,10 @@
 // Previews of the box score picture, for Xcode's canvas.
 //
-// This module may not use SampleData, so the previews read copies of the sample game's box
-// scores saved as JSON in Resources/. A test in BoxScoreTextTests checks the copies still
-// match SampleData.
+// The previews draw the sample game's box scores straight from SampleData.
 
 import SwiftUI
 import Model
+import SampleData
 import DesignSystem
 import BoxScoreText
 
@@ -15,10 +14,10 @@ enum PreviewBoxScores {
     static let pacific = TimeZone(identifier: "America/Los_Angeles")!
 
     /// The finished sample game: Diamond Dogs 5, Mudcats 3, with nine and ten hitters.
-    static var finished: BoxScore { load("sample-game-box-score") }
+    static var finished: BoxScore { SampleGame.boxScore }
 
     /// The sample game after three innings, still going.
-    static var throughThree: BoxScore { load("sample-game-through-three-box-score") }
+    static var throughThree: BoxScore { SampleGame.boxScoreThroughThree }
 
     /// The finished game with the Diamond Dogs batting fourteen, one with a very long name.
     static var fourteenHitters: BoxScore {
@@ -33,16 +32,6 @@ enum PreviewBoxScores {
                         positions: index < 9 ? [BoxPosition.allCases[index]] : [],
                         stats: BattingCounts(plateAppearances: 2, atBats: 2, runs: index % 2, hits: 1,
                                              runsBattedIn: index % 3 == 0 ? 1 : 0))
-        }
-        return box
-    }
-
-    /// Reads one of the saved box scores bundled with this module.
-    static func load(_ name: String) -> BoxScore {
-        guard let url = Bundle.module.url(forResource: name, withExtension: "json"),
-              let data = try? Data(contentsOf: url),
-              let box = try? ScorebookJSON.decode(BoxScore.self, from: data) else {
-            fatalError("The preview box score \(name).json is missing or unreadable")
         }
         return box
     }

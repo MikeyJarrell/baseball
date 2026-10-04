@@ -51,7 +51,7 @@ app/
 Who depends on whom:
 
 - `Model` depends on nothing.
-- `SampleData`, `GameEngine`, `Stats`, `BoxScoreText` and `Storage` depend on `Model` only. Stats reads the rules engine’s play log, whose shape is defined in `Model`, so the two can be built at the same time.
+- `GameEngine`, `Stats`, `BoxScoreText` and `Storage` depend on `Model` only. `SampleData` depends on `Model` and `GameEngine`, so it can hand screens the real rules engine for previews without the screens importing `GameEngine`. Stats reads the rules engine’s play log, whose shape is defined in `Model`, so the two can be built at the same time.
 - `StatsTests` also uses `GameEngine`, to turn scenario files into play logs; until the engine lands, stats tests use the hand-written play log in `SampleData`.
 - `DesignSystem` and `WalkUpAudio` depend on `Model`.
 - `BoxScorePicture` depends on `Model`, `BoxScoreText` and `DesignSystem`.
