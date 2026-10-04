@@ -49,6 +49,13 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 
 ## Simulator walkthrough
 
+`app/ScorebookUITests/ScoringWalkthroughTests.swift`, driven by `GameDriver.swift`, scores two whole games on the iPhone 17 simulator through the real screens, tap by tap: every pitch on the count buttons and chips, every ball in play through the in-play sequence (fielders tapped on the field drawing, runners set on the runners step), defense checks, pitching changes, runner moves, the runner for a designated non-runner, a pinch hitter and the end of the game. After each event it checks the app’s situation against the rules engine’s replay of the book, and at the end compares the printed box score line by line, leaving out only the game’s length (the app times the test’s taps).
+
+- **The sample game** (154 events): passes, box score identical, about 4 minutes.
+- **Astros at Yankees, June 23, 2019** (291 events): passes, box score identical to the book, about 5 minutes. Two plays differ in details that never reach the box score: the app records the base a batter was out at, and its batted-ball guess fills in a type the book left blank.
+
+The first full run found the two problems fixed above (the batting spot on a pitching change, and the defense check after a change at the changeover); both games pass with them fixed. `SmokeTests.swift` also checks that a game in progress opens straight onto the batting screen, and that the home screen’s six tiles and the teams list open.
+
 ## Not done or not checked
 
 - On the phone itself: saving time late in a long game, the picture’s sharpness in a text message, songs with the silent switch on and the screen locked. These belong to the dress rehearsal.
