@@ -9,6 +9,7 @@ import DesignSystem
 import BoxScoreText
 import BoxScorePicture
 import PostgameScreens
+import TeamScreens
 
 /// The page for one route from the home screen.
 struct HomeDestination: View {
@@ -19,9 +20,9 @@ struct HomeDestination: View {
     var body: some View {
         switch route {
         case .teams:
-            TeamsPage(start: .teams)
+            TeamScreen(route: .teams, data: app.teamScreensData, onRequest: app.handleTeams)
         case .songs:
-            TeamsPage(start: .songs)
+            TeamScreen(route: .songs, data: app.teamScreensData, onRequest: app.handleTeams)
         case .season:
             if let totals = app.seasonTotals() {
                 SeasonStatsScreen(totals: totals,

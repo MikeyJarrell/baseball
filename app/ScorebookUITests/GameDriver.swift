@@ -53,6 +53,10 @@ final class GameDriver {
     private(set) var detailNotes: [String] = []
     /// Expected events the screens offer no way to enter exactly.
     private(set) var gaps: [String] = []
+    /// True while entering an event the screens cannot enter exactly: the app's event is then
+    /// allowed to differ (the gap is already a recorded failure), but the game must still stand
+    /// where the book has it.
+    private var enteringGap = false
 
     init(app: XCUIApplication, expected: Game) {
         self.app = app
@@ -82,6 +86,7 @@ final class GameDriver {
         for index in 0..<last {
             let event = expected.events[index]
             do {
+                enteringGap = false
                 try enter(event, at: index)
                 try check(after: index)
             } catch let stop as DriverStop {
@@ -126,6 +131,10 @@ final class GameDriver {
         guard !appAddedOne, let recorded = lastEvent(readout) else { return }
         let want = expected.events[index]
         if Self.boxFacts(recorded) != Self.boxFacts(want) {
+            if enteringGap {
+                detailNotes.append("Event \(index): entered as near as the screens allow (see the failure above).\n  app:      \(Self.allFacts(recorded))\n  expected: \(Self.allFacts(want))")
+                return
+            }
             throw DriverStop(description: "the app recorded a different event.\n  app:      \(Self.boxFacts(recorded))\n  expected: \(Self.boxFacts(want))")
         }
         if Self.allFacts(recorded) != Self.allFacts(want) {
@@ -197,8 +206,15 @@ final class GameDriver {
         return facts(kind)
     }
 
-    /// Everything about an event except its id and time, as one line of text.
-    static func allFacts(_ event: GameEvent) -> String { facts(event.kind) }
+    /// Everything about an event except its id and time, as one line of text. Also left out:
+    /// the exact spot a hit landed (the book never has one), and the kind of batted ball on
+    /// anything but a batter out, the only play whose screen asks for it.
+    static func allFacts(_ event: GameEvent) -> String {
+        guard case .ballInPlay(var play) = event.kind else { return facts(event.kind) }
+        play.hitSpot = nil
+        if play.batterResult != .out { play.battedBall = nil }
+        return facts(.ballInPlay(play))
+    }
 
     /// An event's details as sorted JSON, runners and errors in a fixed order.
     private static func facts(_ kind: EventKind) -> String {
@@ -587,6 +603,7 @@ final class GameDriver {
     /// carries on.
     private func gap(_ words: String) {
         gaps.append(words)
+        enteringGap = true
         XCTFail("Screens cannot enter this: \(words)")
     }
 

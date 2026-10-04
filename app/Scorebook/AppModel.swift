@@ -59,6 +59,9 @@ final class AppModel {
     /// readout of the game for the test to check.
     private(set) var isUITest = false
 
+    /// The teams and songs screens' recording, importing and messages.
+    let teamsWiring = TeamsWiring()
+
     /// The league's rules, shared by every game.
     let engine = ScorebookRulesEngine()
     /// The box score and season stats calculator.
@@ -94,6 +97,7 @@ final class AppModel {
             if let game = try await storage.gameInProgress() {
                 session = GameSession(game: game, storage: storage, engine: engine, stats: stats)
             }
+            deleteIntroductionsNoLongerUsed()
             phase = .ready
         } catch {
             phase = .failed("The scorebook’s saved files could not be opened. (\(error.localizedDescription))")
@@ -224,6 +228,7 @@ final class AppModel {
     /// writes a backup of everything into the folder the Files app shows.
     func gameEnded() async {
         await reloadGames()
+        deleteIntroductionsNoLongerUsed()
         if let storage { _ = try? await storage.makeBackup() }
     }
 

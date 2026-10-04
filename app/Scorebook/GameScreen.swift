@@ -116,7 +116,8 @@ struct GameScreen: View {
 
     private var batting: some View {
         AtBatScreen(
-            setup: session.setup,
+            // Our players' songs and introductions as the saved team has them now.
+            setup: app.withSavedSongs(session.setup),
             situation: session.situation,
             batterHistory: session.batterHistory,
             songs: app.audio?.library ?? SongLibrary(),
@@ -308,7 +309,7 @@ struct GameScreen: View {
         player.walkUpSongID = song
         guard await session.updatePlayer(player, on: side) else { return }
         await app.updateSavedPlayer(player, teamID: session.setup[side].teamID)
-        app.audio?.cue(for: player)
+        app.cueOurNextHitter()
     }
 
     // MARK: Full-screen pages
@@ -354,17 +355,16 @@ struct GameScreen: View {
     /// Loads our next hitter's walk-up song (and announcer introduction), so it starts the
     /// moment the scorer taps it.
     private func cueOurNextHitter() {
-        guard let ours = session.setup.ourSide,
-              let next = session.situation[ours].currentBatter,
-              let player = session.setup.player(next) else { return }
-        app.audio?.cue(for: player)
+        app.cueOurNextHitter()
     }
 
     /// Plays our pitcher's warm-up song, if they have one.
     private func playWarmUp() {
         guard let ours = session.setup.ourSide,
               let pitcher = session.situation[ours].pitcher,
-              let player = session.setup.player(pitcher), player.warmUpSongID != nil else { return }
+              let saved = session.setup.player(pitcher) else { return }
+        let player = app.withSavedSongs(saved)
+        guard player.warmUpSongID != nil else { return }
         app.audio?.playWarmUp(for: player)
     }
 }

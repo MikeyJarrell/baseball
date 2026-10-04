@@ -208,16 +208,3 @@ struct OverviewPage: View {
         }
     }
 }
-
-// MARK: - Teams and songs
-
-/// The teams and songs pages.
-struct TeamsPage: View {
-    /// Which page to open on.
-    enum Start { case teams, songs }
-    var start: Start
-
-    var body: some View {
-        EmptyPage(text: start == .teams ? "Teams" : "Songs")
-    }
-}
