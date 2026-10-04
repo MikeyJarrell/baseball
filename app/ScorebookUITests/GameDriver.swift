@@ -256,8 +256,8 @@ final class GameDriver {
             try enterBallInPlay(play, before: before)
         case .runnerAction(let action):
             try enterRunnerAction(action, before: before)
-        case .defenseConfirmed:
-            try confirmDefense()
+        case .defenseConfirmed(let check):
+            try confirmDefense(team: check.team, before: before, index: index)
         case .runnerForNonRunner(let choice):
             try enterRunnerForNonRunner(choice)
         case .pitchingChange(let change):
@@ -490,11 +490,30 @@ final class GameDriver {
     // MARK: Prompts and changes
 
     /// The defense check when our team takes the field: nobody moved.
-    private func confirmDefense() throws {
+    private func confirmDefense(team: TeamSide, before: Situation, index: Int) throws {
         let confirm = app.buttons["Everyone’s where they were"]
-        if !appears(confirm, within: 3) {
+        let saveChanges = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "Save ", " change")).firstMatch
+        if !appears(confirm, within: 3), !saveChanges.exists {
             // The check is not open by itself: open it from the Defense button on the banner.
             try tap(app.buttons["Defense"], "the Defense button")
+        }
+        if !appears(confirm, within: 2), saveChanges.exists {
+            // The check opened with changes nobody made. Record it, then put every marked
+            // position back to the player there now, as a careful scorer would.
+            let marked = app.buttons.matching(NSPredicate(format: "label ENDSWITH %@", ", changed"))
+                .allElementsBoundByIndex.map(\.label)
+            gap("event \(index): the defense check opened already set to change the defense (\(marked.joined(separator: "; "))), so \"Everyone’s where they were\" was not there; tapping the big button would have recorded a substitution nobody made. Put back by hand.")
+            let fielders = before[team].fielders
+            for position in Position.allCases {
+                let title = position.name.prefix(1).uppercased() + position.name.dropFirst()
+                let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label ENDSWITH %@", title + ":", ", changed")).firstMatch
+                guard row.exists else { continue }
+                guard let here = fielders.first(where: { $0.position == position })?.player,
+                      let full = player(here)?.displayName else { continue }
+                let chip = button(startingWith: full)
+                if !chip.exists { row.tap() }
+                try tap(chip, "\(full) among the players for \(position.name)")
+            }
         }
         try tap(confirm, "\"Everyone’s where they were\"")
     }
@@ -564,6 +583,10 @@ final class GameDriver {
         if appears(app.buttons["Keep playing"], within: 2) {
             try tap(app.buttons["End game"], "\"End game\" on \"Is the game over?\"")
             return
+        }
+        // A defense check open for the next half-inning is put off first.
+        if app.buttons["Everyone’s where they were"].exists {
+            try tap(app.buttons["Later"], "\"Later\" on the defense check")
         }
         try tap(app.buttons["Game menu"], "the game menu")
         try tap(button(startingWith: "End game"), "\"End game\" in the game menu")
