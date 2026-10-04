@@ -27,51 +27,40 @@ enum PostgameWording {
         return "\(hours) \(hours == 1 ? "hour" : "hours") \(minuteWords)"
     }
 
-    /// How a finished game came out for us.
-    enum Outcome: Equatable {
-        case win, loss, tie
-
-        /// The letter in the games list: "W", "L" or "T".
-        var letter: String {
-            switch self {
-            case .win: "W"
-            case .loss: "L"
-            case .tie: "T"
-            }
-        }
-
-        /// The word, for VoiceOver.
-        var word: String {
-            switch self {
-            case .win: "Won"
-            case .loss: "Lost"
-            case .tie: "Tied"
-            }
-        }
-    }
-
-    /// Whether we won, lost or tied a game, read from its final score. Nothing for a game that
-    /// has not ended.
-    static func outcome(of game: GameSummary) -> Outcome? {
-        guard game.isFinished, let score = game.finalScore else { return nil }
-        let ourSide: TeamSide = game.weAreHome ? .home : .away
-        let ours = score[ourSide]
-        let theirs = score[ourSide.opponent]
-        if ours > theirs { return .win }
-        if ours < theirs { return .loss }
-        return .tie
+    /// Whether we won, lost or tied a game, as the stats engine worked it out. Nothing for a
+    /// game that has not ended.
+    static func outcome(of game: GameSummary) -> GameResult? {
+        game.result
     }
 
     /// The score with our runs first, as the games list shows it: "7–5".
     static func scoreOursFirst(_ game: GameSummary) -> String? {
-        guard let score = game.finalScore else { return nil }
-        let ourSide: TeamSide = game.weAreHome ? .home : .away
+        scoreOursFirst(game.finalScore, weAreHome: game.weAreHome)
+    }
+
+    /// A final score with our runs first: "7–5". Nothing without a score.
+    static func scoreOursFirst(_ score: Score?, weAreHome: Bool) -> String? {
+        guard let score else { return nil }
+        let ourSide: TeamSide = weAreHome ? .home : .away
         return "\(score[ourSide])–\(score[ourSide.opponent])"
     }
 
     /// "vs Mudcats" for a home game, "at Mudcats" for an away game.
     static func opponent(_ game: GameSummary) -> String {
         (game.weAreHome ? "vs " : "at ") + game.opponentName
+    }
+
+    /// The game in a player's game log: "Oct 3 at Mudcats, W 7–5", or "Oct 3 vs Bombers" for a
+    /// game still going. An older log that does not say home or away gives just the opponent.
+    static func logGame<Counts>(_ entry: GameLogEntry<Counts>, calendar: Calendar = .current) -> String {
+        var words = shortDate(entry.date, calendar: calendar) + " "
+        if let home = entry.weAreHome { words += home ? "vs " : "at " }
+        words += entry.opponentName
+        if let result = entry.result, let home = entry.weAreHome,
+           let score = scoreOursFirst(entry.finalScore, weAreHome: home) {
+            words += ", \(result.letter) \(score)"
+        }
+        return words
     }
 
     /// A game's date for a list: "Sat, Oct 3", with the year added when it is not `thisYear`'s.
@@ -92,17 +81,18 @@ enum PostgameWording {
         return date.formatted(style)
     }
 
-    /// The season record from the games list: "9 wins, 5 losses", with ties added when there
-    /// are any ("1 tie"). Only finished games count. Nothing when no game has finished.
-    static func record(_ games: [GameSummary]) -> String? {
-        let outcomes = games.compactMap(outcome(of:))
-        guard !outcomes.isEmpty else { return nil }
-        let wins = outcomes.filter { $0 == .win }.count
-        let losses = outcomes.filter { $0 == .loss }.count
-        let ties = outcomes.filter { $0 == .tie }.count
-        var parts = [counted(wins, "win", "wins"), counted(losses, "loss", "losses")]
-        if ties > 0 { parts.append(counted(ties, "tie", "ties")) }
+    /// The season record from the season totals: "9 wins, 5 losses", with ties added when
+    /// there are any ("1 tie"). Nothing when no game has finished.
+    static func record(_ totals: SeasonTotals) -> String? {
+        guard totals.wins + totals.losses + totals.ties > 0 else { return nil }
+        var parts = [counted(totals.wins, "win", "wins"), counted(totals.losses, "loss", "losses")]
+        if totals.ties > 0 { parts.append(counted(totals.ties, "tie", "ties")) }
         return parts.joined(separator: ", ")
+    }
+
+    /// A pitcher's wins and losses as the season table prints them: "6-2".
+    static func winsAndLosses(_ line: SeasonPitchingLine) -> String {
+        "\(line.wins)-\(line.losses)"
     }
 
     /// A number with the right word after it: "1 game", "14 games".
@@ -192,5 +182,25 @@ enum PostgameWording {
     static func perInning(_ value: Double?) -> String {
         guard let value, value.isFinite else { return "—" }
         return String(format: "%.2f", value)
+    }
+}
+
+extension GameResult {
+    /// The letter in the games list and game logs: "W", "L" or "T".
+    var letter: String {
+        switch self {
+        case .win: "W"
+        case .loss: "L"
+        case .tie: "T"
+        }
+    }
+
+    /// The word, for VoiceOver: "Won", "Lost" or "Tied".
+    var word: String {
+        switch self {
+        case .win: "Won"
+        case .loss: "Lost"
+        case .tie: "Tied"
+        }
     }
 }

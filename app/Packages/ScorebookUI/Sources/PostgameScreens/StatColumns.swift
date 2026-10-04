@@ -97,11 +97,10 @@ enum BattingColumn: String, CaseIterable, Identifiable, Sendable {
 
 /// A column of the season pitching table.
 ///
-/// The mockup also shows wins and losses, earned runs and earned run average. Season totals
-/// carry no decisions and the app keeps no earned runs, so those columns wait for a vocabulary
-/// change (see the handoff note); walks and hits per inning and strikeouts per inning stand in.
+/// The mockup also shows earned runs and earned run average. The app keeps no earned runs, so
+/// walks and hits per inning and strikeouts per inning stand in.
 enum PitchingColumn: String, CaseIterable, Identifiable, Sendable {
-    case games, innings, battersFaced, hits, runs, walks, strikeouts, homeRuns, hitBatters
+    case games, winsAndLosses, innings, battersFaced, hits, runs, walks, strikeouts, homeRuns, hitBatters
     case pitches, walksAndHitsPerInning, strikeoutsPerInning, walksPerInning
 
     var id: String { rawValue }
@@ -110,6 +109,7 @@ enum PitchingColumn: String, CaseIterable, Identifiable, Sendable {
     var title: String {
         switch self {
         case .games: "G"
+        case .winsAndLosses: "W-L"
         case .innings: "IP"
         case .battersFaced: "BF"
         case .hits: "H"
@@ -129,6 +129,7 @@ enum PitchingColumn: String, CaseIterable, Identifiable, Sendable {
     var spokenName: String {
         switch self {
         case .games: "games"
+        case .winsAndLosses: "wins and losses"
         case .innings: "innings pitched"
         case .battersFaced: "batters faced"
         case .hits: "hits allowed"
@@ -157,10 +158,29 @@ enum PitchingColumn: String, CaseIterable, Identifiable, Sendable {
     static let gameLog: [PitchingColumn] = [.innings, .battersFaced, .hits, .runs, .walks, .strikeouts,
                                             .homeRuns, .pitches]
 
+    /// The number a season line sorts by in this column. Wins and losses sort by wins, and a
+    /// pitcher with fewer losses goes first among those with the same wins (6-1 above 6-2).
+    func value(_ line: SeasonPitchingLine) -> Double? {
+        switch self {
+        case .winsAndLosses: Double(line.wins) * 1000 - Double(line.losses)
+        default: value(line.stats, games: line.games)
+        }
+    }
+
+    /// A season line's number as printed: "6-2" for wins and losses, otherwise as `text(_:games:)`.
+    func text(_ line: SeasonPitchingLine) -> String {
+        switch self {
+        case .winsAndLosses: PostgameWording.winsAndLosses(line)
+        default: text(line.stats, games: line.games)
+        }
+    }
+
     /// The number this column sorts by. Innings sort by outs recorded, so 5.1 comes after 5.0.
+    /// Wins and losses are not in the counts (see `value(_ line:)`), so they are missing here.
     func value(_ stats: PitchingCounts, games: Int = 0) -> Double? {
         switch self {
         case .games: Double(games)
+        case .winsAndLosses: nil
         case .innings: Double(stats.outsRecorded)
         case .battersFaced: Double(stats.battersFaced)
         case .hits: Double(stats.hits)
@@ -280,7 +300,7 @@ enum StatSorting {
                          minimumInnings: Int) -> [SeasonPitchingLine] {
         sorted(lines, descending: choice.descending) { line in
             if choice.column.isRate && hidesRates(line, minimumInnings: minimumInnings) { return nil }
-            return choice.column.value(line.stats, games: line.games)
+            return choice.column.value(line)
         }
     }
 }

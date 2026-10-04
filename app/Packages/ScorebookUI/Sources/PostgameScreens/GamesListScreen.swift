@@ -116,7 +116,7 @@ private struct GameRow: View {
         }
     }
 
-    private func color(for outcome: PostgameWording.Outcome) -> Color {
+    private func color(for outcome: GameResult) -> Color {
         switch outcome {
         case .win: ScorebookColor.success
         case .loss: ScorebookColor.out
