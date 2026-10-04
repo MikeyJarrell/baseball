@@ -11,6 +11,7 @@
 | In-play sequence | Built; in review |
 | Walk-up audio | Built; fixing review findings |
 | Teams and songs, pregame, game overview, postgame and season screens | In progress |
+| iPad | Batting screen and change sheets checked; batting screen goes side by side when sideways ([notes](notes/ipad-check.md)) |
 | Wiring the app together, dress rehearsal | Not started |
 
 No deadlines have been assigned.
