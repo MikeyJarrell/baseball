@@ -134,3 +134,7 @@ SESSLOG:[2026-10-03 20:08]
 
 ### Context
 Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
+
+## [2026-10-03 22:31] The app is built
+
+Every job in the plan is built, reviewed by a fresh reader, fixed and accepted: the rules engine, stats, storage, box score printer, design system, walk-up audio, every screen, and the wiring. Two full games (the sample game and Astros at Yankees, June 23, 2019) were scored through the real screens in the simulator and their box scores match. Mikey decided along the way: layout A, outs written as words, visitors first in every score line, a powder-blue icon from the original logo, a 12-second walk-up fade, no courtesy runners, the SDABL rule book as the source of league rules (nothing enforced), and alternating fielders by inning. Next: Mikey installs it on his phone and scores a televised game as the dress rehearsal.

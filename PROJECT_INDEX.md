@@ -10,7 +10,7 @@
 | Batting screen, in-game changes sheets | Accepted |
 | In-play sequence, walk-up audio, teams and songs, pregame, game overview, postgame and season screens | Accepted |
 | iPad | Batting screen and change sheets checked; batting screen goes side by side when sideways ([notes](notes/ipad-check.md)) |
-| Wiring the app together | Built; in review ([handoff](plan/handoffs/wiring.md)); install steps for Mikey in [plan/install-on-iphone.md](plan/install-on-iphone.md) |
+| Wiring the app together | Accepted: two full games scored through the real screens match their box scores ([handoff](plan/handoffs/wiring.md)); install steps for Mikey in [plan/install-on-iphone.md](plan/install-on-iphone.md) |
 | Dress rehearsal | Not started: Mikey scores a televised game on his phone |
 
 No deadlines have been assigned.
