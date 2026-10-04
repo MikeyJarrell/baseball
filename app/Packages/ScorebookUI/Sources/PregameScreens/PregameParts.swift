@@ -22,6 +22,9 @@ struct StepPage<Content: View>: View {
     var blockedReason: String? = nil
     /// The big button's look: the blue "Next" button, or our team's "Play ball" button.
     var isPlayBall: Bool = false
+    /// Hides the big button, while a number is being typed, so the keyboard's Done button
+    /// above it cannot be mistaken for it.
+    var hidesButton: Bool = false
     var onButton: () -> Void
     @ViewBuilder var content: Content
 
@@ -51,6 +54,12 @@ struct StepPage<Content: View>: View {
         }
         .toolbarBackground(ScorebookColor.background, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
+            if !hidesButton { footer }
+        }
+    }
+
+    /// The big button pinned to the bottom edge, with why it cannot be tapped yet above it.
+    private var footer: some View {
             VStack(spacing: Spacing.small) {
                 if let blockedReason {
                     Text(blockedReason)
@@ -80,7 +89,6 @@ struct StepPage<Content: View>: View {
             // The button keeps its place at the bottom edge, so its words stop growing at the
             // first accessibility size and leave room for the list.
             .dynamicTypeSize(...DynamicTypeSize.accessibility1)
-        }
     }
 }
 
