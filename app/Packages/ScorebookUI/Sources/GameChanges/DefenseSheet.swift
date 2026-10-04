@@ -33,6 +33,9 @@ public struct DefenseSheet: View {
     var purpose: Purpose
     var suggestion: DefenseSuggestion?
     var onFinish: (GameChangeResult) -> Void
+    /// When the third out was a strikeout: closes the check and opens the dropped-third-strike
+    /// steps instead, since the batter may have reached first and the half-inning goes on.
+    var onDroppedThirdStrike: (() -> Void)?
 
     @State private var side: TeamSide
     /// Who is at each position as the scorer has it on this sheet.
@@ -47,12 +50,16 @@ public struct DefenseSheet: View {
     ///   - suggestion: A planned defense to lay over the one on the field, with reasons. Used only
     ///     when it is for this team and `purpose` is `.check`. Leave it out to use the rules
     ///     engine's suggested defense from the situation.
+    ///   - onDroppedThirdStrike: Hand this in only when the third out was a strikeout: the sheet
+    ///     then shows "Dropped third strike instead" at the top, which calls it.
     ///   - onFinish: Called once with the event to record, or `.cancel` ("Later").
     public init(context: GameChangeContext, purpose: Purpose = .check, side: TeamSide? = nil,
-                suggestion: DefenseSuggestion? = nil, onFinish: @escaping (GameChangeResult) -> Void) {
+                suggestion: DefenseSuggestion? = nil, onDroppedThirdStrike: (() -> Void)? = nil,
+                onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
         self.purpose = purpose
         self.onFinish = onFinish
+        self.onDroppedThirdStrike = onDroppedThirdStrike
         let team = side ?? (purpose == .check ? context.ourSide : nil) ?? context.situation.fieldingSide
         // A plan handed in wins; otherwise the defense check uses the rules engine's suggestion
         // (`Situation.suggestedDefense`, with the team's alternating fielders applied).
@@ -87,6 +94,31 @@ public struct DefenseSheet: View {
                    subtitle: subtitle,
                    cancelTitle: purpose == .check ? "Later" : "Cancel",
                    onCancel: { onFinish(.cancel) }) {
+            if purpose == .check, let onDroppedThirdStrike {
+                // The third out was a strikeout the catcher may not have held.
+                Button(action: onDroppedThirdStrike) {
+                    HStack(spacing: Spacing.small) {
+                        Image(systemName: "arrow.uturn.backward")
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Dropped third strike instead")
+                                .font(ScorebookFont.headline)
+                            Text("The batter ran on strike three: enter it, and the inning may go on")
+                                .font(ScorebookFont.caption)
+                                .foregroundStyle(ScorebookColor.textSecondary)
+                        }
+                        Spacer(minLength: 0)
+                        Image(systemName: "chevron.right")
+                    }
+                    .foregroundStyle(ScorebookColor.textPrimary)
+                    .padding(Spacing.medium)
+                    .background(ScorebookColor.warning.opacity(0.2),
+                                in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Dropped third strike instead"))
+                .padding(.bottom, Spacing.medium)
+            }
             if purpose == .changes {
                 SegmentedChoice(options: [(TeamSide.away, context.teamName(.away)), (.home, context.teamName(.home))],
                                 selection: Binding(get: { side }, set: { switchTeam(to: $0) }))

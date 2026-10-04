@@ -383,6 +383,12 @@ public final class GameSession {
         nonRunnerPromptPostponedAt = game.events.count
     }
 
+    /// Lets the defense check open again straight away: after the scorer left it for the
+    /// dropped-third-strike steps, it comes back if the inning still ends.
+    public func reopenDefenseCheck() {
+        defenseCheckPostponedAt = nil
+    }
+
     /// The scorer said "Later" to the defense check: keep it closed until the next event.
     public func postponeDefenseCheck() {
         defenseCheckPostponedAt = game.events.count

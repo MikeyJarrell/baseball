@@ -38,4 +38,33 @@ final class SmokeTests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Diamond Dogs"].waitForExistence(timeout: 5))
         keepScreenshot(app, named: "teams")
     }
+
+    /// After a strikeout for the third out, the defense check still opens by itself, with a
+    /// "Dropped third strike instead" link that opens those steps and brings the check back
+    /// if the scorer backs out.
+    @MainActor
+    func testDefenseCheckAfterAStrikeoutOffersTheDroppedThirdStrike() throws {
+        // The Diamond Dogs are home. Six strikeouts in a row: the Mudcats go down in the top of
+        // the 1st, then the Diamond Dogs in the bottom, so the last out is a strikeout and the
+        // Diamond Dogs take the field.
+        var events = [GameEvent(kind: .defenseConfirmed(DefenseConfirmed(team: .home)))]
+        events += Array(repeating: GameEvent(kind: .pitch(Pitch(.swingingStrike))), count: 18).map {
+            GameEvent(kind: $0.kind)
+        }
+        let game = Game(id: "strikeouts", setup: SampleGame.game.setup, events: events)
+        let app = try XCUIApplication.launch(seed: TestSeed(teams: [SampleTeams.diamondDogs, SampleTeams.mudcats], games: [game]))
+
+        let link = app.buttons["Dropped third strike instead"]
+        XCTAssertTrue(link.waitForExistence(timeout: 10), "the link on the defense check")
+        XCTAssertTrue(app.buttons["Everyone’s where they were"].exists, "the defense check itself")
+        keepScreenshot(app, named: "defense check after a strikeout")
+
+        link.tap()
+        XCTAssertTrue(app.buttons["Thrown out at first"].waitForExistence(timeout: 5), "the dropped-third-strike steps")
+        keepScreenshot(app, named: "dropped third strike steps")
+        app.buttons["Cancel"].tap()
+
+        // Backed out: the inning still ends, so the check comes back.
+        XCTAssertTrue(app.buttons["Everyone’s where they were"].waitForExistence(timeout: 5), "the check back again")
+    }
 }
