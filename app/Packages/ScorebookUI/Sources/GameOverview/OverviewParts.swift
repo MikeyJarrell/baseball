@@ -45,6 +45,7 @@ struct SectionLabel: View {
         .padding(.horizontal, Spacing.extraSmall)
         .padding(.top, Spacing.large)
         .padding(.bottom, 6)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         .accessibilityAddTraits(.isHeader)
     }
 }

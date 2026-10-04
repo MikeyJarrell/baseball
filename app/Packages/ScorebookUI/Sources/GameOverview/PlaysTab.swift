@@ -95,19 +95,28 @@ struct PlayRowView: View {
     var row: PlayRow
     var onTap: () -> Void
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
+        // At the accessibility text sizes the chip sits above the words instead of beside them.
+        let big = typeSize.isAccessibilitySize
         Button(action: onTap) {
             HStack(alignment: .top, spacing: 10) {
-                Group {
-                    if row.notation.isEmpty {
-                        Color.clear.frame(width: 58, height: 1)
-                    } else {
-                        NotationChip(text: row.notation, isHit: row.isHit, isMinor: row.isMinor)
+                if !big {
+                    Group {
+                        if row.notation.isEmpty {
+                            Color.clear.frame(width: 58, height: 1)
+                        } else {
+                            NotationChip(text: row.notation, isHit: row.isHit, isMinor: row.isMinor)
+                        }
                     }
+                    .frame(minWidth: 58)
                 }
-                .frame(minWidth: 58)
 
                 VStack(alignment: .leading, spacing: 2) {
+                    if big && !row.notation.isEmpty {
+                        NotationChip(text: row.notation, isHit: row.isHit, isMinor: row.isMinor)
+                    }
                     Text(row.text)
                         .font(row.isMinor ? ScorebookFont.caption : ScorebookFont.body)
                         .foregroundStyle(row.isMinor ? ScorebookColor.textSecondary : ScorebookColor.textPrimary)

@@ -120,6 +120,8 @@ struct LineScoreTable: View {
                 if let current = currentCell { reader.scrollTo("inning-\(current.inning)", anchor: .center) }
             }
         }
+        // Past this size the numbers would not fit beside each other in a usable way.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(spokenSummary)
     }
@@ -160,6 +162,7 @@ struct LineScoreTable: View {
             .font(ScorebookFont.caption.weight(.bold))
             .foregroundStyle(ScorebookColor.textSecondary)
             .frame(minWidth: 24)
+            .padding(.horizontal, 2)
             .padding(.vertical, 6)
     }
 
@@ -200,7 +203,7 @@ struct LineScoreTable: View {
             .monospacedDigit()
             .foregroundStyle(isCurrent ? ScorebookColor.onStrike : ScorebookColor.textPrimary)
             .frame(minWidth: 24, minHeight: 34)
-            .padding(.horizontal, 1)
+            .padding(.horizontal, 2)
             .background {
                 if isCurrent {
                     RoundedRectangle(cornerRadius: 6, style: .continuous).fill(ScorebookColor.warning)

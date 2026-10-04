@@ -79,6 +79,7 @@ public struct GameOverview: View {
     public var onAction: (GameOverviewAction) -> Void
 
     @State private var tab: GameOverviewTab
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     public init(
         log: PlayLog,
@@ -133,44 +134,63 @@ public struct GameOverview: View {
         .accessibilityAction(named: "Back to the batting screen") { onAction(.backToBatting) }
     }
 
-    /// "‹ At bat" on the left, the score and the game's state in the middle.
-    private var topBar: some View {
-        ZStack {
-            VStack(spacing: 0) {
-                Text(OverviewWording.score(Score(away: boxScore.away.runs, home: boxScore.home.runs), setup: log.setup))
-                    .font(ScorebookFont.headline)
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-                Text(status)
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
-            }
-            .padding(.horizontal, 96)
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isHeader)
-
-            HStack {
-                Button {
-                    onAction(.backToBatting)
-                } label: {
-                    HStack(spacing: 2) {
-                        Image(systemName: "chevron.left")
-                        Text("At bat")
-                    }
-                    .font(ScorebookFont.body.weight(.semibold))
-                    .foregroundStyle(ScorebookColor.highlight)
-                    .frame(minHeight: Spacing.minimumTapSize)
-                    .contentShape(Rectangle())
+    /// "‹ At bat" on the left, the score and the game's state in the middle. At the
+    /// accessibility text sizes the button gets a line of its own above the score, so the
+    /// two never overlap.
+    @ViewBuilder private var topBar: some View {
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 0) {
+                    backButton
+                    title.frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
-                .accessibilityLabel("Back to the batting screen")
-                Spacer()
+            } else {
+                ZStack {
+                    title.padding(.horizontal, 96)
+                    HStack {
+                        backButton
+                        Spacer()
+                    }
+                }
             }
-            .padding(.horizontal, Spacing.screenEdge)
         }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        .padding(.horizontal, Spacing.screenEdge)
         .padding(.vertical, Spacing.extraSmall)
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+    }
+
+    /// The score and the game's state: "Diamond Dogs 3, Mudcats 2 / Bottom 3rd · live".
+    private var title: some View {
+        VStack(spacing: 0) {
+            Text(OverviewWording.score(Score(away: boxScore.away.runs, home: boxScore.home.runs), setup: log.setup))
+                .font(ScorebookFont.headline)
+                .monospacedDigit()
+                .multilineTextAlignment(.center)
+                .minimumScaleFactor(0.7)
+            Text(status)
+                .font(ScorebookFont.caption)
+                .foregroundStyle(ScorebookColor.textSecondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    /// "‹ At bat": back to the batting screen.
+    private var backButton: some View {
+        Button {
+            onAction(.backToBatting)
+        } label: {
+            HStack(spacing: 2) {
+                Image(systemName: "chevron.left")
+                Text("At bat")
+            }
+            .font(ScorebookFont.body.weight(.semibold))
+            .foregroundStyle(ScorebookColor.highlight)
+            .frame(minHeight: Spacing.minimumTapSize)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Back to the batting screen")
     }
 
     /// The small line under the score: "Bottom 3rd · live", "Final".
