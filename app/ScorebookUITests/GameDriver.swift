@@ -528,6 +528,12 @@ final class GameDriver {
             if spotOf == outgoing {
                 let toggle = app.switches.matching(NSPredicate(format: "label BEGINSWITH %@", "Bats in")).firstMatch
                 guard appears(toggle, within: 3) else { throw missing("the \"Bats in …’s spot\" switch") }
+                // The switch sits at the bottom of a long list: scroll until it is clear of the
+                // confirm button pinned along the bottom edge.
+                let confirm = app.buttons["\(shortName(change.newPitcher)) pitches"]
+                for _ in 0..<6 where !toggle.isHittable || toggle.frame.maxY > confirm.frame.minY {
+                    app.swipeUp()
+                }
                 if (toggle.value as? String) != "1" {
                     // The switch itself sits at the right-hand end of its row.
                     toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.92, dy: 0.5)).tap()
