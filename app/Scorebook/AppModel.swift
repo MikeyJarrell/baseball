@@ -95,7 +95,7 @@ final class AppModel {
             await reloadTeams()
             await reloadGames()
             if let game = try await storage.gameInProgress() {
-                session = GameSession(game: game, storage: storage, engine: engine, stats: stats)
+                session = await GameSession.resume(game, storage: storage, engine: engine, stats: stats)
             }
             deleteIntroductionsNoLongerUsed()
             phase = .ready
@@ -229,7 +229,12 @@ final class AppModel {
     func gameEnded() async {
         await reloadGames()
         deleteIntroductionsNoLongerUsed()
-        if let storage { _ = try? await storage.makeBackup() }
+        guard let storage else { return }
+        do {
+            _ = try await storage.makeBackup()
+        } catch {
+            problem = "The game is saved, but the backup after it could not be written. Make one from Backups on the home screen. (\(error.localizedDescription))"
+        }
     }
 
     /// Closes the finished game, so the home screen no longer offers to resume it.
@@ -264,20 +269,24 @@ final class AppModel {
 
     // MARK: Players changed during a game
 
-    /// Puts a changed player (a name, number, batting side or song filled in during a game)
-    /// on the saved team too, so the change is there next game.
+    /// Puts a player changed during a game (a name, number or batting side filled in) on the
+    /// saved team too, so the change is there next game. The saved team keeps its own songs,
+    /// introduction, and usual position and role: the game's copy of those may be out of date.
     func updateSavedPlayer(_ player: Player, teamID: TeamID) async {
         guard var team = teams.first(where: { $0.id == teamID }) else { return }
         if let i = team.roster.firstIndex(where: { $0.id == player.id }) {
-            // Keep what only the saved team knows (the usual position and role).
-            var merged = player
-            merged.usualPosition = team.roster[i].usualPosition
-            merged.usualRole = team.roster[i].usualRole
-            merged.usuallyLeadsOff = team.roster[i].usuallyLeadsOff
-            team.roster[i] = merged
+            team.roster[i] = player.savedCopy(updating: team.roster[i])
         } else {
             team.roster.append(player)
         }
+        await saveTeam(team)
+    }
+
+    /// Gives one player on a saved team a walk-up song, changing nothing else about them.
+    func setWalkUpSong(_ song: SongID, for id: PlayerID, teamID: TeamID) async {
+        guard var team = teams.first(where: { $0.id == teamID }),
+              let i = team.roster.firstIndex(where: { $0.id == id }) else { return }
+        team.roster[i].walkUpSongID = song
         await saveTeam(team)
     }
 
@@ -332,7 +341,7 @@ final class AppModel {
             await reloadTeams()
             await reloadGames()
             if let game = try await storage.gameInProgress() {
-                session = GameSession(game: game, storage: storage, engine: engine, stats: stats)
+                session = await GameSession.resume(game, storage: storage, engine: engine, stats: stats)
             }
         } catch {
             problem = "That backup could not be restored, and nothing was changed. (\(error.localizedDescription))"

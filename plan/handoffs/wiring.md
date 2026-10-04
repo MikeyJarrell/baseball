@@ -36,8 +36,9 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 - AtBatScreen: `AtBatScreen.swift` (new `countAfter` input), `AtBatControls.swift`, `AtBatBand.swift`, `AtBatWording.swift` (hints from the rules engine, `displayShortName`, visitors first).
 - PregameScreens: `OurLineup.swift`, `PregameBuilder.swift`, `PregameInput.swift` (`UsualRole` and `usualRoles` removed; the first lineup reads `Player`), `PregameSamples.swift`.
 - PlayEntry: `PlayEntry.swift`, `PlayEntryModel.swift` (fixed runners and re-suggestion); `RunnersStep.swift` (fixed accessibility names on each runner row and its two questions, for the simulator tests).
-- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first); `PitchingChangeSheet.swift` (the new pitcher can take any batting spot or none, from a menu that lists the old pitcher’s spot first, in place of the switch that offered only the old pitcher’s spot; found by the walkthrough, where a reliever took the spot of the pinch hitter who had batted for the starter).
+- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first); `BatterSheet.swift` (the note under the edit); `PitchingChangeSheet.swift` (the new pitcher can take any batting spot or none, from a menu that lists the old pitcher’s spot first, in place of the switch that offered only the old pitcher’s spot; found by the walkthrough, where a reliever took the spot of the pinch hitter who had batted for the starter).
 - GameOverview: `OverviewWording.swift` (reads the play log’s inning break, out base and stolen base); `Tests/GameOverviewTests/MoreLogsTests.swift` (two suites run on the main thread, which clears the build warnings).
+- DesignSystemTests: `ScreenImportRulesTests.swift` (`Scoring` added to the modules screens may not import).
 - PostgameScreens: `PostgameWording.swift`, `StatColumns.swift`, `SeasonStatsScreen.swift` (the record comes from the totals, so its `games:` input is gone), `PlayerSeasonScreen.swift`, `GamesListScreen.swift`, `PreviewSeason.swift`, `Previews.swift`.
 - BoxScorePicture: `BoxScorePicture.swift` (pinch-hitter footnotes).
 
@@ -55,6 +56,19 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 - **Astros at Yankees, June 23, 2019** (291 events): passes, box score identical to the book, about 5 minutes. Two plays differ in details that never reach the box score: the app records the base a batter was out at, and its batted-ball guess fills in a type the book left blank.
 
 The first full run found the two problems fixed above (the batting spot on a pitching change, and the defense check after a change at the changeover); both games pass with them fixed. `SmokeTests.swift` also checks that a game in progress opens straight onto the batting screen, and that the home screen’s six tiles and the teams list open.
+
+## After the review
+
+A fresh reviewer’s notes are in `feedback/ai/wiring-review.md`. All eight findings are fixed:
+
+1. **Player edits during a game keep the saved team’s songs.** Saving a name, number or batting side from a game onto the saved team copies only those details (`Player.savedCopy(updating:)` in `Scoring`); songs, the introduction and the usual spot stay as the team has them. The in-game song picker changes only the walk-up song. Test: “A player edited during a game keeps the saved team’s songs, introduction and usual spot”.
+2. **One change at a time.** Every change the game session makes waits for the one before it to finish saving, so two quick taps on Undo take back two events, two on Redo put back two, and nothing is saved twice. Test: “Two Undos and two Redos tapped at once…”, on real files.
+3. **Reopening records a waiting automatic out.** `GameSession.resume` records the automatic out a batting hole calls for before anything else; the app uses it at launch and after a restore. Test: “Reopening a game saved just before its automatic out records that out first”.
+4. **Back at bat after all.** When a dropped third strike turns the third out around, or Undo or a fix steps back over the changeover, the warm-up song fades and our hitter’s song is loaded again. After a strikeout for the third out, the defense check waits rather than covering the “Dropped K” button; the Defense button on the changeover banner opens it. (So after a half-inning that ends on a strikeout, the scorer opens the check from that button; a pitch without it keeps the defense as it was, as “Later” does.)
+5. **“Not over”** reads the games again, so the season stats and games list drop the reopened game; a failed end-of-game backup now says so.
+6. **The import guard** also keeps screens from importing `Scoring`.
+7. **Install steps:** the phone needs to be online for Trust; a free account allows three of your own apps at once; a backup kept in iCloud Drive must be copied back into Scorebook’s backups folder before it can be restored; reinstall from the main project folder after bringing it up to date.
+8. **Comments:** `StatsTests/ScenarioEngine.swift` now describes the engine in place; the batter sheet says an edit is saved to the team’s roster for our players too (`GameChanges/BatterSheet.swift`).
 
 ## Not done or not checked
 

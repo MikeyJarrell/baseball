@@ -180,4 +180,63 @@ struct GameSessionTests {
         await session.record(GameEvent(kind: .pitch(Pitch(.ball))))
         #expect(session.showsDefenseCheck == session.situation.defenseCheckDue)
     }
+
+    @Test("Two Undos and two Redos tapped at once are made one after the other, nothing saved twice")
+    func quickDoubleTaps() async throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("double-tap-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let storage = try FileStorage(dataFolder: folder.appendingPathComponent("data"),
+                                      backupsFolder: folder.appendingPathComponent("backups"))
+        let session = try await emptySession(like: SampleGame.game, storage: storage)
+        await score(Array(SampleGame.game.events.prefix(12)), in: session)
+        let full = session.game
+
+        async let first = session.undo()
+        async let second = session.undo()
+        #expect(await [first, second] == [true, true])
+        #expect(session.game.events == Array(full.events.dropLast(2)))
+        #expect(Set(session.redoStack.map(\.id)).count == 2)
+
+        async let third = session.redo()
+        async let fourth = session.redo()
+        #expect(await [third, fourth] == [true, true])
+        #expect(session.game.events == full.events)
+        #expect(Set(session.game.events.map(\.id)).count == session.game.events.count)
+        // The file holds exactly what the screen shows.
+        #expect(try await storage.loadGame(full.id) == full)
+    }
+
+    @Test("Reopening a game saved just before its automatic out records that out first")
+    func resumeRecordsAWaitingAutomaticOut() async throws {
+        let scenario = try Scenarios.load("batting-hole-automatic-out")
+        let storage = InMemoryStorage()
+        // Saved with the single, but the phone died before the automatic out was saved.
+        let saved = Game(id: scenario.game.id, setup: scenario.game.setup,
+                         events: scenario.events.filter { !$0.isAutomaticOut })
+        try await storage.saveGame(saved)
+        #expect(GameSession(game: saved, storage: storage).situation.isBattingHoleUp)
+
+        let session = await GameSession.resume(saved, storage: storage)
+        #expect(session.game.events.map(\.kind) == scenario.events.map(\.kind))
+        #expect(!session.situation.isBattingHoleUp)
+        #expect(try await storage.loadGame(saved.id) == session.game)
+    }
+
+    @Test("A player edited during a game keeps the saved team's songs, introduction and usual spot")
+    func savedCopyKeepsTeamDetails() {
+        let saved = Player(id: "d1", name: "Alex Moreno", number: "2", walkUpSongID: "new-song",
+                           warmUpSongID: "warm", introduction: AnnouncerIntroduction(source: .recorded, fileName: "new.m4a"),
+                           usualPosition: .secondBase, usualRole: .batsAndFields, usuallyLeadsOff: true)
+        // The game's copy, from the first pitch, with an old song and no introduction; the
+        // scorer has just fixed the number and batting side.
+        let fromGame = Player(id: "d1", name: "Alex Moreno", number: "12", bats: .left, walkUpSongID: "old-song")
+        let updated = fromGame.savedCopy(updating: saved)
+        #expect(updated.number == "12")
+        #expect(updated.bats == .left)
+        #expect(updated.walkUpSongID == "new-song")
+        #expect(updated.warmUpSongID == "warm")
+        #expect(updated.introduction == saved.introduction)
+        #expect(updated.usualPosition == .secondBase)
+        #expect(updated.usuallyLeadsOff)
+    }
 }

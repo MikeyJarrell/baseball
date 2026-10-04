@@ -154,7 +154,12 @@ struct GameScreen: View {
     /// A prompt the game raises by itself, when nothing else is open.
     private var prompt: GameSheet? {
         guard cover == nil, !session.isFinished, session.situation.gameOverQuestion == nil else { return nil }
-        if session.showsDefenseCheck, session.setup.ourSide != nil { return .defenseCheck }
+        // After a strikeout for the third out, the defense check waits, so it does not cover the
+        // "Dropped K" button: the batter may yet be safe and our turn at bat go on. The Defense
+        // button on the changeover banner opens it.
+        if session.showsDefenseCheck, session.setup.ourSide != nil, !session.situation.droppedThirdStrikePossible {
+            return .defenseCheck
+        }
         if session.showsNonRunnerPrompt { return .nonRunner }
         return nil
     }
@@ -308,7 +313,7 @@ struct GameScreen: View {
         guard let side = session.setup.side(of: id), var player = session.setup.player(id) else { return }
         player.walkUpSongID = song
         guard await session.updatePlayer(player, on: side) else { return }
-        await app.updateSavedPlayer(player, teamID: session.setup[side].teamID)
+        await app.setWalkUpSong(song, for: id, teamID: session.setup[side].teamID)
         app.cueOurNextHitter()
     }
 
@@ -341,6 +346,13 @@ struct GameScreen: View {
         if old[ourSideOrAway].currentBatter != new[ourSideOrAway].currentBatter { cueOurNextHitter() }
         let tookTheField = takingTheField(new) && !takingTheField(old)
         if tookTheField, !lastChangeWasUndo { playWarmUp() }
+        // Back at bat after all (a dropped third strike that turned the third out around, an
+        // Undo or a fix stepping back over the changeover): the warm-up song stops and our
+        // hitter's walk-up song is ready again.
+        if let ours = session.setup.ourSide, takingTheField(old), new.battingSide == ours {
+            if app.audio?.playback.phase == .warmUp { app.audio?.fadeOut() }
+            cueOurNextHitter()
+        }
     }
 
     /// Our side, or the visitors in a game between two other teams (no songs are played then).
@@ -406,7 +418,13 @@ struct FinalBoxScore: View {
             }
             .confirmationDialog("Take back the end of the game and keep scoring?", isPresented: $askingToReopen,
                                 titleVisibility: .visible) {
-                Button("Keep scoring") { Task { await session.undo() } }
+                Button("Keep scoring") {
+                    Task {
+                        await session.undo()
+                        // The game is unfinished again: take it out of the season and games list.
+                        await app.reloadGames()
+                    }
+                }
             }
         }
     }
