@@ -197,6 +197,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         try? FileManager.default.createDirectory(at: audioFolder, withIntermediateDirectories: true)
         AudioSessionSettings.usePlayback()
         listenForInterruptions()
+        voice.findVoice()   // in the background, so the first introduction is not delayed
     }
 
     /// A player for previews and the test screen, keeping its files in a temporary folder.

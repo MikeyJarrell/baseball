@@ -57,9 +57,27 @@ final class AnnouncerVoice {
         return number
     }
 
+    /// The chosen voice's identifier, looked up once in the background (see `findVoice`).
+    private var voiceLookup: Task<String?, Never>?
+
+    /// Starts choosing the voice in the background. The player calls it when it is made:
+    /// the first time an iPhone lists its voices it can take a long while (minutes, on a
+    /// freshly set-up simulator), and doing that on the main thread would freeze the screen.
+    func findVoice() {
+        _ = voiceLookupTask()
+    }
+
+    private func voiceLookupTask() -> Task<String?, Never> {
+        if let voiceLookup { return voiceLookup }
+        let lookup = Task.detached(priority: .utility) { Self.bestVoiceIdentifier() }
+        voiceLookup = lookup
+        return lookup
+    }
+
     /// The voice to use: the best-quality American English voice on the phone, a male one
     /// if there is a choice, skipping Apple's novelty voices (the ones that sing or whisper).
-    static func bestVoice() -> AVSpeechSynthesisVoice? {
+    /// Slow the first time, so it runs in the background.
+    nonisolated static func bestVoiceIdentifier() -> String? {
         let candidates = AVSpeechSynthesisVoice.speechVoices().filter { voice in
             voice.language == "en-US"
                 && !voice.identifier.contains("speech.synthesis.voice")   // novelty voices
@@ -69,7 +87,7 @@ final class AnnouncerVoice {
             if a.quality != b.quality { return a.quality.rawValue > b.quality.rawValue }
             return (a.gender == .male ? 1 : 0) > (b.gender == .male ? 1 : 0)
         }
-        return ranked.first ?? AVSpeechSynthesisVoice(language: "en-US")
+        return ranked.first?.identifier
     }
 
     /// Makes the whole introduction as one piece of sound, pauses included. Returns nothing
@@ -77,7 +95,10 @@ final class AnnouncerVoice {
     /// (a clipped introduction is worse than none, and would otherwise be kept and replayed).
     func render(for player: Player) async -> AVAudioPCMBuffer? {
         guard let phrases = Self.phrases(for: player) else { return nil }
-        let voice = Self.bestVoice()
+        // Wait (without blocking the screen) for the background voice lookup.
+        let identifier = await voiceLookupTask().value
+        let voice = identifier.flatMap { AVSpeechSynthesisVoice(identifier: $0) }
+            ?? AVSpeechSynthesisVoice(language: "en-US")
         var pieces: [AVAudioPCMBuffer] = []
         for phrase in phrases {
             let utterance = AVSpeechUtterance(string: phrase.words)
