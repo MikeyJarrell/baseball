@@ -346,6 +346,48 @@ import DesignSystem
         .environment(\.dynamicTypeSize, .accessibility5)
 }
 
+#Preview("Defense check, engine’s alternating first base") {
+    DefenseSheet(context: DemoMoments.rotationCheck, onFinish: ignore)
+}
+
+#Preview("Defense check, engine’s alternating first base, dark") {
+    DefenseSheet(context: DemoMoments.rotationCheck, onFinish: ignore)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Defense check, engine’s alternating first base, largest text") {
+    DefenseSheet(context: DemoMoments.rotationCheck, onFinish: ignore)
+        .environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("Runner actions, out right after a strikeout") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .caughtStealing, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), followsStrikeout: true, onFinish: ignore) }.environment(\.insideChangesStack, true)
+}
+
+#Preview("Runner actions, out right after a strikeout, dark") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .caughtStealing, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), followsStrikeout: true, onFinish: ignore) }.environment(\.insideChangesStack, true)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Runner actions, out right after a strikeout, largest text") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .caughtStealing, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), followsStrikeout: true, onFinish: ignore) }.environment(\.insideChangesStack, true)
+        .environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("Runner actions, pickoff page") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .pickoff, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), onFinish: ignore) }.environment(\.insideChangesStack, true)
+}
+
+#Preview("Runner actions, pickoff page, dark") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .pickoff, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), onFinish: ignore) }.environment(\.insideChangesStack, true)
+        .preferredColorScheme(.dark)
+}
+
+#Preview("Runner actions, pickoff page, largest text") {
+    NavigationStack { RunnerActionConfirmPage(context: DemoMoments.midCount, reason: .pickoff, runners: ["m3"], suggest: DemoMoments.suggest(in: DemoMoments.midCount), onFinish: ignore) }.environment(\.insideChangesStack, true)
+        .environment(\.dynamicTypeSize, .accessibility5)
+}
+
 #Preview("Demo screen") {
     GameChangesDemo()
 }

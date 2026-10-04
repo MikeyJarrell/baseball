@@ -2,11 +2,13 @@
 // the reasons each runner carries on a runner action, where a pickoff out goes, and how a
 // planned defense is laid over the fielders on the field.
 //
-// Ready for a ScorebookUI test target: move this file into it once the lead builder adds one.
-// Until then it runs in a scratch package outside the repository that depends on ScorebookUI.
+// This folder needs its own test target in ScorebookUI's Package.swift, which only the lead
+// builder edits; the stanza is in plan/handoffs/screen-in-game-changes.md. Until it is added,
+// these tests run in a scratch package outside the repository that depends on ScorebookUI.
 
 import XCTest
 import Model
+import SampleData
 import GameChanges
 
 final class RunnerActionBuilderTests: XCTestCase {
@@ -80,6 +82,31 @@ final class RunnerActionBuilderTests: XCTestCase {
         XCTAssertEqual(RunnerActionBuilder.defaultOutBase(for: .caughtStealing, from: .third), .home)
     }
 
+    /// "Picked off while stealing" stays on a runner picked off and put out, and nowhere else.
+    func testWasStealingKeptOnlyOnPickoffOut() throws {
+        let picked = [RunnerMove(runner: "m3", from: .first, to: .out, outBy: [.pitcher, .firstBase, .secondBase], outAt: .second, wasStealing: true)]
+        let action = try XCTUnwrap(RunnerActionBuilder.action(moves: picked, picked: .pickoff, errors: []))
+        XCTAssertEqual(action.moves.first?.wasStealing, true)
+        XCTAssertEqual(action.moves.first?.countsAsCaughtStealing, true)
+        let safe = [RunnerMove(runner: "m3", from: .first, to: .second, wasStealing: true)]
+        let error = ErrorCharge(fielder: .pitcher, type: .throwing)
+        let moved = try XCTUnwrap(RunnerActionBuilder.action(moves: safe, picked: .pickoff, errors: [error]))
+        XCTAssertEqual(moved.moves.first?.wasStealing, false)
+    }
+
+    /// "Same pitch as the strikeout" is kept only when a runner was put out.
+    func testStrikeoutDoublePlayNeedsAnOut() throws {
+        let out = [RunnerMove(runner: "m3", from: .first, to: .out, outBy: [.catcher, .shortstop], outAt: .second)]
+        let dp = try XCTUnwrap(RunnerActionBuilder.action(moves: out, picked: .caughtStealing, errors: [], sameStrikeoutPitch: true))
+        XCTAssertTrue(dp.completesStrikeoutDoublePlay)
+        XCTAssertEqual(dp.moves.first?.reason, .caughtStealing)
+        let stole = [RunnerMove(runner: "m3", from: .first, to: .second)]
+        let sb = try XCTUnwrap(RunnerActionBuilder.action(moves: stole, picked: .stolenBase, errors: [], sameStrikeoutPitch: true))
+        XCTAssertFalse(sb.completesStrikeoutDoublePlay)
+        let plain = try XCTUnwrap(RunnerActionBuilder.action(moves: out, picked: .caughtStealing, errors: []))
+        XCTAssertFalse(plain.completesStrikeoutDoublePlay)
+    }
+
     /// An out with no fielders tapped is flagged, so the button says "Save without fielders".
     func testOutWithoutFieldersIsFlagged() {
         XCTAssertTrue(RunnerActionBuilder.outsMissingFielders([RunnerMove(runner: "m3", from: .first, to: .out)]))
@@ -132,6 +159,27 @@ final class DefenseBuilderTests: XCTestCase {
         let plan = DefenseSuggestion(team: .home, fielders: [.init(position: .firstBase, player: "d11")])
         let draft = DefenseBuilder.startingDraft(current: field, plan: plan, side: .home, isCheck: false)
         XCTAssertEqual(draft, DefenseBuilder.lineup(field))
+    }
+
+    /// The rules engine's suggested defense for the 2nd inning, with first base shared by turns:
+    /// Nash at first, marked "alternating", and every other position left alone.
+    func testEngineSuggestionWithAlternatingFirstBase() throws {
+        let sample = SampleSituations.defenseCheckWithRotation
+        let plan = try XCTUnwrap(DefenseBuilder.engineSuggestion(situation: sample.situation, team: sample.setup.home, side: .home))
+        XCTAssertEqual(plan.team, .home)
+        XCTAssertEqual(plan.fielders, [.init(position: .firstBase, player: "d11")])
+        XCTAssertEqual(plan.reasons, [.firstBase: "alternating"])
+        let draft = DefenseBuilder.startingDraft(current: sample.situation.home.fielders, plan: plan, side: .home, isCheck: true)
+        let change = try XCTUnwrap(DefenseBuilder.substitution(team: .home, current: DefenseBuilder.lineup(sample.situation.home.fielders), draft: draft))
+        XCTAssertEqual(change.defense, [.init(position: .firstBase, player: "d11")])
+    }
+
+    /// No suggestion from the engine, or one matching the field: no plan.
+    func testNoEngineSuggestion() {
+        var situation = SampleSituations.ourPitcherWarmingUp.situation
+        XCTAssertNil(DefenseBuilder.engineSuggestion(situation: situation, team: SampleSetups.mudcatsAtDiamondDogs.home, side: .home))
+        situation.suggestedDefense = situation.home.fielders
+        XCTAssertNil(DefenseBuilder.engineSuggestion(situation: situation, team: SampleSetups.mudcatsAtDiamondDogs.home, side: .home))
     }
 
     /// No changes: no substitution.
