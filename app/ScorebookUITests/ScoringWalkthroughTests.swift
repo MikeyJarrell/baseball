@@ -91,13 +91,28 @@ final class ScoringWalkthroughTests: XCTestCase {
         add(attachment)
     }
 
-    /// The lines that differ between two box scores, app first.
+    /// The lines that differ between two box scores: "-" for a line only the app printed,
+    /// "+" for a line only the book has. Lines both have, in the same order, are left out.
     static func differences(_ app: String, _ book: String) -> String {
         let a = app.components(separatedBy: "\n"), b = book.components(separatedBy: "\n")
+        // common[i][j]: how many lines the rest of the two lists have in common, in order.
+        var common = Array(repeating: Array(repeating: 0, count: b.count + 1), count: a.count + 1)
+        for i in stride(from: a.count - 1, through: 0, by: -1) {
+            for j in stride(from: b.count - 1, through: 0, by: -1) {
+                common[i][j] = a[i] == b[j] ? common[i + 1][j + 1] + 1 : max(common[i + 1][j], common[i][j + 1])
+            }
+        }
+        // Walk both lists, keeping shared lines and noting the rest.
         var lines: [String] = []
-        for i in 0..<max(a.count, b.count) {
-            let left = i < a.count ? a[i] : "(none)", right = i < b.count ? b[i] : "(none)"
-            if left != right { lines.append("line \(i + 1)\n  app:  \(left)\n  book: \(right)") }
+        var i = 0, j = 0
+        while i < a.count || j < b.count {
+            if i < a.count, j < b.count, a[i] == b[j] {
+                i += 1; j += 1
+            } else if j == b.count || (i < a.count && common[i + 1][j] >= common[i][j + 1]) {
+                lines.append("- app:  \(a[i])"); i += 1
+            } else {
+                lines.append("+ book: \(b[j])"); j += 1
+            }
         }
         return lines.joined(separator: "\n")
     }
