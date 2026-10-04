@@ -1,6 +1,6 @@
 // The words and sums the teams and songs screens show, and the edits they make to a team, as
 // plain functions with no screen, so they can be tested on their own: the announcer's script
-// ("Now batting, number twenty-two, Jordan Webb. Number twenty-two."), a team's summary line,
+// ("Now batting, number twenty-two, Jordan Webb."), a team's summary line,
 // who uses a song, times like "0:42.0", reading "22 Jordan Webb" typed in quick entry, and
 // assigning songs and introductions.
 
@@ -12,15 +12,15 @@ public enum TeamWording {
     // MARK: The stadium announcer
 
     /// The announcer's script for a player, the way the phone's voice reads it:
-    /// “Now batting, number twenty-two, Jordan Webb. Number twenty-two.” A player with only a
-    /// name gets “Now batting, Jordan Webb.”, and only a number gets the number twice.
+    /// “Now batting, number twenty-two, Jordan Webb.” A player with only a name gets
+    /// “Now batting, Jordan Webb.”, and only a number “Now batting, number twenty-two.”
     public static func announcerScript(for player: Player) -> String {
         let name = player.name?.trimmingCharacters(in: .whitespaces).nilIfEmpty
         let number = player.number?.trimmingCharacters(in: .whitespaces).nilIfEmpty.map(spokenNumber)
         switch (number, name) {
-        case let (number?, name?): return "Now batting, number \(number), \(name). Number \(number)."
+        case let (number?, name?): return "Now batting, number \(number), \(name)."
         case let (nil, name?): return "Now batting, \(name)."
-        case let (number?, nil): return "Now batting, number \(number). Number \(number)."
+        case let (number?, nil): return "Now batting, number \(number)."
         case (nil, nil): return "Now batting."
         }
     }
@@ -50,6 +50,7 @@ public enum TeamWording {
         case .recorded: return "Recorded in your voice · \(echoWords)"
         case .imported: return "Imported recording · \(echoWords)"
         case .phoneVoice: return "Using the iPhone voice, slowed to stadium pace"
+        case .pieced: return "Your voice, pieced together with their number · \(echoWords)"
         case nil: return "Nothing yet. Until there is, the song plays alone."
         }
     }
@@ -60,6 +61,7 @@ public enum TeamWording {
         case .recorded: "intro recorded"
         case .imported: "intro imported"
         case .phoneVoice: "iPhone voice intro"
+        case .pieced: "intro recorded"
         case nil: "no intro"
         }
     }

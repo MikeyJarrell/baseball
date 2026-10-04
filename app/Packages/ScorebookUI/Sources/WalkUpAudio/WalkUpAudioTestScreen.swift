@@ -200,6 +200,7 @@ public struct WalkUpAudioTestScreen: View {
         case .phoneVoice: "Phone’s voice"
         case .recorded: "Recorded"
         case .imported: "Imported"
+        case .pieced: "Pieced together"
         case nil: "None"
         }
     }

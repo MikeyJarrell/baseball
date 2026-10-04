@@ -24,12 +24,26 @@ To find the album audio for a request, search YouTube Music from the command lin
 
 When a player wants a particular line heard, find when it is sung with `mlx_whisper` (installed in Anaconda) on the first minute of the track, using `--word-timestamps True`, and set the hook just before the line. The announcer finishes as the song reaches its hook, so the line then comes in clear.
 
+## Announcer introductions
+
+Each introduction is pieced together on the phone from short recordings in Mikey’s voice: “Now batting,” then the player’s number and their name. Every number from 0 to 99 and 00 is recorded once for the whole team, so a player who gets a number later, or changes it, needs nothing new recorded: type the number into the app or the roster’s `number` column. A player with no number yet, or a number not recorded (such as 07), is introduced by name alone.
+
+Record the pieces on the Mac with a good microphone (it picks the ATR2100x when plugged in), from the repository root:
+
+```bash
+python3 tools/record_intros.py
+```
+
+It asks for “Now batting,” every player’s name, then every number, one at a time: Enter to start, Enter to stop, then it plays the take back for you to keep or redo. It skips anything already recorded, so it can be stopped and picked up again; a new player in the roster just means running it again. `python3 tools/record_intros.py --redo 22 aidan-kurt` records those pieces again.
+
+Each take is trimmed, cleaned of low rumble, and set to the same loudness as the others, then saved to `~/Dropbox/baseball/intros/` (the untouched take stays in `intros/raw/`). Record without echo: the app adds the stadium echo as it plays. `tools/load_team.sh` copies the pieces onto the phone and gives each player whose name is recorded and who has no introduction yet the pieced one. An introduction chosen in the app (a recording, an import, the iPhone voice) is kept.
+
 ## Putting the team on the phone
 
-`tools/load_team.sh` puts this roster, every opponent in `opponents.csv` and every song file named in the roster onto the phone, with each walk-up song starting at its `start_point_in_clip` and each warm-up song from the top of the track. Plug the phone in, unlock it, and run from the repository root:
+`tools/load_team.sh` puts this roster, every opponent in `opponents.csv`, every song file named in the roster and the announcer recordings onto the phone, with each walk-up song starting at its `start_point_in_clip` and each warm-up song from the top of the track. Plug the phone in, unlock it, and run from the repository root:
 
 ```bash
 tools/load_team.sh
 ```
 
-Run it again whenever this folder changes. It backs up what the phone has to `~/Dropbox/baseball/phone-backups/` first, matches players and teams by name so everyone keeps their id and season stats, keeps anything typed into the app that the roster leaves blank (a jersey number, a recorded introduction), and never touches a game. `tools/load_team.sh --simulator` does a trial run on the Mac’s iPhone simulator. The program it runs, `TeamLoader`, is in `app/Packages/ScorebookCore/Sources/TeamLoader/`; the handoff is [plan/handoffs/load-team.md](../plan/handoffs/load-team.md).
+Run it again whenever this folder changes. It backs up what the phone has to `~/Dropbox/baseball/phone-backups/` first, matches players and teams by name so everyone keeps their id and season stats, keeps anything typed into the app that the roster leaves blank (a recorded introduction), keeps a jersey number changed in the app over the roster’s and says so, and never touches a game. `tools/load_team.sh --simulator` does a trial run on the Mac’s iPhone simulator. The program it runs, `TeamLoader`, is in `app/Packages/ScorebookCore/Sources/TeamLoader/`; the handoff is [plan/handoffs/load-team.md](../plan/handoffs/load-team.md).

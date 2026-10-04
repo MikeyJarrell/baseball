@@ -107,15 +107,15 @@ struct WalkUpTimingTests {
 @Suite("The stadium announcer’s words")
 struct AnnouncerWordsTests {
 
-    @Test("Number and name: “Now batting, number two, Derek Jeter. Number two.”")
+    @Test("Number and name: “Now batting, number two, Derek Jeter.”")
     func numberAndName() {
         let jeter = Player(name: "Derek Jeter", number: "2")
         let words = AnnouncerVoice.phrases(for: jeter)?.map(\.words)
-        #expect(words == ["Now batting,", "number 2,", "Derek Jeter.", "Number 2."])
-        // Long pauses between the parts, the longest before the last “Number two.”
+        #expect(words == ["Now batting,", "number 2,", "Derek Jeter."])
+        // Long pauses between the parts, and none after the name, which ends it.
         let pauses = AnnouncerVoice.phrases(for: jeter)?.map(\.pauseAfter) ?? []
         #expect(pauses.dropLast().allSatisfy { $0 >= 0.5 })
-        #expect(pauses[2] == pauses.max())
+        #expect(pauses.last == 0)
     }
 
     @Test("Name only, number only, and neither")
@@ -123,7 +123,7 @@ struct AnnouncerWordsTests {
         #expect(AnnouncerVoice.phrases(for: Player(name: "Derek Jeter"))?.map(\.words)
                 == ["Now batting,", "Derek Jeter."])
         #expect(AnnouncerVoice.phrases(for: Player(number: "22"))?.map(\.words)
-                == ["Now batting,", "number 22.", "Number 22."])
+                == ["Now batting,", "number 22."])
         #expect(AnnouncerVoice.phrases(for: Player(placeholder: "Batter 4")) == nil)
         #expect(AnnouncerVoice.phrases(for: Player(name: "  ", number: "")) == nil)
     }

@@ -187,3 +187,31 @@ SESSLOG:[2026-10-04 10:28]
 
 ### Context
 Every job in the plan was built, reviewed by a fresh reader, fixed and accepted, then wired into one app; two full games scored through the real screens match their box scores. The app is installed on Mikey’s iPhone 17 Pro with his free Apple account, and the loader put the Diamond Dogs (16 players, 24 songs) and 8 opponents (117 players) onto it. Xcode’s command-line build needs -allowProvisioningDeviceRegistration to register a phone on a free account; the install script does that.
+
+---
+
+## [2026-10-04 11:59] Announcer introductions in Mikey’s voice, pieced together
+SESSLOG:[2026-10-04 11:59]
+
+**Project(s):** baseball
+
+### Decisions
+- Introductions are stitched on the phone from pieces Mikey recorded on the Mac with the ATR2100x: “Now batting,” every number 0–99 and 00, and each player’s name. A new or changed jersey number needs nothing new recorded (Mikey’s design).
+- The introduction ends on the name: “Now batting, number twenty-two, Yered Teodosio.” No repeated number, for the iPhone voice and the player page’s script too; the optional “closing” number set was dropped.
+- A jersey number changed in the app now wins over roster.csv, which only fills in a blank; the loader notes any difference.
+- The loader gives the pieced introduction only to players with none; one chosen in the app is kept.
+- Esteban is said es-te-BAN.
+- Claude runs the install and team-load scripts itself (now in AGENTS.md).
+
+### Follow-ups
+- [ ] Mikey hears an introduction on the phone (player page, “Test: introduction, then song”).
+- [ ] Joaquin Canas needs a jersey number.
+- [ ] Mikey’s number sheet lists different positions for some players (Gaven P, not CF); update the roster if those are current.
+
+### Files
+- [created] tools/record_intros.py, app/Packages/ScorebookUI/Sources/WalkUpAudio/PiecedIntroduction.swift and its tests, plan/handoffs/announcer-pieces.md, feedback/ai/announcer-pieces-review.md
+- [modified] Model/People.swift (pieced introductions), TeamImport, TeamLoader, tools/load_team.sh, AnnouncerVoice, TeamScreensWording, team/roster.csv (15 jersey numbers), team/README.md, PROJECT_INDEX.md, AGENTS.md
+- [created] ~/Dropbox/baseball/intros/ (118 recordings and preview.m4a); [modified] ~/Dropbox/baseball/README.md
+
+### Context
+Mikey wanted to record introductions with his good Mac microphone rather than the phone, and proposed recording every number once so the app could piece them together. A Python recorder trims, filters and levels each take; the app joins the pieces with the same pauses as its phone voice. A fresh review caught that every team load reset numbers changed in the app and re-applied pieced introductions over ones chosen in the app; both fixed. Everything is installed and loaded on the phone, and the check found every piece present, but the stitched introduction has not yet been heard on the phone itself.
