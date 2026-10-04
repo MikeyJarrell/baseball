@@ -15,7 +15,7 @@ Everything is in `app/Packages/ScorebookUI/Sources/GameChanges/`, one file per s
 - **`NonRunnerSheet`**: the automatic prompt. The rule’s runner from `runnerChoice.suggestedRunner`, then “Quinn runs” (records nothing), “Pinch runner instead” (the bench, then “Someone else”), and “Someone else”. “Later” cancels.
 - **`AddHitterSheet`**: roster or new player; says where they bat and how soon they are up.
 - **`DefenseSheet`**: the defense check (`.check`, our team, “Later”, one tap on “Everyone’s where they were”) and the fielders sheet (`.changes`, either team). Tap a position for chips of every player; picking someone already in the field swaps the two; “Nobody” leaves a position empty. Changes go back as one substitution touching only the defense.
-- **`RunnerActionSheet`**: the eight actions plus defensive indifference and a pinch runner link. Tap more runners for a double steal. The second page starts from the handed-in suggestion, shows every runner with a button for each place they could end up, takes fielder taps on the field drawing for an out, and offers “Add an error” on every action (a steal where the catcher throws the ball away). On save, runners who stayed are left out and each runner gets their own reason from where they ended up: on a double steal with the lead runner thrown out, the trail runner stole and the lead runner was caught stealing, whichever button started it. A pickoff or appeal out defaults to the runner’s own base. An out or error with no fielder tapped saves under “Save without fielders”.
+- **`RunnerActionSheet`**: the eight actions plus defensive indifference and a pinch runner link. Tap more runners for a double steal. The second page starts from the handed-in suggestion, shows every runner with a button for each place they could end up, takes fielder taps on the field drawing for an out, and offers “Add an error” on every action (a steal where the catcher throws the ball away). On save, runners who stayed are left out and each runner gets their own reason from where they ended up: on a double steal with the lead runner thrown out, the trail runner stole and the lead runner was caught stealing, whichever button started it. A pickoff or appeal out defaults to the runner’s own base. An out or error with no fielder tapped saves under “Save without fielders”. On a pickoff, each runner put out has “Picked off while stealing” (`wasStealing`, counted as caught stealing). Right after a strikeout in the same half-inning, “Same pitch as the strikeout” appears once a runner is out and sets `completesStrikeoutDoublePlay`.
 - **`GameMenuSheet`**: manual adjustment, error with nobody moving, time limit, edit this batter, the walk-up song length (if a binding is handed in), and end game with a reason.
 - **`ManualAdjustmentSheet`**, **`ErrorSheet`**, **`TimeLimitSheet`**, **`BatterSheet`** (name, number, batting side; for our batter it also leads to the pinch hitter sheet), **`GameOverSheet`** (no Cancel; End game or Keep playing).
 
@@ -30,9 +30,9 @@ Every sheet takes a `GameChangeContext(setup:situation:)` and an `onFinish` clos
 
 Present each one as an ordinary `.sheet`; each brings its own navigation. Notes:
 
-- **Defense check:** open `DefenseSheet(context:)` when `defenseCheckDue` is true. **Alternating positions (Mikey’s addition):** pass `suggestion: DefenseSuggestion(team:fielders:reasons:)` with the team, the planned positions for this half-inning (only the ones the plan sets) and a reason per position (`[.firstBase: "alternating"]`). The plan is used only on that team’s defense check, never on the fielders sheet. The sheet starts from the fielders on the field and lays the plan over them, so a position the plan leaves out keeps its player. It shades each differing position (“First base · alternating (was Quinn)”), and the big button reads “Save 1 change”, so one tap records it. Nothing in `Model` yet says who alternates; the wiring builds the suggestion once the lead builder adds the planned alternations to the setup.
+- **Defense check:** open `DefenseSheet(context:)` when `defenseCheckDue` is true. **Alternating positions (Mikey’s addition):** the sheet reads `Situation.suggestedDefense` by itself. `DefenseBuilder.engineSuggestion` turns it into a plan of only the positions that differ from the field, marking each of the team’s `fieldingRotations` “alternating”. The sheet starts from the fielders on the field and lays the plan over them, so every other position keeps its player. It shades each differing position (“First base · alternating (was Quinn)”), and the big button reads “Save 1 change”, so one tap records it. The plan is used only on that team’s defense check, never on the fielders sheet. A `suggestion: DefenseSuggestion(team:fielders:reasons:)` handed in takes its place, for previews. One difference from the engine’s own list: if the player whose turn it is was already fielding elsewhere, the sheet swaps them rather than leaving their old position empty.
 - **Non-runner prompt:** open `NonRunnerSheet(context:)` when `runnerChoice` is set.
-- **Runner actions:** `RunnerActionSheet(context:runner:suggest:onFinish:)`, where `suggest` is `{ reason, runners in engine.suggestRunnerAction(reason, runners: runners, in: situation) }`. For a wild pitch, passed ball or balk the sheet passes every runner on base.
+- **Runner actions:** `RunnerActionSheet(context:runner:suggest:followsStrikeout:onFinish:)`, where `followsStrikeout` is `RunnerActionBuilder.followsStrikeout(log: replay.log, situation: replay.situation)` (the last event was a strikeout in this half-inning; `droppedThirdStrikePossible` does not do, since it is false with first base occupied and fewer than two outs, the usual strike-’em-out, throw-’em-out case), and `suggest` is `{ reason, runners in engine.suggestRunnerAction(reason, runners: runners, in: situation) }`. For a wild pitch, passed ball or balk the sheet passes every runner on base.
 - **Game over:** open `GameOverSheet(context:)` when `gameOverQuestion` is set or `clock(for:at:).askIfOverOnTime` turns true. It uses a half-height sheet and refuses to be swiped away.
 - **Batting screen taps:** a runner opens `RunnerActionSheet` with that runner, the pitcher opens `PitchingChangeSheet`, the batter opens `BatterSheet`, the menu opens `GameMenuSheet`.
 
@@ -49,11 +49,25 @@ Nothing is blocked. Re-entry (9.9), pitcher re-entry (9.12 B), the non-runner’
 
 ## Event building and its tests
 
-The decisions that turn taps into events are plain functions in `EventBuilding.swift`: `RunnerActionBuilder` (who goes into a runner action, each runner’s reason, where an out goes by default) and `DefenseBuilder` (laying a plan over the field, swaps, the substitution). ScorebookUI has no test target on `main` yet, so 14 tests for them are in [screen-in-game-changes-tests/EventBuildingTests.swift](screen-in-game-changes-tests/EventBuildingTests.swift): the double steal with the lead runner out (from either button), a runner who stayed, a steal plus the catcher’s throwing error, a wild pitch with a runner thrown out, pickoff and appeal out bases, a one-position plan, a swap plan, a plan for the other team, a plan on the fielders sheet, and an emptied position. All 14 pass in a scratch package outside the repository that depends on ScorebookUI (`xcodebuild test` on the iPhone 17 simulator). Move the file into the ScorebookUI test target when the lead builder adds it.
+The decisions that turn taps into events are plain functions in `EventBuilding.swift`: `RunnerActionBuilder` (who goes into a runner action, each runner’s reason, where an out goes by default, the two strikeout and stealing marks, whether a strikeout came just before) and `DefenseBuilder` (laying a plan over the field, the engine’s suggested defense, swaps, the substitution).
+
+18 tests are in `app/Packages/ScorebookUI/Tests/GameChangesTests/EventBuildingTests.swift`: the double steal with the lead runner out (from either button), a runner who stayed, a steal plus the catcher’s throwing error, a wild pitch with a runner thrown out, pickoff and appeal out bases, “picked off while stealing” kept only on a pickoff out, the strikeout double play needing an out, a one-position plan, a swap plan, a plan for the other team, a plan on the fielders sheet, the engine’s alternating first base in the sample situation, no engine suggestion, and an emptied position.
+
+**Request for the lead builder:** that folder needs its own test target in `app/Packages/ScorebookUI/Package.swift`, which builders may not edit. The existing `DesignSystemTests` target cannot hold these tests, since it does not depend on GameChanges. Add, beside `DesignSystemTests`:
+
+```swift
+.testTarget(
+    name: "GameChangesTests",
+    dependencies: ["GameChanges", .product(name: "Model", package: "ScorebookCore"),
+                   .product(name: "SampleData", package: "ScorebookCore")]
+),
+```
+
+Until then, all 18 pass in a scratch package outside the repository that depends on ScorebookUI and compiles this same file (`xcodebuild test` on the iPhone 17 simulator), and `xcodebuild test -scheme ScorebookUI-Package` passes its own seven tests.
 
 ## Vocabulary requests
 
-None required. One for later: the planned alternations for the defense suggestion, which the lead builder already has in hand.
+The test target above. The open in-game changes request in `notes/vocabulary-requests.md` (the two runner marks) is now built and can move to Done.
 
 ## Evidence
 
@@ -67,6 +81,9 @@ None required. One for later: the planned alternations for the defense suggestio
   - `nonRunnerPrompt.png` and the dark version: Quinn on first, Tate suggested.
   - `gameOverTimeLimit.png`, its dark version and `gameOverMercyRule.png`.
   - `runnerAction-caught-stealing-2-6.png`: Hale caught stealing, catcher to shortstop; Save recorded “m3 first→out 2-6”.
+  - `defenseCheckRotation.png`: the engine’s suggested defense for the top of the 2nd with first base alternating: Nash at first, “alternating (was Quinn)”, “Save 1 change”.
+  - `runnerAction-same-pitch-as-strikeout.png`: Hale thrown out 2-6 right after a strikeout; Save recorded “m3 first→out 2-6, with the strikeout: DP”.
+  - `runnerAction-picked-off-while-stealing.png`: Hale picked off at first while stealing; Save recorded “m3 first→out stealing”.
   - `runnerAction-steal-plus-E2.png`: Hale steals second and takes third on the catcher’s throwing error; Save recorded “m3 first→third, E2”.
   - The rest of the sheets, and three at the largest text size.
 

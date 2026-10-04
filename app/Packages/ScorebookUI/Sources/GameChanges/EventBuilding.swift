@@ -69,13 +69,21 @@ public enum RunnerActionBuilder {
     ///   who reached third when the catcher threw the ball away is a stolen base and an error).
     /// - A runner who moved up keeps no fielders or out base.
     ///
+    /// - "Picked off while stealing" (`wasStealing`) is kept only on a runner picked off and put
+    ///   out; official scoring then counts it as caught stealing (rule 9.07(h)).
+    /// - "Same pitch as the strikeout" (`completesStrikeoutDoublePlay`) is kept only when a runner
+    ///   was put out; the rules engine accepts it only right after a strikeout in the same
+    ///   half-inning (see `followsStrikeout(log:situation:)`).
+    ///
     /// Returns nothing when no runner moved or was put out.
-    public static func action(moves: [RunnerMove], picked: RunnerMoveReason, errors: [ErrorCharge]) -> RunnerAction? {
+    public static func action(moves: [RunnerMove], picked: RunnerMoveReason, errors: [ErrorCharge],
+                              sameStrikeoutPitch: Bool = false) -> RunnerAction? {
         let hasError = !errors.isEmpty
         var result: [RunnerMove] = []
         for move in moves where move.to != .safe(at: move.from) {
             var m = move
             m.reason = reason(picked: picked, ended: m.to, hasError: hasError)
+            if m.reason != .pickoff || m.to != .out { m.wasStealing = false }
             if m.to == .out {
                 m.advancedOnError = false
             } else {
@@ -87,7 +95,15 @@ public enum RunnerActionBuilder {
             result.append(m)
         }
         guard !result.isEmpty else { return nil }
-        return RunnerAction(moves: result, errors: errors)
+        let doublePlay = sameStrikeoutPitch && result.contains { $0.to == .out }
+        return RunnerAction(moves: result, errors: errors, completesStrikeoutDoublePlay: doublePlay)
+    }
+
+    /// True when the last event was a strikeout in the half-inning now being played: the only
+    /// time a runner put out can be "on the same pitch as the strikeout" (a strike-'em-out,
+    /// throw-'em-out double play). Read from the play log the wiring already has.
+    public static func followsStrikeout(log: PlayLog, situation: Situation) -> Bool {
+        PlayLog.isStrikeoutJustBefore(log.entries.count, in: log.entries, half: situation.half, inning: situation.inning)
     }
 
     /// True when a runner was put out and nobody was tapped as making the out, so the save
@@ -153,6 +169,24 @@ public enum DefenseBuilder {
     /// Positions where the sheet differs from the field now.
     public static func changedPositions(current: [Position: PlayerID], draft: [Position: PlayerID]) -> [Position] {
         Position.allCases.filter { draft[$0] != current[$0] }
+    }
+
+    /// The rules engine's suggested defense for the defense check (`Situation.suggestedDefense`,
+    /// which applies the team's fielding rotations for this inning), as a plan: only the
+    /// positions that differ from the field now, each marked "alternating" when it is one of the
+    /// team's rotations. Nothing when there is no suggestion or it matches the field.
+    public static func engineSuggestion(situation: Situation, team: GameTeam, side: TeamSide) -> DefenseSuggestion? {
+        guard let suggested = situation.suggestedDefense else { return nil }
+        let current = lineup(situation[side].fielders)
+        let planned = lineup(suggested)
+        let rotated = Set(team.fieldingRotations.map(\.position))
+        let changed = Position.allCases.filter { planned[$0] != nil && planned[$0] != current[$0] }
+        guard !changed.isEmpty else { return nil }
+        return DefenseSuggestion(
+            team: side,
+            fielders: changed.compactMap { p in planned[p].map { FielderAssignment(position: p, player: $0) } },
+            reasons: Dictionary(uniqueKeysWithValues: changed.map { ($0, rotated.contains($0) ? "alternating" : "suggested") })
+        )
     }
 
     /// One substitution with every position that changed, or nothing when nothing changed.
