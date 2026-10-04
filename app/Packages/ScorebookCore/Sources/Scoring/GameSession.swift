@@ -261,6 +261,14 @@ public final class GameSession {
         return engine.replay(earlier).situation
     }
 
+    /// Where the game stood just before one earlier event, so that event can be entered again
+    /// from the same spot when the scorer fixes it from the play-by-play.
+    public func situation(before id: EventID) -> Situation? {
+        guard let index = game.events.firstIndex(where: { $0.id == id }) else { return nil }
+        let earlier = Game(id: game.id, setup: game.setup, events: Array(game.events[..<index]))
+        return engine.replay(earlier).situation
+    }
+
     /// Applies a change to an earlier event from the play-by-play (replace, delete or insert),
     /// then works out everything after it again. Clears Redo.
     @discardableResult
