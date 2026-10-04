@@ -1,0 +1,99 @@
+{
+  "description": "Ortiz singles to left. Ruiz bunts; pitcher Barros fields it and throws to Quinn at first while Ortiz takes second. A sacrifice: no at-bat for Ruiz.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "sacrificeBunt",
+        "battedBall": "bunt",
+        "fielders": [
+          1,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              1,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "runners": [
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3"
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "SH 1-3"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "sacrificeBunts": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 2
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d9",
+        "assists": 1,
+        "putouts": 0
+      },
+      {
+        "player": "d4",
+        "putouts": 1
+      }
+    ]
+  }
+}

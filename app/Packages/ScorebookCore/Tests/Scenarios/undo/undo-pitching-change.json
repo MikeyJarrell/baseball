@@ -1,0 +1,89 @@
+{
+  "description": "Undo a pitching change. Ortiz flies out and Voss relieves Barros. Undoing the change puts Barros back on the mound, and Barros is no longer listed as a removed pitcher who may come back.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "d12"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "pitcher": "d9",
+          "fielders": [
+            {
+              "team": "home",
+              "position": 1,
+              "player": "d9"
+            }
+          ],
+          "lineups": [
+            {
+              "team": "home",
+              "eligibleToPitchAgain": []
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "pitcher": "d12",
+      "fielders": [
+        {
+          "team": "home",
+          "position": 1,
+          "player": "d12"
+        }
+      ],
+      "battingSlots": [
+        {
+          "team": "home",
+          "index": 8,
+          "players": [
+            "d9"
+          ],
+          "isBattingOnly": true
+        }
+      ],
+      "lineups": [
+        {
+          "team": "home",
+          "eligibleToPitchAgain": [
+            "d9"
+          ]
+        }
+      ]
+    }
+  }
+}

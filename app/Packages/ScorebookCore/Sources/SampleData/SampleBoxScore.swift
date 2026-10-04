@@ -27,14 +27,21 @@ extension SampleGame {
                 line("m7", "Joe Varga", "8", 6, [.c], BattingCounts(plateAppearances: 2, atBats: 1, walks: 1)),
                 line("m8", "Nate Bell", "4", 7, [.secondBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1, runsBattedIn: 1)),
                 line("m9", "Ray Collins", "31", 8, [.p], BattingCounts(plateAppearances: 1, atBats: 1, strikeouts: 1)),
-                line("m10", "Kyle Moss", "15", 8, [.ph], BattingCounts(plateAppearances: 1, atBats: 1), sub: true),
-                line("m12", "Gus Reyes", "40", 8, [.p], BattingCounts(), sub: true),
+                // Moss popped out to short batting for Collins in the 4th; Reyes took Moss's spot
+                // when they came in to pitch in the bottom of the 4th.
+                line("m10", "Kyle Moss", "15", 8, [.ph], BattingCounts(plateAppearances: 1, atBats: 1), sub: true,
+                     entered: SubstituteEntry(inning: 4, kind: .pinchHitter, replaced: "m9", replacedName: "Ray Collins",
+                                              outcome: .out, notation: "P6")),
+                line("m12", "Gus Reyes", "40", 8, [.p], BattingCounts(), sub: true,
+                     entered: SubstituteEntry(inning: 4, kind: .replacement, replaced: "m10", replacedName: "Kyle Moss")),
             ],
             pitching: [
                 PitchingLine(player: "m9", name: "Ray Collins", number: "31", stats: PitchingCounts(
                     outsRecorded: 9, battersFaced: 15, hits: 6, runs: 3, walks: 1, strikeouts: 2, homeRuns: 1, pitches: 47, strikes: 30)),
                 PitchingLine(player: "m12", name: "Gus Reyes", number: "40", stats: PitchingCounts(
-                    outsRecorded: 6, battersFaced: 9, hits: 3, runs: 2, hitBatters: 1, pitches: 23, strikes: 15)),
+                    outsRecorded: 6, battersFaced: 9, hits: 3, runs: 2, hitBatters: 1, pitches: 23, strikes: 15),
+                    // Charged with Ford's run in the 4th, which put the Diamond Dogs ahead for good.
+                    decision: .loss),
             ],
             fielding: [
                 field("m1", "Luis Ortiz", .centerField, 1...5, FieldingCounts(putouts: 1)),
@@ -62,12 +69,16 @@ extension SampleGame {
                 line("d7", "Drew Lang", "17", 6, [.rf], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
                 line("d8", "Morgan Fisk", "10", 7, [.c], BattingCounts(plateAppearances: 2, atBats: 1, runsBattedIn: 1, sacrificeFlies: 1)),
                 line("d9", "Sky Barros", "21", 8, [.p], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
-                line("d12", "Taylor Voss", "44", 8, [.p], BattingCounts(), sub: true),
+                line("d12", "Taylor Voss", "44", 8, [.p], BattingCounts(), sub: true,
+                     entered: SubstituteEntry(inning: 5, kind: .replacement, replaced: "d9", replacedName: "Sky Barros")),
                 line("d10", "Jamie Cole", "14", 9, [], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 2, doubles: 1, stolenBases: 1)),
             ],
             pitching: [
                 PitchingLine(player: "d9", name: "Sky Barros", number: "21", stats: PitchingCounts(
-                    outsRecorded: 12, battersFaced: 19, hits: 6, runs: 3, walks: 2, strikeouts: 1, homeRuns: 1, pitches: 57, strikes: 35)),
+                    outsRecorded: 12, battersFaced: 19, hits: 6, runs: 3, walks: 2, strikeouts: 1, homeRuns: 1, pitches: 57, strikes: 35),
+                    // Pitching when the Diamond Dogs went ahead for good in the 4th, with four complete
+                    // innings, enough for a starter when the team plays five innings in the field.
+                    decision: .win),
                 PitchingLine(player: "d12", name: "Taylor Voss", number: "44", stats: PitchingCounts(
                     outsRecorded: 3, battersFaced: 5, hits: 1, walks: 1, strikeouts: 1, pitches: 13, strikes: 9)),
             ],
@@ -103,15 +114,23 @@ extension SampleGame {
             hitByPitch: [tally("d6", "Casey Ford", .home)],
             doublePlays: [TeamTally(team: .away, name: "Mudcats", count: 2), TeamTally(team: .home, name: "Diamond Dogs", count: 2)],
             triplePlays: [],
-            leftOnBase: [TeamTally(team: .away, name: "Mudcats", count: 6), TeamTally(team: .home, name: "Diamond Dogs", count: 4)]
+            leftOnBase: [TeamTally(team: .away, name: "Mudcats", count: 6), TeamTally(team: .home, name: "Diamond Dogs", count: 4)],
+            hitBatters: [HitBatterNote(batter: "d6", batterName: "Casey Ford", team: .home,
+                                       pitcher: "m12", pitcherName: "Gus Reyes", count: 1)],
+            ranForNonRunners: [NonRunnerRunnerNote(runner: "d3", runnerName: "Jordan Webb", nonRunner: "d4",
+                                                   nonRunnerName: "Pat Quinn", team: .home, innings: [3])]
         ),
-        isFinal: true
+        isFinal: true,
+        // The first pitch was the second event and the end of the game the 154th, with 76
+        // seconds between events: 152 × 76 = 11,552 seconds, or 3:12.
+        gameLength: 11_552
     )
 
     /// A batting line. `spot` counts from 0 for the leadoff spot.
     static func line(_ id: PlayerID, _ name: String, _ number: String, _ spot: Int, _ positions: [BoxPosition],
-                             _ stats: BattingCounts, sub: Bool = false) -> BattingLine {
-        BattingLine(player: id, name: name, number: number, batterIndex: spot, positions: positions, isSubstitute: sub, stats: stats)
+                             _ stats: BattingCounts, sub: Bool = false, entered: SubstituteEntry? = nil) -> BattingLine {
+        BattingLine(player: id, name: name, number: number, batterIndex: spot, positions: positions, isSubstitute: sub,
+                    stats: stats, entered: entered)
     }
 
     /// A fielding line for a player who played one position for a run of innings.

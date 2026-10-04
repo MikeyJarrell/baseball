@@ -1,0 +1,75 @@
+# Official box score, Kansas City Royals 6 at New York Yankees 7 (10 innings), April 21, 2019.
+# Transcribed by hand from https://www.retrosheet.org/boxesetc/2019/B04210NYA2019.htm
+# The information used here was obtained free of charge from and is copyrighted by Retrosheet.
+# Interested parties may contact Retrosheet at "www.retrosheet.org".
+#
+# Format: one line per item, fields separated by commas, numbers as NAME=VALUE.
+# line,SIDE,runs by inning (x = did not bat)
+# team,SIDE,...       totals for the team
+# bat,PLAYER,...      batting line; 2B, 3B, HR, SB, CS, SH, SF, HBP come from the notes under the box
+# pit,PLAYER,...      pitching line; IP as printed (6.1 is six innings and one out)
+# fld,PLAYER,...      putouts and assists from the batting table, errors from the notes
+line,away,0,0,0,0,0,0,0,6,0,0
+line,home,1,1,0,0,3,0,0,1,0,1
+team,away,R=6,H=10,E=0,LOB=6,DP=0
+team,home,R=7,H=12,E=0,LOB=9,DP=0
+bat,merrw001,AB=5,R=1,H=2,RBI=0,BB=0,SO=2
+bat,mondr003,AB=5,R=1,H=2,RBI=2,BB=0,SO=3,2B=1,SB=1
+bat,gorda001,AB=5,R=1,H=2,RBI=3,BB=0,SO=1,2B=1,HR=1
+bat,dozih001,AB=4,R=1,H=2,RBI=1,BB=1,SO=1,HR=1
+bat,goret001,AB=0,R=0,H=0,RBI=0,BB=0,SO=0,CS=1
+bat,solej001,AB=5,R=0,H=0,RBI=0,BB=0,SO=5
+bat,owinc001,AB=4,R=0,H=0,RBI=0,BB=1,SO=2
+bat,dudal001,AB=4,R=0,H=0,RBI=0,BB=0,SO=2
+bat,maldm001,AB=4,R=1,H=1,RBI=0,BB=0,SO=3
+bat,hamib001,AB=3,R=1,H=1,RBI=0,BB=1,SO=1,SB=2
+bat,lemad001,AB=4,R=1,H=1,RBI=0,BB=0,SO=0,2B=1,HBP=1
+bat,voitl001,AB=5,R=1,H=1,RBI=0,BB=0,SO=2
+bat,gardb001,AB=5,R=1,H=3,RBI=0,BB=0,SO=0
+bat,frazc001,AB=5,R=1,H=1,RBI=3,BB=0,SO=3,HR=1
+bat,taucm001,AB=4,R=2,H=2,RBI=0,BB=1,SO=1,2B=1
+bat,urshg001,AB=4,R=0,H=0,RBI=0,BB=1,SO=1
+bat,fordm002,AB=4,R=1,H=1,RBI=0,BB=0,SO=0,2B=1
+bat,estrt001,AB=0,R=0,H=0,RBI=0,BB=0,SO=0,SH=1
+bat,romia002,AB=5,R=0,H=3,RBI=3,BB=0,SO=0
+bat,wadet002,AB=2,R=0,H=0,RBI=0,BB=1,SO=1
+bat,torrg001,AB=1,R=0,H=0,RBI=0,BB=0,SO=1
+pit,lopej004,IP=7,H=8,R=5,BB=1,SO=6,HR=1,BFP=31,HBP=1
+pit,peraw001,IP=1,H=2,R=1,BB=0,SO=1,HR=0,BFP=5
+pit,barls001,IP=1,H=1,R=0,BB=0,SO=2,HR=0,BFP=4
+pit,diekj001,IP=0,H=0,R=1,BB=2,SO=0,HR=0,BFP=2
+pit,kenni001,IP=0.1,H=1,R=0,BB=0,SO=0,HR=0,BFP=2
+pit,paxtj001,IP=6,H=3,R=0,BB=1,SO=12,HR=0,BFP=22
+pit,kahnt001,IP=1,H=0,R=0,BB=0,SO=2,HR=0,BFP=3
+pit,greec003,IP=0,H=2,R=3,BB=1,SO=0,HR=0,BFP=3
+pit,ottaa001,IP=1,H=3,R=3,BB=1,SO=2,HR=2,BFP=7
+pit,chapa001,IP=1,H=1,R=0,BB=0,SO=2,HR=0,BFP=4
+pit,britz001,IP=1,H=1,R=0,BB=0,SO=2,HR=0,BFP=3
+fld,merrw001,PO=1,A=0,E=0
+fld,mondr003,PO=0,A=2,E=0
+fld,gorda001,PO=1,A=0,E=0
+fld,solej001,PO=5,A=0,E=0
+fld,owinc001,PO=0,A=2,E=0
+fld,dudal001,PO=8,A=2,E=0
+fld,maldm001,PO=9,A=0,E=0
+fld,hamib001,PO=3,A=0,E=0
+fld,lopej004,PO=0,A=1,E=0
+fld,peraw001,PO=1,A=0,E=0
+fld,barls001,PO=0,A=0,E=0
+fld,diekj001,PO=0,A=0,E=0
+fld,kenni001,PO=0,A=0,E=0
+fld,lemad001,PO=0,A=2,E=0
+fld,gardb001,PO=2,A=0,E=0
+fld,frazc001,PO=1,A=0,E=0
+fld,taucm001,PO=1,A=0,E=0
+fld,urshg001,PO=1,A=1,E=0
+fld,fordm002,PO=4,A=1,E=0
+fld,romia002,PO=20,A=0,E=0
+fld,wadet002,PO=0,A=0,E=0
+fld,torrg001,PO=0,A=0,E=0
+fld,paxtj001,PO=0,A=1,E=0
+fld,kahnt001,PO=0,A=0,E=0
+fld,greec003,PO=0,A=0,E=0
+fld,ottaa001,PO=0,A=0,E=0
+fld,chapa001,PO=0,A=0,E=0
+fld,britz001,PO=1,A=1,E=0
