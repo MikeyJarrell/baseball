@@ -173,7 +173,7 @@ public struct PlayerSeasonScreen: View {
                 }
             } else {
                 StatsTable(
-                    rows: Self.newestFirst(entries), nameTitle: "Game",
+                    rows: StatSorting.newestFirst(entries), nameTitle: "Game",
                     name: { "\(PostgameWording.shortDate($0.date)) \($0.opponentName)" },
                     columns: columns,
                     onTapRow: { onRequest(.openGame($0.gameID)) },
@@ -182,15 +182,6 @@ public struct PlayerSeasonScreen: View {
                 )
             }
         }
-    }
-
-    /// A game log with the newest game first. Games on the same day keep their order.
-    static func newestFirst<Counts>(_ entries: [GameLogEntry<Counts>]) -> [GameLogEntry<Counts>] {
-        entries.enumerated()
-            .sorted { a, b in
-                a.element.date != b.element.date ? a.element.date > b.element.date : a.offset > b.offset
-            }
-            .map(\.element)
     }
 
     // MARK: Small parts

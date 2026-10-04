@@ -24,15 +24,6 @@ public struct GamesListScreen: View {
         self.onRequest = onRequest
     }
 
-    /// Newest first. Games on the same day keep the order they were handed in.
-    static func newestFirst(_ games: [GameSummary]) -> [GameSummary] {
-        games.enumerated()
-            .sorted { a, b in
-                a.element.date != b.element.date ? a.element.date > b.element.date : a.offset < b.offset
-            }
-            .map(\.element)
-    }
-
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -45,7 +36,7 @@ public struct GamesListScreen: View {
                         .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                 } else {
                     VStack(spacing: 0) {
-                        let ordered = Self.newestFirst(games)
+                        let ordered = StatSorting.newestFirst(games)
                         ForEach(ordered) { game in
                             GameRow(game: game) { onRequest(.openGame(game.id)) }
                             if game.id != ordered.last?.id {

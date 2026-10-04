@@ -247,6 +247,26 @@ enum StatSorting {
         }
     }
 
+    /// The games list, newest first. Games with the same start time keep the order they were
+    /// handed in.
+    static func newestFirst(_ games: [GameSummary]) -> [GameSummary] {
+        games.enumerated()
+            .sorted { a, b in
+                a.element.date != b.element.date ? a.element.date > b.element.date : a.offset < b.offset
+            }
+            .map(\.element)
+    }
+
+    /// A player's game log, newest game first. The log comes oldest first, so of two games with
+    /// the same date (a doubleheader) the later one in the log goes on top.
+    static func newestFirst<Counts>(_ entries: [GameLogEntry<Counts>]) -> [GameLogEntry<Counts>] {
+        entries.enumerated()
+            .sorted { a, b in
+                a.element.date != b.element.date ? a.element.date > b.element.date : a.offset > b.offset
+            }
+            .map(\.element)
+    }
+
     /// The season pitching lines sorted for the table.
     static func pitching(_ lines: [SeasonPitchingLine], by choice: SortChoice<PitchingColumn>) -> [SeasonPitchingLine] {
         sorted(lines, descending: choice.descending) { choice.column.value($0.stats, games: $0.games) }

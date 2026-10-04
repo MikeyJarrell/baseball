@@ -42,13 +42,13 @@ struct ResultWordingTests {
 
     @Test("The games list shows the newest game first")
     func newestFirst() {
-        let ordered = GamesListScreen.newestFirst(games)
+        let ordered = StatSorting.newestFirst(games)
         #expect(ordered.map(\.id.rawValue) == ["g8", "g7", "g6", "g5", "g4", "g3", "g2", "g1"])
     }
 
     @Test("A game log shows the newest game first")
     func gameLogNewestFirst() {
-        let ordered = PlayerSeasonScreen.newestFirst(PreviewSeason.morenoLog)
+        let ordered = StatSorting.newestFirst(PreviewSeason.morenoLog)
         #expect(ordered.map(\.opponentName) == ["Mudcats", "Bombers", "Mudcats"])
         #expect(ordered.first?.gameID == "preview-mudcats-2")
     }
