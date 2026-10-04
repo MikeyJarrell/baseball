@@ -50,6 +50,8 @@ public struct PlayRow: Identifiable, Equatable, Sendable {
     public var deleteEffect: String
     /// True when the event is a pitch, so the fix sheet shows the batter and the count.
     public var isPitch: Bool
+    /// True when the event ended a plate appearance (ball four, strike three, a ball in play).
+    public var endedPlateAppearance: Bool
 }
 
 /// One half-inning of the play-by-play.
@@ -165,7 +167,8 @@ public enum PlayByPlay {
                 countAfter: entry.after.count,
                 earlierPitches: (isPitch || isBallInPlay(entry)) ? earlier : [],
                 deleteEffect: OverviewWording.deleteEffect(entry, setup: setup),
-                isPitch: isPitch
+                isPitch: isPitch,
+                endedPlateAppearance: entry.plateAppearance != nil
             ))
 
             // Keep the list of pitches for the next event: a pitch that did not end the plate

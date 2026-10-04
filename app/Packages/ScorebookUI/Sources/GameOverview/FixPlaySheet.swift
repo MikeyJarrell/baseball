@@ -143,7 +143,10 @@ public struct FixPlaySheet: View {
         var parts = [OverviewWording.halfInning(row.half, row.inning)]
         if row.isPitch {
             if let batter = row.batter { parts.append("to \(batter)") }
-            parts.append("count \(OverviewWording.count(row.countBefore)) before it, \(OverviewWording.count(row.countAfter)) after")
+            // A pitch that ended the plate appearance has no count after it worth showing.
+            parts.append(row.endedPlateAppearance
+                ? "count \(OverviewWording.count(row.countBefore)) before it, ended the plate appearance"
+                : "count \(OverviewWording.count(row.countBefore)) before it, \(OverviewWording.count(row.countAfter)) after")
         }
         return parts.joined(separator: " · ")
     }
