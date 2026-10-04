@@ -9,7 +9,7 @@
 import Foundation
 import Observation
 
-/// Plays walk-up songs, announcer introductions and between-innings music, and manages
+/// Plays walk-up songs, announcer introductions and pitchers' warm-up songs, and manages
 /// the song library.
 ///
 /// The player keeps the library it was given. Whenever it changes (new songs added, a new
@@ -22,7 +22,7 @@ import Observation
 public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// The song library as the player has it now.
     var library: SongLibrary { get }
-    /// True while a song, introduction or between-innings track is playing.
+    /// True while a song, introduction or warm-up song is playing.
     var isPlaying: Bool { get }
     /// The song playing now, if any.
     var nowPlaying: SongID? { get }
@@ -31,6 +31,9 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// Called whenever something stops playing for any reason (stopped, faded, reached its
     /// play length, the end of the track, an interruption), with the song that was playing.
     var onPlaybackEnded: ((SongID?) -> Void)? { get set }
+    /// What is playing now, and when a walk-up song will start fading by itself, for the
+    /// song button's countdown. Players that do not report it say only playing or not.
+    var playback: AudioPlayback { get }
 
     /// Hands the player the saved library when the app opens.
     func load(_ library: SongLibrary)
@@ -55,7 +58,6 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     var walkUpLength: TimeInterval { get set }
     /// Sets the song's loudness, 0 to 1.
     func setVolume(_ volume: Double, for song: SongID)
-    func setBetweenInningsPlaylist(_ songs: [SongID], shuffle: Bool)
     /// Sets how much stadium echo recorded introductions get, 0 to 1.
     func setAnnouncerEcho(_ amount: Double)
 
@@ -74,10 +76,12 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     /// Stops whatever is playing at once.
     func stop()
 
-    // Between innings
+    // Pitcher warm-ups
 
-    /// Starts the between-innings playlist.
-    func playBetweenInnings()
+    /// Plays our pitcher's warm-up song while our team takes the field. It plays until stopped
+    /// or faded; the app fades it when the first pitch of the half-inning is recorded. Nothing
+    /// plays for the other team's warm-ups.
+    func playWarmUp(for pitcher: Player)
 
     // Announcer introductions
 
@@ -89,6 +93,42 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     @concurrent nonisolated func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction
     /// Plays a player's introduction on its own, to check it.
     func playIntroduction(for player: Player)
+}
+
+extension WalkUpAudioPlayer {
+    /// A plain reading for players that do not report more: a song while something is playing.
+    public var playback: AudioPlayback {
+        isPlaying ? AudioPlayback(phase: .song, song: nowPlaying) : AudioPlayback(phase: .idle)
+    }
+}
+
+/// What the walk-up audio player is doing now.
+public struct AudioPlayback: Codable, Equatable, Hashable, Sendable {
+    /// The part of the walk-up that is playing.
+    public enum Phase: String, Codable, Sendable, CaseIterable {
+        /// Nothing is playing.
+        case idle
+        /// The announcer introduction, before the song.
+        case introduction
+        /// A walk-up song, or a song previewed in the library.
+        case song
+        /// Our pitcher's warm-up song.
+        case warmUp
+    }
+
+    public var phase: Phase
+    /// The song playing or coming next after the introduction.
+    public var song: SongID?
+    /// When the walk-up song will start fading out by itself: the moment the song started plus
+    /// the walk-up length (or the song's own play length). Missing during the introduction,
+    /// for a warm-up song, and when nothing is playing.
+    public var fadesAt: Date?
+
+    public init(phase: Phase, song: SongID? = nil, fadesAt: Date? = nil) {
+        self.phase = phase
+        self.song = song
+        self.fadesAt = fadesAt
+    }
 }
 
 /// What can go wrong with audio, in words the scorer can act on.
@@ -141,10 +181,6 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
         update(song) { $0.volume = volume }
     }
 
-    public func setBetweenInningsPlaylist(_ songs: [SongID], shuffle: Bool) {
-        library.betweenInningsPlaylist = songs
-        library.shufflePlaylist = shuffle
-    }
 
     public func setAnnouncerEcho(_ amount: Double) { library.announcerEcho = amount }
 
@@ -173,8 +209,8 @@ public final class SilentAudioPlayer: WalkUpAudioPlayer {
         onPlaybackEnded?(ended)
     }
 
-    public func playBetweenInnings() {
-        nowPlaying = library.betweenInningsPlaylist.first
+    public func playWarmUp(for pitcher: Player) {
+        nowPlaying = pitcher.warmUpSongID
         isPlaying = nowPlaying != nil
     }
 

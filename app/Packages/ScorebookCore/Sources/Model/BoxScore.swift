@@ -1,5 +1,5 @@
 // Box scores: one game's batting lines, pitching lines, fielding, line score by inning,
-// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Cardinals 4.").
+// and the notes underneath ("E—Ruiz 2. DP—Mudcats 1. LOB—Mudcats 6, Diamond Dogs 4.").
 //
 // The stats engine fills these in from the play log. The counting-stat bundles
 // (BattingCounts, PitchingCounts, FieldingCounts) are shared with season totals, and
@@ -18,6 +18,9 @@ public struct BoxScore: Codable, Equatable, Sendable {
     public var notes: BoxScoreNotes
     /// True once the game has ended; a box score so far is not final.
     public var isFinal: Bool
+    /// How long the game took, in seconds, from the first pitch to the end-of-game event: the
+    /// "T—1:58" line. Missing until the game is final.
+    public var gameLength: TimeInterval?
 
     public init(
         gameID: GameID,
@@ -26,7 +29,8 @@ public struct BoxScore: Codable, Equatable, Sendable {
         home: TeamBoxScore,
         lineScore: LineScore,
         notes: BoxScoreNotes,
-        isFinal: Bool
+        isFinal: Bool,
+        gameLength: TimeInterval? = nil
     ) {
         self.gameID = gameID
         self.date = date
@@ -35,6 +39,7 @@ public struct BoxScore: Codable, Equatable, Sendable {
         self.lineScore = lineScore
         self.notes = notes
         self.isFinal = isFinal
+        self.gameLength = gameLength
     }
 
     /// One team's half of the box score, by side.
@@ -54,7 +59,9 @@ public struct TeamBoxScore: Codable, Equatable, Sendable {
     public var batting: [BattingLine]
     /// A line for every pitcher, in the order they pitched.
     public var pitching: [PitchingLine]
-    /// Putouts, assists and errors for every player who fielded.
+    /// A line for every player who took a fielding position, even with no putouts, assists or
+    /// errors, showing where they played. Players who field without batting appear only here,
+    /// which is how a manager shows they took part, for playoff eligibility [3.5 B 2].
     public var fielding: [FieldingLine]
     /// Runs, hits and errors for the line score's R H E columns. Runs always equal the team's
     /// final score: runs added or taken away by a manual adjustment count here (see
@@ -121,11 +128,15 @@ public struct BattingLine: Codable, Equatable, Sendable {
     public var number: String?
     /// The spot in the order they batted in (or ran for), counting from 0.
     public var batterIndex: Int
-    /// Every position they played today, in order: "ss", or "ph" then "2b".
+    /// Every position they played today, in order: "ss", or "ph" then "2b". A player who only
+    /// batted has none, or just "ph".
     public var positions: [BoxPosition]
     /// True for a player who came into the game after it started.
     public var isSubstitute: Bool
     public var stats: BattingCounts
+    /// For a substitute: when and how they came in, and what they did then, for the newspaper
+    /// footnote ("a-struck out for Collins in the 4th"). Missing for starters.
+    public var entered: SubstituteEntry?
 
     public init(
         player: PlayerID,
@@ -134,7 +145,8 @@ public struct BattingLine: Codable, Equatable, Sendable {
         batterIndex: Int,
         positions: [BoxPosition],
         isSubstitute: Bool = false,
-        stats: BattingCounts
+        stats: BattingCounts,
+        entered: SubstituteEntry? = nil
     ) {
         self.player = player
         self.name = name
@@ -143,6 +155,34 @@ public struct BattingLine: Codable, Equatable, Sendable {
         self.positions = positions
         self.isSubstitute = isSubstitute
         self.stats = stats
+        self.entered = entered
+    }
+}
+
+/// How a substitute came into the batting order, for the box score footnotes.
+public struct SubstituteEntry: Codable, Equatable, Hashable, Sendable {
+    /// The inning they came in.
+    public var inning: Int
+    /// Pinch hitter, pinch runner, or a replacement (a fielder or pitcher who took the spot).
+    public var kind: BattingChangeKind
+    /// The player whose batting spot they took.
+    public var replaced: PlayerID
+    /// That player's name as the box score prints it.
+    public var replacedName: String
+    /// How the plate appearance they finished in that inning ended, if they finished one: a
+    /// pinch hitter's at-bat. Missing for a pinch runner or a replacement who did not bat then.
+    public var outcome: PlateAppearanceOutcome?
+    /// The same plate appearance in scorebook notation: "K", "1B 7".
+    public var notation: String?
+
+    public init(inning: Int, kind: BattingChangeKind, replaced: PlayerID, replacedName: String,
+                outcome: PlateAppearanceOutcome? = nil, notation: String? = nil) {
+        self.inning = inning
+        self.kind = kind
+        self.replaced = replaced
+        self.replacedName = replacedName
+        self.outcome = outcome
+        self.notation = notation
     }
 }
 
@@ -152,25 +192,63 @@ public struct PitchingLine: Codable, Equatable, Sendable {
     public var name: String
     public var number: String?
     public var stats: PitchingCounts
+    /// The winning or losing pitcher, under official scoring rule 9.17. Missing for every
+    /// other pitcher, and for everyone until the game is final or when it ends tied.
+    public var decision: PitchingDecision?
 
-    public init(player: PlayerID, name: String, number: String? = nil, stats: PitchingCounts) {
+    public init(player: PlayerID, name: String, number: String? = nil, stats: PitchingCounts,
+                decision: PitchingDecision? = nil) {
         self.player = player
         self.name = name
         self.number = number
         self.stats = stats
+        self.decision = decision
     }
 }
 
-/// One fielder's putouts, assists and errors in a box score.
+/// The pitcher's decision in a finished game, under official scoring rule 9.17.
+///
+/// - Win: the winning team's pitcher of record when it took the lead for good. A starting
+///   pitcher needs five complete innings for it (four when their team played only five
+///   innings in the field); otherwise the win goes to a relief pitcher. Which reliever is a
+///   judgment the rule leaves to the scorer; the stats engine picks the reliever with the most
+///   outs, then the fewest runs charged, then the earliest.
+/// - Loss: the pitcher charged with the run that gave the other team the lead for good.
+///
+/// Saves and won-lost records are not kept.
+public enum PitchingDecision: String, Codable, Sendable, CaseIterable {
+    case win
+    case loss
+}
+
+/// One fielder's line in a box score: where they played, by inning, and their putouts,
+/// assists and errors.
 public struct FieldingLine: Codable, Equatable, Sendable {
     public var player: PlayerID
     public var name: String
+    /// Every position they played, in the order they first played it, each with the innings
+    /// they were there. A fielder who was at a position for any part of an inning counts that
+    /// inning.
+    public var appearances: [FieldingAppearance]
     public var stats: FieldingCounts
 
-    public init(player: PlayerID, name: String, stats: FieldingCounts) {
+    public init(player: PlayerID, name: String, appearances: [FieldingAppearance], stats: FieldingCounts) {
         self.player = player
         self.name = name
+        self.appearances = appearances
         self.stats = stats
+    }
+}
+
+/// One position a player played, and the innings they played it.
+public struct FieldingAppearance: Codable, Equatable, Hashable, Sendable {
+    public var position: Position
+    /// The innings, first inning first: `[1, 2, 3]`.
+    public var innings: [Int]
+
+    public init(position: Position, innings: [Int]) {
+        self.position = position
+        self.innings = innings
     }
 }
 
@@ -181,16 +259,15 @@ public enum BoxPosition: String, Codable, Sendable, CaseIterable {
     case secondBase = "2b"
     case thirdBase = "3b"
     case ss, lf, cf, rf
-    /// Extra hitter: bats, does not field.
-    case eh
     /// Pinch hitter.
     case ph
     /// Pinch runner.
     case pr
 
-    /// The box score label for a fielding position: shortstop is "ss".
+    /// The box score label for a fielding position: shortstop is "ss". Every position has one;
+    /// "ph" is a fallback that never crashes the app.
     public init(_ position: Position) {
-        self = BoxPosition(rawValue: position.abbreviation) ?? .eh
+        self = BoxPosition(rawValue: position.abbreviation) ?? .ph
     }
 }
 
@@ -234,6 +311,10 @@ public struct BoxScoreNotes: Codable, Equatable, Sendable {
     public var triplePlays: [TeamTally]
     /// Runners left on base, by team.
     public var leftOnBase: [TeamTally]
+    /// Each batter hit by a pitch, with the pitcher who hit them: "HBP—by Reyes (Ford)".
+    public var hitBatters: [HitBatterNote]
+    /// Who ran for each designated non-runner, and in which innings: "Webb ran for Quinn in the 3rd."
+    public var ranForNonRunners: [NonRunnerRunnerNote]
 
     public init(
         errors: [PlayerTally] = [],
@@ -248,7 +329,9 @@ public struct BoxScoreNotes: Codable, Equatable, Sendable {
         hitByPitch: [PlayerTally] = [],
         doublePlays: [TeamTally] = [],
         triplePlays: [TeamTally] = [],
-        leftOnBase: [TeamTally] = []
+        leftOnBase: [TeamTally] = [],
+        hitBatters: [HitBatterNote] = [],
+        ranForNonRunners: [NonRunnerRunnerNote] = []
     ) {
         self.errors = errors
         self.doubles = doubles
@@ -263,6 +346,76 @@ public struct BoxScoreNotes: Codable, Equatable, Sendable {
         self.doublePlays = doublePlays
         self.triplePlays = triplePlays
         self.leftOnBase = leftOnBase
+        self.hitBatters = hitBatters
+        self.ranForNonRunners = ranForNonRunners
+    }
+
+    // Reading from JSON: the two newer lists may be missing from older files and read as empty.
+    private enum CodingKeys: String, CodingKey {
+        case errors, doubles, triples, homeRuns, runsBattedIn, stolenBases, caughtStealing
+        case sacrificeFlies, sacrificeBunts, hitByPitch, doublePlays, triplePlays, leftOnBase
+        case hitBatters, ranForNonRunners
+    }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        errors = try c.decode([PlayerTally].self, forKey: .errors)
+        doubles = try c.decode([PlayerTally].self, forKey: .doubles)
+        triples = try c.decode([PlayerTally].self, forKey: .triples)
+        homeRuns = try c.decode([PlayerTally].self, forKey: .homeRuns)
+        runsBattedIn = try c.decode([PlayerTally].self, forKey: .runsBattedIn)
+        stolenBases = try c.decode([PlayerTally].self, forKey: .stolenBases)
+        caughtStealing = try c.decode([PlayerTally].self, forKey: .caughtStealing)
+        sacrificeFlies = try c.decode([PlayerTally].self, forKey: .sacrificeFlies)
+        sacrificeBunts = try c.decode([PlayerTally].self, forKey: .sacrificeBunts)
+        hitByPitch = try c.decode([PlayerTally].self, forKey: .hitByPitch)
+        doublePlays = try c.decode([TeamTally].self, forKey: .doublePlays)
+        triplePlays = try c.decode([TeamTally].self, forKey: .triplePlays)
+        leftOnBase = try c.decode([TeamTally].self, forKey: .leftOnBase)
+        hitBatters = try c.decodeIfPresent([HitBatterNote].self, forKey: .hitBatters) ?? []
+        ranForNonRunners = try c.decodeIfPresent([NonRunnerRunnerNote].self, forKey: .ranForNonRunners) ?? []
+    }
+}
+
+/// A batter hit by a pitch, and the pitcher who hit them, for the box score notes.
+public struct HitBatterNote: Codable, Equatable, Hashable, Sendable {
+    public var batter: PlayerID
+    public var batterName: String
+    /// The batter's team.
+    public var team: TeamSide
+    /// The pitcher charged with the hit batter. Missing when nobody is known to be pitching.
+    public var pitcher: PlayerID?
+    public var pitcherName: String?
+    /// How many times this pitcher hit this batter.
+    public var count: Int
+
+    public init(batter: PlayerID, batterName: String, team: TeamSide, pitcher: PlayerID?, pitcherName: String?, count: Int) {
+        self.batter = batter
+        self.batterName = batterName
+        self.team = team
+        self.pitcher = pitcher
+        self.pitcherName = pitcherName
+        self.count = count
+    }
+}
+
+/// Someone who ran for a designated non-runner, for the box score notes.
+public struct NonRunnerRunnerNote: Codable, Equatable, Hashable, Sendable {
+    public var runner: PlayerID
+    public var runnerName: String
+    public var nonRunner: PlayerID
+    public var nonRunnerName: String
+    /// The team they play for.
+    public var team: TeamSide
+    /// The innings they ran for the designated non-runner, first first.
+    public var innings: [Int]
+
+    public init(runner: PlayerID, runnerName: String, nonRunner: PlayerID, nonRunnerName: String, team: TeamSide, innings: [Int]) {
+        self.runner = runner
+        self.runnerName = runnerName
+        self.nonRunner = nonRunner
+        self.nonRunnerName = nonRunnerName
+        self.team = team
+        self.innings = innings
     }
 }
 

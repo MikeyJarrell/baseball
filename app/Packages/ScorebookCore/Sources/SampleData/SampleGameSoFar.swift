@@ -1,11 +1,11 @@
 // The sample game part way through, and every batter's plate appearances, for the game
 // overview and the batting screen's history line. Worked out by hand from SampleGame.swift.
 //
-// Through three innings: Cardinals 2, Mudcats 3.
+// Through three innings: Mudcats 2, Diamond Dogs 3.
 //
 //                1 2 3   R H E
-//     Cardinals  0 1 1   2 4 0
-//     Mudcats    2 0 1   3 6 1
+//     Mudcats  0 1 1   2 4 0
+//     Diamond Dogs    2 0 1   3 6 1
 
 import Foundation
 import Model
@@ -16,111 +16,112 @@ extension SampleGame {
         gameID: id,
         date: SampleSetups.gameDay,
         away: TeamBoxScore(
-            side: .away, teamID: "cardinals", name: "Cardinals",
+            side: .away, teamID: "mudcats", name: "Mudcats",
             batting: [
-                line("c1", "Luis Ortiz", "1", 0, [.cf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 2, triples: 1)),
-                line("c2", "Danny Ruiz", "2", 1, [.ss], BattingCounts(plateAppearances: 2, atBats: 1, runsBattedIn: 1, sacrificeFlies: 1)),
-                line("c3", "Marcus Hale", "24", 2, [.firstBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
-                line("c4", "Tommy Diaz", "7", 3, [.lf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 1, homeRuns: 1, runsBattedIn: 1)),
-                line("c5", "Sam Kim", "5", 4, [.thirdBase], BattingCounts(plateAppearances: 1, walks: 1)),
-                line("c6", "Eddie Park", "11", 5, [.rf], BattingCounts(plateAppearances: 1, atBats: 1, stolenBases: 1)),
-                line("c7", "Joe Varga", "8", 6, [.c], BattingCounts(plateAppearances: 1, atBats: 1)),
-                line("c8", "Nate Bell", "4", 7, [.secondBase], BattingCounts(plateAppearances: 1, atBats: 1)),
-                line("c9", "Ray Collins", "31", 8, [.p], BattingCounts(plateAppearances: 1, atBats: 1, strikeouts: 1)),
+                line("m1", "Luis Ortiz", "1", 0, [.cf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 2, triples: 1)),
+                line("m2", "Danny Ruiz", "2", 1, [.ss], BattingCounts(plateAppearances: 2, atBats: 1, runsBattedIn: 1, sacrificeFlies: 1)),
+                line("m3", "Marcus Hale", "24", 2, [.firstBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
+                line("m4", "Tommy Diaz", "7", 3, [.lf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 1, homeRuns: 1, runsBattedIn: 1)),
+                line("m5", "Sam Kim", "5", 4, [.thirdBase], BattingCounts(plateAppearances: 1, walks: 1)),
+                line("m6", "Eddie Park", "11", 5, [.rf], BattingCounts(plateAppearances: 1, atBats: 1, stolenBases: 1)),
+                line("m7", "Joe Varga", "8", 6, [.c], BattingCounts(plateAppearances: 1, atBats: 1)),
+                line("m8", "Nate Bell", "4", 7, [.secondBase], BattingCounts(plateAppearances: 1, atBats: 1)),
+                line("m9", "Ray Collins", "31", 8, [.p], BattingCounts(plateAppearances: 1, atBats: 1, strikeouts: 1)),
             ],
             pitching: [
-                PitchingLine(player: "c9", name: "Ray Collins", number: "31", stats: PitchingCounts(
+                PitchingLine(player: "m9", name: "Ray Collins", number: "31", stats: PitchingCounts(
                     outsRecorded: 9, battersFaced: 15, hits: 6, runs: 3, walks: 1, strikeouts: 2, homeRuns: 1, pitches: 47, strikes: 30)),
             ],
             fielding: [
-                field("c1", "Luis Ortiz", FieldingCounts()),
-                field("c2", "Danny Ruiz", FieldingCounts(putouts: 1, assists: 1)),
-                field("c3", "Marcus Hale", FieldingCounts(putouts: 4)),
-                field("c4", "Tommy Diaz", FieldingCounts(putouts: 1)),
-                field("c5", "Sam Kim", FieldingCounts(assists: 1)),
-                field("c6", "Eddie Park", FieldingCounts(putouts: 1)),
-                field("c7", "Joe Varga", FieldingCounts(putouts: 2, assists: 1)),
-                field("c8", "Nate Bell", FieldingCounts(assists: 1)),
-                field("c9", "Ray Collins", FieldingCounts(assists: 1)),
+                field("m1", "Luis Ortiz", .centerField, 1...3, FieldingCounts()),
+                field("m2", "Danny Ruiz", .shortstop, 1...3, FieldingCounts(putouts: 1, assists: 1)),
+                field("m3", "Marcus Hale", .firstBase, 1...3, FieldingCounts(putouts: 4)),
+                field("m4", "Tommy Diaz", .leftField, 1...3, FieldingCounts(putouts: 1)),
+                field("m5", "Sam Kim", .thirdBase, 1...3, FieldingCounts(assists: 1)),
+                field("m6", "Eddie Park", .rightField, 1...3, FieldingCounts(putouts: 1)),
+                field("m7", "Joe Varga", .catcher, 1...3, FieldingCounts(putouts: 2, assists: 1)),
+                field("m8", "Nate Bell", .secondBase, 1...3, FieldingCounts(assists: 1)),
+                field("m9", "Ray Collins", .pitcher, 1...3, FieldingCounts(assists: 1)),
             ],
             runs: 2, hits: 4, errors: 0, leftOnBase: 2
         ),
         home: TeamBoxScore(
-            side: .home, teamID: "mudcats", name: "Mudcats",
+            side: .home, teamID: "diamond-dogs", name: "Diamond Dogs",
             batting: [
-                line("m1", "Alex Moreno", "3", 0, [.secondBase], BattingCounts(plateAppearances: 2, atBats: 1, runs: 1, walks: 1)),
-                line("m2", "Chris Tate", "6", 1, [.ss], BattingCounts(plateAppearances: 2, atBats: 1, runs: 1, hits: 1, homeRuns: 1, runsBattedIn: 1, sacrificeBunts: 1)),
-                line("m3", "Jordan Webb", "22", 2, [.cf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 1, doubles: 1, runsBattedIn: 1, strikeouts: 1)),
-                line("m4", "Pat Quinn", "33", 3, [.firstBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
-                line("m11", "Robin Nash", "27", 3, [.pr], BattingCounts(caughtStealing: 1), sub: true),
-                line("m5", "Riley Shaw", "12", 4, [.thirdBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1, runsBattedIn: 1)),
-                line("m6", "Casey Ford", "9", 5, [.lf], BattingCounts(plateAppearances: 1, atBats: 1, strikeouts: 1)),
-                line("m7", "Drew Lang", "17", 6, [.rf], BattingCounts(plateAppearances: 1, atBats: 1)),
-                line("m8", "Morgan Fisk", "10", 7, [.c], BattingCounts(plateAppearances: 1, atBats: 1)),
-                line("m9", "Sky Barros", "21", 8, [.p], BattingCounts(plateAppearances: 1, atBats: 1, hits: 1)),
-                line("m10", "Jamie Cole", "14", 9, [.eh], BattingCounts(plateAppearances: 1, atBats: 1, hits: 1, doubles: 1)),
+                line("d1", "Alex Moreno", "3", 0, [.secondBase], BattingCounts(plateAppearances: 2, atBats: 1, runs: 1, walks: 1)),
+                line("d2", "Chris Tate", "6", 1, [.ss], BattingCounts(plateAppearances: 2, atBats: 1, runs: 1, hits: 1, homeRuns: 1, runsBattedIn: 1, sacrificeBunts: 1)),
+                line("d3", "Jordan Webb", "22", 2, [.cf], BattingCounts(plateAppearances: 2, atBats: 2, runs: 1, hits: 1, doubles: 1, runsBattedIn: 1, strikeouts: 1, caughtStealing: 1)),
+                line("d4", "Pat Quinn", "33", 3, [.firstBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1)),
+                line("d5", "Riley Shaw", "12", 4, [.thirdBase], BattingCounts(plateAppearances: 2, atBats: 2, hits: 1, runsBattedIn: 1)),
+                line("d6", "Casey Ford", "9", 5, [.lf], BattingCounts(plateAppearances: 1, atBats: 1, strikeouts: 1)),
+                line("d7", "Drew Lang", "17", 6, [.rf], BattingCounts(plateAppearances: 1, atBats: 1)),
+                line("d8", "Morgan Fisk", "10", 7, [.c], BattingCounts(plateAppearances: 1, atBats: 1)),
+                line("d9", "Sky Barros", "21", 8, [.p], BattingCounts(plateAppearances: 1, atBats: 1, hits: 1)),
+                line("d10", "Jamie Cole", "14", 9, [], BattingCounts(plateAppearances: 1, atBats: 1, hits: 1, doubles: 1)),
             ],
             pitching: [
-                PitchingLine(player: "m9", name: "Sky Barros", number: "21", stats: PitchingCounts(
+                PitchingLine(player: "d9", name: "Sky Barros", number: "21", stats: PitchingCounts(
                     outsRecorded: 9, battersFaced: 13, hits: 4, runs: 2, walks: 1, strikeouts: 1, homeRuns: 1, pitches: 41, strikes: 25)),
             ],
             fielding: [
-                field("m1", "Alex Moreno", FieldingCounts(putouts: 2, assists: 3)),
-                field("m2", "Chris Tate", FieldingCounts(putouts: 2, assists: 1, errors: 1)),
-                field("m3", "Jordan Webb", FieldingCounts(putouts: 2)),
-                field("m4", "Pat Quinn", FieldingCounts(putouts: 2)),
-                field("m5", "Riley Shaw", FieldingCounts()),
-                field("m6", "Casey Ford", FieldingCounts()),
-                field("m7", "Drew Lang", FieldingCounts()),
-                field("m8", "Morgan Fisk", FieldingCounts(putouts: 1)),
-                field("m9", "Sky Barros", FieldingCounts()),
+                field("d1", "Alex Moreno", .secondBase, 1...3, FieldingCounts(putouts: 2, assists: 3)),
+                field("d2", "Chris Tate", .shortstop, 1...3, FieldingCounts(putouts: 2, assists: 1, errors: 1)),
+                field("d3", "Jordan Webb", .centerField, 1...3, FieldingCounts(putouts: 2)),
+                field("d4", "Pat Quinn", .firstBase, 1...3, FieldingCounts(putouts: 2)),
+                field("d5", "Riley Shaw", .thirdBase, 1...3, FieldingCounts()),
+                field("d6", "Casey Ford", .leftField, 1...3, FieldingCounts()),
+                field("d7", "Drew Lang", .rightField, 1...3, FieldingCounts()),
+                field("d8", "Morgan Fisk", .catcher, 1...3, FieldingCounts(putouts: 1)),
+                field("d9", "Sky Barros", .pitcher, 1...3, FieldingCounts()),
             ],
             runs: 3, hits: 6, errors: 1, leftOnBase: 3
         ),
         lineScore: LineScore(away: [0, 1, 1], home: [2, 0, 1]),
         notes: BoxScoreNotes(
-            errors: [tally("m2", "Chris Tate", .home)],
-            doubles: [tally("m3", "Jordan Webb", .home), tally("m10", "Jamie Cole", .home)],
-            triples: [tally("c1", "Luis Ortiz", .away)],
-            homeRuns: [tally("c4", "Tommy Diaz", .away), tally("m2", "Chris Tate", .home)],
+            errors: [tally("d2", "Chris Tate", .home)],
+            doubles: [tally("d3", "Jordan Webb", .home), tally("d10", "Jamie Cole", .home)],
+            triples: [tally("m1", "Luis Ortiz", .away)],
+            homeRuns: [tally("m4", "Tommy Diaz", .away), tally("d2", "Chris Tate", .home)],
             runsBattedIn: [
-                tally("c2", "Danny Ruiz", .away), tally("c4", "Tommy Diaz", .away),
-                tally("m2", "Chris Tate", .home), tally("m3", "Jordan Webb", .home), tally("m5", "Riley Shaw", .home),
+                tally("m2", "Danny Ruiz", .away), tally("m4", "Tommy Diaz", .away),
+                tally("d2", "Chris Tate", .home), tally("d3", "Jordan Webb", .home), tally("d5", "Riley Shaw", .home),
             ],
-            stolenBases: [tally("c6", "Eddie Park", .away)],
-            caughtStealing: [tally("m11", "Robin Nash", .home)],
-            sacrificeFlies: [tally("c2", "Danny Ruiz", .away)],
-            sacrificeBunts: [tally("m2", "Chris Tate", .home)],
+            stolenBases: [tally("m6", "Eddie Park", .away)],
+            caughtStealing: [tally("d3", "Jordan Webb", .home)],
+            sacrificeFlies: [tally("m2", "Danny Ruiz", .away)],
+            sacrificeBunts: [tally("d2", "Chris Tate", .home)],
             hitByPitch: [],
-            doublePlays: [TeamTally(team: .home, name: "Mudcats", count: 2)],
+            doublePlays: [TeamTally(team: .home, name: "Diamond Dogs", count: 2)],
             triplePlays: [],
-            leftOnBase: [TeamTally(team: .away, name: "Cardinals", count: 2), TeamTally(team: .home, name: "Mudcats", count: 3)]
+            leftOnBase: [TeamTally(team: .away, name: "Mudcats", count: 2), TeamTally(team: .home, name: "Diamond Dogs", count: 3)],
+            ranForNonRunners: [NonRunnerRunnerNote(runner: "d3", runnerName: "Jordan Webb", nonRunner: "d4",
+                                                   nonRunnerName: "Pat Quinn", team: .home, innings: [3])]
         ),
         isFinal: false
     )
 
     /// Every batter's plate appearances in the sample game, oldest first, in scorebook notation.
     public static let plateAppearances: [PlayerID: [PlateAppearanceSummary]] = [
-        "c1": [pa(1, "1B 7", .single), pa(3, "3B 9", .triple), pa(4, "4-3", .out)],
-        "c2": [pa(1, "6-4-3 DP", .out), pa(3, "SF 8", .sacrificeFly, rbi: 1), pa(5, "2B 7", .double)],
-        "c3": [pa(1, "F8", .out), pa(3, "1B 9", .single), pa(5, "4-3", .out)],
-        "c4": [pa(2, "HR 7", .homeRun, rbi: 1), pa(3, "L4-3 DP", .out), pa(5, "IBB", .intentionalWalk)],
-        "c5": [pa(2, "BB", .walk), pa(4, "1B 8", .single), pa(5, "K", .strikeout)],
-        "c6": [pa(2, "FC 4-6", .fieldersChoice), pa(4, "3U", .out), pa(5, "F9", .out)],
-        "c7": [pa(2, "L6", .out), pa(4, "BB", .walk)],
-        "c8": [pa(2, "E6", .reachedOnError), pa(4, "1B 7", .single, rbi: 1)],
-        "c9": [pa(2, "K", .strikeout)],
-        "c10": [pa(4, "P6", .out)],
-        "m1": [pa(1, "BB", .walk), pa(2, "6-3", .out), pa(5, "1B 9", .single, rbi: 1)],
-        "m2": [pa(1, "SH 1-3", .sacrificeBunt), pa(3, "HR 9", .homeRun, rbi: 1), pa(5, "F8", .out)],
-        "m3": [pa(1, "2B 9", .double, rbi: 1), pa(3, "K", .strikeout), pa(5, "E5", .reachedOnError)],
-        "m4": [pa(1, "4-3", .out), pa(3, "1B 7", .single), pa(5, "4-6-3 DP", .out)],
-        "m5": [pa(1, "1B 8", .single, rbi: 1), pa(3, "F9", .out)],
-        "m6": [pa(1, "K", .strikeout), pa(4, "HBP", .hitByPitch)],
-        "m7": [pa(2, "5-3", .out), pa(4, "1B 9", .single)],
-        "m8": [pa(2, "F7", .out), pa(4, "SF 7", .sacrificeFly, rbi: 1)],
-        "m9": [pa(2, "1B 9", .single), pa(4, "6-4-3 DP", .out)],
-        "m10": [pa(2, "2B 7", .double), pa(5, "1B 8", .single)],
+        "m1": [pa(1, "1B 7", .single), pa(3, "3B 9", .triple), pa(4, "4-3", .out)],
+        "m2": [pa(1, "6-4-3 DP", .out), pa(3, "SF 8", .sacrificeFly, rbi: 1), pa(5, "2B 7", .double)],
+        "m3": [pa(1, "F8", .out), pa(3, "1B 9", .single), pa(5, "4-3", .out)],
+        "m4": [pa(2, "HR 7", .homeRun, rbi: 1), pa(3, "L4-3 DP", .out), pa(5, "IBB", .intentionalWalk)],
+        "m5": [pa(2, "BB", .walk), pa(4, "1B 8", .single), pa(5, "K", .strikeout)],
+        "m6": [pa(2, "FC 4-6", .fieldersChoice), pa(4, "3U", .out), pa(5, "F9", .out)],
+        "m7": [pa(2, "L6", .out), pa(4, "BB", .walk)],
+        "m8": [pa(2, "E6", .reachedOnError), pa(4, "1B 7", .single, rbi: 1)],
+        "m9": [pa(2, "K", .strikeout)],
+        "m10": [pa(4, "P6", .out)],
+        "d1": [pa(1, "BB", .walk), pa(2, "6-3", .out), pa(5, "1B 9", .single, rbi: 1)],
+        "d2": [pa(1, "SH 1-3", .sacrificeBunt), pa(3, "HR 9", .homeRun, rbi: 1), pa(5, "F8", .out)],
+        "d3": [pa(1, "2B 9", .double, rbi: 1), pa(3, "K", .strikeout), pa(5, "E5", .reachedOnError)],
+        "d4": [pa(1, "4-3", .out), pa(3, "1B 7", .single), pa(5, "4-6-3 DP", .out)],
+        "d5": [pa(1, "1B 8", .single, rbi: 1), pa(3, "F9", .out)],
+        "d6": [pa(1, "K", .strikeout), pa(4, "HBP", .hitByPitch)],
+        "d7": [pa(2, "5-3", .out), pa(4, "1B 9", .single)],
+        "d8": [pa(2, "F7", .out), pa(4, "SF 7", .sacrificeFly, rbi: 1)],
+        "d9": [pa(2, "1B 9", .single), pa(4, "6-4-3 DP", .out)],
+        "d10": [pa(2, "2B 7", .double), pa(5, "1B 8", .single)],
     ]
 
     /// The same, for the game through three innings.

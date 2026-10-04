@@ -113,7 +113,21 @@ public struct ExpectedSituation: Codable, Sendable {
     public var defenseCheckDue: Bool?
     /// Whether the batting screen should offer the dropped third strike button.
     public var droppedThirdStrikePossible: Bool?
+    /// Whether enough has been played for the game to count (five innings, or four and a half
+    /// with the home team ahead).
     public var isRegulationComplete: Bool?
+    /// The "Is the game over?" question the app should be asking: "regulation", "timeLimit"
+    /// or "runRule".
+    public var gameOverQuestion: EndOfGame.Reason?
+    /// Whether any such question is open (false checks that none is).
+    public var isGameOverQuestionOpen: Bool?
+    /// Whether the time limit has passed during this inning.
+    public var isLastInning: Bool?
+    /// Whether the batter due up holds a batting hole, so the app should record an automatic out.
+    public var isBattingHoleUp: Bool?
+    /// The defense the rules engine suggests for the defense check, exactly. An empty list means
+    /// no suggestion (the defense check is not due).
+    public var suggestedDefense: [ExpectedFielder]?
     public var isFinal: Bool?
 }
 
@@ -141,10 +155,13 @@ public struct ExpectedSlot: Codable, Sendable {
     public var index: Int
     /// Everyone who has batted in the spot, in order.
     public var players: [PlayerID]?
-    /// Where the current player is fielding. Use `isExtraHitter` to check for no position.
+    /// Where the current player is fielding now, from the team's defense. Use `isBattingOnly`
+    /// to check for no position.
     public var position: Position?
-    /// True when the current player should have no fielding position.
-    public var isExtraHitter: Bool?
+    /// True when the current player should bat only, with no fielding position.
+    public var isBattingOnly: Bool?
+    /// Whether the spot is a batting hole.
+    public var isHole: Bool?
 }
 
 /// A team's batting order as a whole.
@@ -154,6 +171,10 @@ public struct ExpectedLineup: Codable, Sendable {
     public var length: Int?
     /// The spot due up, counting from 0.
     public var nextBatterIndex: Int?
+    /// Exactly the starters who may re-enter now, in any order.
+    public var eligibleToReenter: [PlayerID]?
+    /// Exactly the pitchers who may come back to pitch, in any order.
+    public var eligibleToPitchAgain: [PlayerID]?
 }
 
 /// Who should be playing a position.
@@ -187,6 +208,9 @@ public struct ExpectedBatting: Codable, Sendable {
     public var sacrificeBunts: Int?
     public var stolenBases: Int?
     public var caughtStealing: Int?
+    /// The positions on the batter's line, in order, as the box score prints them: ["ph", "2b"].
+    /// An empty list means a batter who only batted.
+    public var positions: [String]?
 }
 
 /// A pitcher's expected box score numbers. Names match `PitchingCounts`.
@@ -202,6 +226,10 @@ public struct ExpectedPitching: Codable, Sendable {
     public var hitBatters: Int?
     public var pitches: Int?
     public var strikes: Int?
+    /// The pitcher's decision: "win" or "loss". Use `hasDecision: false` to check for none.
+    public var decision: PitchingDecision?
+    /// Whether the pitcher has any decision.
+    public var hasDecision: Bool?
 }
 
 /// A fielder's expected putouts, assists and errors.
@@ -226,4 +254,7 @@ public struct ExpectedTeam: Codable, Sendable {
     public var doublePlays: Int?
     /// Triple plays this team turned in the field.
     public var triplePlays: Int?
+    /// The players on the team's batting lines, in the order the box score lists them,
+    /// substitutes under the player they replaced.
+    public var battingLines: [PlayerID]?
 }

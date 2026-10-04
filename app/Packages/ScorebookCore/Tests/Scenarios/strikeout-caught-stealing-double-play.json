@@ -1,0 +1,119 @@
+{
+  "description": "Ortiz singles. Ruiz strikes out swinging and Ortiz, running on the pitch, is thrown out at second, catcher to shortstop. The pitch and the caught stealing are two events; the runner move is marked as completing a double play with the strikeout, so the Diamond Dogs get one double play.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "out",
+            "reason": "caughtStealing",
+            "outBy": [
+              2,
+              6
+            ],
+            "outAt": "second"
+          }
+        ],
+        "completesStrikeoutDoublePlay": true
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "outs": 1,
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "batter": "m3"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 2,
+      "runners": [],
+      "batter": "m3"
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "caughtStealing": 1
+      },
+      {
+        "player": "m2",
+        "strikeouts": 1,
+        "atBats": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1,
+        "assists": 1
+      },
+      {
+        "player": "d2",
+        "putouts": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "doublePlays": 1
+      }
+    ]
+  }
+}

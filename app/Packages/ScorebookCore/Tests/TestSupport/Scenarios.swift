@@ -124,6 +124,10 @@ extension ScenarioExpectation {
             check(&problems, p, "sacrificeBunts", e.sacrificeBunts, s.sacrificeBunts)
             check(&problems, p, "stolenBases", e.stolenBases, s.stolenBases)
             check(&problems, p, "caughtStealing", e.caughtStealing, s.caughtStealing)
+            if let expected = e.positions {
+                let got = lines.flatMap(\.positions).map(\.rawValue)
+                if got != expected { problems.append("\(p) positions: expected \(expected), got \(got)") }
+            }
         }
 
         for e in pitching ?? [] {
@@ -144,6 +148,9 @@ extension ScenarioExpectation {
             check(&problems, p, "hitBatters", e.hitBatters, s.hitBatters)
             check(&problems, p, "pitches", e.pitches, s.pitches)
             check(&problems, p, "strikes", e.strikes, s.strikes)
+            let decision = lines.compactMap(\.decision).first
+            check(&problems, p, "decision", e.decision, decision)
+            check(&problems, p, "hasDecision", e.hasDecision, decision != nil)
         }
 
         for e in fielding ?? [] {
@@ -167,6 +174,7 @@ extension ScenarioExpectation {
             check(&problems, p, "errors", e.errors, t.errors)
             check(&problems, p, "leftOnBase", e.leftOnBase, t.leftOnBase)
             check(&problems, p, "lineScore", e.lineScore, box.lineScore[e.team])
+            check(&problems, p, "battingLines", e.battingLines, t.batting.map(\.player))
             let dp = box.notes.doublePlays.filter { $0.team == e.team }.reduce(0) { $0 + $1.count }
             check(&problems, p, "doublePlays", e.doublePlays, dp)
             let tp = box.notes.triplePlays.filter { $0.team == e.team }.reduce(0) { $0 + $1.count }
@@ -196,6 +204,15 @@ extension ExpectedSituation {
         check(&problems, "situation", "defenseCheckDue", defenseCheckDue, s.defenseCheckDue)
         check(&problems, "situation", "droppedThirdStrikePossible", droppedThirdStrikePossible, s.droppedThirdStrikePossible)
         check(&problems, "situation", "isRegulationComplete", isRegulationComplete, s.isRegulationComplete)
+        check(&problems, "situation", "gameOverQuestion", gameOverQuestion, s.gameOverQuestion)
+        check(&problems, "situation", "isGameOverQuestionOpen", isGameOverQuestionOpen, s.gameOverQuestion != nil)
+        check(&problems, "situation", "isLastInning", isLastInning, s.isLastInning)
+        check(&problems, "situation", "isBattingHoleUp", isBattingHoleUp, s.isBattingHoleUp)
+        if let expected = suggestedDefense {
+            let want = expected.map { "\($0.position.abbreviation) \($0.player)" }.sorted()
+            let got = (s.suggestedDefense ?? []).map { "\($0.position.abbreviation) \($0.player)" }.sorted()
+            if want != got { problems.append("situation suggestedDefense: expected \(want), got \(got)") }
+        }
         check(&problems, "situation", "isFinal", isFinal, s.isFinal)
 
         if let runners {
@@ -228,11 +245,13 @@ extension ExpectedSituation {
                 continue
             }
             let slot = slots[e.index]
+            let position = slot.current.flatMap { s[e.team].position(of: $0) }
             check(&problems, p, "players", e.players, slot.players)
-            check(&problems, p, "position", e.position, slot.position)
-            if e.isExtraHitter == true, slot.position != nil {
-                problems.append("\(p): expected no fielding position, got \(slot.position!.abbreviation)")
+            check(&problems, p, "position", e.position, position)
+            if e.isBattingOnly == true, let position {
+                problems.append("\(p): expected to bat only, but fields at \(position.abbreviation)")
             }
+            check(&problems, p, "isHole", e.isHole, slot.isHole)
         }
 
         for e in lineups ?? [] {
@@ -240,6 +259,10 @@ extension ExpectedSituation {
             let p = "\(e.team.rawValue) lineup"
             check(&problems, p, "length", e.length, t.battingOrder.count)
             check(&problems, p, "nextBatterIndex", e.nextBatterIndex, t.nextBatterIndex)
+            check(&problems, p, "eligibleToReenter", e.eligibleToReenter.map { $0.sorted() },
+                  t.eligibleToReenter.map(\.player).sorted())
+            check(&problems, p, "eligibleToPitchAgain", e.eligibleToPitchAgain.map { $0.sorted() },
+                  t.eligibleToPitchAgain.sorted())
         }
 
         for e in fielders ?? [] {

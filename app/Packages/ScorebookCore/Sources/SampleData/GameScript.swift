@@ -55,11 +55,13 @@ struct GameScript {
     var home: TeamState
     private(set) var tallies: [PitcherTally] = []
     private let firstEvent: Date
+    private let secondsBetweenEvents: TimeInterval
 
-    init(gameID: GameID, setup: GameSetup, firstEventAt: Date) {
+    init(gameID: GameID, setup: GameSetup, firstEventAt: Date, secondsBetweenEvents: TimeInterval = 30) {
         self.gameID = gameID
         self.setup = setup
         self.firstEvent = firstEventAt
+        self.secondsBetweenEvents = secondsBetweenEvents
         let start = Situation(startOf: setup)
         away = start.away
         home = start.home
@@ -183,7 +185,7 @@ struct GameScript {
         before: BasesAndOuts, after: BasesAndOuts, outcome: Outcome?, notation: String
     ) {
         let n = events.count + 1
-        let event = GameEvent(id: EventID(rawValue: "e\(n)"), enteredAt: firstEvent.addingTimeInterval(Double(n - 1) * 30), kind: kind)
+        let event = GameEvent(id: EventID(rawValue: "e\(n)"), enteredAt: firstEvent.addingTimeInterval(Double(n - 1) * secondsBetweenEvents), kind: kind)
         events.append(event)
 
         let result = outcome?.result.map {
@@ -230,9 +232,12 @@ struct GameScript {
     /// The game for everything recorded so far.
     var game: Game { Game(id: gameID, setup: setup, events: events) }
 
-    /// Where the game stands after everything recorded so far.
+    /// Where the game stands after everything recorded so far. The verdicts that need judgment
+    /// (whether the game is over, whether it counts) are set by hand in SampleGame.swift.
     func situation(isFinal: Bool) -> Situation {
-        Situation(
+        // The game started with its first pitch; each inning with its own first pitch.
+        let firstPitch = entries.first { $0.pitches > 0 }?.event.enteredAt
+        return Situation(
             inning: inning,
             half: half,
             outs: outs,
@@ -248,7 +253,9 @@ struct GameScript {
             lastPlayNotation: entries.last { $0.plateAppearance != nil }?.notation,
             isBetweenHalfInnings: outs == 0 && runners.isEmpty && entries.last?.endsHalfInning == true,
             isFinal: isFinal,
-            gameStartedAt: events.first?.enteredAt,
+            gameStartedAt: firstPitch,
+            currentInningStartedAt: entries.first { $0.inning == inning && $0.pitches > 0 }?.event.enteredAt,
+            timeLimitEndsAt: firstPitch.flatMap { start in setup.timeLimitMinutes.map { start.addingTimeInterval(Double($0 * 60)) } },
             scheduledInnings: setup.scheduledInnings
         )
     }

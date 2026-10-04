@@ -1,8 +1,8 @@
 // The rules engine's promise: what the GameEngine module provides to the rest of the app.
 //
 // Declared here so screens and tests can use a stand-in while the real engine is built.
-// The real one lives in GameEngine; the stand-in with canned answers for screens lives in
-// SampleData; the do-nothing one is at the bottom of this file.
+// The real one lives in GameEngine, SampleData hands it to screens for their previews as
+// `SampleRulesEngine`, and the do-nothing one is at the bottom of this file.
 
 import Foundation
 
@@ -27,15 +27,98 @@ public protocol RulesEngine: Sendable {
     /// sheet passes every runner on base, since those move everyone. Returns one move per runner.
     func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove]
 
-    /// The runner to offer first when a designated non-runner reaches base: the batting
-    /// team's player who made that team's most recent out (league rule: the last out runs),
-    /// or nothing if the team has not made an out yet. The same answer the situation carries
+    /// The runner to offer first when a designated non-runner reaches base, by the league's
+    /// rule (see `RunnerChoice.suggestedRunner`): the team's last recorded out; if that player
+    /// is now at bat, the last recorded out before them; in the first inning before any out,
+    /// the last batter in the batting order. `situation` is the one just after the non-runner
+    /// reached, so its batter is the one now at bat. The same answer the situation carries
     /// in `runnerChoice`.
-    func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID?
+    func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID?
+
+    /// The game clock at a moment between events, for the batting screen: time left, whether
+    /// this is the last inning, and whether to ask "Is the game over?" on time. The rules
+    /// engine's own decisions stored in the situation (`isLastInning`, `gameOverQuestion`,
+    /// `declinedEndings`, `isFinal`) are what count; this carries them forward as the clock
+    /// runs, so the question can come up between innings with no new event. A finished game
+    /// never asks anything. This is the only place the time-limit decision is made outside the
+    /// replay itself.
+    func clock(for situation: Situation, at now: Date) -> GameClock
+
+    /// What a pitch would do to the count, for the words under the batting screen's count
+    /// buttons: "makes it 2–1", "walk", "strikeout", "stays 3–2". The screen shows these and
+    /// counts nothing itself. Every engine gets `CountChange.after(_:from:)` unless it says
+    /// otherwise.
+    func countAfter(_ pitch: PitchResult, in situation: Situation) -> CountChange
+
+    /// A guess at the kind of batted ball from what the scorer has picked so far, for the
+    /// in-play screen's default chip: one outfielder handling the ball is a fly ball, a throw
+    /// (two or more fielders) a ground ball, a sacrifice fly a fly ball, a sacrifice bunt a bunt.
+    /// Missing when there is no good guess, such as one infielder alone. Engines that do not
+    /// guess return nothing.
+    func suggestedBattedBall(for draft: PlayDraft) -> BattedBallType?
 
     /// Scorebook notation for one event, given the situation just before it:
     /// "6-3", "F8", "E6", "1B 7", "K", "ꓘ", "BB".
     func notation(for event: GameEvent, in situation: Situation) -> String
+}
+
+extension RulesEngine {
+    /// The counting rules every engine shares: see `CountChange.after(_:from:)`.
+    public func countAfter(_ pitch: PitchResult, in situation: Situation) -> CountChange {
+        CountChange.after(pitch, from: situation.count)
+    }
+
+    /// No guess.
+    public func suggestedBattedBall(for draft: PlayDraft) -> BattedBallType? { nil }
+}
+
+/// What one pitch would do to the count.
+public struct CountChange: Codable, Equatable, Hashable, Sendable {
+    /// The count after the pitch. A fresh count when the plate appearance ends.
+    public var count: Count
+    /// How the plate appearance ends, when the pitch ends it: a walk, a strikeout, a hit batter.
+    public var endsPlateAppearance: PlateAppearanceOutcome?
+    /// True when the count stays as it was: a foul with two strikes.
+    public var isUnchanged: Bool
+    /// The words for under the button: "makes it 2–1", "walk", "strikeout", "stays 3–2",
+    /// "hit by pitch".
+    public var hint: String
+
+    public init(count: Count, endsPlateAppearance: PlateAppearanceOutcome?, isUnchanged: Bool, hint: String) {
+        self.count = count
+        self.endsPlateAppearance = endsPlateAppearance
+        self.isUnchanged = isUnchanged
+        self.hint = hint
+    }
+
+    /// The counting rules: four balls walk the batter; three strikes strike them out; a foul
+    /// with two strikes leaves the count alone; a foul tip or foul bunt with two strikes is
+    /// strike three; a hit batter goes to first. These are the same rules the rules engine's
+    /// replay applies to every pitch.
+    public static func after(_ pitch: PitchResult, from count: Count) -> CountChange {
+        func becomes(_ next: Count) -> CountChange {
+            CountChange(count: next, endsPlateAppearance: nil, isUnchanged: false,
+                        hint: "makes it \(next.balls)–\(next.strikes)")
+        }
+        switch pitch {
+        case .ball:
+            if count.balls >= 3 { return CountChange(count: .fresh, endsPlateAppearance: .walk, isUnchanged: false, hint: "walk") }
+            return becomes(Count(balls: count.balls + 1, strikes: count.strikes))
+        case .calledStrike, .swingingStrike, .foulTip, .foulBunt:
+            if count.strikes >= 2 {
+                return CountChange(count: .fresh, endsPlateAppearance: .strikeout, isUnchanged: false, hint: "strikeout")
+            }
+            return becomes(Count(balls: count.balls, strikes: count.strikes + 1))
+        case .foul:
+            if count.strikes >= 2 {
+                return CountChange(count: count, endsPlateAppearance: nil, isUnchanged: true,
+                                   hint: "stays \(count.balls)–\(count.strikes)")
+            }
+            return becomes(Count(balls: count.balls, strikes: count.strikes + 1))
+        case .hitByPitch:
+            return CountChange(count: .fresh, endsPlateAppearance: .hitByPitch, isUnchanged: false, hint: "hit by pitch")
+        }
+    }
 }
 
 /// What a replay produces.
@@ -125,10 +208,17 @@ public struct RunnerSuggestion: Codable, Equatable, Hashable, Sendable {
     public var runners: [RunnerMove]
     /// Runs batted in under the official scoring rules, for the scorer to confirm.
     public var rbi: Int
+    /// The hit to save instead of the one the scorer picked, when they differ: on a game-ending
+    /// hit the batter is credited only with as many bases as the winning run needed, a walk-off
+    /// "double" with the winning run on third being a single (Official Baseball Rules 9.06(f));
+    /// home runs excepted. Missing when the scorer's pick stands. The replay applies the same
+    /// rule to a saved play, so the box score is right either way.
+    public var batterResult: BatterResult?
 
-    public init(runners: [RunnerMove], rbi: Int) {
+    public init(runners: [RunnerMove], rbi: Int, batterResult: BatterResult? = nil) {
         self.runners = runners
         self.rbi = rbi
+        self.batterResult = batterResult
     }
 }
 
@@ -144,7 +234,9 @@ public struct PlayPreview: Codable, Equatable, Hashable, Sendable {
     public var outsAfter: Int
     /// True when the play makes the third out.
     public var endsHalfInning: Bool
-    /// True when the play wins the game for the home team in its last at-bat.
+    /// True when the play puts the home team ahead in a walk-off inning: the bottom of the
+    /// scheduled last inning or later, or of the inning the time limit has made the last one
+    /// (`Situation.isWalkOffInning`). The app then asks "Is the game over?". Nothing ends by itself.
     public var endsGame: Bool
 
     public init(notation: String, outsOnPlay: Int = 0, runsOnPlay: Int = 0, outsAfter: Int = 0, endsHalfInning: Bool = false, endsGame: Bool = false) {
@@ -159,27 +251,29 @@ public struct PlayPreview: Codable, Equatable, Hashable, Sendable {
 
 extension Situation {
     /// The situation before the first pitch: top of the first, nobody out, both teams'
-    /// starting orders and fielders from the setup, leadoff hitters due up.
+    /// starting orders and defenses from the setup, leadoff hitters due up, and the clock
+    /// showing the scheduled start plus the time limit.
     public init(startOf setup: GameSetup) {
         func state(for team: GameTeam) -> TeamState {
-            let slots = team.lineup.map {
-                BattingSlot(players: [$0.player], position: $0.position, isDesignatedNonRunner: $0.isDesignatedNonRunner)
+            let slots = team.battingOrder.map {
+                BattingSlot(players: [$0], isDesignatedNonRunner: team.isDesignatedNonRunner($0))
             }
-            return TeamState(battingOrder: BattingOrder(slots: slots), nextBatterIndex: 0, fielders: team.startingFielders)
+            return TeamState(battingOrder: BattingOrder(slots: slots), nextBatterIndex: 0, fielders: team.defense)
         }
         self.init(
             away: state(for: setup.away),
             home: state(for: setup.home),
             defenseCheckDue: setup.home.isOurs,
-            timeLimitMinutes: setup.timeLimitMinutes,
-            scheduledInnings: setup.scheduledInnings
+            timeLimitEndsAt: setup.scheduledEnd,
+            scheduledInnings: setup.scheduledInnings,
+            suggestedDefense: setup.home.isOurs ? setup.home.defense(forInning: 1, from: setup.home.defense) : nil
         )
     }
 }
 
 /// A rules engine that does nothing: every replay is the start of the game, every
 /// suggestion leaves the runners where they are. For tests that need a `RulesEngine`
-/// but not its answers. Screens use the canned one in SampleData instead.
+/// but not its answers. Screens use `SampleRulesEngine` in SampleData instead.
 public struct DoNothingRulesEngine: RulesEngine {
     public init() {}
 
@@ -204,8 +298,14 @@ public struct DoNothingRulesEngine: RulesEngine {
         PlayPreview(notation: draft.fielders.map(\.description).joined(separator: "-"), outsAfter: situation.outs)
     }
 
+    /// Reports only the time left, and nothing at all once the game is final. The real
+    /// decisions about the last inning come from the rules engine.
+    public func clock(for situation: Situation, at now: Date) -> GameClock {
+        simpleClock(for: situation, at: now)
+    }
+
     /// Never suggests anyone.
-    public func suggestedRunner(forNonRunnerOn side: TeamSide, in log: PlayLog) -> PlayerID? { nil }
+    public func suggestedRunner(for nonRunner: PlayerID, in log: PlayLog, situation: Situation) -> PlayerID? { nil }
 
     /// Leaves every chosen runner where they are.
     public func suggestRunnerAction(_ reason: RunnerMoveReason, runners: [PlayerID], in situation: Situation) -> [RunnerMove] {

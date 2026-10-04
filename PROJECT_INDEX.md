@@ -4,13 +4,14 @@
 
 | Item | Status |
 |---|---|
-| Repository and project notes | Ready |
-| Scorebook iPhone app: plan, roles and task briefs | Drafted in [plan/](plan/README.md) |
-| Scorebook app: league rules and scope questions | Answered and written into the plan |
-| Scorebook app: Xcode and iPhone simulator on the Mac | Installed (Xcode 27, iOS 27 simulator) |
-| Scorebook app: foundation and design jobs | Not started |
-| Fall schedule | In [team/schedule.md](team/schedule.md): 2–1 so far; next game October 4, 1:00 PM, away at the GWW Whales |
-| Team roster | All 16 players in [team/roster.csv](team/roster.csv), with batting and throwing hand and usual position; jersey numbers not yet collected |
-| Walk-up songs | 8 of 16 clips cut into `~/Dropbox/baseball/songs/`, plus Gaven’s pitching warm-up song; 8 players still to choose |
+| Plan, roles and job briefs | Accepted, in [plan/](plan/README.md); league rules in [notes/league-rules.md](notes/league-rules.md) |
+| Foundation, vocabulary pass, app icon | Accepted |
+| Rules engine, stats, storage, box score printer, design system, 106 test scenarios | Accepted; 197 game-logic tests pass |
+| Batting screen, in-game changes sheets | Accepted |
+| In-play sequence | Built; in review |
+| Walk-up audio | Built; fixing review findings |
+| Teams and songs, pregame, game overview, postgame and season screens | In progress |
+| iPad | Batting screen and change sheets checked; batting screen goes side by side when sideways ([notes](notes/ipad-check.md)) |
+| Wiring the app together, dress rehearsal | Not started |
 
 No deadlines have been assigned.

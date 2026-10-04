@@ -1,0 +1,209 @@
+{
+  "description": "Ortiz walks, Ruiz singles to center (Ortiz to second), and Hale is hit by a pitch, loading the bases. Diaz homers to left: four runs, four runs batted in.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "second"
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "hitByPitch"
+      }
+    },
+    {
+      "id": "e7",
+      "enteredAt": "2026-05-02T18:07:20Z",
+      "ballInPlay": {
+        "batterResult": "homeRun",
+        "battedBall": "flyBall",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "m2",
+            "from": "second",
+            "to": "scored"
+          },
+          {
+            "runner": "m3",
+            "from": "first",
+            "to": "scored"
+          },
+          {
+            "runner": "m4",
+            "from": "home",
+            "to": "scored"
+          }
+        ],
+        "rbi": 4
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e6",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m3",
+              "responsiblePitcher": "d9"
+            },
+            {
+              "base": "second",
+              "runner": "m2",
+              "responsiblePitcher": "d9"
+            },
+            {
+              "base": "third",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "batter": "m4"
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "score": {
+        "away": 4,
+        "home": 0
+      },
+      "runners": [],
+      "batter": "m5",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 7,
+          "strikes": 2,
+          "battersFaced": 4
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e6",
+        "notation": "HBP"
+      },
+      {
+        "event": "e7",
+        "notation": "HR 7"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "walks": 1,
+        "runs": 1
+      },
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 1,
+        "runs": 1
+      },
+      {
+        "player": "m3",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "hitByPitch": 1,
+        "runs": 1,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m4",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 1,
+        "homeRuns": 1,
+        "runs": 1,
+        "runsBattedIn": 4
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "battersFaced": 4,
+        "hits": 2,
+        "walks": 1,
+        "hitBatters": 1,
+        "homeRuns": 1,
+        "runs": 4,
+        "outsRecorded": 0,
+        "pitches": 7,
+        "strikes": 2
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "runs": 4,
+        "hits": 2
+      }
+    ]
+  }
+}

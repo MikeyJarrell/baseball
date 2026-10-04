@@ -1,0 +1,124 @@
+{
+  "description": "Undo a runner move between pitches. Ortiz singles and, with Ruiz up 1-0, steals second and takes third when catcher Fisk throws the ball away. Undoing the steal puts Ortiz back on first and takes back the stolen base and the error.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "runnerAction": {
+        "moves": [
+          {
+            "runner": "m1",
+            "from": "first",
+            "to": "third",
+            "reason": "stolenBase",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 2,
+            "type": "throwing"
+          }
+        ]
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 0
+          },
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "batter": "m2"
+        },
+        "batting": [
+          {
+            "player": "m1",
+            "stolenBases": 0
+          }
+        ],
+        "fielding": [
+          {
+            "player": "d8",
+            "errors": 0
+          }
+        ],
+        "teams": [
+          {
+            "team": "home",
+            "errors": 0
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "count": {
+        "balls": 1,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "third",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2"
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "stolenBases": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "errors": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      }
+    ]
+  }
+}

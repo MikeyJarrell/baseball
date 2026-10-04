@@ -1,5 +1,5 @@
 {
-  "description": "The first four Cardinals walk on four pitches each. The fourth walk forces Ortiz home: a run, and a run batted in for Diaz.",
+  "description": "The first four Mudcats walk on four pitches each. The fourth walk forces Ortiz home: a run, and a run batted in for Diaz.",
   "setupFile": "standard",
   "events": [
     {
@@ -127,18 +127,18 @@
           "runners": [
             {
               "base": "first",
-              "runner": "c3"
+              "runner": "m3"
             },
             {
               "base": "second",
-              "runner": "c2"
+              "runner": "m2"
             },
             {
               "base": "third",
-              "runner": "c1"
+              "runner": "m1"
             }
           ],
-          "batter": "c4"
+          "batter": "m4"
         }
       }
     }
@@ -156,27 +156,27 @@
         "away": 1,
         "home": 0
       },
-      "batter": "c5",
+      "batter": "m5",
       "runners": [
         {
           "base": "first",
-          "runner": "c4",
-          "responsiblePitcher": "m9"
+          "runner": "m4",
+          "responsiblePitcher": "d9"
         },
         {
           "base": "second",
-          "runner": "c3",
-          "responsiblePitcher": "m9"
+          "runner": "m3",
+          "responsiblePitcher": "d9"
         },
         {
           "base": "third",
-          "runner": "c2",
-          "responsiblePitcher": "m9"
+          "runner": "m2",
+          "responsiblePitcher": "d9"
         }
       ],
       "pitchers": [
         {
-          "pitcher": "m9",
+          "pitcher": "d9",
           "pitches": 16,
           "strikes": 0,
           "battersFaced": 4
@@ -191,14 +191,14 @@
     ],
     "batting": [
       {
-        "player": "c4",
+        "player": "m4",
         "plateAppearances": 1,
         "atBats": 0,
         "walks": 1,
         "runsBattedIn": 1
       },
       {
-        "player": "c1",
+        "player": "m1",
         "plateAppearances": 1,
         "atBats": 0,
         "walks": 1,
@@ -207,7 +207,7 @@
     ],
     "pitching": [
       {
-        "pitcher": "m9",
+        "pitcher": "d9",
         "walks": 4,
         "runs": 1,
         "outsRecorded": 0,

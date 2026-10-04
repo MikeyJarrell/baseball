@@ -1,0 +1,66 @@
+{
+  "description": "Bottom of the ninth, tied 3-3, one out, Tate on third. Shaw drives one into the gap and reaches second, and the scorer saves it as a double. Tate scores the winning run, which needed only one base, so Shaw is credited with a single (Official Baseball Rules 9.06(f)).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 1,
+        "score": {
+          "away": 3,
+          "home": 3
+        },
+        "runners": {
+          "third": "d2"
+        },
+        "batterIndex": 4,
+        "note": "Start in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 8,
+        "runners": [
+          {
+            "runner": "d2",
+            "from": "third",
+            "to": "scored"
+          },
+          {
+            "runner": "d5",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 1
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 9,
+      "half": "bottom",
+      "score": {
+        "away": 3,
+        "home": 4
+      },
+      "gameOverQuestion": "regulation"
+    },
+    "batting": [
+      {
+        "player": "d5",
+        "hits": 1,
+        "doubles": 0,
+        "runsBattedIn": 1,
+        "atBats": 1
+      }
+    ]
+  }
+}

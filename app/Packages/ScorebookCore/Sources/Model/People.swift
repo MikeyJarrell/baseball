@@ -22,6 +22,8 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var throwsWith: Hand?
     /// Their walk-up song, for our players.
     public var walkUpSongID: SongID?
+    /// Their warm-up song, for our pitchers: played while they warm up when our team takes the field.
+    public var warmUpSongID: SongID?
     /// The stadium announcer introduction played before their song, if they have one.
     public var introduction: AnnouncerIntroduction?
 
@@ -33,6 +35,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         bats: BattingSide? = nil,
         throwsWith: Hand? = nil,
         walkUpSongID: SongID? = nil,
+        warmUpSongID: SongID? = nil,
         introduction: AnnouncerIntroduction? = nil
     ) {
         self.id = id
@@ -42,6 +45,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         self.bats = bats
         self.throwsWith = throwsWith
         self.walkUpSongID = walkUpSongID
+        self.warmUpSongID = warmUpSongID
         self.introduction = introduction
     }
 
@@ -98,17 +102,34 @@ public struct Team: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var isOurs: Bool
     /// Everyone on the team.
     public var roster: [Player]
+    /// The short name for the scoreboard, chosen on the team page: "DOGS", "MUD". Missing
+    /// means the app makes one with `ShortTeamName.make(from:)`.
+    public var shortName: String?
 
-    public init(id: TeamID = .make(), name: String, isOurs: Bool = false, roster: [Player] = []) {
+    public init(id: TeamID = .make(), name: String, isOurs: Bool = false, roster: [Player] = [], shortName: String? = nil) {
         self.id = id
         self.name = name
         self.isOurs = isOurs
         self.roster = roster
+        self.shortName = shortName
     }
+
+    /// The short name to show: the chosen one, or one made from the name.
+    public var displayShortName: String { shortName ?? ShortTeamName.make(from: name) }
 
     /// Finds a player on this team by id.
     public func player(_ id: PlayerID) -> Player? {
         roster.first { $0.id == id }
+    }
+}
+
+/// Short team names for the scoreboard.
+public enum ShortTeamName {
+    /// A short name made from a team name, in capitals: the last word if it has four letters or
+    /// fewer, else its first three letters. "Diamond Dogs" gives "DOGS", "Mudcats" gives "MUD".
+    public static func make(from name: String) -> String {
+        let last = name.split(separator: " ").last.map(String.init) ?? name
+        return (last.count <= 4 ? last : String(last.prefix(3))).uppercased()
     }
 }
 
@@ -148,26 +169,14 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
     }
 }
 
-/// Every imported song, plus the between-innings playlist and the announcer echo setting.
-/// Saved as `songs/library.json`.
+/// Every imported song, plus the announcer echo setting. Saved as `songs/library.json`.
 public struct SongLibrary: Codable, Equatable, Hashable, Sendable {
     public var songs: [Song]
-    /// Songs for the changeover between half-innings, in playing order.
-    public var betweenInningsPlaylist: [SongID]
-    /// Play the between-innings playlist in random order.
-    public var shufflePlaylist: Bool
     /// How much stadium echo to add to recorded introductions, from 0 (none) to 1 (lots).
     public var announcerEcho: Double
 
-    public init(
-        songs: [Song] = [],
-        betweenInningsPlaylist: [SongID] = [],
-        shufflePlaylist: Bool = false,
-        announcerEcho: Double = 0.5
-    ) {
+    public init(songs: [Song] = [], announcerEcho: Double = 0.5) {
         self.songs = songs
-        self.betweenInningsPlaylist = betweenInningsPlaylist
-        self.shufflePlaylist = shufflePlaylist
         self.announcerEcho = announcerEcho
     }
 
