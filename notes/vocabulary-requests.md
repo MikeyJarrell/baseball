@@ -29,3 +29,8 @@ Made in the vocabulary pass; `plan/handoffs/vocabulary-pass.md` has the details.
 - **App shell:** the app icon is installed.
 - **Batting screen:** count hints from the rules engine, the audio player’s playback state with when the song fades, and short team names.
 - **In-play sequence:** `SampleRulesEngine` is the real rules engine, so previews get real notation and runs batted in; a batted-ball guess on the rules engine.
+- **In-play sequence:** when the scorer moves one runner, the engine’s suggestion leaves the other runners where it first put them, so a scorer who sends the batter to second on a single must also move the runner from first. Let the suggestion take the scorer’s fixed runners and re-suggest the rest.
+- **Postgame and season screens:** season pitching totals need wins and losses (from each game’s winning and losing pitcher). Earned runs and ERA stay out, by plan.
+- **Walk-up audio:** reword the comment on `AudioPlayback.fadesAt`: the fade starts at that time; the song ends about two seconds later.
+- **Postgame and season screens:** the stats engine should supply each game’s result for our team (win, loss, tie) and the season record, so the screens don’t compute them and the record always agrees with the games count.
+- **Game overview:** the play log should supply the wording the overview now works out itself: “stole home,” the base where a runner was out, and “Middle” or “End” of an inning.
