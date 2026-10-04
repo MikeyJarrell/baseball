@@ -52,6 +52,7 @@ public struct SeasonStatsScreen: View {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 Text(subtitle)
                     .font(ScorebookFont.body)
+                    .fixedSize(horizontal: false, vertical: true)
                     .foregroundStyle(ScorebookColor.textSecondary)
                 Picker("Table", selection: $table) {
                     ForEach(Table.allCases) { Text($0.rawValue).tag($0) }
@@ -77,6 +78,9 @@ public struct SeasonStatsScreen: View {
         .padding(.top, Spacing.small)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(ScorebookColor.background)
+        // The table needs room for some rows, so the words stop growing at the second
+        // accessibility size; the table's own rows still grow up to that size.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .navigationTitle("Season")
     }
 
@@ -166,7 +170,7 @@ public struct SeasonStatsScreen: View {
         let columns = PitchingColumn.allCases.map { column in
             StatsTableColumn<SeasonPitchingLine>(
                 id: column.id, title: column.title, spokenName: column.spokenName,
-                width: column.isRate ? 54 : (column == .innings || column == .hitBatters ? 44 : 36),
+                width: column.isRate ? 54 : pitchingWidth(column),
                 text: { column.text($0.stats, games: $0.games) }
             )
         }
@@ -187,6 +191,15 @@ public struct SeasonStatsScreen: View {
                 )
                 .padding(.horizontal, Spacing.screenEdge)
             }
+        }
+    }
+
+    /// How wide a pitching count column is: room for "58.1" innings and three-digit batters
+    /// faced and pitches.
+    private func pitchingWidth(_ column: PitchingColumn) -> CGFloat {
+        switch column {
+        case .innings, .battersFaced, .pitches, .hitBatters: 44
+        default: 34
         }
     }
 

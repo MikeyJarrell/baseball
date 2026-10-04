@@ -115,7 +115,7 @@ public struct BoxScoreTable: View {
         Grid(alignment: .trailing, horizontalSpacing: 0, verticalSpacing: Spacing.extraSmall) {
             GridRow {
                 heading("Batting").gridColumnAlignment(.leading)
-                ForEach(["AB", "R", "H", "RBI", "BB", "K"], id: \.self) { heading($0).frame(width: numberWidth) }
+                ForEach(["AB", "R", "H", "RBI", "BB", "K"], id: \.self) { heading($0).frame(width: numberWidth, alignment: .trailing) }
             }
             ForEach(team.batting.indices, id: \.self) { index in
                 let line = team.batting[index]
@@ -153,8 +153,8 @@ public struct BoxScoreTable: View {
         Grid(alignment: .trailing, horizontalSpacing: 0, verticalSpacing: Spacing.extraSmall) {
             GridRow {
                 heading("Pitching").gridColumnAlignment(.leading)
-                ForEach(["IP", "H", "R", "BB", "K"], id: \.self) { heading($0).frame(width: numberWidth) }
-                heading("P-S").frame(width: numberWidth * 1.8)
+                ForEach(["IP", "H", "R", "BB", "K"], id: \.self) { heading($0).frame(width: numberWidth, alignment: .trailing) }
+                heading("P-S").frame(width: numberWidth * 2.2, alignment: .trailing)
             }
             ForEach(team.pitching.indices, id: \.self) { index in
                 let line = team.pitching[index]
@@ -171,11 +171,11 @@ public struct BoxScoreTable: View {
                     .lineLimit(1)
                     .padding(.trailing, Spacing.small)
                     .gridColumnAlignment(.leading)
-                    Text(stats.inningsPitchedText).font(ScorebookFont.body.monospacedDigit()).frame(width: numberWidth)
+                    Text(stats.inningsPitchedText).font(ScorebookFont.body.monospacedDigit()).frame(width: numberWidth, alignment: .trailing)
                     numbers([stats.hits, stats.runs, stats.walks, stats.strikeouts])
                     Text(stats.pitches > 0 ? "\(stats.pitches)-\(stats.strikes)" : "—")
                         .font(ScorebookFont.body.monospacedDigit())
-                        .frame(width: numberWidth * 1.8, alignment: .trailing)
+                        .frame(width: numberWidth * 2.2, alignment: .trailing)
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(spokenPitching(line))

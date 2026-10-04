@@ -149,13 +149,20 @@ struct FinalScoreHeader: View {
 
     var body: some View {
         VStack(spacing: Spacing.small) {
-            HStack(alignment: .bottom, spacing: Spacing.large) {
-                teamScore(.away)
-                Text(box.isFinal ? "FINAL" : "IN PROGRESS")
-                    .font(ScorebookFont.chip)
-                    .foregroundStyle(ScorebookColor.textSecondary)
-                    .padding(.bottom, Spacing.large)
-                teamScore(.home)
+            // Side by side when the names fit on one line each; at the largest text sizes, one
+            // team above the other.
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .bottom, spacing: Spacing.large) {
+                    teamScore(.away)
+                    statusWord
+                        .padding(.bottom, Spacing.large)
+                    teamScore(.home)
+                }
+                VStack(alignment: .leading, spacing: Spacing.small) {
+                    statusWord
+                    teamRow(.away)
+                    teamRow(.home)
+                }
             }
             if let line = decisionsLine {
                 Text(line)
@@ -170,6 +177,27 @@ struct FinalScoreHeader: View {
         .accessibilityLabel(spokenSummary)
     }
 
+    /// "FINAL", or "IN PROGRESS" for a box score so far.
+    private var statusWord: some View {
+        Text(box.isFinal ? "FINAL" : "IN PROGRESS")
+            .font(ScorebookFont.chip)
+            .foregroundStyle(ScorebookColor.textSecondary)
+    }
+
+    /// One team on a line, for the largest text sizes: the runs, then the name.
+    private func teamRow(_ side: TeamSide) -> some View {
+        let team = box[side]
+        let isOurs = side == ourSide
+        return HStack(alignment: .firstTextBaseline, spacing: Spacing.medium) {
+            Text("\(team.runs)")
+                .font(ScorebookFont.scoreboard)
+                .foregroundStyle(isOurs ? ScorebookColor.ourTeamText : ScorebookColor.textSecondary)
+            Text(team.name)
+                .font(ScorebookFont.headline)
+                .foregroundStyle(ScorebookColor.textPrimary)
+        }
+    }
+
     /// One team: our logo if it is us, the runs in big numbers, the name under them.
     private func teamScore(_ side: TeamSide) -> some View {
         let team = box[side]
@@ -182,8 +210,8 @@ struct FinalScoreHeader: View {
             Text(team.name)
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
-                .lineLimit(2)
-                .multilineTextAlignment(.center)
+                .lineLimit(1)
+                .fixedSize()
         }
         .frame(minWidth: 90)
     }

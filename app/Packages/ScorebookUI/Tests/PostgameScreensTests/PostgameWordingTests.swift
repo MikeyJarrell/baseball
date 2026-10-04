@@ -16,7 +16,7 @@ struct ResultWordingTests {
         // g1: at River Rats, we scored 11 as visitors. g2: vs Hammerheads at home, 2–3.
         let g1 = games.first { $0.id == "g1" }!
         let g2 = games.first { $0.id == "g2" }!
-        let g7 = games.first { $0.id == "g7" }!
+        let g7 = games.first { $0.id == "g7" }!  // 4–4 with the Bombers
         #expect(PostgameWording.outcome(of: g1) == .win)
         #expect(PostgameWording.scoreOursFirst(g1) == "11–6")
         #expect(PostgameWording.opponent(g1) == "at River Rats")
@@ -28,10 +28,10 @@ struct ResultWordingTests {
 
     @Test("A game still going has no result and does not count in the record")
     func unfinished() {
-        let g8 = games.first { $0.id == "g8" }!
-        #expect(PostgameWording.outcome(of: g8) == nil)
-        #expect(PostgameWording.record(games) == "4 wins, 2 losses, 1 tie")
-        #expect(PostgameWording.record([g8]) == nil)
+        let g15 = games.first { $0.id == "g15" }!
+        #expect(PostgameWording.outcome(of: g15) == nil)
+        #expect(PostgameWording.record(games) == "9 wins, 4 losses, 1 tie")
+        #expect(PostgameWording.record([g15]) == nil)
     }
 
     @Test("The sample game is a 5–3 Diamond Dogs win at home")
@@ -43,7 +43,7 @@ struct ResultWordingTests {
     @Test("The games list shows the newest game first")
     func newestFirst() {
         let ordered = StatSorting.newestFirst(games)
-        #expect(ordered.map(\.id.rawValue) == ["g8", "g7", "g6", "g5", "g4", "g3", "g2", "g1"])
+        #expect(ordered.map(\.id.rawValue) == (1...15).reversed().map { "g\($0)" })
     }
 
     @Test("A game log shows the newest game first")

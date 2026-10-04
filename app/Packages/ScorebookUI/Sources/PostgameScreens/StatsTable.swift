@@ -40,6 +40,7 @@ struct StatsTableColumn<Row>: Identifiable {
 ///   - onTapRow: Called when a row is tapped.
 ///   - rowHint: What tapping a row does, for VoiceOver: "Opens their season page".
 ///   - scrollsVertically: Whether the table scrolls up and down by itself.
+///   - rowHeight: How tall each row is at the standard text size: 44 points unless asked.
 struct StatsTable<Row>: View {
     var rows: [Row]
     var nameTitle: String
@@ -54,13 +55,31 @@ struct StatsTable<Row>: View {
     /// tables). False for a table inside a page that scrolls (a player's game log).
     var scrollsVertically: Bool = true
 
+    init(rows: [Row], nameTitle: String, name: @escaping (Row) -> String, columns: [StatsTableColumn<Row>],
+         sortedColumnID: String? = nil, sortedDescending: Bool = true, onSort: ((String) -> Void)? = nil,
+         onTapRow: ((Row) -> Void)? = nil, rowHint: String? = nil, scrollsVertically: Bool = true,
+         rowHeight: CGFloat = 44) {
+        self.rows = rows
+        self.nameTitle = nameTitle
+        self.name = name
+        self.columns = columns
+        self.sortedColumnID = sortedColumnID
+        self.sortedDescending = sortedDescending
+        self.onSort = onSort
+        self.onTapRow = onTapRow
+        self.rowHint = rowHint
+        self.scrollsVertically = scrollsVertically
+        _rowHeight = ScaledMetric(wrappedValue: rowHeight, relativeTo: .body)
+    }
+
     /// How far the numbers have been scrolled sideways, so the headings can follow.
     @State private var scrolledSideways: CGFloat = 0
     /// How tall all the rows are together, so a short table ends after its last row instead
     /// of filling the screen with an empty card.
     @State private var rowsHeight: CGFloat = 0
 
-    /// Row height and column widths grow with the phone's text size.
+    /// Row height and column widths grow with the phone's text size. Rows are 44 points tall
+    /// at the standard size; a table whose names take two lines (a game log) asks for more.
     @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 44
     @ScaledMetric(relativeTo: .body) private var widthScale: CGFloat = 1
     @ScaledMetric(relativeTo: .body) private var scaledNameWidth: CGFloat = 124
@@ -150,9 +169,10 @@ struct StatsTable<Row>: View {
         let label = Text(column.title + (isSorted ? (sortedDescending ? " ↓" : " ↑") : ""))
             .font(ScorebookFont.sectionLabel)
             .lineLimit(1)
+            .minimumScaleFactor(0.6)
             .foregroundStyle(isSorted ? ScorebookColor.inPlay : ScorebookColor.textSecondary)
             .frame(width: column.width * widthScale, height: rowHeight, alignment: .trailing)
-            .padding(.trailing, 2)
+            .padding(.trailing, 5)
         if let onSort {
             Button { onSort(column.id) } label: { label.contentShape(Rectangle()) }
                 .buttonStyle(.plain)
@@ -206,7 +226,7 @@ struct StatsTable<Row>: View {
                     .minimumScaleFactor(0.6)
                     .foregroundStyle(dimmed ? ScorebookColor.textSecondary : ScorebookColor.textPrimary)
                     .frame(width: column.width * widthScale, height: rowHeight, alignment: .trailing)
-                    .padding(.trailing, 2)
+                    .padding(.trailing, 5)
             }
         }
         .padding(.trailing, Spacing.medium)

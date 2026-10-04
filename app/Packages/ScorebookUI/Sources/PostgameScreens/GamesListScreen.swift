@@ -69,6 +69,9 @@ private struct GameRow: View {
     var game: GameSummary
     var onTap: () -> Void
 
+    /// At the accessibility text sizes the result goes under the date instead of beside it.
+    @Environment(\.dynamicTypeSize) private var textSize
+
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: Spacing.medium) {
@@ -79,14 +82,16 @@ private struct GameRow: View {
                     Text(PostgameWording.listDate(game.date))
                         .font(ScorebookFont.caption)
                         .foregroundStyle(ScorebookColor.textSecondary)
+                    if textSize.isAccessibilitySize { result }
                 }
                 Spacer(minLength: Spacing.small)
-                result
+                if !textSize.isAccessibilitySize { result }
                 Image(systemName: "chevron.right")
                     .font(ScorebookFont.caption.weight(.semibold))
                     .foregroundStyle(ScorebookColor.textSecondary)
             }
             .padding(.horizontal, Spacing.large)
+            .padding(.vertical, Spacing.small)
             .frame(minHeight: 60)
             .contentShape(Rectangle())
         }

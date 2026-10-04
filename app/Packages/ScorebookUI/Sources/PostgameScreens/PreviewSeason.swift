@@ -97,18 +97,25 @@ enum PreviewSeason {
                                           stats: FieldingCounts(putouts: 7, assists: 11, errors: 1))])
     }()
 
-    /// A games list: seven finished games (four wins, two losses, a tie) and one still going,
-    /// handed over oldest first so the screen has to put the newest on top.
-    static let games: [GameSummary] = [
-        summary("g1", day: 0, "River Rats", home: false, us: 11, them: 6),
-        summary("g2", day: 7, "Hammerheads", home: true, us: 2, them: 3),
-        summary("g3", day: 14, "Mudcats", home: false, us: 9, them: 2),
-        summary("g4", day: 21, "River Rats", home: true, us: 3, them: 5),
-        summary("g5", day: 28, "Hammerheads", home: false, us: 6, them: 4),
-        summary("g6", day: 35, "Mudcats", home: true, us: 7, them: 5),
-        summary("g7", day: 42, "Bombers", home: true, us: 4, them: 4),
-        GameSummary(id: "g8", date: day(49), opponentName: "Mudcats", weAreHome: false, finalScore: nil, isFinished: false),
-    ]
+    /// The fourteen-game season's games list: nine wins, four losses and a tie, a week apart,
+    /// plus a fifteenth game still going. Handed over oldest first, so the screen has to put the
+    /// newest on top.
+    static let games: [GameSummary] = {
+        // Opponent, whether we were home, our runs, their runs.
+        let results: [(String, Bool, Int, Int)] = [
+            ("River Rats", false, 11, 6), ("Hammerheads", true, 2, 3), ("Mudcats", false, 9, 2),
+            ("River Rats", true, 3, 5), ("Hammerheads", false, 6, 4), ("Mudcats", true, 7, 5),
+            ("Bombers", true, 4, 4), ("Bombers", false, 8, 1), ("Mudcats", true, 5, 6),
+            ("River Rats", false, 10, 3), ("Hammerheads", true, 6, 2), ("Bombers", true, 1, 4),
+            ("Mudcats", false, 12, 7), ("River Rats", true, 4, 3),
+        ]
+        var games = results.enumerated().map { index, game in
+            summary("g\(index + 1)", day: index * 7, game.0, home: game.1, us: game.2, them: game.3)
+        }
+        games.append(GameSummary(id: "g15", date: day(14 * 7), opponentName: "Mudcats", weAreHome: false,
+                                 finalScore: nil, isFinished: false))
+        return games
+    }()
 
     /// One finished game for the games list.
     private static func summary(_ id: String, day days: Int, _ opponent: String, home: Bool,

@@ -64,6 +64,8 @@ public struct PlayerSeasonScreen: View {
             .padding(.bottom, Spacing.large)
         }
         .background(ScorebookColor.background)
+        // Three averages share one row, so the words stop growing at the third accessibility size.
+        .dynamicTypeSize(...DynamicTypeSize.accessibility3)
         .navigationTitle(name)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -178,7 +180,9 @@ public struct PlayerSeasonScreen: View {
                     columns: columns,
                     onTapRow: { onRequest(.openGame($0.gameID)) },
                     rowHint: "Opens the box score",
-                    scrollsVertically: false
+                    scrollsVertically: false,
+                    // Room for the date and the opponent on two lines.
+                    rowHeight: 60
                 )
             }
         }
@@ -218,7 +222,7 @@ public struct PlayerSeasonScreen: View {
                 .font(ScorebookFont.scoreboardSmall)
                 .foregroundStyle(ScorebookColor.textPrimary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.4)
             Text(label)
                 .font(ScorebookFont.sectionLabel)
                 .foregroundStyle(ScorebookColor.textSecondary)
