@@ -2,12 +2,15 @@
 // picked so far, and where they have moved the runners.
 //
 // Every button on every step sends one `PlayEntryAction` to `PlayEntryModel.perform(_:)`.
-// That keeps all the "what happens when I tap this" rules in one place, lets the demos replay
-// a play tap by tap, and counts the taps.
+// That keeps all the "what happens when I tap this" rules in one place, lets the demos and
+// tests replay a play tap by tap, and counts the taps.
 //
-// Nothing here works out baseball. Notation, outs, runs, runs batted in and where the runners
-// went come from the rules engine's two functions (`PlayEntryRules`). The model only keeps
-// track of the scorer's picks and asks the engine again after each one.
+// Nothing here works out baseball. Notation, outs, runs, runs batted in, the guessed kind of
+// batted ball and where the runners went come from the rules engine's functions
+// (`PlayEntryRules`). The model keeps track of the scorer's picks, asks the engine again after
+// each one, and checks the picks are complete before Save: every runner the scorer put out has
+// the fielders who made the out, every "on an error" says whose, and no two runners end on
+// one base or pass each other.
 
 import SwiftUI
 import Model
@@ -33,10 +36,8 @@ enum PlayEntryStep: Hashable {
 enum PlayEntryAction: Equatable, Sendable {
     /// Step one: what happened to the batter.
     case pickResult(BatterResult)
-    /// Step one: open the "More" choices (sacrifices, dropped third strike, interference).
+    /// Step one: open the "More" choices (sacrifices and catcher's interference).
     case showMore
-    /// Step one, under "More": dropped third strike.
-    case pickDroppedThirdStrike
     /// Dropped third strike: the batter was thrown out (K 2-3).
     case droppedThirdStrikeOut
     /// Dropped third strike: the batter reached first.
@@ -59,7 +60,11 @@ enum PlayEntryAction: Equatable, Sendable {
     case moveRunner(PlayerID, to: RunnerEnd)
     /// A runner's tag on the drawing: moves them to their next possible outcome.
     case cycleRunner(PlayerID)
-    /// "On the throw" (or "On the hit") versus "On an error", for a runner who went further than the hit.
+    /// "Who made the out?" for a runner the scorer put out: a fielder, in the order they
+    /// handled the ball. Tapping the last one again takes it back.
+    case tapOutFielder(PlayerID, Position)
+    /// "On the throw" (or "On the hit"/"On the play") versus "On an error", for a runner who
+    /// went further than the play carried them.
     case answerExtraBase(PlayerID, onError: Bool)
     /// Whose error let that runner take the extra base.
     case chargeExtraBaseError(PlayerID, fielder: Position)
@@ -73,9 +78,9 @@ enum PlayEntryAction: Equatable, Sendable {
     case cancel
 }
 
-/// How a runner got further than the hit carried them.
+/// How a runner got further than the play carried them.
 enum ExtraBaseAnswer: Equatable, Sendable {
-    /// On the throw (for the batter) or on the hit (for a runner already on base).
+    /// On the throw (for the batter) or on the play (for a runner already on base).
     case onThePlay
     /// On an error, by this fielder once the scorer has said whose.
     case onError(Position?)
@@ -97,10 +102,10 @@ final class PlayEntryModel {
 
     /// The steps the scorer has walked through; the last one is showing. Back removes it.
     private(set) var steps: [PlayEntryStep]
-    /// The play as the scorer has it so far. This is what the rules engine is asked about.
+    /// The play as the scorer has it so far, every runner included. This is what is saved.
     private(set) var draft: PlayDraft
-    /// True while the kind of batted ball is the screen's own guess (one tap on an outfielder
-    /// guesses a fly ball, anything else a ground ball). The scorer's own pick replaces it.
+    /// True while the kind of batted ball is the rules engine's guess, shown as a dashed chip.
+    /// The scorer's own pick replaces it.
     private(set) var battedBallIsGuess = true
     /// True once "More" has been tapped on step one.
     private(set) var showsMore = false
@@ -108,14 +113,19 @@ final class PlayEntryModel {
     private(set) var errorFielder: Position?
     /// On a reached-on-error: fielding or throwing, if the scorer says.
     private(set) var errorType: ErrorType?
-    /// The rules engine's runner suggestion when the runner step opened: the dot on each runner's row.
-    private(set) var firstSuggestion: [PlayerID: RunnerEnd] = [:]
-    /// The rules engine's latest runner suggestion, in its order (lead runner first, batter last).
+    /// The rules engine's runner suggestion when the runner step opened, by runner. Its ends
+    /// are the dots on each runner's row.
+    private(set) var firstMoves: [PlayerID: RunnerMove] = [:]
+    /// The rules engine's latest answer, in its order (lead runner first, batter last).
     private(set) var engineMoves: [RunnerMove] = []
     /// The runs batted in the rules engine suggests for the play as it stands.
     private(set) var suggestedRBI = 0
+    /// On a game-ending hit, the hit the rules engine says to save instead of the scorer's pick.
+    private(set) var creditedResult: BatterResult?
     /// Where the scorer has put runners themselves, overriding the suggestion.
     private(set) var scorerPicks: [PlayerID: RunnerEnd] = [:]
+    /// For a runner the scorer put out: the fielders who made the out, in order.
+    private(set) var outFielders: [PlayerID: [Position]] = [:]
     /// The scorer's answers to "How did they get there?".
     private(set) var extraBaseAnswers: [PlayerID: ExtraBaseAnswer] = [:]
     /// Taps so far, for the demos' tap counts.
@@ -145,10 +155,19 @@ final class PlayEntryModel {
     /// The runs batted in to show: the scorer's number if they changed it, else the suggestion.
     var rbi: Int { draft.rbi ?? suggestedRBI }
 
-    /// True for a single, double, triple or home run.
+    /// True for a single, double, triple or home run, for the words "On the hit".
     var isHit: Bool {
         switch draft.batterResult {
         case .single, .double, .triple, .homeRun: true
+        default: false
+        }
+    }
+
+    /// True when the batter is out on the play: a batter out, a sacrifice, or a dropped third
+    /// strike thrown out. The batter's row then offers only Out.
+    var batterIsOut: Bool {
+        switch draft.batterResult {
+        case .out, .sacrificeFly, .sacrificeBunt: true
         default: false
         }
     }
@@ -167,7 +186,8 @@ final class PlayEntryModel {
     var canSave: Bool {
         switch step {
         case .fielders: !draft.fielders.isEmpty
-        case .hitLocation, .runners: true
+        case .hitLocation: true
+        case .runners: runnerProblem == nil
         case .result, .droppedThirdStrike, .error: false
         }
     }
@@ -180,6 +200,35 @@ final class PlayEntryModel {
         case .hitLocation: true
         case .result, .droppedThirdStrike, .runners: false
         }
+    }
+
+    /// What stops the runner step from saving, in one line for the screen, or nothing when it
+    /// can save: a question still to answer, two runners on one base, or a runner who passed
+    /// the runner ahead of them.
+    var runnerProblem: String? {
+        for move in draft.runners {
+            let name = name(of: move.runner)
+            if needsOutFielders(move.runner), (outFielders[move.runner] ?? []).isEmpty {
+                return "Tap who put \(name) out"
+            }
+            if asksHow(move.runner), extraBaseAnswer(for: move.runner) == .onError(nil) {
+                return "Tap whose error let \(name) move up"
+            }
+        }
+        // Runners still on base, or who scored, in the order they started (lead runner first).
+        let safe = draft.runners.filter { $0.to != .out }.sorted { $0.from > $1.from }
+        for (i, ahead) in safe.enumerated() {
+            for behind in safe.dropFirst(i + 1) {
+                guard let aheadEnd = ahead.to.progress, let behindEnd = behind.to.progress else { continue }
+                if aheadEnd == behindEnd, let base = ahead.to.base {
+                    return "\(name(of: ahead.runner)) and \(name(of: behind.runner)) can’t both end on \(base.shortLabel)"
+                }
+                if behindEnd > aheadEnd {
+                    return "\(name(of: behind.runner)) can’t pass \(name(of: ahead.runner))"
+                }
+            }
+        }
+        return nil
     }
 
     /// The team at bat, for colors.
@@ -202,22 +251,30 @@ final class PlayEntryModel {
     }
 
     /// The outcomes a runner can be given on the runner step: the base they started on (not for
-    /// the batter), each base ahead of it, scored, and out.
+    /// the batter), each base ahead of it, scored, and out. A batter who is out on the play
+    /// (a batter out or a sacrifice) can only be out.
     func choices(for move: RunnerMove) -> [RunnerEnd] {
+        if move.isBatter && batterIsOut { return [.out] }
         let bases = Base.occupiable.filter { move.isBatter ? true : $0 >= move.from }
         return bases.map { RunnerEnd.safe(at: $0) } + [.scored, .out]
     }
 
-    /// Whether to ask "How did they get there?" for a runner: on a hit, when the scorer has
-    /// moved them further than the rules engine first suggested.
+    /// Whether to ask "How did they get there?" for a runner: whenever the scorer has moved
+    /// them, batter included, further than the rules engine first suggested, on any kind of play.
     func asksHow(_ runner: PlayerID) -> Bool {
-        guard isHit, let pick = scorerPicks[runner], let suggested = firstSuggestion[runner],
+        guard let pick = scorerPicks[runner], let suggested = firstMoves[runner]?.to,
               let pickedOrder = pick.progress, let suggestedOrder = suggested.progress else { return false }
         return pickedOrder > suggestedOrder
     }
 
+    /// Whether to ask "Who made the out?" for a runner: the scorer put them out and the rules
+    /// engine had not.
+    func needsOutFielders(_ runner: PlayerID) -> Bool {
+        scorerPicks[runner] == .out && firstMoves[runner]?.to != .out
+    }
+
     /// The answer showing for a runner's "How did they get there?". A runner already on base
-    /// starts at "on the hit", so the common play costs no extra tap; the batter starts with no
+    /// starts at "on the play", so the common play costs no extra tap; the batter starts with no
     /// answer, which saves as "on the throw".
     func extraBaseAnswer(for runner: PlayerID) -> ExtraBaseAnswer? {
         if let answer = extraBaseAnswers[runner] { return answer }
@@ -226,7 +283,7 @@ final class PlayEntryModel {
 
     /// True when this runner is the batter.
     func isBatterMove(_ runner: PlayerID) -> Bool {
-        engineMoves.first { $0.runner == runner }?.isBatter ?? (runner == situation.batter)
+        firstMoves[runner]?.isBatter ?? (runner == situation.batter)
     }
 
     // MARK: Taps
@@ -238,9 +295,6 @@ final class PlayEntryModel {
         switch action {
         case .pickResult(let result): pickResult(result)
         case .showMore: showsMore = true
-        case .pickDroppedThirdStrike:
-            startOver(context: .droppedThirdStrike, result: nil)
-            steps.append(.droppedThirdStrike)
         case .droppedThirdStrikeOut:
             startOver(context: .droppedThirdStrike, result: .out)
             steps.append(.fielders)
@@ -270,6 +324,11 @@ final class PlayEntryModel {
             let options = choices(for: move)
             let next = options[((options.firstIndex(of: move.to) ?? -1) + 1) % options.count]
             moveRunner(runner, to: next)
+        case .tapOutFielder(let runner, let fielder):
+            var fielders = outFielders[runner] ?? []
+            if fielders.last == fielder { fielders.removeLast() } else { fielders.append(fielder) }
+            outFielders[runner] = fielders
+            askEngineAboutRunners()
         case .answerExtraBase(let runner, let onError):
             extraBaseAnswers[runner] = onError ? .onError(nil) : .onThePlay
             askEngineAboutRunners()
@@ -294,12 +353,9 @@ final class PlayEntryModel {
             steps.append(.hitLocation)
         case .reachedOnError:
             steps.append(.error)
-        case .sacrificeFly:
-            draft.battedBall = .flyBall
-            battedBallIsGuess = false
-            steps.append(.fielders)
-        case .sacrificeBunt:
-            draft.battedBall = .bunt
+        case .sacrificeFly, .sacrificeBunt:
+            // The rules engine says what kind of ball a sacrifice is (a fly ball, a bunt).
+            draft.battedBall = rules.suggestBattedBall(draft)
             battedBallIsGuess = false
             steps.append(.fielders)
         case .catchersInterference, .reachedOnDroppedThirdStrike:
@@ -339,19 +395,14 @@ final class PlayEntryModel {
         }
     }
 
-    /// Keeps the screen's guess at the kind of batted ball up to date as fielders are tapped:
-    /// one tap on an outfielder is a fly ball, anything else a ground ball. Only on a batter
-    /// out, and only until the scorer picks a kind themselves. A guess the scorer never changes
-    /// is saved with the play.
+    /// Keeps the rules engine's guess at the kind of batted ball up to date as fielders are
+    /// tapped, on a batter out, until the scorer picks a kind themselves. A guess the scorer
+    /// never changes is saved with the play.
     private func guessBattedBall() {
         guard battedBallIsGuess, draft.batterResult == .out, draft.context == .ballInPlay else { return }
-        if draft.fielders.isEmpty {
-            draft.battedBall = nil
-        } else if draft.fielders.count == 1, draft.fielders[0].isOutfield {
-            draft.battedBall = .flyBall
-        } else {
-            draft.battedBall = .groundBall
-        }
+        var asked = draft
+        asked.battedBall = nil
+        draft.battedBall = rules.suggestBattedBall(asked)
     }
 
     // MARK: The runner step
@@ -363,7 +414,8 @@ final class PlayEntryModel {
         let suggestion = rules.suggestRunners(draft, situation)
         engineMoves = suggestion.runners
         suggestedRBI = suggestion.rbi
-        firstSuggestion = Dictionary(suggestion.runners.map { ($0.runner, $0.to) }, uniquingKeysWith: { first, _ in first })
+        creditedResult = suggestion.batterResult
+        firstMoves = Dictionary(suggestion.runners.map { ($0.runner, $0) }, uniquingKeysWith: { first, _ in first })
         draft.runners = suggestion.runners
         steps.append(.runners)
     }
@@ -373,46 +425,60 @@ final class PlayEntryModel {
         draft.runners = []
         draft.rbi = nil
         engineMoves = []
-        firstSuggestion = [:]
+        firstMoves = [:]
         suggestedRBI = 0
+        creditedResult = nil
         scorerPicks = [:]
+        outFielders = [:]
         extraBaseAnswers = [:]
     }
 
-    /// The scorer put a runner somewhere new. Any answer about how they got there starts over,
-    /// and so do the runs batted in.
+    /// The scorer put a runner somewhere new. Any answer about how they got there, or who put
+    /// them out, starts over, and so do the runs batted in.
     private func moveRunner(_ runner: PlayerID, to end: RunnerEnd) {
         scorerPicks[runner] = end
         extraBaseAnswers[runner] = nil
+        outFielders[runner] = nil
         draft.rbi = nil
         askEngineAboutRunners()
     }
 
-    /// Puts the scorer's picks and answers into the draft, asks the rules engine again (so it
-    /// can fill in who made an out, follow on with other runners, and recount runs batted in),
-    /// then puts the picks back over its answer.
+    /// Asks the rules engine again. Only the runners the scorer placed go in the question, so
+    /// the engine is free to move everyone else along; its answer is shown with the scorer's
+    /// placements kept exactly as the scorer made them.
     private func askEngineAboutRunners() {
-        draft.runners = runnersWithScorerPicks()
         draft.errors = composedErrors()
-        let suggestion = rules.suggestRunners(draft, situation)
+        var question = draft
+        question.runners = engineMoves.filter { scorerPicks[$0.runner] != nil }.map(placedMove)
+        let suggestion = rules.suggestRunners(question, situation)
         if !suggestion.runners.isEmpty { engineMoves = suggestion.runners }
         suggestedRBI = suggestion.rbi
-        draft.runners = runnersWithScorerPicks()
+        creditedResult = suggestion.batterResult
+        draft.runners = engineMoves.map { scorerPicks[$0.runner] == nil ? $0 : placedMove($0) }
     }
 
-    /// The rules engine's latest moves with the scorer's own picks laid over them. A runner the
-    /// scorer moved keeps the engine's details (who made the out, where) only when the engine
-    /// agrees on where they ended up. A runner who went further than the hit on an error is
-    /// marked as helped by an error.
-    private func runnersWithScorerPicks() -> [RunnerMove] {
-        engineMoves.map { move in
-            guard let pick = scorerPicks[move.runner] else { return move }
-            var picked = move.to == pick ? move : RunnerMove(runner: move.runner, from: move.from, to: pick)
-            if asksHow(move.runner) {
-                picked.advancedOnError = extraBaseErrorFielder(move.runner) != nil
+    /// A runner the scorer placed: the rules engine's own move for them with only the end
+    /// changed, so its other details (such as a batter who reached on an error) are kept. A
+    /// runner taken off Out loses who put them out; a runner the scorer put out gets the
+    /// fielders the scorer tapped; a runner who took an extra base on an error is marked so.
+    private func placedMove(_ move: RunnerMove) -> RunnerMove {
+        guard let pick = scorerPicks[move.runner] else { return move }
+        var placed = move
+        if placed.to != pick {
+            if placed.to == .out {
+                placed.outBy = []
+                placed.outAt = nil
             }
-            return picked
+            placed.to = pick
         }
+        if needsOutFielders(move.runner) {
+            placed.outBy = outFielders[move.runner] ?? []
+        }
+        if asksHow(move.runner) {
+            let first = firstMoves[move.runner]?.advancedOnError ?? false
+            placed.advancedOnError = extraBaseErrorFielder(move.runner) != nil || first
+        }
+        return placed
     }
 
     /// The fielder charged for a runner's extra base, once the scorer has said whose error it was.
@@ -442,11 +508,11 @@ final class PlayEntryModel {
     private func goBack() {
         guard steps.count > 1 else { return finish(.cancelled) }
         let leaving = steps.removeLast()
-        if leaving == .runners { clearRunnerStep(); draft.errors = composedErrors() }
-        if leaving == .fielders || leaving == .hitLocation || leaving == .error {
-            // Going back to step one: the next pick there starts the play over anyway.
-            showsMore = false
+        if leaving == .runners {
+            clearRunnerStep()
+            draft.errors = composedErrors()
         }
+        if steps.last == .result { showsMore = false }
     }
 
     /// Saves the play. When the runner step was skipped (nobody on base), the rules engine's
@@ -455,9 +521,16 @@ final class PlayEntryModel {
         guard canSave else { return }
         var finished = draft
         finished.errors = composedErrors()
-        let suggestion = rules.suggestRunners(finished, situation)
-        if finished.runners.isEmpty { finished.runners = suggestion.runners }
-        let rbi = step == .runners ? suggestedRBI : suggestion.rbi
+        var rbi = suggestedRBI
+        var credited = creditedResult
+        if step != .runners {
+            let suggestion = rules.suggestRunners(finished, situation)
+            finished.runners = suggestion.runners
+            rbi = suggestion.rbi
+            credited = suggestion.batterResult
+        }
+        // On a game-ending hit the batter is credited only with the bases the winning run needed.
+        if let credited { finished.batterResult = credited }
         guard let play = finished.finishedPlay(suggestedRBI: rbi) else { return }
         if finished.context == .droppedThirdStrike {
             finish(.droppedThirdStrike(play))

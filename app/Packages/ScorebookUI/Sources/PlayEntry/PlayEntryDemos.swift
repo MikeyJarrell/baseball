@@ -30,7 +30,7 @@ struct PlayEntryDemo: Identifiable, Sendable {
     @MainActor
     func model(afterTaps count: Int? = nil, onFinish: @escaping (PlayEntryOutcome) -> Void = { _ in }) -> PlayEntryModel {
         let model = PlayEntryModel(situation: sample.situation, setup: sample.setup, start: start,
-                                   rules: .demo, onFinish: onFinish)
+                                   rules: .standIn, onFinish: onFinish)
         for tap in taps.prefix(count ?? taps.count) { model.perform(tap) }
         return model
     }
@@ -169,7 +169,7 @@ enum PlayEntryDemos {
         sample: diamondDogs("Webb up, 1-2, one out", outs: 1, batterSpot: 2, count: Count(balls: 1, strikes: 2)),
         start: .droppedThirdStrike,
         taps: [.droppedThirdStrikeSafe, .save],
-        expected: ("K", 0, 0, 0))
+        expected: ("K, safe", 0, 0, 0))
 
     static let droppedThirdStrikeOut = PlayEntryDemo(
         id: "k3-out", title: "Dropped third strike, thrown out (K 2-3)",
@@ -178,10 +178,24 @@ enum PlayEntryDemos {
         taps: [.droppedThirdStrikeOut, .tapFielder(.catcher), .tapFielder(.firstBase), .save],
         expected: ("K 2-3", 1, 0, 0))
 
+    static let flyOutDoubledOff = PlayEntryDemo(
+        id: "f8-dp", title: "F8, runner doubled off second (8-4)",
+        sample: mudcats("Runner on second, one out", outs: 1, runners: ["m2": .second]),
+        taps: [.pickResult(.out), .tapFielder(.centerField), .goToRunners, .moveRunner("m2", to: .out),
+               .tapOutFielder("m2", .centerField), .tapOutFielder("m2", .secondBase), .save],
+        expected: ("F8", 2, 0, 0))
+
+    static let flyOutThrowingError = PlayEntryDemo(
+        id: "f9-e9", title: "F9, runner scores on the right fielder’s error",
+        sample: mudcats("Runner on second, one out", outs: 1, runners: ["m2": .second]),
+        taps: [.pickResult(.out), .tapFielder(.rightField), .goToRunners, .moveRunner("m2", to: .scored),
+               .answerExtraBase("m2", onError: true), .chargeExtraBaseError("m2", fielder: .rightField), .save],
+        expected: ("F9, E9", 1, 1, 0))
+
     /// Every demo, in the order the brief lists them, then the extras.
     static let all: [PlayEntryDemo] = [
         groundOut, flyOut, singleRunnerScores, doublePlay, errorBatterToSecond, fieldersChoice, sacrificeFly,
-        singlePlusError, droppedThirdStrikeSafe, droppedThirdStrikeOut,
+        singlePlusError, flyOutThrowingError, flyOutDoubledOff, droppedThirdStrikeSafe, droppedThirdStrikeOut,
     ]
 }
 
@@ -200,7 +214,7 @@ public struct PlayEntryDemoGallery: View {
 
     /// - Parameters:
     ///   - demoID: open this demo straight away ("6-3", "f8", "1b", "dp", "e6", "fc", "sf",
-    ///     "1b-e7", "k3-safe", "k3-out"), for screenshots.
+    ///     "1b-e7", "f9-e9", "f8-dp", "k3-safe", "k3-out"), for screenshots.
     ///   - taps: with `demoID`, make this many of its scripted taps first.
     public init(open demoID: String? = nil, afterTaps taps: Int? = nil) {
         autoOpen = demoID.flatMap { id in PlayEntryDemos.all.first { $0.id == id } }

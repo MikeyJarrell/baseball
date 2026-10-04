@@ -137,6 +137,8 @@ struct BottomBar<Buttons: View>: View {
     var title: String
     var detail: String
     var showsInningOver = false
+    /// What still stops Save, in red in place of `detail`, such as "Tap who put Ruiz out".
+    var problem: String? = nil
     @ViewBuilder var buttons: Buttons
 
     var body: some View {
@@ -145,7 +147,11 @@ struct BottomBar<Buttons: View>: View {
                 Text(title)
                     .font(ScorebookFont.headline)
                     .foregroundStyle(ScorebookColor.textPrimary)
-                if showsInningOver {
+                if let problem {
+                    Text(problem)
+                        .font(ScorebookFont.caption.weight(.bold))
+                        .foregroundStyle(ScorebookColor.out)
+                } else if showsInningOver {
                     InningOverTag()
                 } else {
                     Text(detail)
@@ -243,7 +249,7 @@ struct ChoiceChip: View {
                 .lineLimit(1)
                 .foregroundStyle(state == .on ? ScorebookColor.background : ScorebookColor.textPrimary)
                 .padding(.horizontal, Spacing.medium)
-                .frame(minHeight: Spacing.minimumTapSize - 4)
+                .frame(minHeight: Spacing.minimumTapSize)
                 .background {
                     switch state {
                     case .on: Capsule().fill(ScorebookColor.textPrimary)
@@ -251,7 +257,6 @@ struct ChoiceChip: View {
                     case .off: Capsule().fill(ScorebookColor.surfaceSecondary)
                     }
                 }
-                .frame(minHeight: Spacing.minimumTapSize)
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)

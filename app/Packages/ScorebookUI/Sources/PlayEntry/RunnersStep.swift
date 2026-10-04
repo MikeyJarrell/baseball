@@ -4,9 +4,12 @@
 // rules engine's guess. The outs, runs and runs batted in on the play show at the top, and
 // "Inning over" when the play makes the third out.
 //
-// On a hit, a runner the scorer moves further than the hit carried them gets a question: how
-// did they get there, on the throw (or on the hit, for a runner already on base) or on an
-// error, and whose? A single plus the left fielder's error reads "1B 7, E7".
+// A runner the scorer moves further than the play carried them, on any kind of play, gets a
+// question: how did they get there, on the throw (or on the play, for a runner already on
+// base) or on an error, and whose? A single plus the left fielder's error reads "1B 7, E7";
+// a fly to right with the runner scoring on the right fielder's bad throw, "F9, E9".
+// A runner the scorer puts out who was not suggested out gets "Who made the out?". Save
+// waits until both questions are answered, and refuses two runners on one base.
 
 import SwiftUI
 import Model
@@ -38,6 +41,9 @@ struct RunnersStep: View {
                 VStack(spacing: 6) {
                     ForEach(model.draft.runners, id: \.runner) { move in
                         RunnerRow(model: model, move: move)
+                        if model.needsOutFielders(move.runner) {
+                            OutQuestion(model: model, move: move)
+                        }
                         if model.asksHow(move.runner) {
                             ExtraBaseQuestion(model: model, move: move)
                         }
@@ -48,7 +54,7 @@ struct RunnersStep: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomBar(title: bottomTitle(preview), detail: bottomDetail(preview)) {
+            BottomBar(title: bottomTitle(preview), detail: bottomDetail(preview), problem: model.runnerProblem) {
                 SaveButton(enabled: model.canSave) { model.perform(.save) }
             }
         }
@@ -128,7 +134,7 @@ struct RunnerRow: View {
     let move: RunnerMove
 
     var body: some View {
-        let suggested = model.firstSuggestion[move.runner]
+        let suggested = model.firstMoves[move.runner]?.to
         HStack(spacing: Spacing.small) {
             VStack(alignment: .leading, spacing: 0) {
                 Text(model.name(of: move.runner))
@@ -162,12 +168,13 @@ struct RunnerRow: View {
                 .font(ScorebookFont.chip)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .foregroundStyle(isPicked ? Color.white : ScorebookColor.textSecondary)
+                .foregroundStyle(isPicked ? Color.white : ScorebookColor.textPrimary)
                 .frame(maxWidth: .infinity, minHeight: Spacing.minimumTapSize)
                 .overlay(alignment: .bottom) {
+                    // The rules engine's guess: a solid dot, big enough to see in sun.
                     if isSuggested {
-                        Circle().frame(width: 5, height: 5).opacity(0.6).padding(.bottom, 4)
-                            .foregroundStyle(isPicked ? Color.white : ScorebookColor.textSecondary)
+                        Circle().frame(width: 7, height: 7).padding(.bottom, 3)
+                            .foregroundStyle(isPicked ? Color.white : ScorebookColor.textPrimary)
                     }
                 }
                 .background(isPicked ? fill : Color.clear, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
@@ -192,7 +199,7 @@ struct ExtraBaseQuestion: View {
             Text("How did \(model.name(of: move.runner)) get \(move.to == .scored ? "home" : "to \(move.to.sentenceLabel)")?")
                 .font(ScorebookFont.chip)
             HStack(spacing: 3) {
-                segment(move.isBatter ? "On the throw" : "On the hit", isPicked: answer == .onThePlay) {
+                segment(move.isBatter ? "On the throw" : (model.isHit ? "On the hit" : "On the play"), isPicked: answer == .onThePlay) {
                     model.perform(.answerExtraBase(move.runner, onError: false))
                 }
                 segment("On an error", isPicked: answer.isError) {
@@ -204,10 +211,9 @@ struct ExtraBaseQuestion: View {
             if answer.isError {
                 Text("Whose error?")
                     .font(ScorebookFont.chip)
-                HStack(spacing: 3) {
-                    ForEach(Position.allCases, id: \.self) { position in
-                        fielderButton(position, isPicked: answer == .onError(position))
-                    }
+                FielderPicker(picked: { position in answer == .onError(position) ? 1 : nil },
+                              label: { "Error by the \(PlayWords.fielder($0))" }) { position in
+                    model.perform(.chargeExtraBaseError(move.runner, fielder: position))
                 }
             }
         }
@@ -225,32 +231,79 @@ struct ExtraBaseQuestion: View {
                 .font(ScorebookFont.chip)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
-                .foregroundStyle(isPicked ? ScorebookColor.textPrimary : ScorebookColor.textSecondary)
-                .frame(maxWidth: .infinity, minHeight: 40)
+                .foregroundStyle(ScorebookColor.textPrimary)
+                .frame(maxWidth: .infinity, minHeight: Spacing.minimumTapSize)
                 .background(isPicked ? ScorebookColor.surface : Color.clear, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isPicked ? .isSelected : [])
     }
+}
 
-    /// One fielder button under "Whose error?": the number, with "LF" under it.
-    private func fielderButton(_ position: Position, isPicked: Bool) -> some View {
-        Button { model.perform(.chargeExtraBaseError(move.runner, fielder: position)) } label: {
-            VStack(spacing: 0) {
-                Text("\(position.number)").font(ScorebookFont.headline)
-                Text(position.abbreviation.uppercased()).font(ScorebookFont.caption.weight(.bold)).opacity(0.75)
+/// "Who made the out?", under a runner the scorer put out who was not suggested out: tap the
+/// fielders in the order they handled the ball ("8-4" for a runner doubled off second). Tapping
+/// the last one again takes it back. Save waits for at least one.
+struct OutQuestion: View {
+    let model: PlayEntryModel
+    let move: RunnerMove
+
+    var body: some View {
+        let fielders = model.outFielders[move.runner] ?? []
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text("Who put \(model.name(of: move.runner)) out?")
+                    .font(ScorebookFont.chip)
+                Spacer(minLength: Spacing.small)
+                Text(fielders.isEmpty ? "tap in order" : fielders.map(\.description).joined(separator: "-"))
+                    .font(fielders.isEmpty ? ScorebookFont.caption : ScorebookFont.notation)
+                    .foregroundStyle(fielders.isEmpty ? ScorebookColor.textSecondary : ScorebookColor.textPrimary)
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.6)
-            .foregroundStyle(isPicked ? Color.white : ScorebookColor.textPrimary)
-            .frame(maxWidth: .infinity, minHeight: Spacing.minimumTapSize)
-            .background(isPicked ? ScorebookColor.out : ScorebookColor.surface, in: RoundedRectangle(cornerRadius: 9, style: .continuous))
-            .contentShape(Rectangle())
+            FielderPicker(picked: { position in fielders.firstIndex(of: position).map { $0 + 1 } },
+                          label: { "\(PlayWords.fielder($0).capitalized) made or helped make the out" }) { position in
+                model.perform(.tapOutFielder(move.runner, position))
+            }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(Text("Error by the \(PlayWords.fielder(position))"))
-        .accessibilityAddTraits(isPicked ? .isSelected : [])
+        .foregroundStyle(ScorebookColor.textPrimary)
+        .padding(Spacing.small)
+        .background(ScorebookColor.out.opacity(0.12), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
+        .padding(.leading, 92)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+    }
+}
+
+/// A row of nine fielder buttons, the number with "LF" under it, for "Whose error?" and
+/// "Who made the out?". A picked fielder is red; when the order matters, it shows its place.
+struct FielderPicker: View {
+    /// For a fielder: nothing when not picked, else its place in the order (1 for the only pick).
+    var picked: (Position) -> Int?
+    /// What VoiceOver says for a fielder.
+    var label: (Position) -> String
+    var onTap: (Position) -> Void
+
+    var body: some View {
+        HStack(spacing: 3) {
+            ForEach(Position.allCases, id: \.self) { position in
+                let order = picked(position)
+                Button { onTap(position) } label: {
+                    VStack(spacing: 0) {
+                        Text("\(position.number)").font(ScorebookFont.headline)
+                        Text(position.abbreviation.uppercased()).font(ScorebookFont.caption.weight(.bold)).opacity(0.8)
+                    }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                    .foregroundStyle(order != nil ? Color.white : ScorebookColor.textPrimary)
+                    .frame(maxWidth: .infinity, minHeight: Spacing.minimumTapSize + 4)
+                    .background(order != nil ? ScorebookColor.out : ScorebookColor.surface,
+                                in: RoundedRectangle(cornerRadius: 9, style: .continuous))
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(label(position)))
+                .accessibilityValue(Text(order.map { "picked, \($0)" } ?? ""))
+                .accessibilityAddTraits(order != nil ? .isSelected : [])
+            }
+        }
     }
 }
 
