@@ -108,6 +108,11 @@ struct Replay {
         refreshClock(at: now)
 
         let before = s
+        // Who was in the field for the team the defense check is waiting on, so a change made
+        // before the check (a new pitcher at the changeover) can be carried onto its suggestion.
+        let checkSide = s.fieldingSide
+        let fieldersBeforeCheck = s[checkSide].fielders
+        let checkWasDue = s.defenseCheckDue
         let beforeLog = BasesAndOuts(outs: s.outs, count: s.count, runners: s.runners)
         let isPlay = Self.isPlay(event.kind)
         if isPlay { startOfPlay(event) }
@@ -168,6 +173,13 @@ struct Replay {
         s.isRegulationComplete = Self.isOfficial(s)
 
         if s.isFinal { s.gameOverQuestion = nil }
+        // A change recorded while the defense check is still waiting (a pitching change at the
+        // changeover, a substitution) goes into the check's suggestion too, so the check never
+        // proposes putting back the player just taken out.
+        if checkWasDue, s.defenseCheckDue, !endsHalf, s.fieldingSide == checkSide,
+           let suggestion = s.suggestedDefense, s[checkSide].fielders != fieldersBeforeCheck {
+            s.suggestedDefense = Self.carry(from: fieldersBeforeCheck, to: s[checkSide].fielders, onto: suggestion)
+        }
         if !s.defenseCheckDue { s.suggestedDefense = nil }
 
         // A game-ending hit is written as the hit it was credited as ("1B 8", not "2B 8").
@@ -221,6 +233,23 @@ struct Replay {
         case .pitch, .intentionalWalk, .ballInPlay, .runnerAction, .errorWithNoAdvance: true
         default: false
         }
+    }
+
+    /// Carries the fielding changes between two lists of fielders onto the defense check's
+    /// suggestion: whoever now plays a position that changed hands is put there, and anyone
+    /// who left the field leaves the suggestion. Positions nobody changed keep the suggestion's
+    /// player (such as the turn at first base for this inning).
+    static func carry(from old: [FielderAssignment], to new: [FielderAssignment],
+                      onto suggestion: [FielderAssignment]) -> [FielderAssignment] {
+        var result = suggestion
+        let wasThere = Dictionary(old.map { ($0.position, $0.player) }, uniquingKeysWith: { first, _ in first })
+        let leftTheField = Set(old.map(\.player)).subtracting(new.map(\.player))
+        result.removeAll { leftTheField.contains($0.player) }
+        for assignment in new where wasThere[assignment.position] != assignment.player {
+            result.removeAll { $0.position == assignment.position || $0.player == assignment.player }
+            result.append(assignment)
+        }
+        return result.sorted { $0.position < $1.position }
     }
 
     /// What happens at the start of any piece of play: the changeover is over, the defense
