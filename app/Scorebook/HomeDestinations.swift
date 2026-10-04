@@ -32,7 +32,7 @@ struct HomeDestination: View {
                 EmptyPage(text: "Set up your team in Teams, and the season stats will build up game by game.")
             }
         case .games:
-            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedFiles.count, onRequest: handle)
+            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count, onRequest: handle)
         case .boxScore(let id):
             SavedBoxScore(id: id, onRequest: handle)
         case .player(let id):

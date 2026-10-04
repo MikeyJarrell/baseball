@@ -40,6 +40,9 @@ struct HomeView: View {
     @State private var scoring = false
     /// True once the app has opened a game left in progress, so it happens only at launch.
     @State private var checkedForGameInProgress = false
+    /// True when "Play ball" saved a new game: the batting screen opens once the pregame
+    /// screens have finished sliding away.
+    @State private var openGameAfterPregame = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -71,13 +74,19 @@ struct HomeView: View {
             }
         }
         .tint(ScorebookColor.inPlay)
-        .fullScreenCover(isPresented: $settingUpGame) {
-            PregameCover(onStarted: {
-                settingUpGame = false
+        .fullScreenCover(isPresented: $settingUpGame, onDismiss: {
+            if openGameAfterPregame {
+                openGameAfterPregame = false
                 scoring = true
+            }
+        }) {
+            PregameCover(onStarted: {
+                openGameAfterPregame = true
+                settingUpGame = false
             }, onCancel: { settingUpGame = false })
         }
-        .fullScreenCover(isPresented: $scoring) {
+        // Leaving a finished game closes it, so the home screen stops offering to resume it.
+        .fullScreenCover(isPresented: $scoring, onDismiss: { app.closeFinishedGame() }) {
             if let session = app.session {
                 GameScreen(session: session, onLeave: { scoring = false })
             }

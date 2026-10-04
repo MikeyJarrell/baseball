@@ -44,8 +44,12 @@ final class AppModel {
     private(set) var gameSummaries: [GameSummary] = []
     /// Every finished game, oldest first, for the season stats.
     private(set) var finishedGames: [Game] = []
-    /// Saved files that could not be read (a damaged team or game), to mention on screen.
-    private(set) var damagedFiles: [DamagedFile] = []
+    /// Team files that could not be read, to mention on screen.
+    private(set) var damagedTeams: [DamagedFile] = []
+    /// Game files that could not be read, to mention on screen.
+    private(set) var damagedGames: [DamagedFile] = []
+    /// Every saved file that could not be read.
+    var damagedFiles: [DamagedFile] { damagedTeams + damagedGames }
 
     /// The game being scored, if one is open or waiting to be resumed.
     private(set) var session: GameSession?
@@ -141,7 +145,7 @@ final class AppModel {
         do {
             let loaded = try await storage.loadTeams()
             teams = loaded.items
-            damagedFiles = loaded.damaged
+            damagedTeams = loaded.damaged
         } catch {
             problem = "The teams could not be read. (\(error.localizedDescription))"
         }
@@ -157,7 +161,7 @@ final class AppModel {
             gameSummaries = list.items
             let finished = try await storage.finishedGames()
             finishedGames = finished.items
-            damagedFiles = (damagedFiles.filter { !$0.fileName.hasPrefix("games") }) + list.damaged
+            damagedGames = list.damaged
         } catch {
             problem = "The saved games could not be read. (\(error.localizedDescription))"
         }

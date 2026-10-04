@@ -83,10 +83,7 @@ struct GameScreen: View {
     var body: some View {
         Group {
             if session.isFinished {
-                FinalBoxScore(session: session, onLeave: {
-                    app.closeFinishedGame()
-                    onLeave()
-                })
+                FinalBoxScore(session: session, onLeave: onLeave)
             } else {
                 batting
             }
