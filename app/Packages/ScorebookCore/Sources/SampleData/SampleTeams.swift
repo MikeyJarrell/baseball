@@ -32,7 +32,8 @@ public enum SampleTeams {
             Player(id: "d10", name: "Jamie Cole", number: "14", bats: .left, throwsWith: .left, walkUpSongID: "song-09"),
             Player(id: "d11", name: "Robin Nash", number: "27", bats: .right, throwsWith: .right, walkUpSongID: "song-10"),
             Player(id: "d12", name: "Taylor Voss", number: "44", bats: .left, throwsWith: .left, warmUpSongID: "song-12"),
-        ]
+        ],
+        shortName: "DOGS"
     )
 
     /// An opponent with a full roster of names and numbers.
@@ -52,7 +53,8 @@ public enum SampleTeams {
             Player(id: "m10", name: "Kyle Moss", number: "15", bats: .left, throwsWith: .right),
             Player(id: "m11", name: "Ben Ash", number: "19", bats: .right, throwsWith: .right),
             Player(id: "m12", name: "Gus Reyes", number: "40", bats: .left, throwsWith: .left),
-        ]
+        ],
+        shortName: "MUD"
     )
 
     /// An opponent known only by jersey numbers: nobody has names yet.

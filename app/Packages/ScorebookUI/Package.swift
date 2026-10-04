@@ -9,7 +9,7 @@
 //
 // Who may use whom:
 // - DesignSystem and WalkUpAudio use only Model.
-// - BoxScorePicture uses Model, BoxScoreText and DesignSystem.
+// - BoxScorePicture uses Model, SampleData (for its previews), BoxScoreText and DesignSystem.
 // - Every screen module uses Model, SampleData and DesignSystem, and nothing else.
 //   Screens never use GameEngine, Stats, Storage or WalkUpAudio; the app shell
 //   connects them.
@@ -64,6 +64,7 @@ let package = Package(
             name: "BoxScorePicture",
             dependencies: [
                 .product(name: "Model", package: "ScorebookCore"),
+                .product(name: "SampleData", package: "ScorebookCore"),
                 .product(name: "BoxScoreText", package: "ScorebookCore"),
                 "DesignSystem",
             ],
@@ -90,5 +91,14 @@ let package = Package(
 
         // End of game, box score sharing, season stats.
         .target(name: "PostgameScreens", dependencies: screenDependencies),
+
+        // Tests of the design system's plain functions, such as the field drawing's baseball
+        // logic. Run on an iPhone simulator:
+        //   xcodebuild test -scheme ScorebookUI-Package -destination 'platform=iOS Simulator,name=iPhone 17'
+        // Screen builders may add their own test folders here through the lead builder.
+        .testTarget(
+            name: "DesignSystemTests",
+            dependencies: ["DesignSystem", .product(name: "Model", package: "ScorebookCore")]
+        ),
     ]
 )

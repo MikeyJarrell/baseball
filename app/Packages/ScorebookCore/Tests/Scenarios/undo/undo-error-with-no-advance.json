@@ -1,0 +1,79 @@
+{
+  "description": "Undo an error with nobody moving. Ortiz takes ball one, then pops up in foul ground and first baseman Quinn drops it. Nothing on the field changes either way; undoing the error takes it off Quinn's line and the team's.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "foul"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "errorWithNoAdvance": {
+        "fielder": 3,
+        "type": "fielding"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 1,
+            "strikes": 1
+          },
+          "outs": 0,
+          "runners": [],
+          "batter": "m1"
+        },
+        "fielding": [
+          {
+            "player": "d4",
+            "errors": 0
+          }
+        ],
+        "teams": [
+          {
+            "team": "home",
+            "errors": 0
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "count": {
+        "balls": 1,
+        "strikes": 1
+      },
+      "outs": 0,
+      "runners": [],
+      "batter": "m1"
+    },
+    "fielding": [
+      {
+        "player": "d4",
+        "errors": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      }
+    ]
+  }
+}

@@ -1,0 +1,90 @@
+{
+  "description": "Ortiz grounds out to second: second baseman Moreno throws to first baseman Quinn.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "groundBall",
+        "fielders": [
+          4,
+          3
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              4,
+              3
+            ],
+            "outAt": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [],
+      "batter": "m2",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 2,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "4-3"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "outsRecorded": 1,
+        "battersFaced": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d1",
+        "putouts": 0,
+        "assists": 1
+      },
+      {
+        "player": "d4",
+        "putouts": 1,
+        "assists": 0
+      }
+    ]
+  }
+}

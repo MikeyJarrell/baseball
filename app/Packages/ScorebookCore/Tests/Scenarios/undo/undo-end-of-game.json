@@ -1,0 +1,81 @@
+{
+  "description": "Undo the end of the game. Bottom of the ninth, Mudcats ahead 3-2, two out. Moreno flies out and the app asks whether the game is over; the scorer ends it. Undoing the end makes the game unfinished again with the question still to answer. Once a game is final the question is cleared.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "manualAdjustment": {
+        "inning": 9,
+        "half": "bottom",
+        "outs": 2,
+        "score": {
+          "away": 3,
+          "home": 2
+        },
+        "batterIndex": 0,
+        "note": "Start with two out in the bottom of the ninth."
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "flyBall",
+        "fielders": [
+          8
+        ],
+        "runners": [
+          {
+            "runner": "d1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              8
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "endOfGame": {
+        "reason": "regulation",
+        "finalScore": {
+          "away": 3,
+          "home": 2
+        }
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e2",
+      "expected": {
+        "situation": {
+          "score": {
+            "away": 3,
+            "home": 2
+          },
+          "gameOverQuestion": "regulation",
+          "isFinal": false,
+          "isRegulationComplete": true
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "score": {
+        "away": 3,
+        "home": 2
+      },
+      "isGameOverQuestionOpen": false,
+      "isFinal": true,
+      "isRegulationComplete": true
+    }
+  }
+}
