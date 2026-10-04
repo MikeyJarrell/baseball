@@ -267,20 +267,53 @@ enum StatSorting {
             .map(\.element)
     }
 
-    /// The season pitching lines sorted for the table.
-    static func pitching(_ lines: [SeasonPitchingLine], by choice: SortChoice<PitchingColumn>) -> [SeasonPitchingLine] {
-        sorted(lines, descending: choice.descending) { choice.column.value($0.stats, games: $0.games) }
+    /// True when the minimum innings filter hides this pitcher's per-inning rates: fewer outs
+    /// than three times the minimum innings.
+    static func hidesRates(_ line: SeasonPitchingLine, minimumInnings: Int) -> Bool {
+        line.stats.outsRecorded < minimumInnings * 3
+    }
+
+    /// The season pitching lines sorted for the table. When sorting by a per-inning rate,
+    /// pitchers below the minimum innings count as having none and go to the bottom, so one
+    /// out with nobody on does not top the walks-and-hits table.
+    static func pitching(_ lines: [SeasonPitchingLine], by choice: SortChoice<PitchingColumn>,
+                         minimumInnings: Int) -> [SeasonPitchingLine] {
+        sorted(lines, descending: choice.descending) { line in
+            if choice.column.isRate && hidesRates(line, minimumInnings: minimumInnings) { return nil }
+            return choice.column.value(line.stats, games: line.games)
+        }
     }
 }
 
-// MARK: - The minimum plate appearances filter
+// MARK: - The minimum filters
 
-/// The choices in the filter's menu: everyone, or at least this many plate appearances.
+/// The choices in the hitters' filter menu: everyone, or at least this many plate appearances.
 enum MinimumPlateAppearances {
     static let choices = [0, 5, 10, 20, 30]
 
-    /// The words on the filter chip: "At least 10 plate appearances", or "Everyone" when off.
+    /// The words on the filter chip: "At least 10 plate appearances", or "Averages for
+    /// everyone" when the filter is off.
     static func label(_ minimum: Int) -> String {
         minimum <= 0 ? "Averages for everyone" : "At least \(PostgameWording.counted(minimum, "plate appearance", "plate appearances"))"
+    }
+
+    /// The words in the menu: "Everyone", "At least 10 plate appearances".
+    static func choiceLabel(_ minimum: Int) -> String {
+        minimum <= 0 ? "Everyone" : label(minimum)
+    }
+}
+
+/// The choices in the pitchers' filter menu: everyone, or at least this many innings pitched.
+enum MinimumInnings {
+    static let choices = [0, 1, 3, 5, 10, 20]
+
+    /// The words on the filter chip: "At least 3 innings", or "Rates for everyone" when off.
+    static func label(_ minimum: Int) -> String {
+        minimum <= 0 ? "Rates for everyone" : "At least \(PostgameWording.counted(minimum, "inning", "innings"))"
+    }
+
+    /// The words in the menu: "Everyone", "At least 3 innings".
+    static func choiceLabel(_ minimum: Int) -> String {
+        minimum <= 0 ? "Everyone" : label(minimum)
     }
 }

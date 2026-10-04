@@ -76,7 +76,10 @@ public struct EndOfGameScreen<Picture: View, ShareButton: View>: View {
                 }
 
                 VStack(spacing: 10) {
+                    // Whatever is in the share slot gets the big button in our blue, as in the
+                    // mockup, so the share link handed in needs no styling of its own.
                     shareButton
+                        .buttonStyle(TeamButtonStyle(.ours))
                     HStack(spacing: 10) {
                         Button { onRequest(.copyBoxScoreText(box.gameID)) } label: {
                             Label("Copy as text", systemImage: "doc.on.doc")

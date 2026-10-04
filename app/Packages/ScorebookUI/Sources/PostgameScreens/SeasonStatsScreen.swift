@@ -1,10 +1,10 @@
 // The season stats screen: our hitters and pitchers, in sortable tables.
 //
 // As in the approved mockup: a large "Season" title, the team, games played and the record,
-// a Batting / Pitching switch, and for batting a chip that hides averages below a number of
-// plate appearances. The table's names stay pinned on the left while the numbers scroll
-// sideways. Tapping a column heading sorts by it (biggest first; tap again to flip). Tapping a
-// player asks for their page.
+// a Batting / Pitching switch, and a chip that hides averages below a number of plate
+// appearances (for pitchers, per-inning rates below a number of innings). The table's names
+// stay pinned on the left while the numbers scroll sideways. Tapping a column heading sorts by
+// it (biggest first; tap again to flip). Tapping a player asks for their page.
 
 import SwiftUI
 import Model
@@ -17,9 +17,13 @@ import DesignSystem
 ///   - totals: The season totals from the stats engine.
 ///   - games: The games list, for the season record ("9 wins, 5 losses"). Leave it empty to
 ///     show no record.
-///   - minimumPlateAppearances: Where the averages filter starts: hitters with fewer plate
+///   - minimumPlateAppearances: Where the hitters' filter starts: hitters with fewer plate
 ///     appearances show a dash for their averages. 10, as in the mockup; 0 shows everyone's.
-///   - onRequest: Called with the player the scorer taps.
+///     Pass back the last choice the screen handed back, so it is remembered.
+///   - minimumInnings: Where the pitchers' filter starts: pitchers with fewer innings show a
+///     dash for walks and hits, strikeouts and walks per inning. 3 unless remembered.
+///   - onRequest: Called with the player the scorer taps, and with each new minimum the scorer
+///     picks (`setMinimumPlateAppearances`, `setMinimumInnings`) for the app to keep.
 public struct SeasonStatsScreen: View {
     public var totals: SeasonTotals
     public var games: [GameSummary]
@@ -38,13 +42,15 @@ public struct SeasonStatsScreen: View {
     /// The pitching table starts with whoever pitched the most innings on top.
     @State private var pitchingSort = SortChoice(column: PitchingColumn.innings, descending: true)
     @State private var minimumPlateAppearances: Int
+    @State private var minimumInnings: Int
 
     public init(totals: SeasonTotals, games: [GameSummary] = [], minimumPlateAppearances: Int = 10,
-                onRequest: @escaping (PostgameRequest) -> Void) {
+                minimumInnings: Int = 3, onRequest: @escaping (PostgameRequest) -> Void) {
         self.totals = totals
         self.games = games
         self.onRequest = onRequest
         _minimumPlateAppearances = State(initialValue: minimumPlateAppearances)
+        _minimumInnings = State(initialValue: minimumInnings)
     }
 
     public var body: some View {
@@ -58,8 +64,21 @@ public struct SeasonStatsScreen: View {
                     ForEach(Table.allCases) { Text($0.rawValue).tag($0) }
                 }
                 .pickerStyle(.segmented)
-                if table == .batting {
-                    averagesFilter
+                switch table {
+                case .batting:
+                    MinimumFilterChip(
+                        minimum: $minimumPlateAppearances, choices: MinimumPlateAppearances.choices,
+                        label: MinimumPlateAppearances.label, choiceLabel: MinimumPlateAppearances.choiceLabel,
+                        besideText: "for averages", spokenName: "Averages filter",
+                        spokenValue: { $0 == 0 ? "showing averages for everyone"
+                            : "showing averages for players with at least \($0) plate appearances" })
+                case .pitching:
+                    MinimumFilterChip(
+                        minimum: $minimumInnings, choices: MinimumInnings.choices,
+                        label: MinimumInnings.label, choiceLabel: MinimumInnings.choiceLabel,
+                        besideText: "for rates", spokenName: "Pitching rates filter",
+                        spokenValue: { $0 == 0 ? "showing rates for everyone"
+                            : "showing rates for pitchers with at least \(PostgameWording.counted($0, "inning", "innings"))" })
                 }
             }
             .padding(.horizontal, Spacing.large)
@@ -82,6 +101,9 @@ public struct SeasonStatsScreen: View {
         // accessibility size; the table's own rows still grow up to that size.
         .dynamicTypeSize(...DynamicTypeSize.accessibility2)
         .navigationTitle("Season")
+        // Hand each new minimum back, so the app can remember it for next time.
+        .onChange(of: minimumPlateAppearances) { _, minimum in onRequest(.setMinimumPlateAppearances(minimum)) }
+        .onChange(of: minimumInnings) { _, minimum in onRequest(.setMinimumInnings(minimum)) }
     }
 
     /// "Diamond Dogs · 14 games · 9 wins, 5 losses".
@@ -89,46 +111,6 @@ public struct SeasonStatsScreen: View {
         var parts = [totals.teamName, PostgameWording.counted(totals.games, "game", "games")]
         if let record = PostgameWording.record(games) { parts.append(record) }
         return parts.joined(separator: " · ")
-    }
-
-    // MARK: The averages filter
-
-    /// The chip that sets the minimum plate appearances for averages, with "for averages"
-    /// beside it. Tapping it opens the choices.
-    private var averagesFilter: some View {
-        let isOn = minimumPlateAppearances > 0
-        return HStack(spacing: Spacing.small) {
-            Menu {
-                Picker("Show averages for", selection: $minimumPlateAppearances) {
-                    ForEach(MinimumPlateAppearances.choices, id: \.self) { minimum in
-                        Text(minimum == 0 ? "Everyone" : "At least \(minimum) plate appearances").tag(minimum)
-                    }
-                }
-            } label: {
-                HStack(spacing: Spacing.extraSmall) {
-                    Text(MinimumPlateAppearances.label(minimumPlateAppearances))
-                    Image(systemName: "chevron.down").font(ScorebookFont.caption.weight(.bold))
-                }
-                .font(ScorebookFont.chip)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .foregroundStyle(isOn ? ScorebookColor.background : ScorebookColor.textPrimary)
-                .padding(.horizontal, Spacing.medium)
-                .frame(minHeight: Spacing.minimumTapSize)
-                .background(isOn ? ScorebookColor.textPrimary : ScorebookColor.surfaceSecondary, in: Capsule())
-            }
-            .accessibilityLabel("Averages filter")
-            .accessibilityValue(minimumPlateAppearances == 0
-                                ? "showing averages for everyone"
-                                : "showing averages for players with at least \(minimumPlateAppearances) plate appearances")
-            if isOn {
-                Text("for averages")
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
-                    .lineLimit(1)
-            }
-        }
-        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 
     // MARK: The tables
@@ -166,12 +148,17 @@ public struct SeasonStatsScreen: View {
     }
 
     private var pitchingTable: some View {
-        let rows = StatSorting.pitching(totals.pitching, by: pitchingSort)
+        let minimum = minimumInnings
+        let rows = StatSorting.pitching(totals.pitching, by: pitchingSort, minimumInnings: minimum)
         let columns = PitchingColumn.allCases.map { column in
             StatsTableColumn<SeasonPitchingLine>(
                 id: column.id, title: column.title, spokenName: column.spokenName,
                 width: column.isRate ? 54 : pitchingWidth(column),
-                text: { column.text($0.stats, games: $0.games) }
+                text: { line in
+                    if column.isRate && StatSorting.hidesRates(line, minimumInnings: minimum) { return "—" }
+                    return column.text(line.stats, games: line.games)
+                },
+                isDimmed: { line in column.isRate && StatSorting.hidesRates(line, minimumInnings: minimum) }
             )
         }
         return Group {
@@ -212,5 +199,52 @@ public struct SeasonStatsScreen: View {
             .padding(Spacing.large)
             .background(ScorebookColor.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
             .padding(.horizontal, Spacing.screenEdge)
+    }
+}
+
+/// The filter chip over a season table: "At least 10 plate appearances ⌄" with "for averages"
+/// beside it, dark when a minimum is set. Tapping it opens the choices.
+private struct MinimumFilterChip: View {
+    @Binding var minimum: Int
+    var choices: [Int]
+    /// The words on the chip for a minimum.
+    var label: (Int) -> String
+    /// The words in the menu for a minimum.
+    var choiceLabel: (Int) -> String
+    /// The small words beside the chip when a minimum is set: "for averages".
+    var besideText: String
+    var spokenName: String
+    var spokenValue: (Int) -> String
+
+    var body: some View {
+        let isOn = minimum > 0
+        HStack(spacing: Spacing.small) {
+            Menu {
+                Picker(spokenName, selection: $minimum) {
+                    ForEach(choices, id: \.self) { Text(choiceLabel($0)).tag($0) }
+                }
+            } label: {
+                HStack(spacing: Spacing.extraSmall) {
+                    Text(label(minimum))
+                    Image(systemName: "chevron.down").font(ScorebookFont.caption.weight(.bold))
+                }
+                .font(ScorebookFont.chip)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .foregroundStyle(isOn ? ScorebookColor.background : ScorebookColor.textPrimary)
+                .padding(.horizontal, Spacing.medium)
+                .frame(minHeight: Spacing.minimumTapSize)
+                .background(isOn ? ScorebookColor.textPrimary : ScorebookColor.surfaceSecondary, in: Capsule())
+            }
+            .accessibilityLabel(spokenName)
+            .accessibilityValue(spokenValue(minimum))
+            if isOn {
+                Text(besideText)
+                    .font(ScorebookFont.caption)
+                    .foregroundStyle(ScorebookColor.textSecondary)
+                    .lineLimit(1)
+            }
+        }
+        .dynamicTypeSize(...DynamicTypeSize.accessibility2)
     }
 }

@@ -103,15 +103,15 @@ struct PitchingSortTests {
 
     @Test("Most innings first; innings sort by outs and print as innings and outs")
     func innings() {
-        let sorted = StatSorting.pitching(fourteen, by: SortChoice(column: .innings, descending: true))
+        let sorted = StatSorting.pitching(fourteen, by: SortChoice(column: .innings, descending: true), minimumInnings: 0)
         #expect(lastNames(sorted) == ["Barros", "Voss", "Quinn"])
         #expect(sorted.map { PitchingColumn.innings.text($0.stats) } == ["58.1", "21.0", "0.0"])
     }
 
     @Test("A pitcher with no outs has no rates, prints a dash, and sorts last both ways")
     func ratesWithNoOuts() {
-        let up = StatSorting.pitching(fourteen, by: SortChoice(column: .walksAndHitsPerInning, descending: false))
-        let down = StatSorting.pitching(fourteen, by: SortChoice(column: .walksAndHitsPerInning, descending: true))
+        let up = StatSorting.pitching(fourteen, by: SortChoice(column: .walksAndHitsPerInning, descending: false), minimumInnings: 0)
+        let down = StatSorting.pitching(fourteen, by: SortChoice(column: .walksAndHitsPerInning, descending: true), minimumInnings: 0)
         #expect(lastNames(up).last == "Quinn")
         #expect(lastNames(down).last == "Quinn")
         let quinn = fourteen.first { $0.player == "d4" }!
@@ -119,6 +119,59 @@ struct PitchingSortTests {
         // Barros: 51 hits and 14 walks in 175 outs (58⅓ innings) is 1.11 an inning.
         let barros = fourteen.first { $0.player == "d9" }!
         #expect(PitchingColumn.walksAndHitsPerInning.text(barros.stats) == "1.11")
+    }
+}
+
+@Suite("The pitchers' minimum innings")
+struct PitchingMinimumTests {
+    /// The one-game season's pitchers: Barros, 12 outs (4 innings), 6 hits and 2 walks;
+    /// Voss, 3 outs (1 inning), 1 hit and 1 walk. Plus a made-up reliever with one out and
+    /// nobody on, whose walks and hits per inning is 0.00.
+    let pitchers: [SeasonPitchingLine] = SampleSeason.totals.pitching + [
+        SeasonPitchingLine(player: "x1", name: "One Out", games: 1,
+                           stats: PitchingCounts(outsRecorded: 1, battersFaced: 1), gameLog: [])
+    ]
+
+    @Test("With no minimum, one out and nobody on tops the walks and hits table")
+    func noMinimum() {
+        let sorted = StatSorting.pitching(pitchers, by: SortChoice(column: .walksAndHitsPerInning, descending: false),
+                                          minimumInnings: 0)
+        // One Out 0.00, Barros 8 in 4 innings is 2.00, Voss 2 in 1 inning is 2.00 (roster order).
+        #expect(lastNames(sorted) == ["Out", "Barros", "Voss"])
+    }
+
+    @Test("At 3 innings, only Barros keeps his rates; the others sink, whichever way the column sorts")
+    func threeInnings() {
+        for descending in [false, true] {
+            let sorted = StatSorting.pitching(pitchers, by: SortChoice(column: .walksAndHitsPerInning, descending: descending),
+                                              minimumInnings: 3)
+            #expect(lastNames(sorted) == ["Barros", "Voss", "Out"])
+        }
+        #expect(StatSorting.hidesRates(pitchers[1], minimumInnings: 3))
+        #expect(!StatSorting.hidesRates(pitchers[0], minimumInnings: 3))
+    }
+
+    @Test("Exactly the minimum keeps the rates: 1 inning is 3 outs")
+    func boundary() {
+        let voss = pitchers[1]
+        #expect(voss.stats.outsRecorded == 3)
+        #expect(!StatSorting.hidesRates(voss, minimumInnings: 1))
+        #expect(StatSorting.hidesRates(voss, minimumInnings: 2))
+    }
+
+    @Test("The minimum never touches counting columns: innings sort the same with it on")
+    func countsUntouched() {
+        let sorted = StatSorting.pitching(pitchers, by: SortChoice(column: .innings, descending: true), minimumInnings: 20)
+        #expect(lastNames(sorted) == ["Barros", "Voss", "Out"])
+    }
+
+    @Test("The chips' words")
+    func chipWords() {
+        #expect(MinimumInnings.label(3) == "At least 3 innings")
+        #expect(MinimumInnings.label(1) == "At least 1 inning")
+        #expect(MinimumInnings.label(0) == "Rates for everyone")
+        #expect(MinimumPlateAppearances.label(0) == "Averages for everyone")
+        #expect(MinimumPlateAppearances.choiceLabel(0) == "Everyone")
     }
 }
 

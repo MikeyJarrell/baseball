@@ -46,4 +46,10 @@ public enum PostgameRequest: Equatable, Sendable {
     case openGame(GameID)
     /// Open one player's page: their season line and game log.
     case openPlayer(PlayerID)
+    /// The scorer picked a new minimum plate appearances for hitters' averages. Keep it and
+    /// hand it back as `minimumPlateAppearances` the next time the season stats open.
+    case setMinimumPlateAppearances(Int)
+    /// The scorer picked a new minimum innings pitched for pitchers' per-inning rates. Keep it
+    /// and hand it back as `minimumInnings` the next time the season stats open.
+    case setMinimumInnings(Int)
 }

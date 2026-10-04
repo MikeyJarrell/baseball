@@ -10,6 +10,9 @@
 //   5. the 2×2 block of Ball, Strike (with a small Called button), Foul and In play;
 //   6. the song button across the bottom edge.
 //
+// On an iPad turned sideways, or any window wider than it is tall, the band stays on top and
+// the field sits on the left with pieces 3 to 6 on the right, so the field keeps its size.
+//
 // The screen holds no game state. It is handed plain data (the situation, the batter's earlier
 // plate appearances, the song library, the settings, what the audio is doing, the undo label)
 // and hands back every tap as an `AtBatAction`: an event to record, or a request such as
@@ -257,16 +260,15 @@ struct AtBatLayout: View {
     @State private var answeredQuestion: EndOfGame.Reason?
 
     var body: some View {
-        VStack(spacing: 0) {
-            AtBatBand(info: info, onAction: onAction, openMenu: { showingMenu = true })
-            AtBatFieldArea(info: info, onAction: onAction)
-                // The field takes whatever height is left, so everything else stays on screen.
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .layoutPriority(-1)
-            AtBatControls(info: info, onAction: recordWithFade)
-                .padding(.horizontal, Spacing.screenEdge)
-                .padding(.top, Spacing.small)
-                .padding(.bottom, Spacing.small)
+        GeometryReader { geo in
+            // An iPad turned sideways (or a wide iPad window) puts the field beside the buttons
+            // instead of above them, so the field is not squeezed into a thin strip. The iPhone
+            // is held upright and always gets the stacked layout.
+            if geo.size.width > geo.size.height * 1.2 {
+                sideBySide(width: geo.size.width)
+            } else {
+                stacked
+            }
         }
         .background(ScorebookColor.background.ignoresSafeArea())
         // A swipe to the left opens the game overview, as in the mockup.
@@ -298,6 +300,44 @@ struct AtBatLayout: View {
         .onChange(of: info.gameOverQuestion) { _, question in
             if question == nil { answeredQuestion = nil }
         }
+    }
+
+    /// Top to bottom: the band, the field, then the batter and the buttons.
+    private var stacked: some View {
+        VStack(spacing: 0) {
+            AtBatBand(info: info, onAction: onAction, openMenu: { showingMenu = true })
+            AtBatFieldArea(info: info, onAction: onAction)
+                // The field takes whatever height is left, so everything else stays on screen.
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .layoutPriority(-1)
+            controls
+        }
+    }
+
+    /// The band across the top; under it, the field on the left and the batter and the
+    /// buttons on the right, sitting at the bottom where a thumb reaches them.
+    private func sideBySide(width: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            AtBatBand(info: info, onAction: onAction, openMenu: { showingMenu = true })
+            HStack(spacing: 0) {
+                AtBatFieldArea(info: info, onAction: onAction)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                VStack(spacing: 0) {
+                    Spacer(minLength: 0)
+                    controls
+                }
+                // The buttons get a little under half the width, at most enough for the 2×2 block.
+                .frame(width: min(520, width * 0.48))
+            }
+        }
+    }
+
+    /// The batter, the chips, the four big buttons and the song spot.
+    private var controls: some View {
+        AtBatControls(info: info, onAction: recordWithFade)
+            .padding(.horizontal, Spacing.screenEdge)
+            .padding(.top, Spacing.small)
+            .padding(.bottom, Spacing.small)
     }
 
     /// Hands back a tap from the buttons. A pitch, a ball in play or an intentional walk is
