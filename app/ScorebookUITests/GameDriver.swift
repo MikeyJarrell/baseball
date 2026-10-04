@@ -589,7 +589,12 @@ final class GameDriver {
             try tap(app.buttons["Later"], "\"Later\" on the defense check")
         }
         try tap(app.buttons["Game menu"], "the game menu")
-        try tap(button(startingWith: "End game"), "\"End game\" in the game menu")
+        // The menu opens half-height; End game is at the bottom of its list.
+        let endGame = button(startingWith: "End game")
+        for _ in 0..<4 where !endGame.exists || !endGame.isHittable {
+            button(startingWith: "Manual adjustment").swipeUp()
+        }
+        try tap(endGame, "\"End game\" in the game menu")
         let reason: String = switch end.reason {
         case .regulation: "End game: innings complete"
         case .timeLimit: "End game: time limit"
