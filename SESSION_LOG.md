@@ -93,3 +93,44 @@ SESSLOG:[2026-10-03 17:33]
 
 ### Context
 The batting screen and in-game change sheets were run on the 13-inch iPad Pro and iPad mini simulators. Upright they worked; the fixes were oversized runner tags on the big iPad and a squashed field when sideways. The simulator cannot be rotated from the command line here (no Simulator app, and asking iOS to rotate from code did nothing), so sideways was tested by drawing the screen at sideways size in a throwaway harness.
+
+---
+
+## [2026-10-03 19:58] Stopping the simulator permission popups
+SESSLOG:[2026-10-03 19:58]
+
+**Project(s):** baseball
+
+### Decisions
+- Builders use only the existing `iPhone 17`, `iPhone 17e`, `iPad Pro 13-inch (M5)` and `iPad mini (A17 Pro)` simulators, and never create, clone, rename, delete or erase one (`plan/rules-for-agents.md`).
+- Throwaway harness apps get their own bundle id and are uninstalled when the builder finishes; several builders may share one simulator.
+
+### Follow-ups
+- [ ] Builders already running when this landed (the teams-and-songs screen) may still make their own simulator; Mikey can click Cancel on popups naming a made-up simulator.
+
+### Files
+- [modified] `plan/rules-for-agents.md` — simulator rule
+
+### Context
+The app asks Mikey to click Allow the first time Claude controls each simulator. Builders had been making a fresh, uniquely named simulator per job (“GameChanges iPhone 17”, “GOReview2 iPhone 17”, “Overview harness iPhone 17”), so every job set off a new popup. Reusing a fixed set should mean one Allow per simulator, going by the popup’s wording; that it stays allowed across sessions has not been confirmed.
+
+---
+
+## [2026-10-03 20:08] Darin’s and Aidan’s walk-up songs
+SESSLOG:[2026-10-03 20:08]
+
+**Project(s):** baseball
+
+### Decisions
+- Darin: “Big Poppa” by The Notorious B.I.G., the *Ready to Die* album audio, hook at 1:06.
+- Aidan: “Mary Jane” by Rick James, the official upload from a greatest-hits album, the same length as the original album track, hook at 0:20. No official upload of the original album was found.
+
+### Follow-ups
+- [ ] Import the two new clips on the phone and set each start point to 0:20.
+
+### Files
+- [modified] `team/roster.csv` — the two songs, their sources and clip details
+- [created] `aidan-kurt.m4a` and `darin-dietrich.m4a` in `~/Dropbox/baseball/songs/`
+
+### Context
+Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
