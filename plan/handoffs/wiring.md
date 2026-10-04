@@ -23,6 +23,10 @@
 
 Mikey’s decision: every score line lists the visitors first. The resume card, the changeover banner, the “Is the game over?” pop-up (both copies), the game menu and the end-of-game screen now do. The newspaper headline keeps the winner first, as newspapers print it, and the games list keeps “W 7–5”, our runs first, as a result.
 
+### Rules engine fix
+
+A change recorded at the changeover before the defense check (a new pitcher, a substitution) now goes into the check’s suggestion (`Replay.carry`), so the check no longer opens proposing to put the old pitcher back. Found by the walkthrough; checked by `Tests/GameEngineTests/DefenseCheckTests.swift`.
+
 ### Second vocabulary pass
 
 All in `notes/vocabulary-requests.md` under “Done in the second pass”. In short: the printer prints decisions, “HBP—by”, runners for non-runners, the game’s length and lettered pinch-hitter footnotes; runner suggestions around the scorer’s fixed runners; results, record and pitchers’ wins and losses from stats; the play log’s inning breaks, out bases and stolen bases; `Player.usualPosition`, `usualRole` and `usuallyLeadsOff`; `Song.artist`; the `fadesAt` comment.
@@ -31,8 +35,8 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 
 - AtBatScreen: `AtBatScreen.swift` (new `countAfter` input), `AtBatControls.swift`, `AtBatBand.swift`, `AtBatWording.swift` (hints from the rules engine, `displayShortName`, visitors first).
 - PregameScreens: `OurLineup.swift`, `PregameBuilder.swift`, `PregameInput.swift` (`UsualRole` and `usualRoles` removed; the first lineup reads `Player`), `PregameSamples.swift`.
-- PlayEntry: `PlayEntry.swift`, `PlayEntryModel.swift` (fixed runners and re-suggestion).
-- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first).
+- PlayEntry: `PlayEntry.swift`, `PlayEntryModel.swift` (fixed runners and re-suggestion); `RunnersStep.swift` (fixed accessibility names on each runner row and its two questions, for the simulator tests).
+- GameChanges: `GameOverSheet.swift`, `GameMenuSheet.swift` (visitors first); `PitchingChangeSheet.swift` (the new pitcher can take any batting spot or none, from a menu that lists the old pitcher’s spot first, in place of the switch that offered only the old pitcher’s spot; found by the walkthrough, where a reliever took the spot of the pinch hitter who had batted for the starter).
 - GameOverview: `OverviewWording.swift` (reads the play log’s inning break, out base and stolen base); `Tests/GameOverviewTests/MoreLogsTests.swift` (two suites run on the main thread, which clears the build warnings).
 - PostgameScreens: `PostgameWording.swift`, `StatColumns.swift`, `SeasonStatsScreen.swift` (the record comes from the totals, so its `games:` input is gone), `PlayerSeasonScreen.swift`, `GamesListScreen.swift`, `PreviewSeason.swift`, `Previews.swift`.
 - BoxScorePicture: `BoxScorePicture.swift` (pinch-hitter footnotes).
@@ -44,6 +48,13 @@ All in `notes/vocabulary-requests.md` under “Done in the second pass”. In sh
 - `xcodebuild test -project app/Scorebook.xcodeproj -scheme Scorebook` (the new `ScorebookUITests` target, on the iPhone 17 simulator): see the walkthrough below.
 
 ## Simulator walkthrough
+
+`app/ScorebookUITests/ScoringWalkthroughTests.swift`, driven by `GameDriver.swift`, scores two whole games on the iPhone 17 simulator through the real screens, tap by tap: every pitch on the count buttons and chips, every ball in play through the in-play sequence (fielders tapped on the field drawing, runners set on the runners step), defense checks, pitching changes, runner moves, the runner for a designated non-runner, a pinch hitter and the end of the game. After each event it checks the app’s situation against the rules engine’s replay of the book, and at the end compares the printed box score line by line, leaving out only the game’s length (the app times the test’s taps).
+
+- **The sample game** (154 events): passes, box score identical, about 4 minutes.
+- **Astros at Yankees, June 23, 2019** (291 events): passes, box score identical to the book, about 5 minutes. Two plays differ in details that never reach the box score: the app records the base a batter was out at, and its batted-ball guess fills in a type the book left blank.
+
+The first full run found the two problems fixed above (the batting spot on a pitching change, and the defense check after a change at the changeover); both games pass with them fixed. `SmokeTests.swift` also checks that a game in progress opens straight onto the batting screen, and that the home screen’s six tiles and the teams list open.
 
 ## Not done or not checked
 
