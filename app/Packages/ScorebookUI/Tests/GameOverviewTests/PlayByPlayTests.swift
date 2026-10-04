@@ -55,16 +55,16 @@ struct PlayByPlayTests {
     }
 
     @Test func scoreAfterTheLastRunMatchesTheBoxScore() throws {
-        // Diamond Dogs 5, Mudcats 3, our team first.
-        let lastScoring = try #require(PlayByPlay.rows(for: log).last { $0.details.contains { $0.hasPrefix("Diamond Dogs ") } })
-        #expect(lastScoring.details.contains("Diamond Dogs \(SampleGame.boxScore.home.runs), Mudcats \(SampleGame.boxScore.away.runs)"))
-        #expect(lastScoring.details.contains("Diamond Dogs 5, Mudcats 3"))
+        // Mudcats 3, Diamond Dogs 5, visitors first.
+        let lastScoring = try #require(PlayByPlay.rows(for: log).last { $0.details.contains { $0.hasPrefix("Mudcats ") } })
+        #expect(lastScoring.details.contains("Mudcats \(SampleGame.boxScore.away.runs), Diamond Dogs \(SampleGame.boxScore.home.runs)"))
+        #expect(lastScoring.details.contains("Mudcats 3, Diamond Dogs 5"))
     }
 
     @Test func scoreAfterThreeInningsMatchesThatBoxScore() throws {
         let cut = SampleGame.throughThreeInnings.log
-        let lastScoring = try #require(PlayByPlay.rows(for: cut).last { $0.details.contains { $0.hasPrefix("Diamond Dogs ") } })
-        #expect(lastScoring.details.contains("Diamond Dogs 3, Mudcats 2"))
+        let lastScoring = try #require(PlayByPlay.rows(for: cut).last { $0.details.contains { $0.hasPrefix("Mudcats ") } })
+        #expect(lastScoring.details.contains("Mudcats 2, Diamond Dogs 3"))
     }
 
     @Test func firstRunOfTheGameNamesWhoScored() throws {
@@ -73,7 +73,7 @@ struct PlayByPlayTests {
         #expect(double.notation == "2B 9")
         #expect(double.isHit)
         #expect(double.details.contains("Moreno scored"))
-        #expect(double.details.contains("Diamond Dogs 1, Mudcats 0"))
+        #expect(double.details.contains("Mudcats 0, Diamond Dogs 1"))
     }
 
     @Test func outsAreCountedOnTheRowThatMadeThem() throws {

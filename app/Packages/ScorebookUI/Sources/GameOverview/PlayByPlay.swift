@@ -38,6 +38,20 @@ public struct PlayRow: Identifiable, Equatable, Sendable {
     /// True for a pitch in the middle of a plate appearance, which the "Show every pitch"
     /// switch hides.
     public var isHideablePitch: Bool
+    /// The batter at the plate during the event ("Webb"), when there was one.
+    public var batter: String?
+    /// The count just before the event and just after it.
+    public var countBefore: Count
+    public var countAfter: Count
+    /// For a pitch or a ball in play: the pitches already thrown to this batter in this plate
+    /// appearance, oldest first ("Ball", "Called strike"), so the fix sheet can show them.
+    public var earlierPitches: [String]
+    /// What "Delete it" will do, in plain words.
+    public var deleteEffect: String
+    /// True when the event is a pitch, so the fix sheet shows the batter and the count.
+    public var isPitch: Bool
+    /// True when the event ended a plate appearance (ball four, strike three, a ball in play).
+    public var endedPlateAppearance: Bool
 }
 
 /// One half-inning of the play-by-play.
@@ -78,8 +92,19 @@ public enum PlayByPlay {
         var score = Score()
         var rows: [PlayRow] = []
         rows.reserveCapacity(log.entries.count)
+        // The pitches thrown so far in the plate appearance going on, and to whom.
+        var pitchesSoFar: [String] = []
+        var pitchesBatter: PlayerID?
+        var pitchesHalf: (Int, HalfInning)?
 
         for (index, entry) in log.entries.enumerated() {
+            // A new batter, or a new half-inning, starts a new list of pitches.
+            if entry.batter != pitchesBatter || pitchesHalf.map({ $0 != (entry.inning, entry.half) }) ?? true {
+                pitchesSoFar = []
+                pitchesBatter = entry.batter
+                pitchesHalf = (entry.inning, entry.half)
+            }
+            let earlier = pitchesSoFar
             // Keep the running score: each run counts for the team at bat, and a manual
             // adjustment adds (or takes away) the runs the rules engine says it did.
             let side = entry.battingSide
@@ -136,10 +161,31 @@ public enum PlayByPlay {
                     ? (entry.reviewNote ?? "This no longer fits the plays before it.")
                     : nil,
                 isMinor: quietPitch || isCheck,
-                isHideablePitch: quietPitch
+                isHideablePitch: quietPitch,
+                batter: entry.batter.map { OverviewWording.name($0, in: setup) },
+                countBefore: entry.before.count,
+                countAfter: entry.after.count,
+                earlierPitches: (isPitch || isBallInPlay(entry)) ? earlier : [],
+                deleteEffect: OverviewWording.deleteEffect(entry, setup: setup),
+                isPitch: isPitch,
+                endedPlateAppearance: entry.plateAppearance != nil
             ))
+
+            // Keep the list of pitches for the next event: a pitch that did not end the plate
+            // appearance joins it; anything that ended the plate appearance starts it again.
+            if entry.plateAppearance != nil {
+                pitchesSoFar = []
+            } else if case .pitch(let pitch) = entry.event.kind {
+                pitchesSoFar.append(OverviewWording.capitalized(pitch.result.label))
+            }
         }
         return rows
+    }
+
+    /// True for a ball in play.
+    private static func isBallInPlay(_ entry: PlayLogEntry) -> Bool {
+        if case .ballInPlay = entry.event.kind { return true }
+        return false
     }
 
     /// The rows grouped by half-inning, newest half-inning first and newest event first in
@@ -183,7 +229,7 @@ public enum PlayByPlay {
             guard entry.inning == situation.inning, entry.half == situation.half,
                   entry.batter == batter, entry.plateAppearance == nil else { break }
             if case .pitch(let pitch) = entry.event.kind {
-                pitches.append(pitch.result.label.prefix(1).uppercased() + pitch.result.label.dropFirst())
+                pitches.append(OverviewWording.capitalized(pitch.result.label))
             }
         }
         return CurrentAtBat(batter: OverviewWording.name(batter, in: log.setup),

@@ -57,6 +57,11 @@ public enum FixPlay {
     }
 }
 
+extension String {
+    /// The same words with the first letter in capitals.
+    var capitalizedFirst: String { prefix(1).uppercased() + dropFirst() }
+}
+
 // MARK: - The sheet
 
 /// The "Fix a play" sheet for one row of the play-by-play. Public so the app can also open it
@@ -99,14 +104,13 @@ public struct FixPlaySheet: View {
                     Button("Cancel") { dismiss() }
                 }
             }
-            .confirmationDialog("Delete this \(FixPlay.noun(for: row.event))?", isPresented: $askingToDelete,
-                                titleVisibility: .visible) {
-                Button("Delete", role: .destructive) { finish(.edit(.delete(row.event.id))) }
-                Button("Keep it", role: .cancel) {}
-            } message: {
-                Text("Everything after it is worked out again.")
-            }
         }
+    }
+
+    /// The question before deleting, naming the play and its half-inning: "Delete “Cole stole
+    /// second” (Bottom 5th)?"
+    var deleteQuestion: String {
+        "Delete “\(row.text)” (\(OverviewWording.halfInning(row.half, row.inning)))?"
     }
 
     /// The play being fixed, as it appears in the list, with its half-inning.
@@ -117,13 +121,34 @@ public struct FixPlaySheet: View {
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(row.text).font(ScorebookFont.headline)
-                Text(OverviewWording.halfInning(row.half, row.inning))
+                Text(where_)
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
+                if !row.earlierPitches.isEmpty {
+                    // The pitches before this one in the same plate appearance. Each can be
+                    // fixed on its own row once "Show every pitch" is on.
+                    Text("Earlier pitches to \(row.batter ?? "this batter"): \(row.earlierPitches.joined(separator: ", ").lowercased().capitalizedFirst)")
+                        .font(ScorebookFont.caption)
+                        .foregroundStyle(ScorebookColor.textSecondary)
+                }
             }
             Spacer(minLength: 0)
         }
         .accessibilityElement(children: .combine)
+    }
+
+    /// Where the play happened: "Bottom 5th", and for a pitch the batter and the count:
+    /// "Bottom 5th · to Webb · count 1–0 before it, 2–0 after".
+    private var where_: String {
+        var parts = [OverviewWording.halfInning(row.half, row.inning)]
+        if row.isPitch {
+            if let batter = row.batter { parts.append("to \(batter)") }
+            // A pitch that ended the plate appearance has no count after it worth showing.
+            parts.append(row.endedPlateAppearance
+                ? "count \(OverviewWording.count(row.countBefore)) before it, ended the plate appearance"
+                : "count \(OverviewWording.count(row.countBefore)) before it, \(OverviewWording.count(row.countAfter)) after")
+        }
+        return parts.joined(separator: " · ")
     }
 
     /// For a plain pitch: a button for every other kind of pitch.
@@ -162,7 +187,15 @@ public struct FixPlaySheet: View {
             Button {
                 askingToDelete = true
             } label: {
-                actionRow(icon: "trash", title: "Delete it", subtitle: nil, color: ScorebookColor.out)
+                actionRow(icon: "trash", title: "Delete it", subtitle: row.deleteEffect, color: ScorebookColor.out)
+            }
+            // The question hangs off the Delete button itself. "Keep it" has no cancel role,
+            // so it shows as a button even where iOS hides cancel buttons in a pop-over.
+            .confirmationDialog(deleteQuestion, isPresented: $askingToDelete, titleVisibility: .visible) {
+                Button("Delete", role: .destructive) { finish(.edit(.delete(row.event.id))) }
+                Button("Keep it") { askingToDelete = false }
+            } message: {
+                Text(row.deleteEffect)
             }
         }
         .buttonStyle(.plain)

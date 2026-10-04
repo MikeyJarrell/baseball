@@ -64,15 +64,13 @@ public enum OverviewWording {
 
     // MARK: Teams and the score
 
-    /// The team listed first wherever both teams share a line: ours when we know which team
-    /// is ours, else the visitors.
-    public static func firstSide(_ setup: GameSetup) -> TeamSide {
-        setup.ourSide ?? .away
-    }
+    /// The team listed first wherever both teams share a line: always the visitors, as on a
+    /// scoreboard, so the order never changes from one part of the screen to another.
+    public static let firstSide: TeamSide = .away
 
-    /// The score with our team first: "Diamond Dogs 3, Mudcats 2".
+    /// The score, visitors first: "Mudcats 2, Diamond Dogs 3".
     public static func score(_ score: Score, setup: GameSetup) -> String {
-        let first = firstSide(setup)
+        let first = firstSide
         let second = first.opponent
         return "\(setup[first].name) \(score[first]), \(setup[second].name) \(score[second])"
     }
@@ -204,6 +202,11 @@ public enum OverviewWording {
 
     // MARK: One event in words
 
+    /// The first letter in capitals: "called strike" becomes "Called strike".
+    static func capitalized(_ text: String) -> String {
+        text.prefix(1).uppercased() + text.dropFirst()
+    }
+
     /// One event as a sentence for the play-by-play: "Diaz doubled to left", "Park stole
     /// second", "Reyes now pitching for the Mudcats". Uses only what the event and the play
     /// log entry already say.
@@ -233,8 +236,8 @@ public enum OverviewWording {
                 default: return "\(batter): \(pitch.result.label)"
                 }
             }
-            // An ordinary pitch in the middle of a plate appearance.
-            return pitch.result.label.prefix(1).uppercased() + pitch.result.label.dropFirst()
+            // An ordinary pitch in the middle of a plate appearance: "Ball to Webb".
+            return capitalized(pitch.result.label) + (entry.batter == nil ? "" : " to \(batter)")
 
         case .intentionalWalk:
             return "\(batter) was walked intentionally"
@@ -243,7 +246,11 @@ public enum OverviewWording {
             return describe(play, batter: batter)
 
         case .runnerAction(let action):
-            let moves = action.moves.map { describe($0, name: who) }
+            let moves = action.moves.map { move in
+                // The base where the play log says this runner was put out, if it says.
+                let loggedOutAt = entry.outs.first { $0.runner == move.runner }?.at
+                return describe(move, name: who, loggedOutAt: loggedOutAt)
+            }
             var text = moves.isEmpty ? "Runners moved" : moves.joined(separator: "; ")
             if let error = action.errors.first {
                 text += ", error by the \(fielder(error.fielder))"
@@ -308,6 +315,36 @@ public enum OverviewWording {
         }
     }
 
+    /// What "Delete it" will do, in plain words, for the fix sheet: "Deletes strike three only.
+    /// Kim is back at the plate with the count at 1–2." Uses the count the play log had just
+    /// before the event.
+    public static func deleteEffect(_ entry: PlayLogEntry, setup: GameSetup) -> String {
+        let batter = name(entry.batter, in: setup)
+        let count = Self.count(entry.before.count)
+        switch entry.event.kind {
+        case .pitch(let pitch):
+            if let result = entry.plateAppearance {
+                let which: String
+                switch result.outcome {
+                case .strikeout: which = "strike three"
+                case .walk: which = "ball four"
+                case .hitByPitch: which = "the pitch that hit \(batter)"
+                default: which = "this pitch"
+                }
+                return "Deletes \(which) only. \(batter) is back at the plate with the count at \(count); the pitches before it stay, and any runners it moved go back."
+            }
+            return "Deletes this \(pitch.result.label) only. The count before it was \(count); the pitches after it are counted again from there."
+        case .intentionalWalk:
+            return "Deletes the intentional walk. \(batter) is back at the plate with the count at \(count)."
+        case .ballInPlay:
+            return "Deletes the whole play. \(batter) is back at the plate with the count at \(count), and the runners go back where they were."
+        case .runnerAction:
+            return "Deletes this runner move. The runners go back where they were before it; the count stays \(count)."
+        default:
+            return "Deletes this \(entry.event.kind.label). Everything after it is worked out again."
+        }
+    }
+
     /// A ball in play as a sentence: "Ruiz grounded into a double play", "Kim singled to center".
     static func describe(_ play: Play, batter: String) -> String {
         let firstFielder = play.fielders.first
@@ -350,7 +387,12 @@ public enum OverviewWording {
 
     /// One runner's move between pitches: "Park stole second", "Webb was caught stealing
     /// second", "Bell to third on a wild pitch".
-    static func describe(_ move: RunnerMove, name: (PlayerID) -> String) -> String {
+    ///
+    /// The base a runner was put out at comes from the event or the play log when either says.
+    /// Two things are still worked out here until the play log carries them (see the handoff's
+    /// vocabulary requests): the base a stolen base was of (the next base, since a stolen base
+    /// is always one base) and, when nobody recorded it, the base a runner was caught stealing.
+    static func describe(_ move: RunnerMove, name: (PlayerID) -> String, loggedOutAt: Base? = nil) -> String {
         let runner = name(move.runner)
         let destination: String = {
             switch move.to {
@@ -359,7 +401,7 @@ public enum OverviewWording {
             default: return "to \(move.to.base.map(baseName) ?? "")"
             }
         }()
-        let outAt = baseName(move.outAt ?? nextBase(after: move.from))
+        let outAt = baseName(move.outAt ?? loggedOutAt ?? nextBase(after: move.from))
         switch move.reason {
         case .stolenBase:
             let stolen = move.to == .scored && !move.advancedOnError ? "home" : baseName(nextBase(after: move.from))
@@ -367,7 +409,7 @@ public enum OverviewWording {
         case .caughtStealing:
             return "\(runner) was caught stealing \(outAt)"
         case .pickoff:
-            if move.to == .out { return "\(runner) was picked off \(baseName(move.outAt ?? move.from))" }
+            if move.to == .out { return "\(runner) was picked off \(baseName(move.outAt ?? loggedOutAt ?? move.from))" }
             return "\(runner) \(destination) on a pickoff throw"
         case .wildPitch: return "\(runner) \(destination) on a wild pitch"
         case .passedBall: return "\(runner) \(destination) on a passed ball"

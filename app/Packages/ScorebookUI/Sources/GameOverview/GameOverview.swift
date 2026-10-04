@@ -119,18 +119,12 @@ public struct GameOverview: View {
         }
         .background(ScorebookColor.background)
         .foregroundStyle(ScorebookColor.textPrimary)
-        // A swipe to the right that starts near the left edge goes back to the batting screen,
-        // as the swipe to the left on the batting screen came here. Starting at the edge keeps
-        // it from fighting the tables that scroll sideways.
-        .simultaneousGesture(
-            DragGesture(minimumDistance: 30)
-                .onEnded { drag in
-                    if drag.startLocation.x < 40, drag.translation.width > 80,
-                       abs(drag.translation.height) < drag.translation.width / 2 {
-                        onAction(.backToBatting)
-                    }
-                }
-        )
+        // A swipe to the right along the left edge goes back to the batting screen, as the
+        // swipe to the left on the batting screen came here. It lives on its own narrow strip,
+        // so a swipe never lands on a play-by-play row and opens "Fix a play" by accident.
+        .overlay(alignment: .leading) {
+            BackSwipeStrip { onAction(.backToBatting) }
+        }
         .accessibilityAction(named: "Back to the batting screen") { onAction(.backToBatting) }
     }
 
@@ -200,6 +194,37 @@ public struct GameOverview: View {
         guard let situation else { return "In progress" }
         if situation.isBetweenHalfInnings { return "\(OverviewWording.rightNow(situation)) · live" }
         return "\(OverviewWording.halfInning(situation.half, situation.inning)) · live"
+    }
+}
+
+// MARK: - The swipe back
+
+/// A strip along the left edge, too narrow to cover any button, that takes a swipe to the
+/// right as "go back". Rows start further in than the strip is wide, so nothing under it
+/// can be tapped by a swipe that starts here.
+struct BackSwipeStrip: View {
+    /// How wide the strip is, in points. The cards start 12 points in and their chips and
+    /// words 24 points in, so the strip covers only the page's margin and a card's edge.
+    static let width: CGFloat = 16
+    var onBack: () -> Void
+
+    var body: some View {
+        Color.clear
+            .frame(width: Self.width)
+            .frame(maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .gesture(
+                DragGesture(minimumDistance: 20)
+                    .onEnded { drag in
+                        if Self.isBackSwipe(drag.translation) { onBack() }
+                    }
+            )
+            .accessibilityHidden(true)
+    }
+
+    /// True for a swipe far enough to the right and more sideways than up or down.
+    static func isBackSwipe(_ translation: CGSize) -> Bool {
+        translation.width > 60 && abs(translation.height) < translation.width / 2
     }
 }
 
