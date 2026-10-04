@@ -29,3 +29,4 @@ Made in the vocabulary pass; `plan/handoffs/vocabulary-pass.md` has the details.
 - **App shell:** the app icon is installed.
 - **Batting screen:** count hints from the rules engine, the audio player’s playback state with when the song fades, and short team names.
 - **In-play sequence:** `SampleRulesEngine` is the real rules engine, so previews get real notation and runs batted in; a batted-ball guess on the rules engine.
+- **In-play sequence:** when the scorer moves one runner, the engine’s suggestion leaves the other runners where it first put them, so a scorer who sends the batter to second on a single must also move the runner from first. Let the suggestion take the scorer’s fixed runners and re-suggest the rest.
