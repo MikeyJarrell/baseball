@@ -99,10 +99,10 @@ public enum TeamWording {
     }
 
     /// What a player usually does, for the roster and their page: "Center field",
-    /// "Shortstop, leads off", "Bats only, starts on the bench". Empty when nothing is set.
+    /// "Shortstop, leads off", "DH, starts on the bench". Empty when nothing is set.
     public static func usualText(_ usuals: PlayerUsuals) -> String {
         guard !usuals.isEmpty else { return "" }
-        var parts = [usuals.position.map { $0.name.capitalizedFirst } ?? "Bats only"]
+        var parts = [usuals.position.map { $0.name.capitalizedFirst } ?? "DH"]
         if usuals.leadsOff { parts.append("leads off") }
         if usuals.startsOnBench { parts.append("starts on the bench") }
         return parts.joined(separator: ", ")
