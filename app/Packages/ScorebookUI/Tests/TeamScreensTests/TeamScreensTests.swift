@@ -69,7 +69,7 @@ struct RosterWordingTests {
     func usuals() {
         #expect(TeamWording.usualText(PlayerUsuals(position: .centerField)) == "Center field")
         #expect(TeamWording.usualText(PlayerUsuals(position: .shortstop, leadsOff: true)) == "Shortstop, leads off")
-        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "Bats only, leads off")
+        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "DH, leads off")
         #expect(TeamWording.usualText(PlayerUsuals(position: .pitcher, startsOnBench: true)) == "Pitcher, starts on the bench")
         #expect(TeamWording.usualText(PlayerUsuals()) == "")
     }

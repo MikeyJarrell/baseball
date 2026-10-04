@@ -17,6 +17,7 @@ struct GameStep: View {
     @FocusState private var nameFocused: Bool
     /// Which time wheel is open, if any.
     @State private var openWheel: Wheel?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     /// The two times set on a wheel.
     private enum Wheel { case start, limit }
@@ -117,10 +118,16 @@ struct GameStep: View {
         Button {
             withAnimation { openWheel = openWheel == wheel ? nil : wheel }
         } label: {
-            HStack {
+            // At the largest text sizes the label sits above the time, so "12:00 PM" never wraps.
+            let layout = typeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.extraSmall))
+                : AnyLayout(HStackLayout())
+            layout {
                 Text(label).font(ScorebookFont.body).foregroundStyle(ScorebookColor.textPrimary)
-                Spacer()
+                if !typeSize.isAccessibilitySize { Spacer() }
                 Text(PregameWording.clock(time))
+                    .lineLimit(1)
+                    .fixedSize()
                     .font(ScorebookFont.headline.monospacedDigit())
                     .foregroundStyle(openWheel == wheel ? ScorebookColor.highlight : ScorebookColor.textPrimary)
                     .padding(.horizontal, Spacing.medium)

@@ -55,6 +55,14 @@ import DesignSystem
     PregameFlow.sample(against: "riverhawks", at: .theirs)
 }
 
+#Preview("4. Mudcats, largest text") {
+    PregameFlow.sample(against: "mudcats", at: .theirs).environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("4. Bombers, numbers only, largest text") {
+    PregameFlow.sample(against: "bombers", at: .theirs).environment(\.dynamicTypeSize, .accessibility5)
+}
+
 #Preview("4. Bombers, dark") {
     PregameFlow.sample(against: "bombers", at: .theirs).preferredColorScheme(.dark)
 }

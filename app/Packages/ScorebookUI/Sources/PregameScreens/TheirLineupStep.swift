@@ -21,6 +21,7 @@ struct TheirLineupStep: View {
     @State private var addOpen = false
     /// The number box being typed in: a saved player's id, or a numbers-only entry's id.
     @FocusState private var focusedNumber: PlayerID?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var team: Team { draft.opponent ?? Team(id: draft.newOpponentID, name: "Opponent") }
     private var theirs: TheirLineup { draft.theirs }
@@ -29,6 +30,7 @@ struct TheirLineupStep: View {
     var body: some View {
         StepPage(step: 4, title: "\(team.name) lineup", buttonTitle: "Next: starting pitchers",
                  blockedReason: theirs.battingOrder(for: team).isEmpty ? "Add at least one hitter." : nil,
+                 hidesButton: focusedNumber != nil,
                  onButton: onNext) {
             Section {
                 modeRow(.names, "Names and numbers",
@@ -68,7 +70,9 @@ struct TheirLineupStep: View {
         }
         .font(ScorebookFont.headline.monospacedDigit())
         .padding(.horizontal, Spacing.small)
-        .frame(width: 76, height: 40)
+        // Wider at the largest text sizes, where the box has a line of its own.
+        .frame(width: typeSize.isAccessibilitySize ? 150 : 76)
+        .frame(minHeight: 40)
         .background(ScorebookColor.surfaceSecondary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
     }
 
@@ -78,29 +82,41 @@ struct TheirLineupStep: View {
         Section {
             ForEach(Array(theirs.namedOrder.enumerated()), id: \.element) { index, id in
                 if let player = team.player(id) {
+                    let box = numberBox(Binding(get: { theirs.numberEdits[id] ?? player.number ?? "" },
+                                                set: { draft.theirs.setNumber($0, for: id) }),
+                                        focus: id, label: "Number for \(player.displayName)")
+                    let remove = RemoveButton(label: "Take \(player.displayName) out of their batting order") {
+                        draft.theirs.namedOrder.removeAll { $0 == id }
+                    }
+                    // Tapping the name types in the number box too.
+                    let name = Button { focusedNumber = id } label: {
+                        Group {
+                            if let name = player.name, !name.isEmpty {
+                                Text(name)
+                            } else {
+                                Text("Name unknown").foregroundStyle(ScorebookColor.textSecondary)
+                            }
+                        }
+                        .font(ScorebookFont.headline)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint(Text("Type their number"))
                     HStack(spacing: Spacing.small) {
                         OrderNumber(spot: index + 1)
-                        Grip()
-                        numberBox(Binding(get: { theirs.numberEdits[id] ?? player.number ?? "" },
-                                          set: { draft.theirs.setNumber($0, for: id) }),
-                                  focus: id, label: "Number for \(player.displayName)")
-                        // Tapping the name types in the number box too.
-                        Button { focusedNumber = id } label: {
-                            Group {
-                                if let name = player.name, !name.isEmpty {
-                                    Text(name)
-                                } else {
-                                    Text("Name unknown").foregroundStyle(ScorebookColor.textSecondary)
-                                }
+                        // At the largest text sizes the name gets its own line, with the number
+                        // box and the minus button under it; the drag handle gives up its room.
+                        if typeSize.isAccessibilitySize {
+                            VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                                name
+                                HStack(spacing: Spacing.small) { box; remove }
                             }
-                            .font(ScorebookFont.headline)
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .accessibilityHint(Text("Type their number"))
-                        RemoveButton(label: "Take \(player.displayName) out of their batting order") {
-                            draft.theirs.namedOrder.removeAll { $0 == id }
+                        } else {
+                            Grip()
+                            box
+                            name
+                            remove
                         }
                     }
                     .accessibilityElement(children: .contain)
@@ -148,23 +164,35 @@ struct TheirLineupStep: View {
     private var numbersSection: some View {
         Section {
             ForEach(Array(theirs.numbers.enumerated()), id: \.element.id) { index, entry in
+                let box = numberBox(Binding(get: { draft.theirs.numbers.first { $0.id == entry.id }?.number ?? "" },
+                                            set: { draft.theirs.setNumber($0, forEntry: entry.id) }),
+                                    focus: entry.id, label: "Number for hitter \(index + 1)")
+                let remove = RemoveButton(label: "Take hitter \(index + 1) out of their batting order") {
+                    draft.theirs.numbers.removeAll { $0.id == entry.id }
+                }
+                let name = Button { focusedNumber = entry.id } label: {
+                    Text(matchedName(entry) ?? (entry.number.isEmpty ? "Batter \(index + 1)" : ""))
+                        .font(ScorebookFont.body)
+                        .foregroundStyle(ScorebookColor.textSecondary)
+                        .lineLimit(typeSize.isAccessibilitySize ? nil : 1)
+                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
                 HStack(spacing: Spacing.small) {
                     OrderNumber(spot: index + 1)
-                    Grip()
-                    numberBox(Binding(get: { draft.theirs.numbers.first { $0.id == entry.id }?.number ?? "" },
-                                      set: { draft.theirs.setNumber($0, forEntry: entry.id) }),
-                              focus: entry.id, label: "Number for hitter \(index + 1)")
-                    Button { focusedNumber = entry.id } label: {
-                        Text(matchedName(entry) ?? (entry.number.isEmpty ? "Batter \(index + 1)" : ""))
-                            .font(ScorebookFont.body)
-                            .foregroundStyle(ScorebookColor.textSecondary)
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
-                            .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    RemoveButton(label: "Take hitter \(index + 1) out of their batting order") {
-                        draft.theirs.numbers.removeAll { $0.id == entry.id }
+                    // At the largest text sizes the number box and minus button get a line of
+                    // their own, with the matched name under them.
+                    if typeSize.isAccessibilitySize {
+                        VStack(alignment: .leading, spacing: Spacing.extraSmall) {
+                            HStack(spacing: Spacing.small) { box; remove }
+                            name
+                        }
+                    } else {
+                        Grip()
+                        box
+                        name
+                        remove
                     }
                 }
                 .cardRow()
