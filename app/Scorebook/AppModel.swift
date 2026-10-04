@@ -51,6 +51,9 @@ final class AppModel {
     private(set) var session: GameSession?
     /// A message for the scorer when something could not be saved or read.
     var problem: String?
+    /// True when a simulator test started the app: the game screen then carries a hidden
+    /// readout of the game for the test to check.
+    private(set) var isUITest = false
 
     /// The league's rules, shared by every game.
     let engine = ScorebookRulesEngine()
@@ -62,6 +65,7 @@ final class AppModel {
     /// Opens storage and the audio player, reads everything saved, and finds a game in
     /// progress to resume. Called once, when the app starts.
     func load(using launch: LaunchOptions = .fromProcess) async {
+        isUITest = launch.isUITest
         do {
             let folders = try launch.folders()
             let storage = try FileStorage(dataFolder: folders.data, backupsFolder: folders.backups)

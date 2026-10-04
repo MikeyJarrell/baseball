@@ -393,3 +393,20 @@ extension GameSetup {
         }
     }
 }
+
+extension Situation {
+    /// Where the game stands in one line, for automated checks and for debugging: the half
+    /// inning, outs, count, score, who is on each base, the batter and both pitchers.
+    /// "top 3 · 1 out · 2-1 · 2-4 · 1st:m4 3rd:m2 · up:m6 · pitching:d9/m10".
+    public var checkLine: String {
+        let bases = runners.sorted { $0.base < $1.base }
+            .map { "\($0.base.rawValue):\($0.runner.rawValue)" }.joined(separator: " ")
+        let state = isFinal ? "final" : (isBetweenHalfInnings ? "between" : "playing")
+        return [
+            "\(half.rawValue) \(inning)", "\(outs) out", "\(count.balls)-\(count.strikes)",
+            "\(score.away)-\(score.home)", bases.isEmpty ? "empty" : bases,
+            "up:\(batter?.rawValue ?? "-")",
+            "pitching:\(away.pitcher?.rawValue ?? "-")/\(home.pitcher?.rawValue ?? "-")", state,
+        ].joined(separator: " · ")
+    }
+}

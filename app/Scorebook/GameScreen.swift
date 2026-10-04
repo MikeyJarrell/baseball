@@ -98,6 +98,9 @@ struct GameScreen: View {
             if session.game.events.allSatisfy({ !$0.isScorerPlay }), session.setup.weAreHome { playWarmUp() }
         }
         .onDisappear { UIApplication.shared.isIdleTimerDisabled = false }
+        .overlay(alignment: .topLeading) {
+            if app.isUITest { TestReadout(session: session) }
+        }
         .onChange(of: session.situation) { old, new in
             situationChanged(from: old, to: new)
         }
@@ -409,5 +412,39 @@ struct FinalBoxScore: View {
                 Button("Keep scoring") { Task { await session.undo() } }
             }
         }
+    }
+}
+
+/// For simulator tests only: an invisible line of text holding the number of events, the
+/// last event, where the game stands and, once it is over, the printed box score, so a test
+/// can check every step against the game it is scoring. Never shown on Mikey's phone.
+struct TestReadout: View {
+    var session: GameSession
+
+    var body: some View {
+        Text(readout)
+            .font(.system(size: 1))
+            .opacity(0.02)
+            .frame(width: 1, height: 1)
+            .accessibilityIdentifier("test-readout")
+            .accessibilityLabel(Text(readout))
+    }
+
+    private var readout: String {
+        var fields: [String: Any] = [
+            "count": session.game.events.count,
+            "line": session.situation.checkLine,
+        ]
+        if let last = session.game.events.last,
+           let data = try? ScorebookJSON.encode(last),
+           var object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            object["id"] = nil
+            object["enteredAt"] = nil
+            object["formatVersion"] = nil
+            fields["last"] = object
+        }
+        if session.isFinished { fields["box"] = BoxScorePrinter.text(session.boxScore) }
+        guard let data = try? JSONSerialization.data(withJSONObject: fields, options: [.sortedKeys]) else { return "" }
+        return String(decoding: data, as: UTF8.self)
     }
 }
