@@ -141,7 +141,8 @@ public struct PlayerSeasonScreen: View {
                     }
                     Rectangle().fill(ScorebookColor.divider).frame(height: 0.5)
                     countsGrid([
-                        ("G", "games", "\(line.games)"), ("BF", "batters faced", "\(s.battersFaced)"),
+                        ("G", "games", "\(line.games)"), ("W", "wins", "\(line.wins)"),
+                        ("L", "losses", "\(line.losses)"), ("BF", "batters faced", "\(s.battersFaced)"),
                         ("H", "hits allowed", "\(s.hits)"), ("R", "runs allowed", "\(s.runs)"),
                         ("BB", "walks", "\(s.walks)"), ("K", "strikeouts", "\(s.strikeouts)"),
                         ("HR", "home runs allowed", "\(s.homeRuns)"), ("HBP", "hit batters", "\(s.hitBatters)"),
@@ -161,7 +162,8 @@ public struct PlayerSeasonScreen: View {
 
     // MARK: Game logs
 
-    /// A game-by-game table, newest game first, with the date and opponent pinned on the left.
+    /// A game-by-game table, newest game first, with the date, opponent and result pinned on the
+    /// left: "Oct 3 at Mudcats, W 7–5".
     @ViewBuilder
     private func gameLog<Counts>(title: String, entries: [GameLogEntry<Counts>],
                                  columns: [StatsTableColumn<GameLogEntry<Counts>>]) -> some View {
@@ -176,12 +178,12 @@ public struct PlayerSeasonScreen: View {
             } else {
                 StatsTable(
                     rows: StatSorting.newestFirst(entries), nameTitle: "Game",
-                    name: { "\(PostgameWording.shortDate($0.date)) \($0.opponentName)" },
+                    name: { PostgameWording.logGame($0) },
                     columns: columns,
                     onTapRow: { onRequest(.openGame($0.gameID)) },
                     rowHint: "Opens the box score",
                     scrollsVertically: false,
-                    // Room for the date and the opponent on two lines.
+                    // Room for the date, opponent and result on two lines.
                     rowHeight: 60
                 )
             }
