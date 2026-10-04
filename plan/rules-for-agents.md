@@ -18,7 +18,7 @@ Read this, then [architecture.md](architecture.md), then your brief in [briefs/]
 
 **Test what has no screen.** Anything in `ScorebookCore` comes with tests that pass under `swift test` in `app/Packages/ScorebookCore`. Use the scenario files in `Tests/Scenarios/` where they apply.
 
-**Preview what has a screen.** Every screen has SwiftUI previews driven by `SampleData`, covering at least the situations your brief lists, in light and dark mode and at the largest accessibility text size.
+**Preview what has a screen.** Every screen has SwiftUI previews driven by `SampleData`, covering at least the situations your brief lists, in light and dark mode and at the largest accessibility text size. Check it on an iPad too, upright and sideways: the app installs on iPads, and an iPad window can be any shape ([notes/ipad-check.md](../notes/ipad-check.md)).
 
 **Keep it plain.** Use the names in the design system for colors, type and spacing. No outside code libraries without the lead builder’s approval. No images downloaded from the internet: icons come from Apple’s built-in SF Symbols set, and anything else is drawn in code by the designer.
 
