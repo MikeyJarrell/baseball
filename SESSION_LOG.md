@@ -93,3 +93,24 @@ SESSLOG:[2026-10-03 17:33]
 
 ### Context
 The batting screen and in-game change sheets were run on the 13-inch iPad Pro and iPad mini simulators. Upright they worked; the fixes were oversized runner tags on the big iPad and a squashed field when sideways. The simulator cannot be rotated from the command line here (no Simulator app, and asking iOS to rotate from code did nothing), so sideways was tested by drawing the screen at sideways size in a throwaway harness.
+
+---
+
+## [2026-10-03 20:08] Darin’s and Aidan’s walk-up songs
+SESSLOG:[2026-10-03 20:08]
+
+**Project(s):** baseball
+
+### Decisions
+- Darin: “Big Poppa” by The Notorious B.I.G., the *Ready to Die* album audio, hook at 1:06.
+- Aidan: “Mary Jane” by Rick James, the official upload from a greatest-hits album, the same length as the original album track, hook at 0:20. No official upload of the original album was found.
+
+### Follow-ups
+- [ ] Import the two new clips on the phone and set each start point to 0:20.
+
+### Files
+- [modified] `team/roster.csv` — the two songs, their sources and clip details
+- [created] `aidan-kurt.m4a` and `darin-dietrich.m4a` in `~/Dropbox/baseball/songs/`
+
+### Context
+Ten of sixteen players now have walk-up clips. Sources were found with the yt-dlp copy’s own YouTube search, preferring the artist’s official album audio.
