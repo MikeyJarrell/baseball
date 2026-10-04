@@ -151,6 +151,10 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
         case imported
         /// The iPhone's built-in speech voice reads the number and name.
         case phoneVoice
+        /// Put together at play time from short recordings shared by the whole team
+        /// ("Now batting," and every number) and one of this player's name, so a new jersey
+        /// number needs no new recording. `fileName` is the name recording.
+        case pieced
     }
 
     public var source: Source
@@ -160,6 +164,22 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
     public init(source: Source, fileName: String? = nil) {
         self.source = source
         self.fileName = fileName
+    }
+
+    // The shared pieces of a `pieced` introduction, in the app's audio folder. The team
+    // loader copies them in from ~/Dropbox/baseball/intros/.
+
+    /// "Now batting,"
+    public static let nowBattingFile = "announcer-now-batting.m4a"
+
+    /// "Number twenty-two," said mid-sentence, for jersey number "22" (or "00").
+    public static func numberFile(_ number: String) -> String {
+        "announcer-number-\(number).m4a"
+    }
+
+    /// A player's name recording, from the plain file name stem "aidan-kurt".
+    public static func nameFile(_ stem: String) -> String {
+        "announcer-name-\(stem).m4a"
     }
 }
 

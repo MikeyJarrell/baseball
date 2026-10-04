@@ -465,7 +465,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Throws away an introduction the scorer did not keep (“redo”), or one being replaced,
     /// deleting its sound file. The phone voice has no file, so nothing happens for it.
     public func discardIntroduction(_ introduction: AnnouncerIntroduction) {
-        guard introduction.source != .phoneVoice, let name = introduction.fileName else { return }
+        // The phone's voice has no file, and a pieced introduction's name recording belongs
+        // to the team loader, which copies it in again on every load.
+        guard introduction.source != .phoneVoice, introduction.source != .pieced,
+              let name = introduction.fileName else { return }
         try? FileManager.default.removeItem(at: audioFolder.appending(path: name))
         readyIntroductions = readyIntroductions.filter { $0.value.madeFrom.introduction != introduction }
         if pendingRecording == introduction { pendingRecording = nil }
@@ -941,9 +944,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         if introductionJobs[player.id]?.madeFrom == recipe { introductionJobs[player.id] = nil }
 
         guard let sound else {
-            lastProblem = introduction.source == .phoneVoice
-                ? "The phone’s voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
-                : "The introduction recording for \(player.displayName) is missing or too long. Record it again."
+            switch introduction.source {
+            case .phoneVoice:
+                lastProblem = "The phone’s voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
+            case .pieced:
+                lastProblem = "The recorded pieces of \(player.displayName)’s introduction are not all on the phone. Load the team from the Mac again."
+            case .recorded, .imported:
+                lastProblem = "The introduction recording for \(player.displayName) is missing or too long. Record it again."
+            }
             return nil
         }
         // Keep a modest number ready: plenty for a whole lineup.
@@ -977,6 +985,12 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             return await voice.render(for: player)
         case .recorded, .imported:
             return introduction.fileName.flatMap { readIntroductionFile(audioFolder.appending(path: $0)) }
+        case .pieced:
+            let folder = audioFolder
+            let pieces = PiecedIntroduction.pieces(for: player) { name in
+                FileManager.default.fileExists(atPath: folder.appending(path: name).path)
+            }
+            return pieces.flatMap { PiecedIntroduction.render($0, from: folder, read: readIntroductionFile) }
         }
     }
 
