@@ -51,12 +51,16 @@ public struct DefenseSheet: View {
                 suggestion: DefenseSuggestion? = nil, onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
         self.purpose = purpose
-        self.suggestion = suggestion
+        // A plan handed in wins; otherwise the defense check uses the rules engine's suggestion.
+        let team0 = side ?? (purpose == .check ? context.ourSide : nil) ?? context.situation.fieldingSide
+        self.suggestion = suggestion ?? (purpose == .check
+            ? DefenseBuilder.engineSuggestion(situation: context.situation, team: context.setup[team0], side: team0)
+            : nil)
         self.onFinish = onFinish
         let team = side ?? (purpose == .check ? context.ourSide : nil) ?? context.situation.fieldingSide
         _side = State(initialValue: team)
         _draft = State(initialValue: DefenseBuilder.startingDraft(
-            current: context.state(team).fielders, plan: suggestion, side: team, isCheck: purpose == .check))
+            current: context.state(team).fielders, plan: self.suggestion, side: team, isCheck: purpose == .check))
     }
 
     /// The plan, when it applies to this sheet: that team's defense check only.
