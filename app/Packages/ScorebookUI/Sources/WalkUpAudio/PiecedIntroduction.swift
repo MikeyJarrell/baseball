@@ -1,4 +1,5 @@
 // An introduction in Mikey's own voice, put together at play time from short recordings:
+// "Now batting, … number twenty-two, … Aidan Kurt."
 // "Now batting," and every jersey number are shared by the whole team, and each player has a
 // recording of their name. Changing a player's number in the app changes their introduction
 // with nothing new to record.
@@ -21,7 +22,7 @@ enum PiecedIntroduction {
     /// Which recordings make this player's introduction, in order, with the same pauses the
     /// phone's voice uses. `hasFile` says whether a recording is on the phone.
     ///
-    /// - Number and name: "Now batting, … number twenty-two, … Aidan Kurt. … Number twenty-two."
+    /// - Number and name: "Now batting, … number twenty-two, … Aidan Kurt."
     /// - No number, or no recording of that number: "Now batting, … Aidan Kurt."
     ///
     /// Returns nothing when the name recording or "Now batting" is missing.
@@ -36,12 +37,9 @@ enum PiecedIntroduction {
             return [IntroductionPiece(fileName: AnnouncerIntroduction.nowBattingFile, pauseAfter: 0.55),
                     IntroductionPiece(fileName: nameFile, pauseAfter: 0)]
         }
-        // The number said once more to finish: the falling "closing" take if there is one.
-        let closing = AnnouncerIntroduction.closingNumberFile(number)
         return [IntroductionPiece(fileName: AnnouncerIntroduction.nowBattingFile, pauseAfter: 0.55),
                 IntroductionPiece(fileName: numberFile, pauseAfter: 0.5),
-                IntroductionPiece(fileName: nameFile, pauseAfter: 0.9),
-                IntroductionPiece(fileName: hasFile(closing) ? closing : numberFile, pauseAfter: 0)]
+                IntroductionPiece(fileName: nameFile, pauseAfter: 0)]
     }
 
     /// Reads the pieces and joins them, pauses included, into one piece of sound. Returns

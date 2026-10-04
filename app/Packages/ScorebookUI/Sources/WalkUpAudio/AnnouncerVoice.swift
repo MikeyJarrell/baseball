@@ -1,7 +1,7 @@
 // The phone's built-in speech voice as the stadium announcer, for players without a
 // recording of their own yet.
 //
-// It reads “Now batting, number two, Derek Jeter. Number two.” slowly and low, with long
+// It reads “Now batting, number two, Derek Jeter.” slowly and low, with long
 // pauses between the parts, in the old Yankee Stadium style. Instead of speaking out loud
 // directly, it turns the words into sound in memory, so the introduction can go through
 // the same stadium echo as a recording and be ready before the button is tapped.
@@ -25,9 +25,9 @@ final class AnnouncerVoice {
     /// What the announcer says for this player, phrase by phrase, or nothing when the
     /// player has neither a name nor a number.
     ///
-    /// - Number and name: “Now batting, … number two, … Derek Jeter. … Number two.”
+    /// - Number and name: “Now batting, … number two, … Derek Jeter.”
     /// - Name only: “Now batting, … Derek Jeter.”
-    /// - Number only: “Now batting, … number twenty-two. … Number twenty-two.”
+    /// - Number only: “Now batting, … number twenty-two.”
     nonisolated static func phrases(for player: Player) -> [AnnouncerPhrase]? {
         let name = player.name?.trimmingCharacters(in: .whitespaces)
         let number = player.number?.trimmingCharacters(in: .whitespaces)
@@ -40,12 +40,10 @@ final class AnnouncerVoice {
             let spoken = spokenNumber(number)
             if hasName, let name {
                 phrases.append(AnnouncerPhrase(words: "number \(spoken),", pauseAfter: 0.5))
-                phrases.append(AnnouncerPhrase(words: "\(name).", pauseAfter: 0.9))
+                phrases.append(AnnouncerPhrase(words: "\(name).", pauseAfter: 0))
             } else {
-                // No name: the number ends the sentence, then comes once more.
-                phrases.append(AnnouncerPhrase(words: "number \(spoken).", pauseAfter: 0.9))
+                phrases.append(AnnouncerPhrase(words: "number \(spoken).", pauseAfter: 0))
             }
-            phrases.append(AnnouncerPhrase(words: "Number \(spoken).", pauseAfter: 0))
         } else if let name {
             phrases.append(AnnouncerPhrase(words: "\(name).", pauseAfter: 0))
         }

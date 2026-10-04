@@ -48,7 +48,7 @@ func openStorage(_ dataFolder: URL) throws -> FileStorage {
 }
 
 /// Every announcer piece in the intros folder, from its file there to its name in the app:
-/// "now-batting.m4a", "numbers/22.m4a", "closing/22.m4a" and "names/aidan-kurt.m4a" become
+/// "now-batting.m4a", "numbers/22.m4a" and "names/aidan-kurt.m4a" become
 /// the names in `AnnouncerIntroduction`.
 func announcerPieces(in introsFolder: URL) -> [(source: URL, appName: String)] {
     var pieces: [(source: URL, appName: String)] = []
@@ -58,7 +58,6 @@ func announcerPieces(in introsFolder: URL) -> [(source: URL, appName: String)] {
     }
     let kinds: [(folder: String, appName: (String) -> String)] = [
         ("numbers", AnnouncerIntroduction.numberFile),
-        ("closing", AnnouncerIntroduction.closingNumberFile),
         ("names", AnnouncerIntroduction.nameFile),
     ]
     for kind in kinds {

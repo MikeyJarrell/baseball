@@ -12,16 +12,16 @@ import SampleData
 
 @Suite("The stadium announcer’s words")
 struct AnnouncerWordingTests {
-    @Test("Name and number: the number, the name, then the number again")
+    @Test("Name and number: the number, then the name")
     func nameAndNumber() {
         let jeter = Player(name: "Derek Jeter", number: "2")
-        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter. Number two.")
+        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter.")
     }
 
     @Test("Only a name, or only a number")
     func partial() {
         #expect(TeamWording.announcerScript(for: Player(name: "Jordan Webb")) == "Now batting, Jordan Webb.")
-        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two. Number twenty-two.")
+        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two.")
         #expect(TeamWording.announcerScript(for: Player(placeholder: "Batter 4")) == "Now batting.")
     }
 

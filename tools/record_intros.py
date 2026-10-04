@@ -3,15 +3,13 @@
 The app builds each player's introduction out of pieces, so a jersey number assigned
 mid-season needs no new recording:
 
-    "Now batting,"  +  "number twenty-two,"  +  "Aidan Kurt."  +  "Number twenty-two."
+    "Now batting,"  +  "number twenty-two,"  +  "Aidan Kurt."
 
 This script records those pieces with the Mac's microphone (the ATR2100x if it is plugged in):
 
     now-batting.m4a       "Now batting,"
     names/<player>.m4a    each player's name, one per row of team/roster.csv
     numbers/<n>.m4a       "Number twenty-two", for every number 0 to 99 and 00
-    closing/<n>.m4a       optional: the same numbers said again to END the introduction,
-                          voice falling. Without one, the app repeats the numbers/ clip.
 
 Everything goes to ~/Dropbox/baseball/intros/. Each take is cleaned up before it is saved:
 silence trimmed from both ends, low rumble filtered out, and the loudness evened out so
@@ -27,7 +25,7 @@ Run from the repository root:
 
     python3 tools/record_intros.py                   # everything not recorded yet
     python3 tools/record_intros.py names             # only one kind: now-batting, names,
-                                                     #   numbers or closing
+                                                     #   or numbers
     python3 tools/record_intros.py --redo 22 aidan-kurt   # record these pieces again
     python3 tools/record_intros.py --mic "Desk Microphone"   # another microphone
 """
@@ -96,9 +94,6 @@ def all_pieces():
     for n in numbers:
         said = f"Number {number_words(n)}   ({n})"
         pieces.append(("numbers", n, INTROS_DIR / "numbers" / f"{n}.m4a", said))
-    for n in numbers:
-        said = f"Number {number_words(n)}.   ({n}, voice falling: the end of the introduction)"
-        pieces.append(("closing", n, INTROS_DIR / "closing" / f"{n}.m4a", said))
     return pieces
 
 
@@ -200,7 +195,7 @@ def play(path):
 
 def main():
     parser = argparse.ArgumentParser(description="Record the announcer's pieces.")
-    parser.add_argument("kind", nargs="?", choices=["now-batting", "names", "numbers", "closing"],
+    parser.add_argument("kind", nargs="?", choices=["now-batting", "names", "numbers"],
                         help="record only this kind of piece")
     parser.add_argument("--redo", nargs="+", metavar="PIECE",
                         help="record these pieces again, by short name: 22, 00, aidan-kurt, now-batting")
@@ -212,17 +207,11 @@ def main():
         pieces = [p for p in pieces if p[1] in args.redo]
         if args.kind:
             pieces = [p for p in pieces if p[0] == args.kind]
-        elif any(p[0] == "closing" for p in pieces):
-            # "--redo 22" means the main number clip; the closing one only when asked for.
-            pieces = [p for p in pieces if p[0] != "closing"]
         if not pieces:
             sys.exit("None of those pieces exist. Use 22, 00, now-batting or a name like aidan-kurt.")
     else:
         if args.kind:
             pieces = [p for p in pieces if p[0] == args.kind]
-        else:
-            # The closing numbers are optional, so they are only recorded when asked for.
-            pieces = [p for p in pieces if p[0] != "closing"]
         pieces = [p for p in pieces if not p[2].exists()]
         if not pieces:
             print("Every piece is already recorded. Use --redo to record one again.")
