@@ -77,6 +77,9 @@ struct StepPage<Content: View>: View {
             .overlay(alignment: .top) {
                 Rectangle().fill(ScorebookColor.divider).frame(height: 1)
             }
+            // The button keeps its place at the bottom edge, so its words stop growing at the
+            // first accessibility size and leave room for the list.
+            .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         }
     }
 }
