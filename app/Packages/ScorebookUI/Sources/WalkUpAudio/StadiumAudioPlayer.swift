@@ -300,13 +300,18 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         }
 
         // The introduction is usually ready already (cued). If not, show the button as
-        // playing straight away and start as soon as it is made.
+        // playing straight away and start as soon as it is made, but wait no more than
+        // three seconds: after that the song plays on its own, so the button never sits
+        // silent. The introduction carries on being made, ready for next time.
         if wantsIntroduction, readyIntroduction(for: player) == nil {
             let number = beginPlay(.walkUp, song: song)
             if songMissing { lastProblem = missingMessage }
             Task {
-                let introduction = await introductionSound(for: player)
+                let introduction = await introductionSound(for: player, waitingAtMost: 3)
                 guard number == playNumber else { return }   // stopped or replaced meanwhile
+                if introduction == nil, lastProblem == nil, song != nil {
+                    lastProblem = "The introduction was not ready, so the song played without it."
+                }
                 startWalkUp(song: song, introduction: introduction)
             }
             return
@@ -469,9 +474,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             startIntroductionOnly(ready)
         } else {
             Task {
-                let sound = await introductionSound(for: player)
+                let sound = await introductionSound(for: player, waitingAtMost: 10)
                 guard number == playNumber else { return }
-                if let sound { startIntroductionOnly(sound) } else { finish() }
+                if let sound {
+                    startIntroductionOnly(sound)
+                } else {
+                    if lastProblem == nil { lastProblem = "The introduction was not ready. Try again in a moment." }
+                    finish()
+                }
             }
         }
     }
@@ -916,6 +926,24 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         if readyIntroductions.count >= 30 { readyIntroductions.removeAll() }
         readyIntroductions[player.id] = ReadyIntroduction(madeFrom: recipe, sound: sound)
         return sound
+    }
+
+    /// The player's introduction as sound, but giving up waiting after `seconds`. The job
+    /// itself carries on and keeps its result ready for next time.
+    private func introductionSound(for player: Player, waitingAtMost seconds: Double) async -> AVAudioPCMBuffer? {
+        let job = Task { SoundBox(sound: await self.introductionSound(for: player)) }
+        // Two racers: the job and a timer. Whichever finishes first decides.
+        let first = await withTaskGroup(of: SoundBox?.self) { group in
+            group.addTask { await job.value }
+            group.addTask {
+                try? await Task.sleep(for: .seconds(seconds))
+                return nil   // the timer won
+            }
+            let winner = await group.next() ?? nil
+            group.cancelAll()
+            return winner
+        }
+        return first?.sound
     }
 
     /// Turns an introduction into sound: reads the recording, or has the phone's voice speak.
