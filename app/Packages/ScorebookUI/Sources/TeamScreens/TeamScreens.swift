@@ -214,9 +214,11 @@ public enum TeamScreensRequest: Equatable, Sendable {
     /// Copy an introduction recorded elsewhere into the app for this player, and hand it back
     /// in `IntroductionRecording.recorded` so the scorer can listen and keep it.
     case importIntroduction(URL, for: PlayerID)
-    /// Delete an introduction's sound file that nothing uses any more, because the player's
-    /// introduction was replaced or removed.
-    case discardIntroductionFile(AnnouncerIntroduction)
+    /// The team no longer uses this introduction's sound file: the player recorded or imported a
+    /// new one, switched to the iPhone voice, or left the team. The app shell deletes the file
+    /// (`discardIntroduction(_:)`) only once no game in progress still names it, since a game
+    /// keeps its own copy of the roster.
+    case introductionReplaced(AnnouncerIntroduction)
 
     // Messages
 

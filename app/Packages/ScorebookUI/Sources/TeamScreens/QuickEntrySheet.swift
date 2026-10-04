@@ -29,6 +29,11 @@ struct QuickEntrySheet: View {
         _throwsWith = State(initialValue: team.isOurs ? .right : nil)
     }
 
+    /// The team as handed in, plus anyone added here that has not come back yet.
+    private var currentTeam: Team {
+        added.reduce(team) { team, earlier in team.player(earlier.id) == nil ? team.saving(earlier) : team }
+    }
+
     /// The typed line, read into a number and a name.
     private var parsed: QuickEntryLine { QuickEntryLine(line) }
 
@@ -77,8 +82,13 @@ struct QuickEntrySheet: View {
 
                 Text(lineHint)
                     .font(ScorebookFont.caption)
-                    .foregroundStyle(TeamWording.playerWearing(parsed.number, in: team) == nil
+                    .foregroundStyle(TeamWording.playerWearing(parsed.number, in: currentTeam) == nil
                                      ? ScorebookColor.textSecondary : ScorebookColor.ourTeamText)
+                // The player just added stays named here, above the keyboard, with any shared
+                // number marked, so a fast typist still sees it after Return clears the line.
+                if parsed.isEmpty, let last = added.first {
+                    lastAddedLine(last)
+                }
 
                 labeled("Bats") { ClearableSegments(options: HandChoices.bats, selection: $bats) }
                 labeled("Throws") { ClearableSegments(options: HandChoices.throwsWith, selection: $throwsWith) }
@@ -96,10 +106,22 @@ struct QuickEntrySheet: View {
     /// The line under the typing field: what Return will add, or how to type it.
     private var lineHint: String {
         if parsed.isEmpty { return "Number first, then the name. Return adds the player." }
-        if let twin = TeamWording.playerWearing(parsed.number, in: team) {
+        if let twin = TeamWording.playerWearing(parsed.number, in: currentTeam) {
             return parsed.preview + " · \(twin.displayName) also wears \(parsed.number ?? "")"
         }
         return parsed.preview + " · Return adds"
+    }
+
+    /// "Added: #22 Jordan Webb", with "Same number as Pat Quinn" in our blue when shared.
+    private func lastAddedLine(_ player: Player) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Label("Added: \(player.number.map { "#\($0) " } ?? "")\(player.name ?? "")", systemImage: "checkmark.circle.fill")
+                .foregroundStyle(ScorebookColor.success)
+            if let note = TeamWording.sharedNumberNote(for: player, in: currentTeam) {
+                Text(note).fontWeight(.semibold).foregroundStyle(ScorebookColor.ourTeamText)
+            }
+        }
+        .font(ScorebookFont.caption)
     }
 
     /// The nine positions as small chips, one tap each; tapping the chosen one clears it.
@@ -145,7 +167,13 @@ struct QuickEntrySheet: View {
                 ForEach(added) { player in
                     HStack(spacing: Spacing.medium) {
                         NumberBadge(player: player, look: team.isOurs ? .ours : .theirs, size: 36)
-                        Text(player.displayName).font(ScorebookFont.headline)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(player.displayName).font(ScorebookFont.headline)
+                            if let note = TeamWording.sharedNumberNote(for: player, in: currentTeam) {
+                                Text(note).font(ScorebookFont.caption.weight(.semibold))
+                                    .foregroundStyle(ScorebookColor.ourTeamText)
+                            }
+                        }
                         Spacer()
                         Text(TeamWording.handedness(player))
                             .font(ScorebookFont.caption)
@@ -166,8 +194,7 @@ struct QuickEntrySheet: View {
         let player = entry.player(bats: bats, throwsWith: throwsWith)
         // Build on the team as handed in, plus anyone added here that has not come back yet,
         // so two quick adds never lose the first.
-        let current = added.reduce(team) { team, earlier in team.player(earlier.id) == nil ? team.saving(earlier) : team }
-        onRequest(.saveTeam(current.saving(player)))
+        onRequest(.saveTeam(currentTeam.saving(player)))
         if let position {
             onRequest(.setUsuals(PlayerUsuals(position: position), for: player.id))
         }

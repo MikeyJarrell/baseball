@@ -1,7 +1,8 @@
 // Song assignment, both ways round. From a player: the song picker (mockup: SHEETS.songpick),
 // a searchable list of every song with a play button to hear it, "No song" at the top, and a
 // check by the one chosen. From a song: the list of our players, with a Walk-up / Warm-up
-// choice at the top, and a check by everyone who has it. Each tap saves at once.
+// choice at the top, and a check by everyone who has it. Each tap saves at once; picking a song
+// for a player also closes the picker.
 
 import SwiftUI
 import Model
@@ -56,10 +57,14 @@ struct SongPickerSheet: View {
             .navigationTitle("\(slot == .walkUp ? "Walk-up" : "Warm-up") song for \(player?.lastName ?? "player")")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }.fontWeight(.bold)
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Done") { dismiss() }
                 }
             }
+        }
+        // A song previewed here stops when the picker closes.
+        .onDisappear {
+            if data.audio.playback.phase == .song { onRequest(.stopPlaying) }
         }
     }
 
@@ -82,7 +87,11 @@ struct SongPickerSheet: View {
                     .frame(width: Spacing.minimumTapSize, height: Spacing.minimumTapSize)
             }
             Button {
+                // One tap picks the song and closes the picker. While the search field is in
+                // use the top bar shows the search's own Close button in place of Done, so
+                // closing on a pick saves the scorer a second, hidden step.
                 onRequest(.saveTeam(team.assigning(song, as: slot, to: playerID)))
+                dismiss()
             } label: {
                 HStack {
                     VStack(alignment: .leading, spacing: 2) {

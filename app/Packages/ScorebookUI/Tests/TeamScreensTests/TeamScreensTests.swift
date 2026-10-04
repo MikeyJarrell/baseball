@@ -280,3 +280,32 @@ struct DemoStateTests {
         #expect(state.data.library.song("song-03")?.startTime == 15)
     }
 }
+
+@Suite("Review fixes")
+struct ReviewFixTests {
+    @Test("Scrolling up or down over a song’s track never moves its start point; a sideways drag does")
+    func sidewaysOnly() {
+        #expect(!TeamWording.isSidewaysDrag(width: 2, height: 80))      // an ordinary scroll
+        #expect(!TeamWording.isSidewaysDrag(width: 30, height: 40))     // a slanted scroll
+        #expect(!TeamWording.isSidewaysDrag(width: 6, height: 0))       // too short to tell
+        #expect(TeamWording.isSidewaysDrag(width: 40, height: 5))
+        #expect(TeamWording.isSidewaysDrag(width: -25, height: 10))
+    }
+
+    @Test("Two players wearing the same number are both marked, and nobody else is")
+    func sharedNumbers() {
+        let twin = Player(id: "twin", name: "Second Webb", number: "22")
+        let team = SampleTeams.diamondDogs.saving(twin)
+        #expect(TeamWording.sharedNumberNote(for: twin, in: team) == "Same number as Jordan Webb")
+        #expect(TeamWording.sharedNumberNote(for: team.player("d3")!, in: team) == "Same number as Second Webb")
+        #expect(TeamWording.sharedNumberNote(for: team.player("d1")!, in: team) == nil)
+        #expect(TeamWording.sharedNumberNote(for: Player(name: "No Number"), in: team) == nil)
+    }
+
+    @Test("A player with the same song as walk-up and warm-up gets two distinct rows under Used by")
+    func usedByRows() {
+        let fisk = SampleTeams.diamondDogs.player("d8")!
+        let walkUp = SongUser(player: fisk, slot: .walkUp), warmUp = SongUser(player: fisk, slot: .warmUp)
+        #expect(walkUp.id != warmUp.id)
+    }
+}

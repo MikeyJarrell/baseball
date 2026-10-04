@@ -122,11 +122,12 @@ struct PlayerEditSheet: View {
         dismiss()
     }
 
-    /// Hands back the team without the player, and frees their introduction's sound file.
+    /// Hands back the team without the player, and says their introduction's sound file is no longer used.
     private func remove() {
         onRequest(.saveTeam(team.removing(draft.player.id)))
+        onRequest(.setUsuals(PlayerUsuals(), for: draft.player.id))
         if let introduction = draft.player.introduction, introduction.fileName != nil {
-            onRequest(.discardIntroductionFile(introduction))
+            onRequest(.introductionReplaced(introduction))
         }
         dismiss()
     }

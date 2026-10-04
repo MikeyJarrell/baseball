@@ -224,11 +224,11 @@ public struct PlayerPage: View {
         .disabled(!isPlaying && player.walkUpSongID == nil && player.introduction == nil)
     }
 
-    /// Hands back the team with the player's introduction changed, and frees the old sound file.
+    /// Hands back the team with the player's introduction changed, and says the old sound file is no longer used.
     private func setIntroduction(_ introduction: AnnouncerIntroduction?, for player: Player, in team: Team) {
         let (updated, unused) = team.settingIntroduction(introduction, for: player.id)
         onRequest(.saveTeam(updated))
-        if let unused { onRequest(.discardIntroductionFile(unused)) }
+        if let unused { onRequest(.introductionReplaced(unused)) }
     }
 }
 
