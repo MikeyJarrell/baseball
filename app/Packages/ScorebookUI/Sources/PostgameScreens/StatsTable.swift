@@ -85,7 +85,7 @@ struct StatsTable<Row>: View {
     @ScaledMetric(relativeTo: .body) private var scaledNameWidth: CGFloat = 124
 
     /// The pinned name column never takes more than this, so numbers always show beside it on
-    /// the smallest iPhone at the largest text sizes. Long names shrink, then wrap to two lines.
+    /// the smallest iPhone at the largest text sizes. Long names wrap to a second line.
     private var nameWidth: CGFloat { min(scaledNameWidth, 170) }
 
     var body: some View {
@@ -113,19 +113,31 @@ struct StatsTable<Row>: View {
     private var rowsBody: some View {
         HStack(alignment: .top, spacing: 0) {
             nameColumn
-            ScrollView(.horizontal) {
-                VStack(spacing: 0) {
-                    ForEach(rows.indices, id: \.self) { index in
-                        numberRow(rows[index])
+            ScrollViewReader { scroller in
+                ScrollView(.horizontal) {
+                    VStack(spacing: 0) {
+                        columnMarkers
+                        ForEach(rows.indices, id: \.self) { index in
+                            numberRow(rows[index])
+                        }
                     }
                 }
-            }
-            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-            // Keep the headings over their columns as the numbers scroll.
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                geometry.contentOffset.x + geometry.contentInsets.leading
-            } action: { _, offset in
-                scrolledSideways = offset
+                .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+                // Keep the headings over their columns as the numbers scroll.
+                .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                    geometry.contentOffset.x + geometry.contentInsets.leading
+                } action: { _, offset in
+                    scrolledSideways = offset
+                }
+                // Open with the sorted column in view, so the order of the rows makes sense
+                // (the batting table starts sorted by AVG, near its right end). Only when the
+                // table appears: after a tap on a heading, that column is already in view.
+                .onAppear {
+                    guard let sortedColumnID else { return }
+                    DispatchQueue.main.async {
+                        scroller.scrollTo(sortedColumnID, anchor: .trailing)
+                    }
+                }
             }
         }
     }
@@ -196,8 +208,8 @@ struct StatsTable<Row>: View {
                     Text(name(row))
                         .font(ScorebookFont.body.weight(.semibold))
                         .foregroundStyle(ScorebookColor.textPrimary)
+                        // A long name wraps to a second line at full size.
                         .lineLimit(2)
-                        .minimumScaleFactor(0.7)
                         .multilineTextAlignment(.leading)
                         .padding(.leading, Spacing.medium)
                         .padding(.trailing, Spacing.extraSmall)
@@ -213,6 +225,19 @@ struct StatsTable<Row>: View {
         }
         .frame(width: nameWidth)
         .overlay(alignment: .trailing) { verticalLine }
+    }
+
+    /// An invisible row, one mark per column, so the table can scroll a column into view.
+    private var columnMarkers: some View {
+        HStack(spacing: 0) {
+            ForEach(columns) { column in
+                Color.clear
+                    .frame(width: column.width * widthScale + 5, height: 0)
+                    .id(column.id)
+            }
+        }
+        .padding(.trailing, Spacing.medium)
+        .accessibilityHidden(true)
     }
 
     /// One row of numbers. Tapping anywhere on it does what tapping the name does.
