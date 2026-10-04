@@ -2,10 +2,11 @@
 // actually makes sound.
 //
 // What it does, in game terms:
-// - When our hitter comes up, one tap plays their announcer introduction (if they have one)
-//   and then their walk-up song from its start point. The song fades out by itself after
-//   12 seconds of song (the walk-up length setting), or sooner when the button is tapped
-//   again, with a fade of about two seconds.
+// - When our hitter comes up, one tap plays their walk-up song. If they have an announcer
+//   introduction, the song fades in underneath the voice, the way stadiums do it, and reaches
+//   full volume at its start point (the hook) just as the announcer finishes. The song then
+//   fades out by itself after 12 seconds of song (the walk-up length setting), or sooner
+//   when the button is tapped again, with a fade of about two seconds.
 // - When our team takes the field, it plays the pitcher's warm-up song over and over until
 //   it is stopped or the first pitch is recorded, and fades by itself after five minutes in
 //   case nobody stops it.
