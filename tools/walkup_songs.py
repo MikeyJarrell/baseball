@@ -199,11 +199,17 @@ def extra_warmups(redo):
         columns = reader.fieldnames
         rows = list(reader)
 
-    for row in rows:
+    used = set()  # file names given out this run, so two rows never share one file
+    for number, row in enumerate(rows, start=1):
         who = row["player"]
         if not who or not row["source"]:
             continue  # no song chosen yet
-        out_path = SONGS_DIR / f"{slug(who)}-warmup-{slug(row['song'])}.m4a"
+        # Named after the song; a title with no plain letters, or one already used, gets the row number.
+        name = f"{slug(who)}-warmup-{slug(row['song']) or number}"
+        if name in used:
+            name = f"{name}-{number}"
+        used.add(name)
+        out_path = SONGS_DIR / f"{name}.m4a"
         if out_path.exists() and row["file"] and not redo:
             print(f"skip   {who}: {out_path.name} already saved")
             continue

@@ -50,9 +50,14 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL) async throws {
     let opponentsText = try String(contentsOf: teamFolder.appendingPathComponent("opponents.csv"), encoding: .utf8)
     let roster = RosterRow.read(rosterText)
     let opponents = OpponentRow.read(opponentsText)
-    // Extra warm-up songs are optional: no file means none.
-    let extrasText = try? String(contentsOf: teamFolder.appendingPathComponent("warmup_extras.csv"), encoding: .utf8)
-    let extraWarmUps = ExtraWarmUpRow.read(extrasText ?? "")
+    // Extra warm-up songs are optional: no file means none. A file that is there but cannot
+    // be read stops the load, rather than wiping every pitcher's extra songs.
+    let extrasFile = teamFolder.appendingPathComponent("warmup_extras.csv")
+    var extraWarmUps: [ExtraWarmUpRow] = []
+    if FileManager.default.fileExists(atPath: extrasFile.path) {
+        guard let text = try? String(contentsOf: extrasFile, encoding: .utf8) else { fail("warmup_extras.csv could not be read") }
+        extraWarmUps = ExtraWarmUpRow.read(text)
+    }
     guard !roster.isEmpty else { fail("roster.csv has no players") }
 
     // Every song file the roster names must be there and play.

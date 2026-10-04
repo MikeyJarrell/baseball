@@ -239,12 +239,18 @@ public enum TeamImport {
         var library = library
         var audioFiles: [String] = []
 
+        // Every file the roster files name. A song matched by title and artist (one imported on
+        // the phone by hand) must not be one of these, or a whole warm-up track could take over a
+        // teammate's walk-up clip of the same song.
+        let namedFiles = Set(roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file))
+
         // Songs first, so players can point at them.
         func song(file: String, title: String, artist: String, start: TimeInterval) -> SongID? {
             guard !file.isEmpty else { return nil }
             audioFiles.append(file)
             if let i = library.songs.firstIndex(where: { $0.fileName == file })
-                ?? library.songs.firstIndex(where: { RosterWords.key($0.title) == RosterWords.key(title) && RosterWords.key($0.artist ?? "") == RosterWords.key(artist) }) {
+                ?? library.songs.firstIndex(where: { !namedFiles.contains($0.fileName)
+                    && RosterWords.key($0.title) == RosterWords.key(title) && RosterWords.key($0.artist ?? "") == RosterWords.key(artist) }) {
                 var s = library.songs[i]
                 s.fileName = file
                 s.title = title.isEmpty ? s.title : title
@@ -292,9 +298,12 @@ public enum TeamImport {
             if let warmUp { player.warmUpSongID = warmUp }
             // Extra warm-up songs come only from the file, so its list replaces what is saved;
             // a row whose song is not cut yet is skipped.
-            player.extraWarmUpSongIDs = extraWarmUps
-                .filter { names.contains(RosterWords.key($0.player)) }
-                .compactMap { song(file: $0.file, title: $0.song, artist: $0.artist, start: 0) }
+            var extras: [SongID] = []
+            for extra in extraWarmUps where names.contains(RosterWords.key(extra.player)) {
+                if let id = song(file: extra.file, title: extra.song, artist: extra.artist, start: 0),
+                   !extras.contains(id), id != player.warmUpSongID { extras.append(id) }
+            }
+            player.extraWarmUpSongIDs = extras
             if let index {
                 if ours.roster[index] != player { notes.append("Player updated: \(row.displayName)") }
                 ours.roster[index] = player
@@ -305,6 +314,11 @@ public enum TeamImport {
         }
         var toSave: [Team] = []
         if ours != oursBefore { toSave.append(ours) }
+        // An extra warm-up song for a name not on the roster (a misspelling) is said, not lost quietly.
+        let rosterNames = Set(roster.flatMap { [RosterWords.key($0.displayName), RosterWords.key("\($0.firstName) \($0.lastName)")] })
+        for extra in extraWarmUps where !rosterNames.contains(RosterWords.key(extra.player)) {
+            notes.append("Not on the roster, so skipped: \(extra.player)’s warm-up song \(extra.song)")
+        }
 
         // Each opponent.
         var opponentNames: [String] = []
