@@ -320,9 +320,11 @@ public enum OverviewWording {
         case .out:
             if let multi = play.multiOut {
                 let kind = multi == .doublePlay ? "double play" : "triple play"
-                return play.battedBall == .groundBall
-                    ? "\(batter) grounded into a \(kind)"
-                    : "\(batter) hit into a \(kind)"
+                switch play.battedBall {
+                case .groundBall: return "\(batter) grounded into a \(kind)"
+                case .lineDrive: return "\(batter) lined into a \(kind)"
+                default: return "\(batter) hit into a \(kind)"
+                }
             }
             let verb: String
             switch play.battedBall {
