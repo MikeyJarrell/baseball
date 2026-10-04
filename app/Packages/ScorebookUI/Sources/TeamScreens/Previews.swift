@@ -89,7 +89,7 @@ public struct TeamScreensDemoState: Equatable, Sendable {
             data.audio.recording = .idle
         case .importIntroduction(let url, let player):
             data.audio.recording = .recorded(player, AnnouncerIntroduction(source: .imported, fileName: url.lastPathComponent))
-        case .discardIntroductionFile:
+        case .introductionReplaced:
             break
         case .dismissProblems:
             data.audio.problems = []
@@ -139,7 +139,7 @@ public struct TeamScreensDemoState: Equatable, Sendable {
         case .cancelRecording: "Throw the recording away"
         case .finishRecording: "Recording kept"
         case .importIntroduction(let url, _): "Import introduction: \(url.lastPathComponent)"
-        case .discardIntroductionFile(let intro): "Delete \(intro.fileName ?? "file")"
+        case .introductionReplaced(let intro): "No longer used: \(intro.fileName ?? "file")"
         case .dismissProblems: "Messages read"
         }
     }

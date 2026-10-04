@@ -137,6 +137,13 @@ public enum TeamWording {
         return team.roster.first { $0.id != id && $0.number == number }
     }
 
+    /// The mark beside a player whose number someone else on the team also wears, "Same number
+    /// as Jordan Webb", or nil when nobody does. Two players may share a number; the mark only
+    /// makes sure the scorer sees it.
+    public static func sharedNumberNote(for player: Player, in team: Team) -> String? {
+        playerWearing(player.number, in: team, except: player.id).map { "Same number as \($0.displayName)" }
+    }
+
     // MARK: Songs
 
     /// The players on a team who use a song, as a walk-up song and as a warm-up song.
@@ -189,6 +196,15 @@ public enum TeamWording {
     public static func clampedStart(_ seconds: TimeInterval, in song: Song) -> TimeInterval {
         let latest = max(0, timelineLength(of: song) - 1)
         return (min(max(0, seconds), latest) * 10).rounded() / 10
+    }
+
+    /// How far, in points, a finger must move on the drawing of a track before a drag counts.
+    public static let scrubThreshold: CGFloat = 10
+
+    /// True when a drag on the drawing of a track has gone clearly sideways, so it moves the start
+    /// point. A drag mostly up or down is the scorer scrolling the page, and moves nothing.
+    public static func isSidewaysDrag(width: CGFloat, height: CGFloat) -> Bool {
+        abs(width) >= scrubThreshold && abs(width) > abs(height) * 1.5
     }
 
     /// Bar heights from 0.15 to 1 for the drawing of a song on its page. The app does not read

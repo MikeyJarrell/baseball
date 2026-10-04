@@ -204,14 +204,15 @@ public struct RosterScreen: View {
         }
     }
 
-    /// Hands back the team without the player waiting to be removed, and frees their
-    /// introduction's sound file.
+    /// Hands back the team without the player waiting to be removed, and says their
+    /// introduction's sound file is no longer used.
     private func remove(from team: Team) {
         guard let player = removing else { return }
         removing = nil
         onRequest(.saveTeam(team.removing(player.id)))
+        onRequest(.setUsuals(PlayerUsuals(), for: player.id))
         if let introduction = player.introduction, introduction.fileName != nil {
-            onRequest(.discardIntroductionFile(introduction))
+            onRequest(.introductionReplaced(introduction))
         }
     }
 }
@@ -234,6 +235,12 @@ struct RosterRow: View {
                 secondLine
                     .font(ScorebookFont.caption)
                     .lineLimit(4)
+                // Two players may share a number; the roster marks both so the scorer notices.
+                if let note = TeamWording.sharedNumberNote(for: player, in: team) {
+                    Text(note)
+                        .font(ScorebookFont.caption.weight(.semibold))
+                        .foregroundStyle(ScorebookColor.ourTeamText)
+                }
             }
             Spacer(minLength: 0)
         }

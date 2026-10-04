@@ -192,7 +192,7 @@ public struct SongPage: View {
     /// Our players who use this song, and the button to assign it.
     private func usedBy(_ song: Song) -> some View {
         let (walkUp, warmUp) = TeamWording.users(of: song.id, in: data.ourTeam)
-        let users = walkUp.map { ($0, SongSlot.walkUp) } + warmUp.map { ($0, SongSlot.warmUp) }
+        let users = walkUp.map { SongUser(player: $0, slot: .walkUp) } + warmUp.map { SongUser(player: $0, slot: .warmUp) }
         return VStack(alignment: .leading, spacing: 0) {
             SectionLabel("Used by")
             Card(padding: 0) {
@@ -202,7 +202,8 @@ public struct SongPage: View {
                         .foregroundStyle(ScorebookColor.textSecondary)
                         .padding(Spacing.large - 2)
                 }
-                ForEach(users, id: \.0.id.rawValue) { player, slot in
+                ForEach(users) { user in
+                    let player = user.player, slot = user.slot
                     HStack(spacing: Spacing.medium) {
                         NumberBadge(player: player, look: .ours)
                         VStack(alignment: .leading, spacing: 2) {
@@ -230,6 +231,14 @@ public struct SongPage: View {
     }
 }
 
+/// One row of "Used by": a player and which of their songs this is. A player with this song as
+/// both walk-up and warm-up gets two rows, so each row is named by player and slot together.
+struct SongUser: Identifiable {
+    var player: Player
+    var slot: SongSlot
+    var id: String { "\(player.id.rawValue)-\(slot.rawValue)" }
+}
+
 /// A drawing of the track with a line at the start point. Tap or drag along it to move the start
 /// point. Bars after the start point are in our blue; while the song plays, a thin line follows
 /// where it is.
@@ -241,6 +250,9 @@ struct TrackDrawing: View {
     var onMove: (TimeInterval, _ finished: Bool) -> Void
 
     private let barCount = 90
+    /// Whether the drag under way is moving the start point (sideways), or is left to the page
+    /// (up or down). Undecided until the finger has moved far enough to tell.
+    @State private var isScrubbing: Bool?
 
     var body: some View {
         let length = TeamWording.timelineLength(of: song)
@@ -267,10 +279,29 @@ struct TrackDrawing: View {
                 }
             }
             .contentShape(Rectangle())
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { onMove(seconds(at: $0.location.x, width: width, length: length), false) }
-                    .onEnded { onMove(seconds(at: $0.location.x, width: width, length: length), true) }
+            // A tap sets the start point where the finger touched.
+            .onTapGesture { location in
+                onMove(seconds(at: location.x, width: width, length: length), true)
+            }
+            // A drag moves it only once the finger has clearly gone sideways, so scrolling the
+            // page up or down over the drawing never moves the start point. Running alongside
+            // the page's own scrolling, it never stops the page from scrolling.
+            .simultaneousGesture(
+                DragGesture(minimumDistance: TeamWording.scrubThreshold)
+                    .onChanged { drag in
+                        if isScrubbing == nil {
+                            isScrubbing = TeamWording.isSidewaysDrag(width: drag.translation.width, height: drag.translation.height)
+                        }
+                        if isScrubbing == true {
+                            onMove(seconds(at: drag.location.x, width: width, length: length), false)
+                        }
+                    }
+                    .onEnded { drag in
+                        if isScrubbing == true {
+                            onMove(seconds(at: drag.location.x, width: width, length: length), true)
+                        }
+                        isScrubbing = nil
+                    }
             )
         }
         .frame(height: 90)

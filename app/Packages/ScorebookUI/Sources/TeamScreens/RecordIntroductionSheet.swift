@@ -20,6 +20,11 @@ struct RecordIntroductionSheet: View {
 
     /// True once Keep was tapped, so closing the sheet does not throw the recording away.
     @State private var kept = false
+    /// Asks before Cancel throws away a recording under way or waiting for Keep.
+    @State private var confirmsCancel = false
+    /// The echo level to go back to when the echo switch is turned on again: the level the
+    /// scorer chose, never a fixed amount.
+    @State private var echoBeforeOff: Double?
     @Environment(\.dismiss) private var dismiss
 
     /// The player as saved.
@@ -40,6 +45,12 @@ struct RecordIntroductionSheet: View {
         if case .recording = state { return true }
         return false
     }
+
+    /// True while the new introduction is playing, so it can be stopped before Redo or Keep.
+    private var isListening: Bool { data.audio.playback.phase == .introduction }
+
+    /// True when closing the sheet would throw something away.
+    private var hasUnkeptTake: Bool { isRecording || pending != nil }
 
     var body: some View {
         NavigationStack {
@@ -76,7 +87,9 @@ struct RecordIntroductionSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel") {
+                        if hasUnkeptTake { confirmsCancel = true } else { dismiss() }
+                    }
                 }
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 0) {
@@ -88,8 +101,16 @@ struct RecordIntroductionSheet: View {
                 }
             }
         }
+        // A swipe down cannot close the sheet while a take is under way or waiting for Keep:
+        // Cancel asks first, and Keep saves it.
+        .interactiveDismissDisabled(hasUnkeptTake)
+        .confirmationDialog("Throw this recording away?", isPresented: $confirmsCancel, titleVisibility: .visible) {
+            Button("Throw it away", role: .destructive) { dismiss() }
+            Button("Keep recording", role: .cancel) {}
+        }
         // Closing the sheet any way but Keep throws the new recording away.
         .onDisappear {
+            if isListening { onRequest(.stopPlaying) }
             if !kept, state != .idle { onRequest(.cancelRecording) }
         }
     }
@@ -133,8 +154,7 @@ struct RecordIntroductionSheet: View {
 
     /// Listen to the new recording, or throw it away and record again.
     private func listenAndRedo(_ pending: AnnouncerIntroduction) -> some View {
-        let isListening = data.audio.playback.phase == .introduction
-        return AdaptiveStack {
+        AdaptiveStack {
             Button {
                 if isListening {
                     onRequest(.stopPlaying)
@@ -148,6 +168,8 @@ struct RecordIntroductionSheet: View {
             }
             .buttonStyle(WideButtonStyle(kind: .quiet))
             Button {
+                // Stop the take first, so its file is never deleted while it plays.
+                if isListening { onRequest(.stopPlaying) }
                 onRequest(.cancelRecording)
             } label: {
                 Label("Redo", systemImage: "arrow.counterclockwise")
@@ -161,7 +183,14 @@ struct RecordIntroductionSheet: View {
         Card(padding: 0) {
             Toggle("Stadium echo", isOn: Binding(
                 get: { data.library.announcerEcho > 0 },
-                set: { onRequest(.setAnnouncerEcho($0 ? 0.5 : 0)) }
+                set: { isOn in
+                    if isOn {
+                        onRequest(.setAnnouncerEcho(echoBeforeOff ?? 0.5))
+                    } else {
+                        echoBeforeOff = data.library.announcerEcho
+                        onRequest(.setAnnouncerEcho(0))
+                    }
+                }
             ))
             .tint(ScorebookColor.success)
             .padding(.horizontal, Spacing.large - 2)
@@ -179,13 +208,14 @@ struct RecordIntroductionSheet: View {
         .padding(.top, Spacing.small)
     }
 
-    /// Saves the new introduction on the player, frees the old file, and closes the sheet.
+    /// Saves the new introduction on the player, says the old file is no longer used, and closes the sheet.
     private func keep() {
         guard let pending else { return }
         let (updated, unused) = team.settingIntroduction(pending, for: playerID)
         kept = true
+        if isListening { onRequest(.stopPlaying) }
         onRequest(.saveTeam(updated))
-        if let unused { onRequest(.discardIntroductionFile(unused)) }
+        if let unused { onRequest(.introductionReplaced(unused)) }
         onRequest(.finishRecording)
         dismiss()
     }
