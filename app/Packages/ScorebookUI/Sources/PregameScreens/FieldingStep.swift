@@ -35,6 +35,7 @@ struct FieldingStep: View {
                 Text("Tap a position to pick who plays it. Anyone can field, whether or not they bat.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
+                    .padding(.horizontal, Spacing.extraSmall)
                     .bareRow()
             }
             Section {
