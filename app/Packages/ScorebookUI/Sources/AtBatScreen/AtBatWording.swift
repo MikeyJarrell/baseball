@@ -121,12 +121,10 @@ enum AtBatWording {
             : "End \(ordinal(max(1, situation.inning - 1)))"
     }
 
-    /// The score for banners and the game-over question, our team first:
-    /// "Diamond Dogs 4, Mudcats 2". With no team of ours, the visitors first.
+    /// The score for banners and the game-over question, the visiting team first, as in the
+    /// newspaper box score: "Mudcats 2, Diamond Dogs 4" when we are home.
     static func scoreLine(_ setup: GameSetup, _ score: Score) -> String {
-        let first = setup.ourSide ?? .away
-        let second = first.opponent
-        return "\(setup[first].name) \(score[first]), \(setup[second].name) \(score[second])"
+        "\(setup.away.name) \(score.away), \(setup.home.name) \(score.home)"
     }
 
     // MARK: The time limit

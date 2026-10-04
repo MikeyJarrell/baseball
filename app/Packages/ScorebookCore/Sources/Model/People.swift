@@ -209,6 +209,8 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var id: SongID
     /// The name shown in the app. Starts as the file name; the scorer can rename it.
     public var title: String
+    /// Who recorded it, if the scorer knows or the file said: "AC/DC". Shown under the title.
+    public var artist: String?
     /// The audio file's name inside the app's `songs/audio/` folder.
     public var fileName: String
     /// Seconds into the track where the walk-up clip starts (the hook).
@@ -228,10 +230,12 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
         startTime: TimeInterval = 0,
         playLength: TimeInterval? = nil,
         volume: Double = 1,
-        duration: TimeInterval? = nil
+        duration: TimeInterval? = nil,
+        artist: String? = nil
     ) {
         self.id = id
         self.title = title
+        self.artist = artist
         self.fileName = fileName
         self.startTime = startTime
         self.playLength = playLength
