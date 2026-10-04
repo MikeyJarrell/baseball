@@ -645,7 +645,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Wait a moment first: if the speaker was disconnected, that news arrives now and stops
     /// the song for good, which is what should happen.
     private func engineStoppedByItself() {
-        guard isPlaying, !graph.engine.isRunning else { return }
+        // Only if sound had actually started. While a walk-up is still waiting for its
+        // introduction to be made, nothing has started yet, and the start to come switches
+        // the engine on by itself.
+        let started = timing.songStart != nil || timing.introductionEnd != nil
+        guard isPlaying, started, !graph.engine.isRunning else { return }
         let number = playNumber
         Task {
             try? await Task.sleep(for: .milliseconds(300))
