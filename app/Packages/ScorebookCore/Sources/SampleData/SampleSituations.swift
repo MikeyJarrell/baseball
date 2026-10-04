@@ -229,12 +229,29 @@ public enum SampleSituations {
         return s
     }()
 
+    /// The changeover before the top of the 2nd, in a game where first base is shared by turns:
+    /// the defense check is due, and the rules engine suggests Robin Nash at first for this
+    /// even inning.
+    public static let defenseCheckWithRotation: SampleSituation = {
+        var s = make(
+            "Defense check, first base shared by turns",
+            setup: SampleSetups.mudcatsAtDiamondDogsAlternatingFirstBase,
+            inning: 2, half: .top, outs: 0, score: Score(away: 0, home: 2),
+            awayUp: 3, homeUp: 6,
+            pitchers: [tally("d9", .home, 10, 6, 3), tally("m9", .away, 17, 11, 6)]
+        )
+        s.situation.isBetweenHalfInnings = true
+        s.situation.defenseCheckDue = true
+        s.situation.suggestedDefense = s.setup.home.defense(forInning: 2, from: s.situation.home.fielders)
+        return s
+    }()
+
     /// Every sample situation, for preview lists.
     public static let all: [SampleSituation] = [
         topOfFirst, runnerOnFirstOneOut, basesLoadedTwoOutsFullCount, secondAndThirdNobodyOut,
         tenthHitterUpAfterAddingOne, newPitcherJustIn, lastInningHomeAhead, extraInnings,
         betweenHalfInnings, designatedNonRunnerOnFirst, ourHitterWithoutSong, theirHitterKnownByNumber,
-        rightAfterStrikeThree, lastInningOnTime, ourPitcherWarmingUp,
+        rightAfterStrikeThree, lastInningOnTime, ourPitcherWarmingUp, defenseCheckWithRotation,
     ]
 
     // MARK: Building blocks

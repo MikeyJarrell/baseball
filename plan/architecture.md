@@ -51,7 +51,7 @@ app/
 Who depends on whom:
 
 - `Model` depends on nothing.
-- `SampleData`, `GameEngine`, `Stats`, `BoxScoreText` and `Storage` depend on `Model` only. Stats reads the rules engine’s play log, whose shape is defined in `Model`, so the two can be built at the same time.
+- `GameEngine`, `Stats`, `BoxScoreText` and `Storage` depend on `Model` only. `SampleData` depends on `Model` and `GameEngine`, so it can hand screens the real rules engine for previews without the screens importing `GameEngine`. Stats reads the rules engine’s play log, whose shape is defined in `Model`, so the two can be built at the same time.
 - `StatsTests` also uses `GameEngine`, to turn scenario files into play logs; until the engine lands, stats tests use the hand-written play log in `SampleData`.
 - `DesignSystem` and `WalkUpAudio` depend on `Model`.
 - `BoxScorePicture` depends on `Model`, `BoxScoreText` and `DesignSystem`.
@@ -62,7 +62,7 @@ Who depends on whom:
 
 This is the agreement between builders. The foundation job writes it as real Swift in `Model/`; the sketch below gives the intent, and the code in `Model/` is the final word. Every type is `Codable` (can be saved as JSON), `Equatable` and `Sendable`. The packages use the Swift 6 language mode. Changes after the foundation lands go through the lead builder (see [rules-for-agents.md](rules-for-agents.md)).
 
-**People and teams.** `Player` has an id, name, optional jersey number, optional batting side (right, left, switch), optional throwing hand, an optional walk-up song id, and an optional announcer introduction (a recording made in the app or imported, or a setting to use the phone’s speech voice). `Team` has an id, name, whether it is our team, and a roster. Opponent teams are saved too, so their rosters can be reused the next time we play them. A player can be created mid-game with only a number, or nothing at all (“Batter 4”), and filled in later.
+**People and teams.** `Player` has an id, name, optional jersey number, optional batting side (right, left, switch), optional throwing hand, an optional usual position, an optional usual role (leads off, starts on the bench), an optional walk-up song id, and an optional announcer introduction (a recording made in the app or imported, or a setting to use the phone’s speech voice). `Team` has an id, name, whether it is our team, and a roster. Opponent teams are saved too, so their rosters can be reused the next time we play them. A player can be created mid-game with only a number, or nothing at all (“Batter 4”), and filled in later.
 
 **Positions.** The standard scorebook numbers: 1 pitcher, 2 catcher, 3 first base, 4 second base, 5 third base, 6 shortstop, 7 left field, 8 center field, 9 right field. The batting order and the fielders are separate lists: a player may bat only, field only, or both.
 

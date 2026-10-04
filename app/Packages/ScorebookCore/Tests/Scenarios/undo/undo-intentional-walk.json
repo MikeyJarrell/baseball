@@ -1,0 +1,99 @@
+{
+  "description": "Undo an intentional walk. Ortiz singles; Ruiz is walked intentionally, pushing Ortiz to second. Undoing the walk leaves Ortiz alone on first with Ruiz up.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "single",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "first"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "intentionalWalk": {}
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e1",
+      "expected": {
+        "situation": {
+          "runners": [
+            {
+              "base": "first",
+              "runner": "m1",
+              "responsiblePitcher": "d9"
+            }
+          ],
+          "batter": "m2",
+          "pitchers": [
+            {
+              "pitcher": "d9",
+              "pitches": 1,
+              "strikes": 1,
+              "battersFaced": 1
+            }
+          ]
+        },
+        "batting": [
+          {
+            "player": "m2",
+            "plateAppearances": 0,
+            "walks": 0
+          }
+        ]
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        },
+        {
+          "base": "second",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 1,
+          "strikes": 1,
+          "battersFaced": 2
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "IBB"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "walks": 1,
+        "atBats": 0
+      }
+    ]
+  }
+}

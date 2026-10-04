@@ -102,17 +102,34 @@ public struct Team: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var isOurs: Bool
     /// Everyone on the team.
     public var roster: [Player]
+    /// The short name for the scoreboard, chosen on the team page: "DOGS", "MUD". Missing
+    /// means the app makes one with `ShortTeamName.make(from:)`.
+    public var shortName: String?
 
-    public init(id: TeamID = .make(), name: String, isOurs: Bool = false, roster: [Player] = []) {
+    public init(id: TeamID = .make(), name: String, isOurs: Bool = false, roster: [Player] = [], shortName: String? = nil) {
         self.id = id
         self.name = name
         self.isOurs = isOurs
         self.roster = roster
+        self.shortName = shortName
     }
+
+    /// The short name to show: the chosen one, or one made from the name.
+    public var displayShortName: String { shortName ?? ShortTeamName.make(from: name) }
 
     /// Finds a player on this team by id.
     public func player(_ id: PlayerID) -> Player? {
         roster.first { $0.id == id }
+    }
+}
+
+/// Short team names for the scoreboard.
+public enum ShortTeamName {
+    /// A short name made from a team name, in capitals: the last word if it has four letters or
+    /// fewer, else its first three letters. "Diamond Dogs" gives "DOGS", "Mudcats" gives "MUD".
+    public static func make(from name: String) -> String {
+        let last = name.split(separator: " ").last.map(String.init) ?? name
+        return (last.count <= 4 ? last : String(last.prefix(3))).uppercased()
     }
 }
 

@@ -1,0 +1,115 @@
+{
+  "description": "Ortiz leads off and walks on a 3-1 pitch (ball, called strike, three more balls) with nobody on.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "checkpoints": [
+    {
+      "afterEvent": "e4",
+      "expected": {
+        "situation": {
+          "count": {
+            "balls": 3,
+            "strikes": 1
+          },
+          "batter": "m1",
+          "runners": []
+        }
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "score": {
+        "away": 0,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m2",
+      "onDeck": "m3",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 5,
+          "strikes": 1,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "notation": [
+      {
+        "event": "e5",
+        "notation": "BB"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 0,
+        "hits": 0,
+        "walks": 1,
+        "runsBattedIn": 0
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "walks": 1,
+        "battersFaced": 1,
+        "outsRecorded": 0,
+        "hits": 0,
+        "pitches": 5,
+        "strikes": 1
+      }
+    ]
+  }
+}

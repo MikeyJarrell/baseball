@@ -120,7 +120,7 @@
         "away": 3,
         "home": 4
       },
-      "gameOverQuestion": "regulation",
+      "isGameOverQuestionOpen": false,
       "isRegulationComplete": true,
       "isFinal": true
     },

@@ -1,0 +1,54 @@
+{
+  "description": "Ortiz pops up behind the plate and catcher Fisk catches it.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "out",
+        "battedBall": "popUp",
+        "fielders": [
+          2
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "out",
+            "outBy": [
+              2
+            ]
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 1,
+      "batter": "m2"
+    },
+    "notation": [
+      {
+        "event": "e1",
+        "notation": "P2"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d8",
+        "putouts": 1,
+        "assists": 0
+      }
+    ]
+  }
+}
