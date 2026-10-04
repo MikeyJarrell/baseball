@@ -15,3 +15,11 @@ It only cuts players who have no clip yet; `--redo` cuts them all again. Each cl
 A pitcher’s warm-up song goes in the `warmup_` columns: the song, the artist and its source. It plays until the first pitch, so the script keeps the whole track rather than a clip, saved as `<player>-warmup.m4a`.
 
 Prefer the album audio on YouTube Music over a music video: video intros shift the timings players read off Spotify.
+
+To find the album audio for a request, search YouTube Music from the command line; each result’s album shows with `--print "%(album)s"`:
+
+```bash
+~/.stacher/youtube-dl --flat-playlist --playlist-end 3 --print "%(id)s | %(title)s" "https://music.youtube.com/search?q=low+rider+war#songs"
+```
+
+When a player wants a particular line heard, find when it is sung with `mlx_whisper` (installed in Anaconda) on the first minute of the track, using `--word-timestamps True`, and set the hook just before the line. The announcer finishes as the song reaches its hook, so the line then comes in clear.
