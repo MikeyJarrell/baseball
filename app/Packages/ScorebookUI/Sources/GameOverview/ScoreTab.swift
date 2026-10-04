@@ -153,7 +153,7 @@ struct LineScoreTable: View {
             Divider().overlay(ScorebookColor.divider)
             teamRow(.home)
         }
-        .padding(.trailing, Spacing.small)
+        .padding(.trailing, Spacing.extraSmall)
         .fixedSize(horizontal: true, vertical: false)
     }
 
@@ -161,8 +161,8 @@ struct LineScoreTable: View {
         Text(text)
             .font(ScorebookFont.caption.weight(.bold))
             .foregroundStyle(ScorebookColor.textSecondary)
-            .frame(minWidth: 24)
-            .padding(.horizontal, 2)
+            .frame(minWidth: 22)
+            .padding(.horizontal, 1)
             .padding(.vertical, 6)
     }
 
@@ -176,7 +176,7 @@ struct LineScoreTable: View {
                 .foregroundStyle(isOurs ? ScorebookColor.ourTeamText : ScorebookColor.textPrimary)
                 .lineLimit(1)
                 .padding(.leading, Spacing.medium)
-                .padding(.trailing, Spacing.small)
+                .padding(.trailing, Spacing.extraSmall)
                 .gridColumnAlignment(.leading)
             ForEach(1...innings, id: \.self) { inning in
                 let isCurrent = currentCell?.inning == inning && currentCell?.side == side
@@ -202,8 +202,8 @@ struct LineScoreTable: View {
             .font(bold || isCurrent ? ScorebookFont.body.weight(.heavy) : ScorebookFont.body)
             .monospacedDigit()
             .foregroundStyle(isCurrent ? ScorebookColor.onStrike : ScorebookColor.textPrimary)
-            .frame(minWidth: 24, minHeight: 34)
-            .padding(.horizontal, 2)
+            .frame(minWidth: 22, minHeight: 34)
+            .padding(.horizontal, 1)
             .background {
                 if isCurrent {
                     RoundedRectangle(cornerRadius: 6, style: .continuous).fill(ScorebookColor.warning)

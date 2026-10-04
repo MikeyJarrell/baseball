@@ -166,6 +166,7 @@ public struct GameOverview: View {
                 .font(ScorebookFont.headline)
                 .monospacedDigit()
                 .multilineTextAlignment(.center)
+                .lineLimit(typeSize.isAccessibilitySize ? 3 : 1)
                 .minimumScaleFactor(0.7)
             Text(status)
                 .font(ScorebookFont.caption)

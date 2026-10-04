@@ -59,16 +59,22 @@ public enum FixPlay {
 
 // MARK: - The sheet
 
-/// The "Fix a play" sheet for one row of the play-by-play.
-struct FixPlaySheet: View {
-    var row: PlayRow
+/// The "Fix a play" sheet for one row of the play-by-play. Public so the app can also open it
+/// for a play shown somewhere else; make the row with `PlayByPlay.rows(for:)`.
+public struct FixPlaySheet: View {
+    public var row: PlayRow
     /// Called with the scorer's choice; the sheet closes itself afterward.
-    var onAction: (GameOverviewAction) -> Void
+    public var onAction: (GameOverviewAction) -> Void
+
+    public init(row: PlayRow, onAction: @escaping (GameOverviewAction) -> Void) {
+        self.row = row
+        self.onAction = onAction
+    }
 
     @Environment(\.dismiss) private var dismiss
     @State private var askingToDelete = false
 
-    var body: some View {
+    public var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -130,11 +136,13 @@ struct FixPlaySheet: View {
                 .padding(.top, Spacing.small)
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: Spacing.small)], spacing: Spacing.small) {
                 ForEach(choices, id: \.self) { choice in
-                    Button(choice.label.prefix(1).uppercased() + choice.label.dropFirst()) {
+                    Button {
                         finish(.edit(.replace(FixPlay.replacing(row.event, with: choice))))
+                    } label: {
+                        Text(choice.label.prefix(1).uppercased() + choice.label.dropFirst())
+                            .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(PlainActionButtonStyle())
-                    .frame(maxWidth: .infinity)
                 }
             }
         }

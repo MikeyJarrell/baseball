@@ -21,10 +21,10 @@ struct PitchersTab: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.small) {
-                ViewThatFits(in: .horizontal) {
-                    table
-                    ScrollView(.horizontal, showsIndicators: false) { table }
-                }
+                // Scrolls sideways only when the table is wider than the screen (large text).
+                ScrollView(.horizontal, showsIndicators: false) { table }
+                    .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+                    .dynamicTypeSize(...DynamicTypeSize.accessibility2)
                 .padding(.vertical, Spacing.extraSmall)
                 .overviewCard()
 
