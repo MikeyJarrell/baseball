@@ -240,3 +240,7 @@ SESSLOG:[2026-10-04 12:16]
 
 ### Context
 The feature is built, reviewed twice and tested, but is not on the phone until the next reinstall and team load. Known gaps left on purpose: a half-inning ended before any pitch does not count as started, and a pitching change during a playing warm-up song needs Stop then Play.
+
+## [2026-10-04 12:56] Changes after the first phone install
+
+Pregame got time wheels, a separate fielding step on the diamond, DH in place of “bats only,” and typeable opponent numbers with only the names-and-numbers and numbers-only choices. First and third base now sit in fair territory. Walk-up songs fade in under the announcer and reach full volume at their start point as the announcer finishes. Games can be deleted from the Games list or a box score (the app backs up first), and the game menu has a way home. Installed on the phone except delete-a-game, which goes on at the next install; a test game is still on the phone, and the phone’s files were backed up to Dropbox before any of this.
