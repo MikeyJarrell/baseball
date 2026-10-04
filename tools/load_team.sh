@@ -1,0 +1,128 @@
+#!/bin/bash
+# Loads the Diamond Dogs onto the phone: every player from team/roster.csv (with their usual
+# position and role, walk-up song and its start point, and a pitcher's warm-up song), every
+# opponent from team/opponents.csv, and every song file from ~/Dropbox/baseball/songs/.
+#
+# Run it from anywhere, with the iPhone plugged into the Mac and unlocked:
+#
+#     tools/load_team.sh               # the connected iPhone
+#     tools/load_team.sh --simulator   # the "iPhone 17" simulator on the Mac, for a trial run
+#
+# It is safe to run again after the roster changes: players are matched by name and keep their
+# place in the season stats, numbers typed into the app are kept, and nothing on the phone is
+# deleted. Games and settings are never touched.
+#
+# What it does, in order:
+#   1. stops the Scorebook app, so nothing is being saved while files are copied;
+#   2. copies everything the app has saved to ~/Dropbox/baseball/phone-backups/<date and time>/;
+#   3. merges the roster files into a copy of those saved files (the TeamLoader program, which
+#      writes them exactly as the app does) and copies the song files in;
+#   4. copies the teams and songs back into the app, and starts the app again;
+#   5. reads everything back off the phone and checks it: players, opponents, and that every
+#      song file is there and plays.
+
+set -euo pipefail
+
+# The repository folder (this script lives in its tools folder).
+REPO="$(cd "$(dirname "$0")/.." && pwd)"
+BUNDLE_ID="com.mikeyjarrell.scorebook"
+SONGS="$HOME/Dropbox/baseball/songs"
+STAMP="$(date +%Y-%m-%d-%H%M%S)"
+# Where the app keeps its saved files, inside its own folder on the phone.
+DATA_PATH="Library/Application Support/Scorebook"
+
+MODE="phone"
+if [[ "${1:-}" == "--simulator" ]]; then MODE="simulator"; fi
+
+# Build the loader program (only the first time takes long).
+echo "Building the loader…"
+swift build -c release --package-path "$REPO/app/Packages/ScorebookCore" --product TeamLoader >/dev/null
+LOADER="$(swift build -c release --package-path "$REPO/app/Packages/ScorebookCore" --show-bin-path)/TeamLoader"
+
+WORK="$(mktemp -d)"
+trap 'rm -rf "$WORK"' EXIT
+
+if [[ "$MODE" == "simulator" ]]; then
+    # ---- The simulator: its app folder is an ordinary folder on the Mac. ----
+    SIM="iPhone 17"
+    xcrun simctl boot "$SIM" 2>/dev/null || true
+    CONTAINER="$(xcrun simctl get_app_container "$SIM" "$BUNDLE_ID" data)"
+    BACKUP="$WORK/simulator-backup"
+    echo "1. Stopping the app on the simulator"
+    xcrun simctl terminate "$SIM" "$BUNDLE_ID" 2>/dev/null || true
+    echo "2. Copying its saved files aside (simulator copies are not kept)"
+    mkdir -p "$BACKUP" && cp -R "$CONTAINER/." "$BACKUP/"
+    echo "3. Loading the team"
+    mkdir -p "$WORK/Scorebook"
+    [[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
+    "$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+    echo "4. Copying the teams and songs into the app, and starting it"
+    mkdir -p "$CONTAINER/$DATA_PATH"
+    cp -R "$WORK/Scorebook/teams" "$WORK/Scorebook/songs" "$CONTAINER/$DATA_PATH/"
+    xcrun simctl launch "$SIM" "$BUNDLE_ID" >/dev/null
+    echo "5. Checking what the app now has"
+    "$LOADER" check "$CONTAINER/$DATA_PATH"
+    exit 0
+fi
+
+# ---- The iPhone, through Xcode's device tool. ----
+
+# The phone: the one named in SCOREBOOK_DEVICE, or else the first iPhone plugged in.
+DEVICE="${SCOREBOOK_DEVICE:-}"
+if [[ -z "$DEVICE" ]]; then
+    xcrun devicectl list devices --json-output "$WORK/devices.json" >/dev/null
+    DEVICE="$(python3 - "$WORK/devices.json" <<'EOF'
+import json, sys
+devices = json.load(open(sys.argv[1]))["result"]["devices"]
+for d in devices:
+    props, hw = d.get("connectionProperties", {}), d.get("hardwareProperties", {})
+    if hw.get("reality") == "physical" and hw.get("deviceType") == "iPhone" and props.get("tunnelState") != "unavailable":
+        print(hw.get("udid", d["identifier"])); break
+EOF
+)"
+fi
+if [[ -z "$DEVICE" ]]; then
+    echo "No iPhone found. Plug the phone into the Mac, unlock it, and try again." >&2
+    exit 1
+fi
+# Every file command below uses the app's own folder on that phone.
+ON_PHONE=(--device "$DEVICE" --domain-type appDataContainer --domain-identifier "$BUNDLE_ID")
+
+echo "1. Stopping the app on the phone"
+xcrun devicectl device info processes --device "$DEVICE" --json-output "$WORK/processes.json" >/dev/null
+PID="$(python3 - "$WORK/processes.json" <<'EOF'
+import json, sys
+for p in json.load(open(sys.argv[1]))["result"]["runningProcesses"]:
+    if p.get("executable", "").endswith("/Scorebook.app/Scorebook"):
+        print(p["processIdentifier"]); break
+EOF
+)"
+if [[ -n "$PID" ]]; then
+    xcrun devicectl device process terminate --device "$DEVICE" --pid "$PID" >/dev/null
+    sleep 2
+fi
+
+BACKUP="$HOME/Dropbox/baseball/phone-backups/$STAMP"
+echo "2. Copying everything the app has saved to $BACKUP"
+mkdir -p "$BACKUP"
+xcrun devicectl device copy from "${ON_PHONE[@]}" --source "/" --destination "$BACKUP" >/dev/null
+
+echo "3. Loading the team"
+mkdir -p "$WORK/Scorebook"
+[[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
+"$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+
+echo "4. Copying the teams and songs into the app, and starting it"
+# Only the teams and songs folders go back; files already the same are skipped, and nothing
+# on the phone is removed.
+for folder in teams songs; do
+    xcrun devicectl device copy to "${ON_PHONE[@]}" --source "$WORK/Scorebook/$folder" \
+        --destination "$DATA_PATH/$folder" >/dev/null
+done
+xcrun devicectl device process launch --device "$DEVICE" --terminate-existing "$BUNDLE_ID" >/dev/null
+
+echo "5. Reading it back off the phone and checking it"
+mkdir -p "$WORK/readback"
+xcrun devicectl device copy from "${ON_PHONE[@]}" --source "$DATA_PATH" --destination "$WORK/readback" >/dev/null
+"$LOADER" check "$WORK/readback"
+echo "Done. The phone's earlier files are in $BACKUP"
