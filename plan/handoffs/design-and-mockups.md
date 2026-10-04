@@ -93,6 +93,12 @@ Every file has previews in light and dark mode and at the largest accessibility 
 
 - **The newspaper box score picture** belongs to the box score printer. The fonts and colors it needs are here (`newspaper*`, `TeamLogo.image`), and the approved layout is the end-of-game screen in the mockups.
 
+## Base placement
+
+The bases sit where they do on a real field. First and third base are entirely in fair territory, each with its outside edge along the foul line and its back corner the full base distance from home. Home plate’s back point is at the corner where the foul lines meet, with its two back edges along the lines. Second base is centered on the line from home through the pitcher’s mound. The positions are worked out from those rules in `Layout.base(_:)`, so runner arrows, lit bases, out crosses, runner tags and tap targets all follow the bags at every size: the batting screen, the in-play steps, the runner step, and the sheets that show the field. A bag’s outline is drawn inside its edge, so it does not spill over the foul line.
+
+Before and after pictures of the batting screen, the runner step and the in-play step are in `plan/handoffs/design-and-mockups/` (`before-*.png` and `after-*.png`).
+
 ## The field drawing’s baseball logic, and its tests
 
 The baseball decisions behind the drawing are plain functions in `FieldLogic.swift`, separate from the drawing: which bases light, where a runner’s tag goes, which bases an arrow passes through, whether to draw an out cross, and whether a tap counts as a hit location. ScorebookUI has no test target, and adding one means editing `Package.swift`, which this job does not own. Six tests for these functions, and for the Strike button’s words, are ready in `plan/handoffs/design-and-mockups-field-logic-tests.swift`: the fly-out batter tagged at home with no path or cross, the 5-4-3 double play, a single with the runner from second scoring, a runner who stays put, fair and foul hit locations, and dark words on Strike. They passed in a scratch package outside the repository that imported the design system. When the lead builder adds a ScorebookUI test target, move that file into it.
