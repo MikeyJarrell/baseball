@@ -9,7 +9,7 @@
 //   swift run TeamLoader check <app data folder>
 //
 // - The app data folder is the app's `Library/Application Support/Scorebook`.
-// - `load` merges `roster.csv` and `opponents.csv` into it and copies each song file into its
+// - `load` merges `roster.csv`, `warmup_extras.csv` (if there is one) and `opponents.csv` into it and copies each song file into its
 //   `songs/audio` folder. Games and settings are never touched.
 // - The intros folder (~/Dropbox/baseball/intros/) holds the announcer pieces recorded by
 //   tools/record_intros.py. Every piece is copied into `songs/audio` under the name the app
@@ -78,11 +78,19 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
     let opponentsText = try String(contentsOf: teamFolder.appendingPathComponent("opponents.csv"), encoding: .utf8)
     let roster = RosterRow.read(rosterText)
     let opponents = OpponentRow.read(opponentsText)
+    // Extra warm-up songs are optional: no file means none. A file that is there but cannot
+    // be read stops the load, rather than wiping every pitcher's extra songs.
+    let extrasFile = teamFolder.appendingPathComponent("warmup_extras.csv")
+    var extraWarmUps: [ExtraWarmUpRow] = []
+    if FileManager.default.fileExists(atPath: extrasFile.path) {
+        guard let text = try? String(contentsOf: extrasFile, encoding: .utf8) else { fail("warmup_extras.csv could not be read") }
+        extraWarmUps = ExtraWarmUpRow.read(text)
+    }
     guard !roster.isEmpty else { fail("roster.csv has no players") }
 
     // Every song file the roster names must be there and play.
     var durations: [String: TimeInterval] = [:]
-    let files = Set(roster.flatMap { [$0.clipFile, $0.warmUpFile] }.filter { !$0.isEmpty })
+    let files = Set((roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file)).filter { !$0.isEmpty })
     for file in files.sorted() {
         guard let length = await playableLength(songsFolder.appendingPathComponent(file)) else {
             fail("\(file) is missing from \(songsFolder.path) or will not play")
@@ -121,7 +129,7 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
     if !saved.damaged.isEmpty { fail("some saved team files could not be read: \(saved.damaged.map(\.fileName))") }
     let library = try await storage.loadSongLibrary()
     let result = TeamImport.merge(teams: saved.items, library: library, roster: roster, opponents: opponents,
-                                  durations: durations, recordedNames: recordedNames)
+                                  extraWarmUps: extraWarmUps, durations: durations, recordedNames: recordedNames)
 
     // Song files first, then the library that names them, then the teams that use them.
     for file in Set(result.audioFiles).sorted() {
@@ -173,6 +181,8 @@ func check(dataFolder: URL) async throws -> Bool {
             line += p.usuallyLeadsOff ? " · leads off" : ""
             line += " · walk-up: \(walkUp.map { "\($0.title) from \(Int($0.startTime))s" } ?? "none")"
             if let warmUp { line += " · warm-up: \(warmUp.title)" }
+            let extras = p.extraWarmUpSongIDs.compactMap { songsByID[$0] }
+            if !extras.isEmpty { line += " · extra warm-ups: \(extras.map(\.title).joined(separator: ", "))" }
             line += " · intro: \(p.introduction.map { $0.source.rawValue } ?? "none")"
             print(line)
             if let intro = p.introduction, intro.source != .phoneVoice {
@@ -188,6 +198,7 @@ func check(dataFolder: URL) async throws -> Bool {
             }
             if p.walkUpSongID != nil && walkUp == nil { print("  MISSING walk-up song in the library"); ok = false }
             if p.warmUpSongID != nil && warmUp == nil { print("  MISSING warm-up song in the library"); ok = false }
+            if extras.count != p.extraWarmUpSongIDs.count { print("  MISSING extra warm-up song in the library"); ok = false }
         }
     }
     let audioFiles = (try? FileManager.default.contentsOfDirectory(atPath: storage.audioFolder.path)) ?? []

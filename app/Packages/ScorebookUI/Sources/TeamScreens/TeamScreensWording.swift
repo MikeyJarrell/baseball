@@ -148,10 +148,11 @@ public enum TeamWording {
 
     // MARK: Songs
 
-    /// The players on a team who use a song, as a walk-up song and as a warm-up song.
+    /// The players on a team who use a song, as a walk-up song and as a warm-up song (main or extra).
     public static func users(of song: SongID, in team: Team?) -> (walkUp: [Player], warmUp: [Player]) {
         let roster = team?.roster ?? []
-        return (roster.filter { $0.walkUpSongID == song }, roster.filter { $0.warmUpSongID == song })
+        return (roster.filter { $0.walkUpSongID == song },
+                roster.filter { $0.warmUpSongID == song || $0.extraWarmUpSongIDs.contains(song) })
     }
 
     /// Who uses a song, for the library: "walk-up: Moreno, Tate · warm-up: Barros", or

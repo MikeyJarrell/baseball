@@ -4,6 +4,7 @@
 // - `team/roster.csv`: the Diamond Dogs, one row per player: name, the name they go by,
 //   number, batting and throwing side, usual position and role, walk-up song and its start
 //   point, and a pitcher's warm-up song.
+// - `team/warmup_extras.csv`: our pitchers' extra warm-up songs, one row per song.
 // - `team/opponents.csv`: every opponent's registered players.
 //
 // The merge never throws anything away. It matches what is already saved by name: a team by
@@ -117,6 +118,24 @@ public struct RosterRow: Equatable, Sendable {
     }
 }
 
+/// One extra warm-up song for one of our pitchers, as `team/warmup_extras.csv` has them.
+public struct ExtraWarmUpRow: Equatable, Sendable {
+    /// The pitcher, by the name he goes by and his last name: "Chris Strong".
+    public var player: String
+    public var song: String
+    public var artist: String
+    /// The song's file name in `~/Dropbox/baseball/songs/`: a whole track, played from the start.
+    public var file: String
+
+    /// Reads every row of `team/warmup_extras.csv`.
+    public static func read(_ text: String) -> [ExtraWarmUpRow] {
+        CSV.rows(text).map { r in
+            ExtraWarmUpRow(player: r["player"] ?? "", song: r["song"] ?? "", artist: r["artist"] ?? "",
+                           file: r["file"] ?? "")
+        }.filter { !$0.player.isEmpty }
+    }
+}
+
 /// One opponent's registered player, as `team/opponents.csv` has them.
 public struct OpponentRow: Equatable, Sendable {
     public var team: String
@@ -222,22 +241,29 @@ public enum TeamImport {
     ///   - library: The app's song library now.
     ///   - roster: Our players, from `team/roster.csv`.
     ///   - opponents: Every opponent's players, from `team/opponents.csv`.
+    ///   - extraWarmUps: Our pitchers' extra warm-up songs, from `team/warmup_extras.csv`.
     ///   - durations: Each song file's length in seconds, by file name, where known.
     ///   - recordedNames: The players whose names were recorded for a pieced introduction,
     ///     by their file name stem ("aidan-kurt").
     public static func merge(teams: [Team], library: SongLibrary, roster: [RosterRow], opponents: [OpponentRow],
-                             durations: [String: TimeInterval] = [:],
+                             extraWarmUps: [ExtraWarmUpRow] = [], durations: [String: TimeInterval] = [:],
                              recordedNames: Set<String> = []) -> ImportResult {
         var notes: [String] = []
         var library = library
         var audioFiles: [String] = []
+
+        // Every file the roster files name. A song matched by title and artist (one imported on
+        // the phone by hand) must not be one of these, or a whole warm-up track could take over a
+        // teammate's walk-up clip of the same song.
+        let namedFiles = Set(roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file))
 
         // Songs first, so players can point at them.
         func song(file: String, title: String, artist: String, start: TimeInterval) -> SongID? {
             guard !file.isEmpty else { return nil }
             audioFiles.append(file)
             if let i = library.songs.firstIndex(where: { $0.fileName == file })
-                ?? library.songs.firstIndex(where: { RosterWords.key($0.title) == RosterWords.key(title) && RosterWords.key($0.artist ?? "") == RosterWords.key(artist) }) {
+                ?? library.songs.firstIndex(where: { !namedFiles.contains($0.fileName)
+                    && RosterWords.key($0.title) == RosterWords.key(title) && RosterWords.key($0.artist ?? "") == RosterWords.key(artist) }) {
                 var s = library.songs[i]
                 s.fileName = file
                 s.title = title.isEmpty ? s.title : title
@@ -296,6 +322,14 @@ public enum TeamImport {
             if recordedNames.contains(stem), player.introduction == nil || player.introduction?.source == .pieced {
                 player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
             }
+            // Extra warm-up songs come only from the file, so its list replaces what is saved;
+            // a row whose song is not cut yet is skipped.
+            var extras: [SongID] = []
+            for extra in extraWarmUps where names.contains(RosterWords.key(extra.player)) {
+                if let id = song(file: extra.file, title: extra.song, artist: extra.artist, start: 0),
+                   !extras.contains(id), id != player.warmUpSongID { extras.append(id) }
+            }
+            player.extraWarmUpSongIDs = extras
             if let index {
                 if ours.roster[index] != player { notes.append("Player updated: \(row.displayName)") }
                 ours.roster[index] = player
@@ -306,6 +340,11 @@ public enum TeamImport {
         }
         var toSave: [Team] = []
         if ours != oursBefore { toSave.append(ours) }
+        // An extra warm-up song for a name not on the roster (a misspelling) is said, not lost quietly.
+        let rosterNames = Set(roster.flatMap { [RosterWords.key($0.displayName), RosterWords.key("\($0.firstName) \($0.lastName)")] })
+        for extra in extraWarmUps where !rosterNames.contains(RosterWords.key(extra.player)) {
+            notes.append("Not on the roster, so skipped: \(extra.player)’s warm-up song \(extra.song)")
+        }
 
         // Each opponent.
         var opponentNames: [String] = []

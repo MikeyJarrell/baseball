@@ -215,3 +215,28 @@ SESSLOG:[2026-10-04 11:59]
 
 ### Context
 Mikey wanted to record introductions with his good Mac microphone rather than the phone, and proposed recording every number once so the app could piece them together. A Python recorder trims, filters and levels each take; the app joins the pieces with the same pauses as its phone voice. A fresh review caught that every team load reset numbers changed in the app and re-applied pieced introductions over ones chosen in the app; both fixed. Everything is installed and loaded on the phone, and the check found every piece present, but the stitched introduction has not yet been heard on the phone itself.
+
+---
+
+## [2026-10-04 12:16] Several warm-up songs per pitcher
+SESSLOG:[2026-10-04 12:16]
+
+**Project(s):** baseball
+
+### Decisions
+- A pitcher’s main warm-up song plays the first inning he starts; extra songs shuffle for later innings, each once before repeats, never two innings running (Mikey chose main-first).
+- Mikey sends the extra songs; they live in `team/warmup_extras.csv`, not editable in the app.
+- The song is worked out from the game record each time, not remembered: the first version kept a list in memory, and the review showed reopening a game, undo over a changeover, or a pitching change at the changeover then played the wrong song.
+- Extras so far: Chris (4), Erick (3), Gaven (2). Luis Miguel’s “El Rey” is the live *El Concierto* recording; no studio version by him exists.
+
+### Follow-ups
+- [ ] Reinstall the app (`tools/install_on_phone.sh`) and load the team (`tools/load_team.sh`) so the phone gets the feature and the songs.
+- [ ] More extras for the other pitchers when Mikey sends them.
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/Model/WarmUpRotation.swift`, its tests, `team/warmup_extras.csv`, `plan/handoffs/warmup-rotation.md`, `feedback/ai/warmup-rotation-review.md`
+- [modified] `People.swift`, `TeamImport.swift`, `TeamLoader/main.swift`, `GameScreen.swift`, `TeamsWiring.swift`, player page, `tools/walkup_songs.py`, `team/README.md`, `plan/README.md`, `PROJECT_INDEX.md`
+- [created] nine extra warm-up tracks in `~/Dropbox/baseball/songs/`
+
+### Context
+The feature is built, reviewed twice and tested, but is not on the phone until the next reinstall and team load. Known gaps left on purpose: a half-inning ended before any pitch does not count as started, and a pitching change during a playing warm-up song needs Stop then Play.
