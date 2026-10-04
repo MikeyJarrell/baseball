@@ -29,7 +29,6 @@ struct StatsTableColumn<Row>: Identifiable {
 ///
 /// - Parameters:
 ///   - rows: The rows, already in the order to show them.
-///   - rowID: Something unique about each row, such as the player's id.
 ///   - nameTitle: The heading over the names: "Player", "Pitcher", "Game".
 ///   - name: The words in the pinned column for a row.
 ///   - columns: The number columns, left to right.
@@ -40,9 +39,8 @@ struct StatsTableColumn<Row>: Identifiable {
 ///     that does not sort.
 ///   - onTapRow: Called when a row is tapped.
 ///   - rowHint: What tapping a row does, for VoiceOver: "Opens their season page".
-struct StatsTable<Row, ID: Hashable>: View {
+struct StatsTable<Row>: View {
     var rows: [Row]
-    var rowID: (Row) -> ID
     var nameTitle: String
     var name: (Row) -> String
     var columns: [StatsTableColumn<Row>]
@@ -54,6 +52,9 @@ struct StatsTable<Row, ID: Hashable>: View {
 
     /// How far the numbers have been scrolled sideways, so the headings can follow.
     @State private var scrolledSideways: CGFloat = 0
+    /// How tall all the rows are together, so a short table ends after its last row instead
+    /// of filling the screen with an empty card.
+    @State private var rowsHeight: CGFloat = 0
 
     /// Row height and column widths grow with the phone's text size.
     @ScaledMetric(relativeTo: .body) private var rowHeight: CGFloat = 44
@@ -87,6 +88,12 @@ struct StatsTable<Row, ID: Hashable>: View {
                 }
             }
             .scrollBounceBehavior(.basedOnSize, axes: .vertical)
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentSize.height
+            } action: { _, height in
+                rowsHeight = height
+            }
+            .frame(maxHeight: rowsHeight > 0 ? rowsHeight : nil)
         }
         .background(ScorebookColor.surface)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -198,7 +205,7 @@ struct StatsTable<Row, ID: Hashable>: View {
         .accessibilityHidden(true)
     }
 
-    /// The whole row in words: "Alex Moreno: 1 games, 3 plate appearances, ... batting
+    /// The whole row in words: "Alex Moreno: games 1, plate appearances 3, ... batting
     /// average .333".
     private func spokenRow(_ row: Row) -> String {
         let values = columns.map { "\($0.spokenName) \($0.text(row))" }
