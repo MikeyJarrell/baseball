@@ -82,6 +82,20 @@ public final class GameSession {
         return session
     }
 
+    /// Reopens a game saved earlier (the app was closed mid-game). If the phone died between
+    /// saving the scorer's last event and the automatic out that should follow it, that out is
+    /// recorded now, before anything else.
+    public static func resume(_ game: Game, storage: any ScorebookStorage,
+                              engine: any RulesEngine = ScorebookRulesEngine(),
+                              stats: any StatsCalculator = StatsEngine()) async -> GameSession {
+        let session = GameSession(game: game, storage: storage, engine: engine, stats: stats)
+        _ = await session.oneAtATime {
+            await session.recordAutomaticOuts()
+            return true
+        }
+        return session
+    }
+
     // MARK: What the screens read
 
     /// Where the game stands now.
@@ -165,13 +179,76 @@ public final class GameSession {
         }
     }
 
-    // MARK: Recording
+    // MARK: One change at a time
+
+    /// The change being saved now, if any. Each new change waits for it to finish, so two
+    /// quick taps (Undo twice, a pitch during a slow save) are made one after the other, each
+    /// starting from the game the one before left, and nothing is saved twice.
+    private var lastChange: Task<Bool, Never>?
+
+    /// Runs one change after every change asked for before it has finished.
+    private func oneAtATime(_ change: @escaping @MainActor () async -> Bool) async -> Bool {
+        let previous = lastChange
+        let task = Task { @MainActor in
+            _ = await previous?.value
+            return await change()
+        }
+        lastChange = task
+        return await task.value
+    }
 
     /// Records one event: saves it, then updates the game. Clears Redo. Afterward records an
     /// automatic out if a batting hole has come up. Returns false if the save failed (the
     /// game is then unchanged and `saveProblem` says why).
     @discardableResult
     public func record(_ event: GameEvent) async -> Bool {
+        await oneAtATime { await self.recordNow(event) }
+    }
+
+    /// Records an event a sheet handed back, first adding any players the scorer created on
+    /// the spot (a new pitcher known only by number) to that team's game roster.
+    @discardableResult
+    public func record(_ entered: EnteredEvent) async -> Bool {
+        await oneAtATime { await self.recordNow(entered) }
+    }
+
+    /// Puts an edited player in place of the one with the same id on one team's game roster.
+    @discardableResult
+    public func updatePlayer(_ player: Player, on side: TeamSide) async -> Bool {
+        await oneAtATime { await self.updatePlayerNow(player, on: side) }
+    }
+
+    /// Takes back the scorer's last event, with any automatic outs after it, keeping it for Redo.
+    @discardableResult
+    public func undo() async -> Bool {
+        await oneAtATime { await self.undoNow() }
+    }
+
+    /// Puts back the event Undo just took back.
+    @discardableResult
+    public func redo() async -> Bool {
+        await oneAtATime { await self.redoNow() }
+    }
+
+    /// Puts a dropped-third-strike play on the strike-three pitch.
+    @discardableResult
+    public func addDroppedThirdStrike(_ play: Play) async -> Bool {
+        await oneAtATime { await self.addDroppedThirdStrikeNow(play) }
+    }
+
+    /// Applies a fix from the play-by-play.
+    @discardableResult
+    public func apply(_ edit: EventEdit) async -> Bool {
+        await oneAtATime { await self.applyNow(edit) }
+    }
+
+    // MARK: Recording
+
+    /// Records one event: saves it, then updates the game. Clears Redo. Afterward records an
+    /// automatic out if a batting hole has come up. Returns false if the save failed (the
+    /// game is then unchanged and `saveProblem` says why).
+    @discardableResult
+    private func recordNow(_ event: GameEvent) async -> Bool {
         guard await append(event) else { return false }
         redoStack.removeAll()
         await recordAutomaticOuts()
@@ -181,8 +258,8 @@ public final class GameSession {
     /// Records an event a sheet handed back, first adding any players the scorer created on
     /// the spot (a new pitcher known only by number) to that team's game roster.
     @discardableResult
-    public func record(_ entered: EnteredEvent) async -> Bool {
-        guard !entered.newPlayers.isEmpty else { return await record(entered.event) }
+    private func recordNow(_ entered: EnteredEvent) async -> Bool {
+        guard !entered.newPlayers.isEmpty else { return await recordNow(entered.event) }
         var changed = game
         for addition in entered.newPlayers {
             changed.setup.add(addition.player, to: addition.side)
@@ -197,7 +274,7 @@ public final class GameSession {
     /// Puts an edited player in place of the one with the same id on one team's game roster
     /// (a name, number or batting side filled in). Rosters change without an event.
     @discardableResult
-    public func updatePlayer(_ player: Player, on side: TeamSide) async -> Bool {
+    private func updatePlayerNow(_ player: Player, on side: TeamSide) async -> Bool {
         var changed = game
         changed.setup.replace(player, on: side)
         return await saveWhole(changed)
@@ -206,7 +283,7 @@ public final class GameSession {
     /// Takes back the scorer's last event, along with any automatic outs the app added after
     /// it, and keeps it for Redo.
     @discardableResult
-    public func undo() async -> Bool {
+    private func undoNow() async -> Bool {
         guard let index = lastScorerEventIndex else { return false }
         var changed = game
         let taken = changed.events[index]
@@ -221,7 +298,7 @@ public final class GameSession {
 
     /// Puts back the event Undo just took back.
     @discardableResult
-    public func redo() async -> Bool {
+    private func redoNow() async -> Bool {
         guard let event = redoStack.last else { return false }
         guard await append(event) else { return false }
         redoStack.removeLast()
@@ -233,7 +310,7 @@ public final class GameSession {
     /// went) on the strike-three pitch, in place of the plain strikeout. The pitch keeps its id
     /// and time. Automatic outs after it are worked out again.
     @discardableResult
-    public func addDroppedThirdStrike(_ play: Play) async -> Bool {
+    private func addDroppedThirdStrikeNow(_ play: Play) async -> Bool {
         guard let index = strikeThreeIndex, case .pitch(let pitch) = game.events[index].kind else { return false }
         var changed = game
         var event = changed.events[index]
@@ -272,7 +349,7 @@ public final class GameSession {
     /// Applies a change to an earlier event from the play-by-play (replace, delete or insert),
     /// then works out everything after it again. Clears Redo.
     @discardableResult
-    public func apply(_ edit: EventEdit) async -> Bool {
+    private func applyNow(_ edit: EventEdit) async -> Bool {
         var changed = game
         switch edit {
         case .replace(let event):

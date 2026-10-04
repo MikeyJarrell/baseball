@@ -10,7 +10,7 @@ The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 
 2. **Open the app in Xcode.** In Xcode choose File, then Open, and open `Scorebook.xcodeproj` in the `app` folder of the baseball project (`/Users/mikey/projects/personal/baseball/app/Scorebook.xcodeproj`).
 
-3. **Tell Xcode to use your account.** In the column on the left, click the blue “Scorebook” at the very top. In the middle, under Targets, click “Scorebook”, then the Signing & Capabilities tab. Check “Automatically manage signing”, and set Team to your name (Personal Team). If a red message says the name `com.mikeyjarrell.scorebook` is not available, change that text in the box beside “Bundle Identifier” to `com.mikeyjarrell.scorebook2` and press Return.
+3. **Tell Xcode to use your account.** In the column on the left, click the blue “Scorebook” at the very top. In the middle, under Targets, click “Scorebook”, then the Signing & Capabilities tab. Check “Automatically manage signing”, and set Team to your name (Personal Team). If a red message says the name `com.mikeyjarrell.scorebook` is not available, change that text in the box beside “Bundle Identifier” to `com.mikeyjarrell.scorebook2` and press Return. A free account can have at most three of your own apps on the phone at once, so if Xcode says you have reached that limit, delete one of the others from the phone (never the Scorebook) and try again.
 
 4. **Plug the phone into the Mac** with a cable. Unlock the phone. If it asks “Trust This Computer?”, tap Trust and type your passcode.
 
@@ -18,7 +18,7 @@ The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 
 6. **Install.** In Xcode, at the top middle of the window, click the device name next to “Scorebook” and choose your iPhone from the list. Press the Play button (the triangle at the top left), or Command-R. The first time, Xcode spends a few minutes getting the phone ready; the bar at the top of the window says what it is doing. When it finishes, the Scorebook icon appears on the phone.
 
-7. **Trust yourself as the app’s maker, on the phone.** The first time you tap the Scorebook icon, the phone says “Untrusted Developer” and will not open it. Open Settings, then General, then VPN & Device Management. Under Developer App, tap your Apple account’s email address, tap Trust, then Trust again. Now the app opens.
+7. **Trust yourself as the app’s maker, on the phone.** The first time you tap the Scorebook icon, the phone says “Untrusted Developer” and will not open it. Open Settings, then General, then VPN & Device Management. Under Developer App, tap your Apple account’s email address, tap Trust, then Trust again. The phone checks with Apple at this step, so it needs to be on Wi-Fi or cellular data. Now the app opens.
 
 8. **Allow what the app asks for.** The first time you record an announcer introduction, the phone asks to use the microphone: tap Allow.
 
@@ -27,14 +27,15 @@ The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 Seven days after an install, the app shows a message that it is no longer available and will not open. Your games, teams and songs are all still on the phone.
 
 1. Plug the phone into the Mac and unlock it.
-2. Open Xcode, choose your iPhone at the top middle, and press the Play button.
+2. Make sure the main project folder has the newest version of the app: ask Claude to bring the baseball project’s main folder up to date (in Terminal, the same thing is `git -C /Users/mikey/projects/personal/baseball pull`). Xcode puts on the phone whatever version that folder holds.
+3. Open `/Users/mikey/projects/personal/baseball/app/Scorebook.xcodeproj` in Xcode (File, then Open Recent usually has it), choose your iPhone at the top middle, and press the Play button.
 
 That is all. It takes a minute or two. Doing it the morning of every game day means it never runs out mid-game.
 
 ## Keeping your games safe
 
 - **Never delete the Scorebook app from the phone.** Deleting it deletes its games, teams and songs with it. Reinstalling from Xcode, as above, keeps everything.
-- **Backups.** The app writes a backup at the end of every game, and the Backups link at the bottom of the home screen makes one any time. To keep a copy off the phone, open the Files app, then On My iPhone, then Scorebook, then backups, and copy the newest file to iCloud Drive. The same Backups link puts everything back from a backup file.
+- **Backups.** The app writes a backup at the end of every game, and the Backups link at the bottom of the home screen makes one any time. To keep a copy off the phone, open the Files app, then On My iPhone, then Scorebook, then backups, and copy the newest file to iCloud Drive. The same Backups link puts everything back from a backup file, but it lists only the files in Scorebook’s own backups folder. To restore a copy kept in iCloud Drive, first copy it in the Files app from iCloud Drive back into On My iPhone, then Scorebook, then backups; then it appears under Backups.
 
 ## If something goes wrong
 
