@@ -26,7 +26,7 @@ struct PlayEntryDemo: Identifiable, Sendable {
     var expected: (notation: String, outs: Int, runs: Int, rbi: Int)
 
     /// A fresh sequence for this demo with the first `count` taps already made (all of them
-    /// when `count` is missing), using the demo rules engine.
+    /// when `count` is missing), using SampleData's rules engine.
     @MainActor
     func model(afterTaps count: Int? = nil, onFinish: @escaping (PlayEntryOutcome) -> Void = { _ in }) -> PlayEntryModel {
         let model = PlayEntryModel(situation: sample.situation, setup: sample.setup, start: start,
