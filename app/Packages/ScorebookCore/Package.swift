@@ -23,6 +23,7 @@ let package = Package(
         .library(name: "Stats", targets: ["Stats"]),
         .library(name: "BoxScoreText", targets: ["BoxScoreText"]),
         .library(name: "Storage", targets: ["Storage"]),
+        .library(name: "Scoring", targets: ["Scoring"]),
     ],
     targets: [
         // The shared vocabulary: players, teams, events, plays, the situation, box scores.
@@ -46,6 +47,11 @@ let package = Package(
         // Saving and loading teams, games and the song list as JSON files.
         .target(name: "Storage", dependencies: ["Model"]),
 
+        // One game being scored: saves each event through storage, replays the game through
+        // the rules engine and works out the box score. The app shell holds one while a game
+        // is open.
+        .target(name: "Scoring", dependencies: ["Model", "GameEngine", "Stats"]),
+
         // Test helper: bundles the Tests/Scenarios folder and loads a scenario in one line.
         // It lives under Tests/ so the scenario files sit beside the tests that use them.
         // The test folders are excluded so this module only picks up its own code.
@@ -55,7 +61,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "ModelTests", "GameEngineTests", "StatsTests",
-                "BoxScoreTextTests", "StorageTests",
+                "BoxScoreTextTests", "StorageTests", "ScoringTests",
             ],
             sources: ["TestSupport"],
             resources: [.copy("Scenarios")]
@@ -75,5 +81,9 @@ let package = Package(
 
         // Tests of saving and loading.
         .testTarget(name: "StorageTests", dependencies: ["Storage", "Model", "SampleData", "TestSupport"]),
+
+        // Tests of scoring a game: saving each event, undo and redo, automatic outs, and whole
+        // games scored event by event matching their box scores.
+        .testTarget(name: "ScoringTests", dependencies: ["Scoring", "Storage", "GameEngine", "Stats", "Model", "SampleData", "TestSupport"]),
     ]
 )

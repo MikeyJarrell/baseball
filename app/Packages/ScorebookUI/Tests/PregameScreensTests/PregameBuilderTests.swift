@@ -59,7 +59,7 @@ struct LineupStartTests {
 
     @Test("Before the first game: usual positions, the leadoff hitter first, the usual bench on the bench")
     func fromRoster() {
-        let lineup = OurLineup.fromRoster(roster, usual: PregameSamples.usualRoles)
+        let lineup = OurLineup.fromRoster(PregameSamples.diamondDogsWithUsuals.roster)
         #expect(lineup.battingOrder.first == "d1")
         #expect(lineup.battingOrder.count == 10)
         #expect(!lineup.battingOrder.contains("d11"))
@@ -69,7 +69,20 @@ struct LineupStartTests {
         #expect(lineup.defense[.firstBase] == "d4")
         #expect(lineup.defense[.pitcher] == "d9")
         #expect(lineup.emptyPositions.isEmpty)
-        // Cole has no usual position: he bats only.
+        // Cole bats only.
+        #expect(lineup.position(of: "d10") == nil)
+    }
+
+    @Test("Only fielding keeps a player out of the batting order; no role set means bat and field")
+    func fieldsOnlyAndNoRole() {
+        var roster = PregameSamples.diamondDogsWithUsuals.roster
+        // Barros (d9) fields but does not bat; Cole (d10) has no role set and no position.
+        roster[8].usualRole = .fieldsOnly
+        roster[9].usualRole = nil
+        let lineup = OurLineup.fromRoster(roster)
+        #expect(!lineup.battingOrder.contains("d9"))
+        #expect(lineup.defense[.pitcher] == "d9")
+        #expect(lineup.battingOrder.contains("d10"))
         #expect(lineup.position(of: "d10") == nil)
     }
 

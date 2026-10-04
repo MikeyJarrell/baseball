@@ -23,6 +23,10 @@ public struct SampleRulesEngine: RulesEngine {
         engine.suggestRunners(for: draft, in: situation)
     }
 
+    public func suggestRunners(for draft: PlayDraft, in situation: Situation, keeping fixed: Set<PlayerID>) -> RunnerSuggestion {
+        engine.suggestRunners(for: draft, in: situation, keeping: fixed)
+    }
+
     public func preview(_ draft: PlayDraft, in situation: Situation) -> PlayPreview {
         engine.preview(draft, in: situation)
     }

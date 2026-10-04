@@ -118,11 +118,10 @@ public struct GameMenuSheet: View {
         return "\(end.formatted(date: .omitted, time: .shortened)) · \(left)"
     }
 
-    /// "Diamond Dogs 5, Mudcats 3".
+    /// "Mudcats 3, Diamond Dogs 5": the visiting team first, as in the newspaper box score.
     private var scoreLine: String {
-        let first = context.ourSide ?? .away
         let score = context.situation.score
-        return "\(context.teamName(first)) \(score[first]), \(context.teamName(first.opponent)) \(score[first.opponent])"
+        return "\(context.teamName(.away)) \(score.away), \(context.teamName(.home)) \(score.home)"
     }
 
     /// Records the end of the game, with the score as it stands.

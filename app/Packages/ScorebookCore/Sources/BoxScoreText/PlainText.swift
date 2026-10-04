@@ -52,14 +52,16 @@ enum PlainText {
         return sections.map { $0.joined(separator: "\n") }.joined(separator: "\n\n")
     }
 
-    /// One table as lines of text: the heading line, then a line per row.
+    /// One table as lines of text: the heading line, then a line per row, then any pinch
+    /// hitters' and runners' footnotes together on one line right under the totals.
     static func lines(for table: NewspaperTable, labelWidth: Int, columnWidths: [Int]) -> [String] {
         let heading = row(label: table.title.uppercased(), cells: table.columns,
                           labelWidth: labelWidth, columnWidths: columnWidths)
         let body = table.rows.map {
             row(label: $0.paddedLabel, cells: $0.cells, labelWidth: labelWidth, columnWidths: columnWidths)
         }
-        return [heading] + body
+        let footnotes = table.footnotes.isEmpty ? [] : [table.footnotes.joined(separator: " ")]
+        return [heading] + body + footnotes
     }
 
     /// A label padded out to the label width, then each number right-aligned in its column,

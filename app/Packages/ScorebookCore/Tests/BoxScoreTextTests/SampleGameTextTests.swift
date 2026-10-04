@@ -4,6 +4,10 @@
 // (SampleData/SampleBoxScore.swift), adding up every column and checking every note,
 // then compared with the printer's output character for character. The spacing was
 // widened after review so the line score's runs, hits and errors sit under r, h and bi.
+// The newer lines were worked out the same way: Moss is the Mudcats' only pinch hitter,
+// so they are "a" and popped out ("P6") for Collins in the 4th; Voss and Reyes only took
+// over a spot, so they get no letter; Barros won and Reyes lost; Reyes hit Ford; Webb ran
+// for Quinn in the 3rd; and 11,552 seconds is 192 whole minutes, 3 hours 12 minutes.
 
 import Foundation
 import Testing
@@ -32,9 +36,10 @@ struct SampleGameTextTests {
         Varga c              1  0  0  0
         Bell 2b              2  0  1  1
         Collins p            1  0  0  0
-          Moss ph            1  0  0  0
+          a-Moss ph          1  0  0  0
           Reyes p            0  0  0  0
         Totals              20  3  7  3
+        a-popped out for Collins in the 4th.
 
         DIAMOND DOGS        ab  r  h bi
         Moreno 2b            2  1  1  1
@@ -53,16 +58,16 @@ struct SampleGameTextTests {
         Mudcats      011 10  —  3  7  1
         Diamond Dogs 201 11  —  5  9  1
 
-        E—Kim, Tate. DP—Mudcats 2, Diamond Dogs 2. LOB—Mudcats 6, Diamond Dogs 4. 2B—Ruiz, Webb, Cole. 3B—Ortiz. HR—Diaz, Tate. SB—Park, Cole. CS—Webb. S—Tate. SF—Ruiz, Fisk.
+        E—Kim, Tate. DP—Mudcats 2, Diamond Dogs 2. LOB—Mudcats 6, Diamond Dogs 4. 2B—Ruiz, Webb, Cole. 3B—Ortiz. HR—Diaz, Tate. SB—Park, Cole. CS—Webb. S—Tate. SF—Ruiz, Fisk. Webb ran for Quinn in the 3rd.
 
         MUDCATS             ip  h  r bb so
         Collins              3  6  3  1  2
-        Reyes                2  3  2  0  0
+        Reyes L              2  3  2  0  0
         DIAMOND DOGS        ip  h  r bb so
-        Barros               4  6  3  2  1
+        Barros W             4  6  3  2  1
         Voss                 1  1  0  1  1
 
-        HBP—by Reyes (Ford). Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss 13-9.
+        HBP—by Reyes (Ford). Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss 13-9. T—3:12.
         """
         let printed = BoxScorePrinter.text(SampleGame.boxScore, timeZone: pacific)
         #expect(printed == expected)
@@ -99,6 +104,6 @@ struct SampleGameTextTests {
     func substitutes() {
         let mudcats = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific).batting[0]
         let labels = mudcats.rows.map(\.paddedLabel)
-        #expect(Array(labels[8...10]) == ["Collins p", "  Moss ph", "  Reyes p"])
+        #expect(Array(labels[8...10]) == ["Collins p", "  a-Moss ph", "  Reyes p"])
     }
 }

@@ -33,6 +33,8 @@ struct LogWriter {
 }
 
 /// The play-by-play on the rules engine's own play log, and on hand-written short logs.
+/// On the main thread, because the "Fix a play" sheet is a screen and screens live there.
+@MainActor
 struct MoreLogsTests {
     @Test func theRulesEnginesLogGroupsAndOrdersTheSameWay() throws {
         let log = SampleRulesEngine().replay(SampleGame.game).log
@@ -131,7 +133,8 @@ struct MoreLogsTests {
 
 /// The swipe back to the batting screen. A swipe has to start on the strip along the left
 /// edge, which is narrower than the margin before any row's chip or words, so it cannot also
-/// tap a row. (Checked by hand too: see the handoff.)
+/// tap a row. (Checked by hand too: see the handoff.) On the main thread, like the strip itself.
+@MainActor
 struct BackSwipeTests {
     @Test func theStripIsNarrowerThanTheRowsInset() {
         // Rows start at the page margin (12) plus the row's own padding (12).

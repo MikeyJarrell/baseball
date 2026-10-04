@@ -29,10 +29,9 @@ public struct GameOverSheet: View {
 
     private var score: Score { context.situation.score }
 
-    /// "Diamond Dogs 5, Mudcats 3": our team first when one team is ours.
+    /// "Mudcats 3, Diamond Dogs 5": the visiting team first, as in the newspaper box score.
     private var scoreLine: String {
-        let first = context.ourSide ?? .away
-        return "\(context.teamName(first)) \(score[first]), \(context.teamName(first.opponent)) \(score[first.opponent])"
+        "\(context.teamName(.away)) \(score.away), \(context.teamName(.home)) \(score.home)"
     }
 
     /// Why the app is asking, in words, with the rule.

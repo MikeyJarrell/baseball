@@ -90,31 +90,31 @@ private func log(_ request: PostgameRequest) {
     // The one-game season: with the filter at its usual 10 plate appearances every average is
     // hidden, so the filter starts off here to show them.
     InNavigation {
-        SeasonStatsScreen(totals: SampleSeason.totals, games: SampleSeason.games,
+        SeasonStatsScreen(totals: SampleSeason.totals,
                           minimumPlateAppearances: 0, onRequest: log)
     }
 }
 
 #Preview("Season, one game, filter on") {
-    InNavigation { SeasonStatsScreen(totals: SampleSeason.totals, games: SampleSeason.games, onRequest: log) }
+    InNavigation { SeasonStatsScreen(totals: SampleSeason.totals, onRequest: log) }
 }
 
 #Preview("Season, fourteen games") {
     InNavigation {
-        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, games: PreviewSeason.games, onRequest: log)
+        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, onRequest: log)
     }
 }
 
 #Preview("Season, fourteen games, dark") {
     InNavigation {
-        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, games: PreviewSeason.games, onRequest: log)
+        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, onRequest: log)
     }
     .preferredColorScheme(.dark)
 }
 
 #Preview("Season, largest text") {
     InNavigation {
-        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, games: PreviewSeason.games, onRequest: log)
+        SeasonStatsScreen(totals: PreviewSeason.fourteenGames, onRequest: log)
     }
     .dynamicTypeSize(.accessibility5)
 }

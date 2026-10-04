@@ -25,7 +25,8 @@ public struct StatsEngine: StatsCalculator {
         BoxScoreBuilder(log: log).build()
     }
 
-    /// Season totals for one of our teams. Opponents' players are left out.
+    /// Season totals for one of our teams, with the season record and each pitcher's wins and
+    /// losses. Opponents' players are left out.
     public func seasonTotals(for logs: [PlayLog], team: TeamID) -> SeasonTotals {
         SeasonTotalsBuilder(logs: logs, team: team, stats: self).build()
     }
