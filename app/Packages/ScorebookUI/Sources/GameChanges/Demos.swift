@@ -54,6 +54,10 @@ enum DemoMoments {
         reasons: [.firstBase: "alternating"]
     )
 
+    /// The defense check in the top of the 2nd, with first base shared by turns: the rules
+    /// engine suggests Robin Nash at first for the even inning.
+    static let rotationCheck = context(SampleSituations.defenseCheckWithRotation)
+
     /// Bottom of the 1st: Pat Quinn, a designated non-runner, has just singled. Chris Tate,
     /// who made the out, is the league rule's runner.
     static let nonRunnerOnFirst = context(SampleSituations.designatedNonRunnerOnFirst)
@@ -120,8 +124,8 @@ enum DemoMoments {
 /// Every sheet in this module, by name, for the demo screen and its launch argument.
 public enum GameChangesDemoSheet: String, CaseIterable, Identifiable, Sendable {
     case changesMenu, addTenthHitter, addEleventhHitter, pitchingChangeMidCount, pinchHitterReentry,
-         pinchRunner, nonRunnerPrompt, defenseCheck, defenseCheckSwapped, defenseCheckAlternating,
-         fielders, runnerSteal, runnerWildPitch, errorNobodyMoved, manualAdjustment, theirBatter,
+         pinchRunner, nonRunnerPrompt, defenseCheck, defenseCheckSwapped, defenseCheckAlternating, defenseCheckRotation,
+         fielders, runnerSteal, runnerAfterStrikeout, runnerWildPitch, errorNobodyMoved, manualAdjustment, theirBatter,
          timeLimit, gameOverTimeLimit, gameOverMercyRule, gameMenu
 
     public var id: String { rawValue }
@@ -139,6 +143,8 @@ public enum GameChangesDemoSheet: String, CaseIterable, Identifiable, Sendable {
         case .defenseCheck: "Defense check"
         case .defenseCheckSwapped: "Defense check, two fielders swapped"
         case .defenseCheckAlternating: "Defense check, first base alternating"
+        case .defenseCheckRotation: "Defense check, engine’s alternating first base"
+        case .runnerAfterStrikeout: "Runner actions: right after a strikeout"
         case .fielders: "Fielders"
         case .runnerSteal: "Runner actions: steal"
         case .runnerWildPitch: "Runner actions: wild pitch"
@@ -208,6 +214,11 @@ public struct GameChangesDemo: View {
             DefenseSheet(context: DemoMoments.takingTheField, suggestion: DemoMoments.swappedFielders, onFinish: finish)
         case .defenseCheckAlternating:
             DefenseSheet(context: DemoMoments.takingTheField, suggestion: DemoMoments.alternatingFirstBase, onFinish: finish)
+        case .defenseCheckRotation:
+            DefenseSheet(context: DemoMoments.rotationCheck, onFinish: finish)
+        case .runnerAfterStrikeout:
+            RunnerActionSheet(context: DemoMoments.midCount, runner: "m3", suggest: DemoMoments.suggest(in: DemoMoments.midCount),
+                              followsStrikeout: true, onFinish: finish)
         case .fielders:
             DefenseSheet(context: DemoMoments.midCount, purpose: .changes, onFinish: finish)
         case .runnerSteal:
@@ -268,9 +279,10 @@ private func details(_ kind: EventKind) -> String {
     case .pitchingChange(let p): return " \(p.newPitcher)"
     case .runnerForNonRunner(let r): return " \(r.runner) for \(r.replacing)"
     case .runnerAction(let a):
-        let moves = a.moves.map { "\($0.runner) \($0.from.rawValue)→\($0.to.rawValue)\($0.outBy.isEmpty ? "" : " " + $0.outBy.map(\.description).joined(separator: "-"))" }
+        let moves = a.moves.map { "\($0.runner) \($0.from.rawValue)→\($0.to.rawValue)\($0.outBy.isEmpty ? "" : " " + $0.outBy.map(\.description).joined(separator: "-"))\($0.wasStealing ? " stealing" : "")" }
         let errors = a.errors.map { "E\($0.fielder.number)" }
-        return " (" + (moves + errors).joined(separator: ", ") + ")"
+        let dp = a.completesStrikeoutDoublePlay ? ["with the strikeout: DP"] : []
+        return " (" + (moves + errors + dp).joined(separator: ", ") + ")"
     case .errorWithNoAdvance(let e): return " E\(e.fielder.number)"
     case .keepPlaying(let k): return " (\(k.reason.rawValue))"
     case .endOfGame(let e): return " (\(e.reason.rawValue))"

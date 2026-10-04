@@ -39,6 +39,7 @@ struct StatsTableColumn<Row>: Identifiable {
 ///     that does not sort.
 ///   - onTapRow: Called when a row is tapped.
 ///   - rowHint: What tapping a row does, for VoiceOver: "Opens their season page".
+///   - scrollsVertically: Whether the table scrolls up and down by itself.
 struct StatsTable<Row>: View {
     var rows: [Row]
     var nameTitle: String
@@ -49,6 +50,9 @@ struct StatsTable<Row>: View {
     var onSort: ((String) -> Void)? = nil
     var onTapRow: ((Row) -> Void)? = nil
     var rowHint: String? = nil
+    /// True when the table scrolls up and down by itself, with its headings pinned (the season
+    /// tables). False for a table inside a page that scrolls (a player's game log).
+    var scrollsVertically: Bool = true
 
     /// How far the numbers have been scrolled sideways, so the headings can follow.
     @State private var scrolledSideways: CGFloat = 0
@@ -68,36 +72,43 @@ struct StatsTable<Row>: View {
     var body: some View {
         VStack(spacing: 0) {
             headings
-            ScrollView(.vertical) {
-                HStack(alignment: .top, spacing: 0) {
-                    nameColumn
-                    ScrollView(.horizontal) {
-                        VStack(spacing: 0) {
-                            ForEach(rows.indices, id: \.self) { index in
-                                numberRow(rows[index])
-                            }
-                        }
-                    }
-                    .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
-                    // Keep the headings over their columns as the numbers scroll.
+            if scrollsVertically {
+                ScrollView(.vertical) { rowsBody }
+                    .scrollBounceBehavior(.basedOnSize, axes: .vertical)
                     .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                        geometry.contentOffset.x + geometry.contentInsets.leading
-                    } action: { _, offset in
-                        scrolledSideways = offset
+                        geometry.contentSize.height
+                    } action: { _, height in
+                        rowsHeight = height
                     }
-                }
+                    .frame(maxHeight: rowsHeight > 0 ? rowsHeight : nil)
+            } else {
+                rowsBody
             }
-            .scrollBounceBehavior(.basedOnSize, axes: .vertical)
-            .onScrollGeometryChange(for: CGFloat.self) { geometry in
-                geometry.contentSize.height
-            } action: { _, height in
-                rowsHeight = height
-            }
-            .frame(maxHeight: rowsHeight > 0 ? rowsHeight : nil)
         }
         .background(ScorebookColor.surface)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
         .shadow(color: .black.opacity(0.08), radius: 4, y: 1)
+    }
+
+    /// Every row: the pinned names beside the numbers, which scroll sideways.
+    private var rowsBody: some View {
+        HStack(alignment: .top, spacing: 0) {
+            nameColumn
+            ScrollView(.horizontal) {
+                VStack(spacing: 0) {
+                    ForEach(rows.indices, id: \.self) { index in
+                        numberRow(rows[index])
+                    }
+                }
+            }
+            .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+            // Keep the headings over their columns as the numbers scroll.
+            .onScrollGeometryChange(for: CGFloat.self) { geometry in
+                geometry.contentOffset.x + geometry.contentInsets.leading
+            } action: { _, offset in
+                scrolledSideways = offset
+            }
+        }
     }
 
     // MARK: Headings
