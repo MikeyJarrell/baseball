@@ -44,6 +44,9 @@ public final class GameSession {
     /// The number of events when the scorer said "Later" to the defense check. The check
     /// stays closed until something else is recorded.
     public private(set) var defenseCheckPostponedAt: Int?
+    /// The number of events when the scorer backed out of the "who runs?" prompt without
+    /// answering. It stays closed until something else is recorded.
+    public private(set) var nonRunnerPromptPostponedAt: Int?
 
     /// Where games are saved.
     private let storage: any ScorebookStorage
@@ -117,7 +120,7 @@ public final class GameSession {
     /// engine says one just reached base, and the scorer has not already said they run.
     public var showsNonRunnerPrompt: Bool {
         guard let choice = situation.runnerChoice, !situation.isFinal else { return false }
-        return choice.nonRunner != nonRunnerRunsThemselves
+        return choice.nonRunner != nonRunnerRunsThemselves && nonRunnerPromptPostponedAt != game.events.count
     }
 
     /// True when the defense check should be open: our team is taking the field, and the
@@ -212,6 +215,7 @@ public final class GameSession {
         redoStack.append(taken)
         // Undoing past the "Later" moment brings the defense check back.
         if let postponed = defenseCheckPostponedAt, postponed > game.events.count { defenseCheckPostponedAt = nil }
+        if let postponed = nonRunnerPromptPostponedAt, postponed > game.events.count { nonRunnerPromptPostponedAt = nil }
         return true
     }
 
@@ -257,6 +261,14 @@ public final class GameSession {
         return engine.replay(earlier).situation
     }
 
+    /// Where the game stood just before one earlier event, so that event can be entered again
+    /// from the same spot when the scorer fixes it from the play-by-play.
+    public func situation(before id: EventID) -> Situation? {
+        guard let index = game.events.firstIndex(where: { $0.id == id }) else { return nil }
+        let earlier = Game(id: game.id, setup: game.setup, events: Array(game.events[..<index]))
+        return engine.replay(earlier).situation
+    }
+
     /// Applies a change to an earlier event from the play-by-play (replace, delete or insert),
     /// then works out everything after it again. Clears Redo.
     @discardableResult
@@ -287,6 +299,11 @@ public final class GameSession {
     /// The scorer let the designated non-runner run themselves: keep the prompt closed for them.
     public func letNonRunnerRun() {
         nonRunnerRunsThemselves = situation.runnerChoice?.nonRunner
+    }
+
+    /// The scorer backed out of the "who runs?" prompt: keep it closed until the next event.
+    public func postponeNonRunnerPrompt() {
+        nonRunnerPromptPostponedAt = game.events.count
     }
 
     /// The scorer said "Later" to the defense check: keep it closed until the next event.
