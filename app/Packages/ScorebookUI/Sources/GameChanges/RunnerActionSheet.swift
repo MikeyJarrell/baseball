@@ -18,6 +18,7 @@ import DesignSystem
 public struct RunnerActionSheet: View {
     var context: GameChangeContext
     var suggest: (RunnerMoveReason, [PlayerID]) -> [RunnerMove]
+    var followsStrikeout: Bool
     var onFinish: (GameChangeResult) -> Void
 
     /// The runners the scorer has chosen.
@@ -32,12 +33,17 @@ public struct RunnerActionSheet: View {
     ///   - runner: The runner the scorer tapped. Leave it out to start with the lead runner.
     ///   - suggest: Where the runners most likely ended up, for a reason and the runners
     ///     chosen: the rules engine's `suggestRunnerAction(_:runners:in:)` for this situation.
+    ///   - followsStrikeout: True when the last event was a strikeout in this half-inning
+    ///     (`RunnerActionBuilder.followsStrikeout(log:situation:)`): the sheet then offers
+    ///     "same pitch as the strikeout" for a runner put out.
     ///   - onFinish: Called once with the event to record, or `.cancel`.
     public init(context: GameChangeContext, runner: PlayerID? = nil,
                 suggest: @escaping (RunnerMoveReason, [PlayerID]) -> [RunnerMove],
+                followsStrikeout: Bool = false,
                 onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
         self.suggest = suggest
+        self.followsStrikeout = followsStrikeout
         self.onFinish = onFinish
         let start = runner ?? context.runnersLeadFirst.first?.runner
         _chosen = State(initialValue: start.map { [$0] } ?? [])
@@ -74,7 +80,7 @@ public struct RunnerActionSheet: View {
             // The next pages open inside this sheet's own navigation stack.
             .navigationDestination(item: $reason) { reason in
                 RunnerActionConfirmPage(context: context, reason: reason, runners: runnersMoving(for: reason),
-                                        suggest: suggest, onFinish: onFinish)
+                                        suggest: suggest, followsStrikeout: followsStrikeout, onFinish: onFinish)
             }
             .navigationDestination(isPresented: $pinchRunning) {
                 PinchRunnerSheet(context: context, base: firstChosenBase, onFinish: onFinish)
@@ -179,8 +185,11 @@ public struct RunnerActionSheet: View {
 struct RunnerActionConfirmPage: View {
     var context: GameChangeContext
     var reason: RunnerMoveReason
+    var followsStrikeout: Bool
     var onFinish: (GameChangeResult) -> Void
 
+    /// True when the scorer says the out came on the same pitch as the strikeout just before.
+    @State private var sameStrikeoutPitch = false
     @State private var moves: [RunnerMove]
     /// The runner whose out the fielder taps go to.
     @State private var activeRunner: PlayerID?
@@ -192,9 +201,11 @@ struct RunnerActionConfirmPage: View {
     @State private var errorType: ErrorType?
 
     init(context: GameChangeContext, reason: RunnerMoveReason, runners: [PlayerID],
-         suggest: (RunnerMoveReason, [PlayerID]) -> [RunnerMove], onFinish: @escaping (GameChangeResult) -> Void) {
+         suggest: (RunnerMoveReason, [PlayerID]) -> [RunnerMove], followsStrikeout: Bool = false,
+         onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
         self.reason = reason
+        self.followsStrikeout = followsStrikeout
         self.onFinish = onFinish
         // Start from the suggestion; any chosen runner it left out stays where they are.
         var start = suggest(reason, runners)
@@ -233,6 +244,23 @@ struct RunnerActionConfirmPage: View {
 
             ForEach(moves.indices, id: \.self) { i in
                 runnerCard(i)
+            }
+
+            if followsStrikeout && moves.contains(where: { $0.to == .out }) {
+                SectionLabel("Strikeout")
+                Card {
+                    Toggle(isOn: $sameStrikeoutPitch) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Same pitch as the strikeout").font(ScorebookFont.headline)
+                            Text("Strike three and this out make one double play")
+                                .font(ScorebookFont.caption)
+                                .foregroundStyle(ScorebookColor.textSecondary)
+                        }
+                    }
+                    .tint(ScorebookColor.highlight)
+                    .padding(.horizontal, Spacing.large - 2)
+                    .frame(minHeight: 58)
+                }
             }
 
             SectionLabel("Error")
@@ -312,6 +340,17 @@ struct RunnerActionConfirmPage: View {
                             .buttonStyle(ChipStyle(isOn: move.outAt == base))
                     }
                 }
+                if reason == .pickoff {
+                    Toggle(isOn: Binding(get: { moves[i].wasStealing }, set: { moves[i].wasStealing = $0 })) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Picked off while stealing").font(ScorebookFont.headline)
+                            Text("Counts as caught stealing").font(ScorebookFont.caption)
+                                .foregroundStyle(ScorebookColor.textSecondary)
+                        }
+                    }
+                    .tint(ScorebookColor.highlight)
+                    .frame(minHeight: Spacing.minimumTapSize)
+                }
                 HStack {
                     Text(move.outBy.isEmpty ? "Fielders: none tapped" : "Fielders: \(move.outBy.map(\.description).joined(separator: "-"))")
                         .font(ScorebookFont.notation)
@@ -388,7 +427,7 @@ struct RunnerActionConfirmPage: View {
 
     /// The event as it stands (see `RunnerActionBuilder.action`): nothing when no runner moved.
     private var builtAction: RunnerAction? {
-        RunnerActionBuilder.action(moves: moves, picked: reason, errors: errors)
+        RunnerActionBuilder.action(moves: moves, picked: reason, errors: errors, sameStrikeoutPitch: followsStrikeout && sameStrikeoutPitch)
     }
 
     /// "Save", or "Save without fielders" when an out or the error has nobody tapped.

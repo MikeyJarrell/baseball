@@ -25,7 +25,7 @@ import SampleData
 import DesignSystem
 
 /// The five pregame steps.
-enum PregameStep: Hashable, CaseIterable {
+public enum PregameStep: Hashable, CaseIterable, Sendable {
     case game, ours, theirs, pitchers, review
 }
 
