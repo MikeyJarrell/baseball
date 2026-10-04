@@ -85,8 +85,11 @@ final class PlayEntryTests: XCTestCase {
     }
 
     func testARunnerCannotPassTheRunnerAhead() {
+        // The scorer holds the runner from second at third, then sends the runner from first
+        // home. Both are fixed where the scorer put them, so the engine moves neither.
         let (model, _) = enter(PlayEntryDemos.singleRunnerScores,
-                               [.pickResult(.single), .goToRunners, .moveRunner("d3", to: .scored)])
+                               [.pickResult(.single), .goToRunners, .moveRunner("d2", to: .third),
+                                .moveRunner("d3", to: .scored)])
         // The runner from first scored but the runner from second is still on third.
         XCTAssertEqual(model.runnerProblem, "Webb can’t pass Tate")
         XCTAssertFalse(model.canSave)

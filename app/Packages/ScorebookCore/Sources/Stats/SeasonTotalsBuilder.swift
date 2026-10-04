@@ -8,6 +8,9 @@
 // are formulas in Model (`BattingCounts`, `PitchingCounts`); they are worked out from the
 // counts here, and come back missing (printed "—") for a player with no at-bats or a pitcher
 // with no outs, rather than dividing by zero.
+//
+// The season record (wins, losses, ties) counts every finished game among the same games, and
+// each pitcher's wins and losses are counted from the decisions in each game's box score.
 
 import Model
 
@@ -29,6 +32,16 @@ struct SeasonTotalsBuilder {
         var opponentName: String { log.setup[side.opponent].name }
         /// Our team as it lined up for this game, with its roster.
         var team: GameTeam { log.setup[side] }
+        /// The final score, once the game is final; missing for a game still going. The box
+        /// score's runs always equal the final score.
+        var finalScore: Score? {
+            guard box.isFinal else { return nil }
+            return Score(away: box.away.runs, home: box.home.runs)
+        }
+        /// Whether we won, lost or tied; missing for a game still going.
+        var result: GameResult? {
+            finalScore.map { GameResult(score: $0, ourSide: side) }
+        }
     }
 
     /// Adds up the season.
@@ -43,10 +56,15 @@ struct SeasonTotalsBuilder {
             .sorted { ($0.element.log.setup.scheduledStart, $0.offset) < ($1.element.log.setup.scheduledStart, $1.offset) }
             .map(\.element)
 
+        // The record: each finished game's result, counted.
+        let results = games.compactMap(\.result)
         return SeasonTotals(
             teamID: team,
             teamName: games.last?.team.name ?? "",
             games: games.count,
+            wins: results.filter { $0 == .win }.count,
+            losses: results.filter { $0 == .loss }.count,
+            ties: results.filter { $0 == .tie }.count,
             batting: battingLines(games),
             pitching: pitchingLines(games),
             fielding: fieldingLines(games)
@@ -92,18 +110,24 @@ struct SeasonTotalsBuilder {
 
         return players.items.map { player in
             var total = PitchingCounts()
+            var wins = 0
+            var losses = 0
             var gameLog: [GameLogEntry<PitchingCounts>] = []
             for game in games {
                 let lines = game.ours.pitching.filter { $0.player == player }
                 guard !lines.isEmpty else { continue }
                 let stats = lines.reduce(PitchingCounts()) { $0 + $1.stats }
                 total = total + stats
+                // The game's decision, if they got one: the winning or the losing pitcher.
+                if lines.contains(where: { $0.decision == .win }) { wins += 1 }
+                if lines.contains(where: { $0.decision == .loss }) { losses += 1 }
                 gameLog.append(logEntry(game, stats))
             }
             let (name, number) = nameAndNumber(of: player, in: games,
                                                fallback: games.flatMap(\.ours.pitching).first { $0.player == player }?.name)
             return SeasonPitchingLine(player: player, name: name, number: number,
-                                      games: gameLog.count, stats: total, gameLog: gameLog)
+                                      games: gameLog.count, wins: wins, losses: losses,
+                                      stats: total, gameLog: gameLog)
         }
     }
 
@@ -125,10 +149,11 @@ struct SeasonTotalsBuilder {
         }
     }
 
-    /// One game in a player's game-by-game log.
+    /// One game in a player's game-by-game log, with where it was played and how it came out.
     private func logEntry<Counts>(_ game: OurGame, _ stats: Counts) -> GameLogEntry<Counts> {
         GameLogEntry(gameID: game.log.gameID, date: game.log.setup.scheduledStart,
-                     opponentName: game.opponentName, stats: stats)
+                     opponentName: game.opponentName, weAreHome: game.side == .home,
+                     finalScore: game.finalScore, result: game.result, stats: stats)
     }
 
     /// A player's name and number as written in the most recent game that has them on the

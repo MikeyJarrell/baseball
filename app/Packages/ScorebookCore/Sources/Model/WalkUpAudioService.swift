@@ -119,9 +119,9 @@ public struct AudioPlayback: Codable, Equatable, Hashable, Sendable {
     public var phase: Phase
     /// The song playing or coming next after the introduction.
     public var song: SongID?
-    /// When the walk-up song will start fading out by itself: the moment the song started plus
-    /// the walk-up length (or the song's own play length). Missing during the introduction,
-    /// for a warm-up song, and when nothing is playing.
+    /// When the walk-up song starts fading out by itself: 2 seconds before the walk-up length
+    /// (or the song's own play length) is up, so the song is silent exactly at the end of it.
+    /// Missing during the introduction, for a warm-up song, and when nothing is playing.
     public var fadesAt: Date?
 
     public init(phase: Phase, song: SongID? = nil, fadesAt: Date? = nil) {

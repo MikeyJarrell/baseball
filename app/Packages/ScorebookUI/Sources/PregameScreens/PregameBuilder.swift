@@ -123,7 +123,7 @@ public struct PregameDraft: Equatable, Sendable {
             ours = OurLineup.fromLastGame(last[side], roster: input.ourTeam.roster)
             lineupStartedFrom = last
         } else {
-            ours = OurLineup.fromRoster(input.ourTeam.roster, usual: input.usualRoles)
+            ours = OurLineup.fromRoster(input.ourTeam.roster)
             lineupStartedFrom = nil
         }
         theirs = TheirLineup(mode: .unknown)

@@ -2,8 +2,10 @@
 //
 // `BoxScorePrinter.layout` works out every line a newspaper sports page would print for a
 // game: the headline with the score, each team's batting lines (ab r h bi) and totals,
-// the line score by inning, the notes paragraph ("E—Kim, Tate. DP—Mudcats 2."), and the
-// pitching lines (ip h r bb so). `BoxScorePrinter.text` turns that layout into plain text
+// with lettered footnotes for pinch hitters and pinch runners ("a-popped out for Collins
+// in the 4th."), the line score by inning, the notes paragraph ("E—Kim, Tate. DP—Mudcats
+// 2."), the pitching lines (ip h r bb so) with the winning and losing pitchers marked
+// "W" and "L", and the notes under them, ending with the game's length ("T—3:12."). `BoxScorePrinter.text` turns that layout into plain text
 // for the share sheet; the BoxScorePicture module draws the same layout as a picture.
 
 import Foundation
@@ -62,16 +64,123 @@ public enum BoxScorePrinter {
 
     /// One team's batting lines, with substitutes under the player they replaced (the stats
     /// engine already lists them that way) and a totals row at the bottom.
+    ///
+    /// Each pinch hitter and pinch runner gets a letter in front of their name ("a-Moss ph"),
+    /// lettered a, b, c down the team's batting order, and a matching footnote under the
+    /// totals saying what they did and for whom ("a-popped out for Collins in the 4th.").
+    /// A player who simply took over a spot, like a new pitcher, gets no letter.
     static func battingTable(_ team: TeamBoxScore, _ names: ShortNames) -> NewspaperTable {
-        var rows = team.batting.map { line in
-            NewspaperRow(
-                label: "\(names.name(for: line.player, fallback: line.name)) \(positionText(line))",
-                isSubstitute: line.isSubstitute,
-                cells: battingCells(line.stats)
-            )
+        var rows: [NewspaperRow] = []
+        var footnotes: [String] = []
+        for line in team.batting {
+            var label = "\(names.name(for: line.player, fallback: line.name)) \(positionText(line))"
+            if let entered = line.entered, let wording = substituteWording(entered, names) {
+                let letter = footnoteLetter(footnotes.count)
+                label = "\(letter)-\(label)"
+                footnotes.append("\(letter)-\(wording).")
+            }
+            rows.append(NewspaperRow(label: label, isSubstitute: line.isSubstitute, cells: battingCells(line.stats)))
         }
         rows.append(NewspaperRow(label: "Totals", isTotal: true, cells: battingCells(team.battingTotals)))
-        return NewspaperTable(title: team.name, columns: battingColumns, rows: rows)
+        return NewspaperTable(title: team.name, columns: battingColumns, rows: rows, footnotes: footnotes)
+    }
+
+    /// The footnote letter for a team's first, second, third... pinch hitter or runner:
+    /// "a", "b", "c". After "z" (a team would need 27 of them) the letters double: "aa", "bb".
+    static func footnoteLetter(_ index: Int) -> String {
+        let letters = Array("abcdefghijklmnopqrstuvwxyz")
+        return String(repeating: String(letters[index % 26]), count: index / 26 + 1)
+    }
+
+    /// What a pinch hitter or pinch runner did, without the letter: "popped out for Collins
+    /// in the 4th", "ran for Hale in the 7th". A pinch hitter whose turn at bat did not end
+    /// (the inning ended while they were batting) "batted for" the player. A player who came
+    /// in some other way, such as a new pitcher taking the spot, gets no footnote, so this is
+    /// missing for them.
+    static func substituteWording(_ entered: SubstituteEntry, _ names: ShortNames) -> String? {
+        let replaced = names.name(for: entered.replaced, fallback: entered.replacedName)
+        let when = "in the \(ordinal(entered.inning))"
+        switch entered.kind {
+        case .pinchHitter:
+            let did = entered.outcome.map { outcomeWords($0, notation: entered.notation) } ?? "batted"
+            return "\(did) for \(replaced) \(when)"
+        case .pinchRunner:
+            return "ran for \(replaced) \(when)"
+        case .replacement:
+            return nil
+        }
+    }
+
+    /// How a turn at bat ended, in the words a newspaper footnote uses: "singled", "walked",
+    /// "struck out". For an out on a ball in play, the scorebook notation tells what kind of
+    /// ball it was: "F8" flied out, "P6" popped out, "L6" lined out, "6-3" grounded out,
+    /// and a "DP" or "TP" on the end means the batter hit into a double or triple play.
+    static func outcomeWords(_ outcome: PlateAppearanceOutcome, notation: String?) -> String {
+        switch outcome {
+        case .single: return "singled"
+        case .double: return "doubled"
+        case .triple: return "tripled"
+        case .homeRun: return "homered"
+        case .walk: return "walked"
+        case .intentionalWalk: return "was intentionally walked"
+        case .hitByPitch: return "was hit by a pitch"
+        case .strikeout: return "struck out"
+        case .sacrificeFly: return "hit a sacrifice fly"
+        case .sacrificeBunt: return "sacrificed"
+        case .reachedOnError: return "reached on an error"
+        case .fieldersChoice: return "hit into a fielder's choice"
+        case .catchersInterference: return "reached on catcher's interference"
+        case .out: return outWords(notation)
+        }
+    }
+
+    /// The words for an out on a ball in play, read from its scorebook notation. The first
+    /// part of the notation is the play ("L4-3"); a " DP" or " TP" after it is a double or
+    /// triple play. With no notation, or one that does not say how the ball was hit (a
+    /// lone "4"), the batter just "made an out".
+    static func outWords(_ notation: String?) -> String {
+        let text = notation ?? ""
+        let play = text.split(separator: " ").first.map(String.init) ?? ""
+        let multiple: String? = text.contains(" TP") ? "triple play" : text.contains(" DP") ? "double play" : nil
+        let first = play.first
+        let startsWithFielder = first?.isNumber == true
+        if first == "F" || first == "P" {
+            // A fly ball or a pop-up.
+            if let multiple { return "hit into a \(multiple)" }
+            return first == "F" ? "flied out" : "popped out"
+        }
+        if first == "L" {
+            // A line drive.
+            if let multiple { return "lined into a \(multiple)" }
+            return "lined out"
+        }
+        if startsWithFielder && (play.contains("-") || play.hasSuffix("U")) {
+            // Fielders' numbers alone, thrown to a base ("6-3") or a fielder stepping on the
+            // base alone ("3U"): a ground ball.
+            if let multiple { return "grounded into a \(multiple)" }
+            return "grounded out"
+        }
+        if let multiple { return "hit into a \(multiple)" }
+        return "made an out"
+    }
+
+    /// An inning number as a newspaper writes it: "1st", "2nd", "3rd", "4th", "11th", "21st".
+    static func ordinal(_ number: Int) -> String {
+        let lastTwo = number % 100
+        if (11...13).contains(lastTwo) { return "\(number)th" }
+        switch number % 10 {
+        case 1: return "\(number)st"
+        case 2: return "\(number)nd"
+        case 3: return "\(number)rd"
+        default: return "\(number)th"
+        }
+    }
+
+    /// Several innings as a newspaper lists them: "3rd", "3rd and 5th", "3rd, 5th and 7th".
+    static func inningList(_ innings: [Int]) -> String {
+        let words = innings.map(ordinal)
+        guard words.count > 1 else { return words.first ?? "" }
+        return words.dropLast().joined(separator: ", ") + " and " + words.last!
     }
 
     /// The positions a batter played, joined by dashes: "ss", "ph-2b". A starter who only
@@ -118,6 +227,8 @@ public enum BoxScorePrinter {
     /// The notes under the line score, in the newspaper's usual order: errors, double plays,
     /// triple plays, runners left on base, doubles, triples, home runs, stolen bases, caught
     /// stealing, sacrifice bunts ("S"), sacrifice flies. A note with nobody in it is left out.
+    /// Last come the runners for designated non-runners, a sentence each ("Webb ran for
+    /// Quinn in the 3rd.").
     static func notes(_ box: BoxScore, _ names: ShortNames) -> [String] {
         let n = box.notes
         let entries: [(String, String?)] = [
@@ -134,6 +245,22 @@ public enum BoxScorePrinter {
             ("SF", playerList(n.sacrificeFlies, names)),
         ]
         return entries.compactMap { label, list in list.map { "\(label)—\($0)." } }
+            + ranForNonRunnersNotes(box, names)
+    }
+
+    /// One sentence for each player who ran for a designated non-runner, visitors first:
+    /// "Webb ran for Quinn in the 3rd." or, for several innings, "in the 3rd and 5th."
+    /// (A designated non-runner is a batter who, under the league's rule, does not run the
+    /// bases; someone else runs for them once they reach base.)
+    static func ranForNonRunnersNotes(_ box: BoxScore, _ names: ShortNames) -> [String] {
+        let all = box.notes.ranForNonRunners
+        let ordered = all.filter { $0.team == .away } + all.filter { $0.team == .home }
+        return ordered.map { note in
+            let runner = names.name(for: note.runner, fallback: note.runnerName)
+            let nonRunner = names.name(for: note.nonRunner, fallback: note.nonRunnerName)
+            let when = note.innings.isEmpty ? "" : " in the \(inningList(note.innings))"
+            return "\(runner) ran for \(nonRunner)\(when)."
+        }
     }
 
     /// Players for one note, visitors first: "Ruiz 2, Webb, Cole". The count is printed only
@@ -164,11 +291,13 @@ public enum BoxScorePrinter {
 
     // MARK: - Pitching
 
-    /// One team's pitchers, in the order they pitched.
+    /// One team's pitchers, in the order they pitched. The winning pitcher has a "W" after
+    /// their name and the losing pitcher an "L" ("Barros W"), as newspapers print it. A
+    /// newspaper adds the pitcher's season record ("W, 4-1"), but records are not kept.
     static func pitchingTable(_ team: TeamBoxScore, _ names: ShortNames) -> NewspaperTable {
         let rows = team.pitching.map { line in
             NewspaperRow(
-                label: names.name(for: line.player, fallback: line.name),
+                label: names.name(for: line.player, fallback: line.name) + decisionText(line.decision),
                 cells: [
                     inningsPitchedText(line.stats.outsRecorded),
                     String(line.stats.hits), String(line.stats.runs),
@@ -177,6 +306,16 @@ public enum BoxScorePrinter {
             )
         }
         return NewspaperTable(title: team.name, columns: pitchingColumns, rows: rows)
+    }
+
+    /// The mark after a pitcher's name for the game's decision: " W" for the winning
+    /// pitcher, " L" for the losing pitcher, and nothing for everyone else.
+    static func decisionText(_ decision: PitchingDecision?) -> String {
+        switch decision {
+        case .win: return " W"
+        case .loss: return " L"
+        case nil: return ""
+        }
     }
 
     /// Innings pitched the way an old-time newspaper printed them: "5", "4⅓", "⅔", "0",
@@ -190,9 +329,9 @@ public enum BoxScorePrinter {
     }
 
     /// The notes under the pitching lines: batters hit by a pitch, then each pitcher's
-    /// pitches and strikes. A pitcher whose pitches were not counted still appears, with a
-    /// dash, so nobody reads them as not having pitched; if no pitches were counted for
-    /// anybody, the note is left out.
+    /// pitches and strikes, then how long the game took. A pitcher whose pitches were not
+    /// counted still appears, with a dash, so nobody reads them as not having pitched; if no
+    /// pitches were counted for anybody, the note is left out.
     static func pitchingNotes(_ box: BoxScore, _ names: ShortNames) -> [String] {
         var result: [String] = []
         if let hitByPitch = hitByPitchNote(box, names) {
@@ -207,12 +346,65 @@ public enum BoxScorePrinter {
             }
             result.append("Pitches-strikes—\(list.joined(separator: ", ")).")
         }
+        if let length = gameLengthText(box.gameLength) {
+            result.append("T—\(length).")
+        }
         return result
     }
 
-    /// Batters hit by a pitch. When only one pitcher on the other team hit anybody, it
-    /// names them the newspaper way, "by Reyes (Ford)"; otherwise it lists the batters.
+    /// How long the game took, as hours and minutes the newspaper way: 11,552 seconds is
+    /// "3:12" (any leftover seconds are dropped, not rounded up). Missing when the length
+    /// is not known, as before the game ends.
+    static func gameLengthText(_ seconds: TimeInterval?) -> String? {
+        guard let seconds, seconds.isFinite, seconds >= 0 else { return nil }
+        let minutes = Int(seconds) / 60
+        return "\(minutes / 60):" + String(format: "%02d", minutes % 60)
+    }
+
+    /// Batters hit by a pitch, grouped under the pitcher who hit them, the newspaper way:
+    /// "by Reyes (Ford)", or "by Collins (Webb), by Reyes (Ford, Tate 2)" when two pitchers
+    /// hit batters. Pitchers come in the order they pitched, visitors' pitchers first. A
+    /// batter hit when nobody knew who was pitching is listed on their own at the end.
+    ///
+    /// Box scores saved before the app recorded who hit whom fall back to the older note
+    /// (see `olderHitByPitchNote`).
     static func hitByPitchNote(_ box: BoxScore, _ names: ShortNames) -> String? {
+        let hit = box.notes.hitBatters.filter { $0.count > 0 }
+        guard !hit.isEmpty else { return olderHitByPitchNote(box, names) }
+
+        // Group the hit batters by pitcher, keeping each pitcher's batters in the order given.
+        var pitchers: [PlayerID?] = []
+        var battersByPitcher: [PlayerID?: [HitBatterNote]] = [:]
+        for note in hit {
+            if battersByPitcher[note.pitcher] == nil { pitchers.append(note.pitcher) }
+            battersByPitcher[note.pitcher, default: []].append(note)
+        }
+        // Pitchers in the order they appear in the pitching lines; an unknown pitcher last.
+        let pitchingOrder = (box.away.pitching + box.home.pitching).map(\.player)
+        func place(_ pitcher: PlayerID?) -> Int {
+            guard let pitcher else { return Int.max }
+            return pitchingOrder.firstIndex(of: pitcher) ?? pitchingOrder.count
+        }
+        let ordered = pitchers.enumerated()
+            .sorted { (place($0.element), $0.offset) < (place($1.element), $1.offset) }
+            .map(\.element)
+
+        let parts = ordered.map { pitcher -> String in
+            let notes = battersByPitcher[pitcher]!
+            let batters = notes.map { note in
+                let name = names.name(for: note.batter, fallback: note.batterName)
+                return note.count > 1 ? "\(name) \(note.count)" : name
+            }.joined(separator: ", ")
+            guard let pitcher, let first = notes.first else { return batters }
+            return "by \(names.name(for: pitcher, fallback: first.pitcherName ?? "")) (\(batters))"
+        }
+        return parts.joined(separator: ", ")
+    }
+
+    /// The hit-by-pitch note for a box score that names only the batters hit, not who hit
+    /// them. When only one pitcher on the other team hit anybody, it names them the
+    /// newspaper way, "by Reyes (Ford)"; otherwise it lists the batters.
+    static func olderHitByPitchNote(_ box: BoxScore, _ names: ShortNames) -> String? {
         var parts: [String] = []
         for side in TeamSide.allCases {
             let batters = box.notes.hitByPitch.filter { $0.team == side }
