@@ -73,6 +73,25 @@ enum PostgameWording {
         return date.formatted(style)
     }
 
+    /// The question before deleting a game: "Delete Diamond Dogs vs Mudcats, Oct 4?". Without
+    /// our team's name, "Delete the game vs Mudcats, Oct 4?".
+    static func deleteQuestion(_ game: GameSummary, ourTeamName: String?, calendar: Calendar = .current) -> String {
+        "Delete \(ourTeamName ?? "the game") \(opponent(game)), \(shortDate(game.date, calendar: calendar))?"
+    }
+
+    /// The question before deleting a game from its box score: "Delete Diamond Dogs vs
+    /// Mudcats, Oct 4?" with our team's name first, or "Delete Mudcats at Bombers, Oct 4?" when
+    /// neither team is ours.
+    static func deleteQuestion(_ box: BoxScore, ourSide: TeamSide?, calendar: Calendar = .current) -> String {
+        let date = shortDate(box.date, calendar: calendar)
+        guard let ours = ourSide else { return "Delete \(box.away.name) at \(box.home.name), \(date)?" }
+        let words = ours == .home ? "vs" : "at"
+        return "Delete \(box[ours].name) \(words) \(box[ours.opponent].name), \(date)?"
+    }
+
+    /// Under the delete question.
+    static let deleteWarning = "This can’t be undone in the app. A backup of everything is written first."
+
     /// A short date for a game log row: "Oct 3".
     static func shortDate(_ date: Date, calendar: Calendar = .current) -> String {
         let style = Date.FormatStyle(date: .omitted, time: .omitted, locale: Locale(identifier: "en_US"),

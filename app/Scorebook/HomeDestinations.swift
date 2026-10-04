@@ -33,7 +33,8 @@ struct HomeDestination: View {
                 EmptyPage(text: "Set up your team in Teams, and the season stats will build up game by game.")
             }
         case .games:
-            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count, onRequest: handle)
+            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count,
+                            ourTeamName: app.ourTeam?.name, onRequest: handle)
         case .boxScore(let id):
             SavedBoxScore(id: id, onRequest: handle)
         case .player(let id):
@@ -66,6 +67,10 @@ struct HomeDestination: View {
             Task { await app.updateSettings { $0.minimumPlateAppearances = n } }
         case .setMinimumInnings(let n):
             Task { await app.updateSettings { $0.minimumInnings = n } }
+        case .deleteGame(let id):
+            // Deleted from its own box score: go back to the list it was opened from.
+            if route == .boxScore(id), !path.isEmpty { path.removeLast() }
+            Task { await app.deleteGame(id) }
         }
     }
 }
@@ -80,7 +85,8 @@ struct SavedBoxScore: View {
     var body: some View {
         Group {
             if let box {
-                BoxScorePage(box: box, ourSide: app.ourSide(in: id), showsDoneButton: false, onRequest: onRequest)
+                BoxScorePage(box: box, ourSide: app.ourSide(in: id), showsDoneButton: false, canDelete: true,
+                             onRequest: onRequest)
             } else {
                 ProgressView()
             }
@@ -94,10 +100,13 @@ struct BoxScorePage: View {
     var box: BoxScore
     var ourSide: TeamSide?
     var showsDoneButton: Bool
+    /// True to offer "Delete game" in the top bar's menu: for a saved game from the games list.
+    var canDelete = false
     var onRequest: (PostgameRequest) -> Void
 
     var body: some View {
-        EndOfGameScreen(box: box, ourSide: ourSide, showsDoneButton: showsDoneButton, onRequest: onRequest) {
+        EndOfGameScreen(box: box, ourSide: ourSide, showsDoneButton: showsDoneButton, canDelete: canDelete,
+                        onRequest: onRequest) {
             BoxScorePicture(box)
         } shareButton: {
             BoxScoreShareLink(box)
