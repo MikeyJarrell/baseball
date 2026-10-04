@@ -40,3 +40,14 @@ What held up by hand:
 9. **Tests.** The play-by-play tests run only on the hand-written sample log; none uses a log the rules engine produced. Nothing tests the swipe-and-tap clash in finding 1. Add a test on an engine-produced log, and a UI test for the edge swipe once a UI test target exists.
 
 The comments are clear and readable for a beginner throughout.
+
+## Re-check
+
+**Reviewed:** the fix commit 8802a3d and the work-in-progress commit before it. Checked by hand in a throwaway copy of the app on a simulator made for this check (deleted afterward). All 37 game overview tests pass.
+
+1. **Swipe back: pass.** Swipes starting 6 and 13 points from the left edge went back to the batting screen and opened nothing. A sideways swipe starting 22 points in, just past the new strip, opened “Fix a play” for that row and did not go back. That is one action, so the scorer is no longer sent away with a sheet open. Treating a sideways drag across a row as a tap is still a small trap.
+2. **Delete question: pass.** It hangs off “Delete it” and reads “Delete ‘Cole stole second’ (Bottom 5th)?”, with what deleting does underneath, and both “Delete” and “Keep it” show. “Keep it” kept the play.
+3. **Pitch details: pass.** “Ball to Webb · Bottom 5th · to Webb · count 0–0 before it, 1–0 after”. The batter is named twice.
+4. **Largest text size: pass.** The “At bat” badge now sits above the words. The fix sheet still puts its summary in a narrow column beside the chip, but it reads.
+
+**Elsewhere in the diff:** every team now lists the visitors first, the top bar included (“Mudcats 3, Diamond Dogs 5”). The mockup and the earlier handoff put our team first. Only the game overview’s own folders, its handoff and this file changed.
