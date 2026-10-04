@@ -69,4 +69,45 @@ final class SmokeTests: XCTestCase {
         // Backed out: the inning still ends, so the check comes back.
         XCTAssertTrue(app.buttons["Everyone’s where they were"].waitForExistence(timeout: 5), "the check back again")
     }
+
+    /// Deleting the game in progress from the games list: Edit, Delete, the question naming
+    /// the game, then the list holds only the other game and home offers nothing to resume.
+    @MainActor
+    func testDeleteAGameFromTheGamesList() throws {
+        let finished = SampleGame.game
+        var started = Game(id: "test-game", setup: SampleGame.game.setup)
+        started.setup.scheduledStart = finished.setup.scheduledStart.addingTimeInterval(86_400)
+        started.events = [GameEvent(kind: .defenseConfirmed(DefenseConfirmed(team: .home))),
+                          GameEvent(kind: .pitch(Pitch(.ball)))]
+        let app = try XCUIApplication.launch(seed: TestSeed(teams: [SampleTeams.diamondDogs, SampleTeams.mudcats],
+                                                            games: [finished, started]))
+        // The game in progress opens first; the game menu's Home screen goes back home.
+        XCTAssertTrue(app.buttons["Ball"].waitForExistence(timeout: 10))
+        app.buttons["Game menu"].tap()
+        let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Home screen")).firstMatch
+        XCTAssertTrue(home.waitForExistence(timeout: 3), "Home screen in the game menu")
+        home.tap()
+
+        XCTAssertTrue(app.buttons["Games"].waitForExistence(timeout: 5))
+        app.buttons["Games"].tap()
+        app.buttons["Edit"].tap()
+        let deleteButtons = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Delete vs"))
+        XCTAssertEqual(deleteButtons.count, 2)
+        // Newest first: the game in progress is on top.
+        deleteButtons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.staticTexts["Delete Diamond Dogs vs Mudcats, \(Self.shortDate(started.setup.scheduledStart))?"].waitForExistence(timeout: 3))
+        keepScreenshot(app, named: "delete question")
+        app.buttons["Delete game"].tap()
+
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Delete vs")).firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Delete vs")).count, 1)
+        app.navigationBars.buttons.element(boundBy: 0).tap()
+        XCTAssertTrue(app.buttons["New game"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Resume scoring")).firstMatch.exists)
+    }
+
+    /// "Oct 4", as the app writes a date in the question.
+    static func shortDate(_ date: Date) -> String {
+        date.formatted(Date.FormatStyle(date: .omitted, time: .omitted, locale: Locale(identifier: "en_US")).month(.abbreviated).day())
+    }
 }
