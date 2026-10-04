@@ -7,22 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9BDF2142D95EF1164D12F0BA /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = CC89CC60197ABE4B8DAA1F0A /* Model */; };
-		67F48B20D992E7CC21640133 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 8CB2AC0EEEBAB22A22251243 /* SampleData */; };
-		E6B2682416F97A324CEF719D /* GameEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 622CB478C0FD8441CA74378B /* GameEngine */; };
-		6CF67A8F9864168243E880CB /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 328DC2C6A5667AE3C2898FEB /* Stats */; };
-		9E6ED0139D2AA734F660E7E6 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */; };
-		7AC57166B0081561163F49B8 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 662BE0BD463F7EAF3EB7635F /* Storage */; };
-		92D7AC0E8D896641D9F5CBBE /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 223BD1BB5891A21BF2DA2BF7 /* DesignSystem */; };
-		8FED08182EE376D3A709949B /* WalkUpAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B7B376ED18E0447125424568 /* WalkUpAudio */; };
-		DC048E4653BD05939F11935C /* BoxScorePicture in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */; };
-		373B0E68AC5FBF13CE44F5C0 /* TeamScreens in Frameworks */ = {isa = PBXBuildFile; productRef = 44C43781EE93736D19D97407 /* TeamScreens */; };
 		140548D1B3290A4BB4FB3C14 /* PregameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = E005FA8C0AF41DB2945D4130 /* PregameScreens */; };
-		E31E8E6A35117BC91BFF048F /* AtBatScreen in Frameworks */ = {isa = PBXBuildFile; productRef = 3738290C16A704D6D03AA7DA /* AtBatScreen */; };
 		2B70A26A9038151A6F062F0E /* PlayEntry in Frameworks */ = {isa = PBXBuildFile; productRef = 760347CAC3A9DEAA351E9E3E /* PlayEntry */; };
-		66F6F025F23E59807C51B867 /* GameChanges in Frameworks */ = {isa = PBXBuildFile; productRef = D584782B09732B49596F2964 /* GameChanges */; };
-		AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */ = {isa = PBXBuildFile; productRef = C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */; };
-		928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = F1776B435852E7A7A42C154E /* PostgameScreens */; };
+		373B0E68AC5FBF13CE44F5C0 /* TeamScreens in Frameworks */ = {isa = PBXBuildFile; productRef = 44C43781EE93736D19D97407 /* TeamScreens */; };
 		5C0A11E2B7D04F6A9E31C201 /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C202 /* Scoring */; };
 		5C0A11E2B7D04F6A9E31C300 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C301 /* Model */; };
 		5C0A11E2B7D04F6A9E31C302 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C303 /* SampleData */; };
@@ -30,25 +17,20 @@
 		5C0A11E2B7D04F6A9E31C306 /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C307 /* Stats */; };
 		5C0A11E2B7D04F6A9E31C308 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */; };
 		5C0A11E2B7D04F6A9E31C30A /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C30B /* Scoring */; };
+		66F6F025F23E59807C51B867 /* GameChanges in Frameworks */ = {isa = PBXBuildFile; productRef = D584782B09732B49596F2964 /* GameChanges */; };
+		67F48B20D992E7CC21640133 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 8CB2AC0EEEBAB22A22251243 /* SampleData */; };
+		6CF67A8F9864168243E880CB /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 328DC2C6A5667AE3C2898FEB /* Stats */; };
+		7AC57166B0081561163F49B8 /* Storage in Frameworks */ = {isa = PBXBuildFile; productRef = 662BE0BD463F7EAF3EB7635F /* Storage */; };
+		8FED08182EE376D3A709949B /* WalkUpAudio in Frameworks */ = {isa = PBXBuildFile; productRef = B7B376ED18E0447125424568 /* WalkUpAudio */; };
+		928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = F1776B435852E7A7A42C154E /* PostgameScreens */; };
+		92D7AC0E8D896641D9F5CBBE /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 223BD1BB5891A21BF2DA2BF7 /* DesignSystem */; };
+		9BDF2142D95EF1164D12F0BA /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = CC89CC60197ABE4B8DAA1F0A /* Model */; };
+		9E6ED0139D2AA734F660E7E6 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */; };
+		AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */ = {isa = PBXBuildFile; productRef = C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */; };
+		DC048E4653BD05939F11935C /* BoxScorePicture in Frameworks */ = {isa = PBXBuildFile; productRef = D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */; };
+		E31E8E6A35117BC91BFF048F /* AtBatScreen in Frameworks */ = {isa = PBXBuildFile; productRef = 3738290C16A704D6D03AA7DA /* AtBatScreen */; };
+		E6B2682416F97A324CEF719D /* GameEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 622CB478C0FD8441CA74378B /* GameEngine */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXFileReference section */
-		7F6D01D6546BCD07518D8398 /* Scorebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scorebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScorebookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-/* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		74C61EEF9C048939045A3EDA /* Scorebook */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Scorebook;
-			sourceTree = "<group>";
-		};
-		5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = ScorebookUITests;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXContainerItemProxy section */
 		5C0A11E2B7D04F6A9E31C212 /* PBXContainerItemProxy */ = {
@@ -59,6 +41,24 @@
 			remoteInfo = Scorebook;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScorebookUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F6D01D6546BCD07518D8398 /* Scorebook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Scorebook.app; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ScorebookUITests;
+			sourceTree = "<group>";
+		};
+		74C61EEF9C048939045A3EDA /* Scorebook */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Scorebook;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		059DB2086B49B680F85B3555 /* Frameworks */ = {
@@ -101,15 +101,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		2B731CEFC6751AAE0EC69B98 = {
-			isa = PBXGroup;
-			children = (
-				74C61EEF9C048939045A3EDA /* Scorebook */,
-				5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */,
-				0A2C978E52A76F0AA9F68BB5 /* Products */,
-			);
-			sourceTree = "<group>";
-		};
 		0A2C978E52A76F0AA9F68BB5 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,6 +108,15 @@
 				5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		2B731CEFC6751AAE0EC69B98 = {
+			isa = PBXGroup;
+			children = (
+				74C61EEF9C048939045A3EDA /* Scorebook */,
+				5C0A11E2B7D04F6A9E31C211 /* ScorebookUITests */,
+				0A2C978E52A76F0AA9F68BB5 /* Products */,
+			);
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -234,14 +234,14 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B9C6EB6F79FC54535ACB3053 /* Resources */ = {
+		5C0A11E2B7D04F6A9E31C217 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5C0A11E2B7D04F6A9E31C217 /* Resources */ = {
+		B9C6EB6F79FC54535ACB3053 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -251,14 +251,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		FCA229C23F166EBB0BA5029E /* Sources */ = {
+		5C0A11E2B7D04F6A9E31C216 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		5C0A11E2B7D04F6A9E31C216 /* Sources */ = {
+		FCA229C23F166EBB0BA5029E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -276,122 +276,6 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		F25EF7827B5210B4D9103995 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ENABLE_MODULES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_FAST_MATH = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 6.0;
-			};
-			name = Debug;
-		};
-		B7DFA010494D99B3247DD1DF /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
-				CLANG_ENABLE_MODULES = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu17;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
-				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
-				MTL_FAST_MATH = YES;
-				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_VERSION = 6.0;
-				VALIDATE_PRODUCT = YES;
-			};
-			name = Release;
-		};
-		9551FA205EEDB822C0C0C876 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Scorebook-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
-				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		B13417540F0CA686AB156AEE /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Scorebook-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
-				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_VERSION = 6.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		5C0A11E2B7D04F6A9E31C219 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -426,14 +310,132 @@
 			};
 			name = Release;
 		};
+		9551FA205EEDB822C0C0C876 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2U9RH88978;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Scorebook-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B13417540F0CA686AB156AEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 2U9RH88978;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Scorebook-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
+				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.mikeyjarrell.scorebook;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B7DFA010494D99B3247DD1DF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F25EF7827B5210B4D9103995 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		CDC8A1029C4F3E06784CCFF1 /* Build configuration list for PBXProject "Scorebook" */ = {
+		5C0A11E2B7D04F6A9E31C215 /* Build configuration list for PBXNativeTarget "ScorebookUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				F25EF7827B5210B4D9103995 /* Debug */,
-				B7DFA010494D99B3247DD1DF /* Release */,
+				5C0A11E2B7D04F6A9E31C219 /* Debug */,
+				5C0A11E2B7D04F6A9E31C21A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -447,11 +449,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		5C0A11E2B7D04F6A9E31C215 /* Build configuration list for PBXNativeTarget "ScorebookUITests" */ = {
+		CDC8A1029C4F3E06784CCFF1 /* Build configuration list for PBXProject "Scorebook" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				5C0A11E2B7D04F6A9E31C219 /* Debug */,
-				5C0A11E2B7D04F6A9E31C21A /* Release */,
+				F25EF7827B5210B4D9103995 /* Debug */,
+				B7DFA010494D99B3247DD1DF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -470,85 +472,25 @@
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CC89CC60197ABE4B8DAA1F0A /* Model */ = {
+		223BD1BB5891A21BF2DA2BF7 /* DesignSystem */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
-			productName = Model;
-		};
-		8CB2AC0EEEBAB22A22251243 /* SampleData */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
-			productName = SampleData;
-		};
-		622CB478C0FD8441CA74378B /* GameEngine */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
-			productName = GameEngine;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = DesignSystem;
 		};
 		328DC2C6A5667AE3C2898FEB /* Stats */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
 			productName = Stats;
 		};
-		5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
-			productName = BoxScoreText;
-		};
-		662BE0BD463F7EAF3EB7635F /* Storage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
-			productName = Storage;
-		};
-		223BD1BB5891A21BF2DA2BF7 /* DesignSystem */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = DesignSystem;
-		};
-		B7B376ED18E0447125424568 /* WalkUpAudio */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = WalkUpAudio;
-		};
-		D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = BoxScorePicture;
-		};
-		44C43781EE93736D19D97407 /* TeamScreens */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = TeamScreens;
-		};
-		E005FA8C0AF41DB2945D4130 /* PregameScreens */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = PregameScreens;
-		};
 		3738290C16A704D6D03AA7DA /* AtBatScreen */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
 			productName = AtBatScreen;
 		};
-		760347CAC3A9DEAA351E9E3E /* PlayEntry */ = {
+		44C43781EE93736D19D97407 /* TeamScreens */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = PlayEntry;
-		};
-		D584782B09732B49596F2964 /* GameChanges */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = GameChanges;
-		};
-		C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = GameOverview;
-		};
-		F1776B435852E7A7A42C154E /* PostgameScreens */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
-			productName = PostgameScreens;
+			productName = TeamScreens;
 		};
 		5C0A11E2B7D04F6A9E31C202 /* Scoring */ = {
 			isa = XCSwiftPackageProductDependency;
@@ -584,6 +526,66 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
 			productName = Scoring;
+		};
+		5D412682E2ACFDB1AC3A7A85 /* BoxScoreText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = BoxScoreText;
+		};
+		622CB478C0FD8441CA74378B /* GameEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = GameEngine;
+		};
+		662BE0BD463F7EAF3EB7635F /* Storage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Storage;
+		};
+		760347CAC3A9DEAA351E9E3E /* PlayEntry */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PlayEntry;
+		};
+		8CB2AC0EEEBAB22A22251243 /* SampleData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = SampleData;
+		};
+		B7B376ED18E0447125424568 /* WalkUpAudio */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = WalkUpAudio;
+		};
+		C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = GameOverview;
+		};
+		CC89CC60197ABE4B8DAA1F0A /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Model;
+		};
+		D584782B09732B49596F2964 /* GameChanges */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = GameChanges;
+		};
+		D9A1C84E0571FD1A387C2FEF /* BoxScorePicture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = BoxScorePicture;
+		};
+		E005FA8C0AF41DB2945D4130 /* PregameScreens */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PregameScreens;
+		};
+		F1776B435852E7A7A42C154E /* PostgameScreens */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D09F4885B69C53ADE5CC64CE /* XCLocalSwiftPackageReference "Packages/ScorebookUI" */;
+			productName = PostgameScreens;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
