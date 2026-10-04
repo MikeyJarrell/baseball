@@ -7,8 +7,8 @@
 // Tapping a row opens "Fix a play" (FixPlaySheet). A row the rules engine flagged after an
 // earlier edit shows a warning with what looks wrong.
 //
-// The list stays smooth with hundreds of events: the rows are built once per play log, and
-// only the rows on screen are drawn.
+// The list stays smooth with hundreds of events: the rows are built again only when the play
+// log changes (RowCache), and only the rows on screen are drawn.
 
 import SwiftUI
 import Model
@@ -20,8 +20,8 @@ struct PlaysTab: View {
     var situation: Situation?
     var onAction: (GameOverviewAction) -> Void
 
-    /// Every event as a row, oldest first, built once for this play log.
-    private let rows: [PlayRow]
+    /// Keeps the rows between redraws, so they are built again only for a new play log.
+    @State private var cache = RowCache()
     @State private var showPitches = false
     @State private var fixing: PlayRow?
 
@@ -29,11 +29,10 @@ struct PlaysTab: View {
         self.log = log
         self.situation = situation
         self.onAction = onAction
-        self.rows = PlayByPlay.rows(for: log)
     }
 
     var body: some View {
-        let sections = PlayByPlay.sections(from: rows, showPitches: showPitches)
+        let sections = PlayByPlay.sections(from: cache.rows(for: log), showPitches: showPitches)
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
                 Toggle("Show every pitch", isOn: $showPitches)
@@ -86,6 +85,25 @@ struct PlaysTab: View {
             FixPlaySheet(row: row, onAction: onAction)
                 .presentationDetents([.medium, .large])
         }
+    }
+}
+
+/// Holds the play-by-play rows for the last play log it was asked about. A class, so filling
+/// it in while the screen draws does not make the screen draw again.
+final class RowCache {
+    private var log: PlayLog?
+    private var rows: [PlayRow] = []
+    /// How many times the rows have been built, for the tests.
+    private(set) var builds = 0
+
+    /// The rows for this play log: the ones already built when the log is unchanged.
+    func rows(for log: PlayLog) -> [PlayRow] {
+        if log != self.log {
+            rows = PlayByPlay.rows(for: log)
+            self.log = log
+            builds += 1
+        }
+        return rows
     }
 }
 
@@ -164,8 +182,14 @@ struct PlayRowView: View {
 struct CurrentAtBatRow: View {
     var atBat: CurrentAtBat
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
+        // At the accessibility text sizes the "At bat" badge sits above the words.
+        let layout = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: 10))
+        layout {
             Text("At bat")
                 .font(ScorebookFont.chip)
                 .foregroundStyle(ScorebookColor.onOurTeam)
@@ -173,14 +197,15 @@ struct CurrentAtBatRow: View {
                 .padding(.vertical, 3)
                 .background(ScorebookColor.ourTeam, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
                 .fixedSize()
-                .frame(minWidth: 58)
+                .frame(minWidth: typeSize.isAccessibilitySize ? nil : 58)
             VStack(alignment: .leading, spacing: 2) {
                 Text(atBat.batter).font(ScorebookFont.body.weight(.semibold))
                 Text(atBat.summary)
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.vertical, 10)

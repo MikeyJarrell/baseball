@@ -101,9 +101,10 @@ struct OverviewWordingTests {
         #expect(OverviewWording.battingSummary(reyes) == "has not batted · p")
     }
 
-    @Test func scoreLeadsWithOurTeam() {
+    @Test func visitorsAlwaysComeFirst() {
         let setup = SampleGame.playLog.setup
-        #expect(OverviewWording.score(Score(away: 3, home: 5), setup: setup) == "Diamond Dogs 5, Mudcats 3")
+        #expect(OverviewWording.score(Score(away: 3, home: 5), setup: setup) == "Mudcats 3, Diamond Dogs 5")
+        #expect(OverviewWording.firstSide == .away)
     }
 
     @Test func hitsAreGreen() {

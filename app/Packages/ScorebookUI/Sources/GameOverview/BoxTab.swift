@@ -1,4 +1,4 @@
-// BoxTab: the box score so far, team by team (ours first, as in the mockup). Each batter has
+// BoxTab: the box score so far, team by team (visitors first, as everywhere on the screen). Each batter has
 // a row with their number, name, "2 for 3 · 1 run · cf", and today's plate appearances as
 // scorebook notation chips, hits in green. Substitutes sit indented under the player they
 // replaced, in the order the box score lists them. Anyone who fielded without batting is
@@ -17,8 +17,8 @@ struct BoxTab: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                let first = OverviewWording.firstSide(setup)
-                ForEach([first, first.opponent], id: \.self) { side in
+                // Visitors first, as everywhere on this screen.
+                ForEach([TeamSide.away, .home], id: \.self) { side in
                     teamBlock(boxScore[side], look: setup[side].isOurs ? .ours : .theirs)
                 }
             }
