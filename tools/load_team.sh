@@ -1,8 +1,9 @@
 #!/bin/bash
 # Loads the Diamond Dogs onto the phone: every player from team/roster.csv (with their usual
-# position and role, walk-up song and its start point, and a pitcher's warm-up song), every
-# opponent from team/opponents.csv, every song file from ~/Dropbox/baseball/songs/, and the
-# announcer recordings from ~/Dropbox/baseball/intros/ (made with tools/record_intros.py).
+# position and role, walk-up song and its start point, and a pitcher's warm-up songs, with his
+# extra ones from team/warmup_extras.csv), every opponent from team/opponents.csv, every song
+# file from ~/Dropbox/baseball/songs/, and the announcer recordings from ~/Dropbox/baseball/intros/
+# (made with tools/record_intros.py).
 #
 # Run it from anywhere, with the iPhone plugged into the Mac and unlocked:
 #

@@ -150,13 +150,27 @@ public struct PlayerPage: View {
 
     /// The pitcher warm-up song and a button to change it.
     private func warmUpCard(_ player: Player) -> some View {
-        let song = player.warmUpSongID.flatMap { data.library.song($0) }
+        // With no main song, his first extra song plays his first inning, so it is shown as his song.
+        let mainID = player.warmUpSongID ?? player.extraWarmUpSongIDs.first
+        let song = mainID.flatMap { data.library.song($0) }
+        var extras: [String] = []
+        for id in player.extraWarmUpSongIDs where id != mainID {
+            if let title = data.library.song(id)?.title, !extras.contains(title) { extras.append(title) }
+        }
         let who = player.lastName
         return VStack(alignment: .leading, spacing: 0) {
             SectionLabel("Pitcher warm-up song")
             Card {
                 SongLine(title: song?.title ?? "No warm-up song",
-                         details: "Plays at the changeover when we take the field with \(who) pitching")
+                         details: extras.isEmpty
+                            ? "Plays at the changeover when we take the field with \(who) pitching"
+                            : "Plays at \(who)’s first changeover each game")
+                // Extra songs come from the roster files; later innings shuffle through them.
+                if !extras.isEmpty {
+                    SongLine(title: extras.joined(separator: " · "),
+                             details: "Later innings: one of these at random, each once before any repeats")
+                        .padding(.top, Spacing.medium)
+                }
                 Button(song == nil ? "Pick a warm-up song" : "Change warm-up song") { picking = .warmUp }
                     .buttonStyle(WideButtonStyle(kind: .quiet, compact: true))
                     .padding(.top, Spacing.medium)
