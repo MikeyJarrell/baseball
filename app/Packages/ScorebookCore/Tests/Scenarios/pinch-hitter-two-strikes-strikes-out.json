@@ -1,0 +1,96 @@
+{
+  "description": "Ortiz falls behind 0-2 and Moss pinch-hits. Moss strikes out. Because Moss came in with two strikes, the strikeout and the at-bat are charged to Ortiz (Official Baseball Rules 9.15(b)); Moss has a line with no plate appearance.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "substitution": {
+        "team": "away",
+        "batting": [
+          {
+            "kind": "pinchHitter",
+            "incoming": "m10",
+            "replacing": "m1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "swingingStrike"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "inning": 1,
+      "half": "top",
+      "outs": 1,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "batter": "m2"
+    },
+    "batting": [
+      {
+        "player": "m1",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "strikeouts": 1,
+        "positions": []
+      },
+      {
+        "player": "m10",
+        "plateAppearances": 0,
+        "atBats": 0,
+        "strikeouts": 0,
+        "positions": [
+          "ph"
+        ]
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "strikeouts": 1,
+        "battersFaced": 1,
+        "outsRecorded": 1
+      }
+    ],
+    "teams": [
+      {
+        "team": "away",
+        "battingLines": [
+          "m1",
+          "m10",
+          "m2",
+          "m3",
+          "m4",
+          "m5",
+          "m6",
+          "m7",
+          "m8",
+          "m9"
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "description": "Ortiz doubles to left. Ruiz grounds to short and Tate boots it: Ruiz is safe at first and Ortiz scores from second on the error. No hit and no run batted in for Ruiz; the error is Tate's.",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "ballInPlay": {
+        "batterResult": "double",
+        "battedBall": "lineDrive",
+        "hitLocation": 7,
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "home",
+            "to": "second"
+          }
+        ],
+        "rbi": 0
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "ballInPlay": {
+        "batterResult": "reachedOnError",
+        "battedBall": "groundBall",
+        "fielders": [
+          6
+        ],
+        "runners": [
+          {
+            "runner": "m1",
+            "from": "second",
+            "to": "scored",
+            "advancedOnError": true
+          },
+          {
+            "runner": "m2",
+            "from": "home",
+            "to": "first",
+            "advancedOnError": true
+          }
+        ],
+        "errors": [
+          {
+            "fielder": 6,
+            "type": "fielding"
+          }
+        ],
+        "rbi": 0
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "score": {
+        "away": 1,
+        "home": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m2",
+          "responsiblePitcher": "d9"
+        }
+      ],
+      "batter": "m3"
+    },
+    "notation": [
+      {
+        "event": "e2",
+        "notation": "E6"
+      }
+    ],
+    "batting": [
+      {
+        "player": "m2",
+        "plateAppearances": 1,
+        "atBats": 1,
+        "hits": 0,
+        "runsBattedIn": 0
+      },
+      {
+        "player": "m1",
+        "runs": 1,
+        "doubles": 1
+      }
+    ],
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "runs": 1,
+        "hits": 1,
+        "battersFaced": 2,
+        "outsRecorded": 0
+      }
+    ],
+    "fielding": [
+      {
+        "player": "d2",
+        "errors": 1,
+        "putouts": 0,
+        "assists": 0
+      }
+    ],
+    "teams": [
+      {
+        "team": "home",
+        "errors": 1
+      },
+      {
+        "team": "away",
+        "runs": 1,
+        "hits": 1
+      }
+    ]
+  }
+}

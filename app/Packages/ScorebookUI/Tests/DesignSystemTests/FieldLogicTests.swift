@@ -1,12 +1,12 @@
 // Tests for the field drawing's baseball logic (FieldLogic.swift) and the Strike button's words.
-// Ready for a ScorebookUI test target: move this file into it once the lead builder adds one.
-// They passed against commit-ready DesignSystem code in a scratch package that imported it with @testable.
+// Written by the designer; run with the ScorebookUI package's tests on an iPhone simulator.
 
 import XCTest
 import SwiftUI
 @testable import DesignSystem
 import Model
 
+@MainActor
 final class FieldLogicTests: XCTestCase {
   func testFlyOutBatterTagAtHomeNoPathNoCross() {
     let m = FieldRunnerMarker(runner: "d3", label: "Kowalski", from: .home, to: .out)

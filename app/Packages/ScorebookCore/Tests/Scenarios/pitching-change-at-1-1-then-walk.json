@@ -1,0 +1,104 @@
+{
+  "description": "Barros goes 1-1 on Ortiz and is hurt, so Voss comes in mid-at-bat (league rule 9.12 B 2). Voss throws three balls. At 1-1 the pitcher was not behind in the count, so the walk is Voss's, not Barros's (Official Baseball Rules 9.16(h)).",
+  "setupFile": "standard",
+  "events": [
+    {
+      "id": "e1",
+      "enteredAt": "2026-05-02T18:05:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e2",
+      "enteredAt": "2026-05-02T18:05:40Z",
+      "pitch": {
+        "result": "calledStrike"
+      }
+    },
+    {
+      "id": "e3",
+      "enteredAt": "2026-05-02T18:06:00Z",
+      "pitchingChange": {
+        "team": "home",
+        "newPitcher": "d12"
+      }
+    },
+    {
+      "id": "e4",
+      "enteredAt": "2026-05-02T18:06:20Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e5",
+      "enteredAt": "2026-05-02T18:06:40Z",
+      "pitch": {
+        "result": "ball"
+      }
+    },
+    {
+      "id": "e6",
+      "enteredAt": "2026-05-02T18:07:00Z",
+      "pitch": {
+        "result": "ball"
+      }
+    }
+  ],
+  "expected": {
+    "situation": {
+      "outs": 0,
+      "count": {
+        "balls": 0,
+        "strikes": 0
+      },
+      "runners": [
+        {
+          "base": "first",
+          "runner": "m1",
+          "responsiblePitcher": "d12"
+        }
+      ],
+      "batter": "m2",
+      "pitcher": "d12",
+      "pitchers": [
+        {
+          "pitcher": "d9",
+          "pitches": 2,
+          "strikes": 1,
+          "battersFaced": 0
+        },
+        {
+          "pitcher": "d12",
+          "pitches": 3,
+          "strikes": 0,
+          "battersFaced": 1
+        }
+      ]
+    },
+    "pitching": [
+      {
+        "pitcher": "d9",
+        "walks": 0,
+        "battersFaced": 0,
+        "pitches": 2,
+        "strikes": 1
+      },
+      {
+        "pitcher": "d12",
+        "walks": 1,
+        "battersFaced": 1,
+        "pitches": 3,
+        "strikes": 0
+      }
+    ],
+    "batting": [
+      {
+        "player": "m1",
+        "walks": 1,
+        "atBats": 0
+      }
+    ]
+  }
+}
