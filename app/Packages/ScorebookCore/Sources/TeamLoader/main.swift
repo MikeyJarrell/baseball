@@ -93,15 +93,26 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
 
     // Every announcer piece must play too. Without "Now batting," no pieced introduction
     // can be made, so the names are only used when it is there.
-    let pieces = introsFolder.map(announcerPieces) ?? []
-    for piece in pieces where await playableLength(piece.source) == nil {
-        fail("\(piece.source.path) will not play. Record it again with tools/record_intros.py.")
+    // A piece that will not play (not yet downloaded by Dropbox, say) is left out with a
+    // warning rather than stopping the whole load.
+    var pieces: [(source: URL, appName: String)] = []
+    for piece in introsFolder.map(announcerPieces) ?? [] {
+        if await playableLength(piece.source) == nil {
+            print("WARNING: \(piece.source.path) will not play, so it was left off the phone. Record it again with tools/record_intros.py.")
+        } else {
+            pieces.append(piece)
+        }
     }
     let hasNowBatting = pieces.contains { $0.appName == AnnouncerIntroduction.nowBattingFile }
     let namePrefix = AnnouncerIntroduction.nameFile("").dropLast(4)   // "announcer-name-"
     let recordedNames = hasNowBatting
         ? Set(pieces.filter { $0.appName.hasPrefix(namePrefix) }.map { String($0.appName.dropFirst(namePrefix.count).dropLast(4)) })
         : []
+    // A name recording that matches nobody on the roster is a spelling or file-name slip.
+    let rosterStems = Set(roster.map { RosterWords.fileStem($0.displayName) })
+    for stem in recordedNames.subtracting(rosterStems).sorted() {
+        print("WARNING: the name recording “\(stem)” matches nobody in roster.csv")
+    }
     if !pieces.isEmpty && !hasNowBatting {
         print("No “Now batting” recording yet, so no pieced introductions were set up.")
     }

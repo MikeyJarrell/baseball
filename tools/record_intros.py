@@ -76,7 +76,8 @@ def number_words(number):
 
 def player_slug(row):
     """A plain file name stem from the player's name, matching their song: "bobby-yabumoto"."""
-    name = f"{row['goes_by']} {row['last_name']}".lower()
+    # The first name when "goes by" is blank, as the app does.
+    name = f"{row['goes_by'] or row['first_name']} {row['last_name']}".lower()
     # Drop accents and anything that is not a letter or digit.
     name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode()
     words = "".join(c if c.isalnum() else " " for c in name).split()
@@ -89,7 +90,7 @@ def all_pieces():
     with open(ROSTER, newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             slug = player_slug(row)
-            spoken = f"{row['goes_by']} {row['last_name']}"
+            spoken = f"{row['goes_by'] or row['first_name']} {row['last_name']}"
             pieces.append(("names", slug, INTROS_DIR / "names" / f"{slug}.m4a", spoken))
     numbers = [str(n) for n in range(100)] + ["00"]
     for n in numbers:
@@ -144,6 +145,9 @@ def read_audio(path, filters=None):
 
 def clean_up(raw_wav, out_path):
     """Trims, filters and levels one take, saves it as M4A, and returns a warning or None."""
+    if not raw_wav.exists() or raw_wav.stat().st_size < 1000:
+        return ("Nothing was recorded. Check that the Terminal is allowed to use the microphone "
+                "(System Settings → Privacy & Security → Microphone).")
     # Take out low rumble (desk bumps, air conditioning) below the voice.
     audio = read_audio(raw_wav, filters="highpass=f=70")
     if len(audio) < RATE // 10:
@@ -237,6 +241,9 @@ def main():
         take = raw_dir / f"{kind}-{name}.take.m4a"
         print(f"[{done}/{len(pieces)}]  Say:  {spoken}")
         while True:
+            # Clear out any earlier take, so a failed take never brings back an old one.
+            take.unlink(missing_ok=True)
+            take_wav.unlink(missing_ok=True)
             input("  Press Enter to start recording.")
             record(mic, take_wav)
             warning = clean_up(take_wav, take)
@@ -245,10 +252,15 @@ def main():
             if not take.exists():
                 continue  # nothing usable came out of that take: record again
             play(take)
-            choice = input("  Enter keeps it · r redo · p play again · s skip · q quit: ").strip().lower()
-            while choice == "p":
-                play(take)
+            # Ask until the answer is one of the choices; "p" plays the take again.
+            while True:
                 choice = input("  Enter keeps it · r redo · p play again · s skip · q quit: ").strip().lower()
+                if choice == "p":
+                    play(take)
+                elif choice in ("", "r", "s", "q"):
+                    break
+                else:
+                    print("  Press Enter on its own to keep the take, or type r, p, s or q.")
             if choice == "r":
                 continue
             if choice == "":

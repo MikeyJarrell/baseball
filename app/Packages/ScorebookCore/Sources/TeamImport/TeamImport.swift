@@ -9,9 +9,9 @@
 // The merge never throws anything away. It matches what is already saved by name: a team by
 // its name, a player by their name within the team, a song by its file name. A match keeps
 // its id (so season stats carry over) and anything the CSV leaves blank (a jersey number
-// typed into the app). A player whose name was recorded on the Mac (tools/record_intros.py)
-// gets the introduction pieced together from those recordings, unless they already have one
-// recorded or imported in the app, which is never touched. Players, teams and songs the CSV
+// typed into the app; a jersey number changed in the app, which wins over the file). A player
+// whose name was recorded on the Mac (tools/record_intros.py) and who has no introduction yet
+// gets one pieced together from those recordings; one chosen in the app is never touched. Players, teams and songs the CSV
 // does not mention stay as they are. Games are never touched.
 //
 // The command-line loader (Sources/TeamLoader) reads and writes the files; this module only
@@ -268,7 +268,14 @@ public enum TeamImport {
             let index = ours.roster.firstIndex { names.contains(RosterWords.key($0.name ?? "")) }
             var player = index.map { ours.roster[$0] } ?? Player()
             player.name = row.displayName
-            if !row.number.isEmpty { player.number = row.number }
+            // A number changed in the app during the season wins over the roster file; the
+            // file only fills in a player with no number yet.
+            let phoneNumber = player.number?.trimmingCharacters(in: .whitespaces) ?? ""
+            if phoneNumber.isEmpty, !row.number.isEmpty {
+                player.number = row.number
+            } else if !row.number.isEmpty, phoneNumber != row.number {
+                notes.append("\(row.displayName) wears \(phoneNumber) in the app and \(row.number) in roster.csv; the app’s number was kept")
+            }
             player.bats = RosterWords.battingSide(row.bats) ?? player.bats
             player.throwsWith = RosterWords.hand(row.throwsWith) ?? player.throwsWith
             player.usualPosition = RosterWords.position(row.position)
@@ -283,10 +290,10 @@ public enum TeamImport {
             }
             if let walkUp { player.walkUpSongID = walkUp }
             if let warmUp { player.warmUpSongID = warmUp }
-            // The pieced introduction, unless the scorer recorded or imported one in the app.
+            // The pieced introduction for a player with none yet. One chosen in the app (a
+            // recording, an import, the iPhone voice) is kept.
             let stem = RosterWords.fileStem(row.displayName)
-            let keepsOwn = player.introduction?.source == .recorded || player.introduction?.source == .imported
-            if recordedNames.contains(stem), !keepsOwn {
+            if recordedNames.contains(stem), player.introduction == nil || player.introduction?.source == .pieced {
                 player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
             }
             if let index {
