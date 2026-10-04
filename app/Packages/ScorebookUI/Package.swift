@@ -100,5 +100,48 @@ let package = Package(
             name: "DesignSystemTests",
             dependencies: ["DesignSystem", .product(name: "Model", package: "ScorebookCore")]
         ),
+
+        // One test target per screen module and the audio module, so each builder can test
+        // the plain functions behind their screens without editing this file.
+        .testTarget(
+            name: "AtBatScreenTests",
+            dependencies: ["AtBatScreen", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "PlayEntryTests",
+            dependencies: ["PlayEntry", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "GameChangesTests",
+            dependencies: ["GameChanges", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "TeamScreensTests",
+            dependencies: ["TeamScreens", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "PregameScreensTests",
+            dependencies: ["PregameScreens", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "GameOverviewTests",
+            dependencies: ["GameOverview", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "PostgameScreensTests",
+            dependencies: ["PostgameScreens", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
+        .testTarget(
+            name: "WalkUpAudioTests",
+            dependencies: ["WalkUpAudio", .product(name: "Model", package: "ScorebookCore"),
+                           .product(name: "SampleData", package: "ScorebookCore")]
+        ),
     ]
 )
