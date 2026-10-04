@@ -60,7 +60,9 @@ final class SmokeTests: XCTestCase {
         keepScreenshot(app, named: "defense check after a strikeout")
 
         link.tap()
-        XCTAssertTrue(app.buttons["Thrown out at first"].waitForExistence(timeout: 5), "the dropped-third-strike steps")
+        // The big answer buttons read their title and detail together: "Thrown out at first: …".
+        let thrownOut = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Thrown out at first")).firstMatch
+        XCTAssertTrue(thrownOut.waitForExistence(timeout: 5), "the dropped-third-strike steps")
         keepScreenshot(app, named: "dropped third strike steps")
         app.buttons["Cancel"].tap()
 
