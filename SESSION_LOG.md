@@ -67,3 +67,29 @@ SESSLOG:[2026-10-03 16:46]
 
 ### Context
 The real Diamond Dogs team, schedule and opponents are now in the project, and 8 of 16 walk-up songs are cut and in Dropbox. The league site’s roster tab is broken; each team’s player list is on its home page and loads only after the page opens, so read it in a browser rather than by downloading the page.
+
+---
+
+## [2026-10-03 17:33] iPad check of the scorebook app
+SESSLOG:[2026-10-03 17:33]
+
+**Project(s):** baseball
+
+### Decisions
+- The app stays installable on iPad (it already was). Locking the iPad upright like the iPhone was rejected: Apple is phasing out the setting that lets an iPad app refuse to turn or resize, so every screen must handle any window shape.
+- The batting screen puts the field on the left and the batter and buttons on the right whenever the window is more than 1.2 times wider than tall; the buttons sit at the bottom of their column. The iPhone layout is unchanged.
+- Runner name tags on the field stop growing at 1.6 times their iPhone size.
+- Mikey left the empty space above the buttons in the sideways layout as it is.
+- Every screen builder now checks their screen on an iPad, upright and sideways, before acceptance (`plan/rules-for-agents.md`).
+
+### Follow-ups
+- [ ] The screens still being built get the iPad check before acceptance.
+
+### Files
+- [modified] `app/Packages/ScorebookUI/Sources/AtBatScreen/AtBatScreen.swift` — side-by-side layout when wide
+- [modified] `app/Packages/ScorebookUI/Sources/DesignSystem/FieldDrawing.swift` — runner tag size cap
+- [created] `notes/ipad-check.md` and `notes/ipad-check/` screenshots
+- [modified] `plan/rules-for-agents.md`, `PROJECT_INDEX.md`
+
+### Context
+The batting screen and in-game change sheets were run on the 13-inch iPad Pro and iPad mini simulators. Upright they worked; the fixes were oversized runner tags on the big iPad and a squashed field when sideways. The simulator cannot be rotated from the command line here (no Simulator app, and asking iOS to rotate from code did nothing), so sideways was tested by drawing the screen at sideways size in a throwaway harness.
