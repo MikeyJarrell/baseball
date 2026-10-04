@@ -230,10 +230,10 @@ struct RosterRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 (Text(player.displayName).font(ScorebookFont.headline).foregroundColor(ScorebookColor.textPrimary)
                  + Text(roleText).font(ScorebookFont.caption).foregroundColor(ScorebookColor.textSecondary))
-                    .lineLimit(2)
+                    .lineLimit(4)
                 secondLine
                     .font(ScorebookFont.caption)
-                    .lineLimit(2)
+                    .lineLimit(4)
             }
             Spacer(minLength: 0)
         }

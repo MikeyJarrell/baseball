@@ -64,7 +64,7 @@ struct QuickEntrySheet: View {
                     .font(ScorebookFont.caption.weight(.semibold))
                     .foregroundStyle(ScorebookColor.textSecondary)
 
-                TextField("Number and name: 22 Jordan Webb", text: $line)
+                TextField("22 Jordan Webb", text: $line)
                     .font(.title3.weight(.semibold))
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
