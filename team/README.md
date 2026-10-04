@@ -36,7 +36,7 @@ python3 tools/record_intros.py
 
 It asks for “Now batting,” every player’s name, then every number, one at a time: Enter to start, Enter to stop, then it plays the take back for you to keep or redo. It skips anything already recorded, so it can be stopped and picked up again; a new player in the roster just means running it again. `python3 tools/record_intros.py --redo 22 aidan-kurt` records those pieces again. `python3 tools/record_intros.py closing` records an optional second set of numbers said to end the sentence, voice falling, which the app uses for the last “Number twenty-two.” in place of repeating the first.
 
-Each take is trimmed, cleaned of low rumble, and set to the same loudness as the others, then saved to `~/Dropbox/baseball/intros/` (the untouched take stays in `intros/raw/`). Record without echo: the app adds the stadium echo as it plays. `tools/load_team.sh` copies the pieces onto the phone and gives each player whose name is recorded the pieced introduction, unless they already have one recorded or imported in the app.
+Each take is trimmed, cleaned of low rumble, and set to the same loudness as the others, then saved to `~/Dropbox/baseball/intros/` (the untouched take stays in `intros/raw/`). Record without echo: the app adds the stadium echo as it plays. `tools/load_team.sh` copies the pieces onto the phone and gives each player whose name is recorded and who has no introduction yet the pieced one. An introduction chosen in the app (a recording, an import, the iPhone voice) is kept.
 
 ## Putting the team on the phone
 
@@ -46,4 +46,4 @@ Each take is trimmed, cleaned of low rumble, and set to the same loudness as the
 tools/load_team.sh
 ```
 
-Run it again whenever this folder changes. It backs up what the phone has to `~/Dropbox/baseball/phone-backups/` first, matches players and teams by name so everyone keeps their id and season stats, keeps anything typed into the app that the roster leaves blank (a jersey number, a recorded introduction), and never touches a game. `tools/load_team.sh --simulator` does a trial run on the Mac’s iPhone simulator. The program it runs, `TeamLoader`, is in `app/Packages/ScorebookCore/Sources/TeamLoader/`; the handoff is [plan/handoffs/load-team.md](../plan/handoffs/load-team.md).
+Run it again whenever this folder changes. It backs up what the phone has to `~/Dropbox/baseball/phone-backups/` first, matches players and teams by name so everyone keeps their id and season stats, keeps anything typed into the app that the roster leaves blank (a recorded introduction), keeps a jersey number changed in the app over the roster’s and says so, and never touches a game. `tools/load_team.sh --simulator` does a trial run on the Mac’s iPhone simulator. The program it runs, `TeamLoader`, is in `app/Packages/ScorebookCore/Sources/TeamLoader/`; the handoff is [plan/handoffs/load-team.md](../plan/handoffs/load-team.md).

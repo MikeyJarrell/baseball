@@ -111,17 +111,34 @@ struct TeamImportTests {
         let (roster, opponents) = try realRows()
         var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
         let o = try #require(teams.firstIndex { $0.isOurs })
-        // Mikey recorded Chris's introduction in the app.
+        // Mikey recorded Chris's introduction in the app, and switched Darin to the iPhone voice.
         let chris = try #require(teams[o].roster.firstIndex { $0.name == "Chris Strong" })
         teams[o].roster[chris].introduction = AnnouncerIntroduction(source: .recorded, fileName: "intro-chris.m4a")
+        let darin = try #require(teams[o].roster.firstIndex { $0.name == "Darin Dietrich" })
+        teams[o].roster[darin].introduction = AnnouncerIntroduction(source: .phoneVoice)
 
         let result = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents,
-                                      recordedNames: ["aidan-kurt", "chris-strong"])
+                                      recordedNames: ["aidan-kurt", "chris-strong", "darin-dietrich"])
         let ours = try #require(result.teamsToSave.first { $0.isOurs })
         let intro = { (name: String) in ours.roster.first { $0.name == name }?.introduction }
         #expect(intro("Aidan Kurt") == AnnouncerIntroduction(source: .pieced, fileName: "announcer-name-aidan-kurt.m4a"))
         #expect(intro("Chris Strong")?.source == .recorded)
+        #expect(intro("Darin Dietrich")?.source == .phoneVoice)
         #expect(intro("Mikey Jarrell") == nil)
+    }
+
+    @Test("A number changed in the app is kept over the roster file’s; a blank one is filled in")
+    func numbersFromTheApp() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        let aidan = try #require(teams[o].roster.firstIndex { $0.name == "Aidan Kurt" })
+        #expect(teams[o].roster[aidan].number == "3")   // from roster.csv
+        teams[o].roster[aidan].number = "9"
+        let again = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents)
+        let ours = try #require(again.teamsToSave.first { $0.isOurs })
+        #expect(ours.roster[aidan].number == "9")
+        #expect(again.notes.contains { $0.contains("Aidan Kurt wears 9") })
     }
 
     @Test("File name stems match the Mac scripts: no accents, words joined by dashes")
