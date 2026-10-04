@@ -158,6 +158,8 @@ struct RunnerRow: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(model.name(of: move.runner)))
+        // A fixed name for simulator tests, so they find this runner's buttons by player.
+        .accessibilityIdentifier("runner-row-\(move.runner.rawValue)")
     }
 
     /// One base button: "1st", "2nd", "3rd", "Home" or "Out".
@@ -222,6 +224,9 @@ struct ExtraBaseQuestion: View {
         .background(ScorebookColor.warning.opacity(0.18), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         .padding(.leading, 92)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        // Grouped under a fixed name for simulator tests; VoiceOver still reads each button.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("extra-base-question-\(move.runner.rawValue)")
     }
 
     /// One half of the "on the throw / on an error" switch.
@@ -269,6 +274,9 @@ struct OutQuestion: View {
         .background(ScorebookColor.out.opacity(0.12), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         .padding(.leading, 92)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        // Grouped under a fixed name for simulator tests; VoiceOver still reads each button.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("out-question-\(move.runner.rawValue)")
     }
 }
 

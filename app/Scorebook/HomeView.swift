@@ -32,14 +32,18 @@ enum HomeRoute: Hashable {
 /// The home screen.
 struct HomeView: View {
     @Environment(AppModel.self) private var app
-    /// The pages slid in from the home screen, oldest first.
-    @State private var path: [HomeRoute] = []
+    /// The pages slid in from the home screen, oldest first. A mixed list, because the teams
+    /// and songs pages push their own kind of page onto it.
+    @State private var path = NavigationPath()
     /// True while the pregame screens are open.
     @State private var settingUpGame = false
     /// True while the batting screen is open.
     @State private var scoring = false
     /// True once the app has opened a game left in progress, so it happens only at launch.
     @State private var checkedForGameInProgress = false
+    /// True when "Play ball" saved a new game: the batting screen opens once the pregame
+    /// screens have finished sliding away.
+    @State private var openGameAfterPregame = false
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -55,7 +59,7 @@ struct HomeView: View {
                             .font(ScorebookFont.caption)
                             .foregroundStyle(ScorebookColor.out)
                     }
-                    Button("Backups") { path.append(.backups) }
+                    Button("Backups") { path.append(HomeRoute.backups) }
                         .font(ScorebookFont.body)
                         .tint(ScorebookColor.ourTeamText)
                         .frame(maxWidth: .infinity)
@@ -71,13 +75,19 @@ struct HomeView: View {
             }
         }
         .tint(ScorebookColor.inPlay)
-        .fullScreenCover(isPresented: $settingUpGame) {
-            PregameCover(onStarted: {
-                settingUpGame = false
+        .fullScreenCover(isPresented: $settingUpGame, onDismiss: {
+            if openGameAfterPregame {
+                openGameAfterPregame = false
                 scoring = true
+            }
+        }) {
+            PregameCover(onStarted: {
+                openGameAfterPregame = true
+                settingUpGame = false
             }, onCancel: { settingUpGame = false })
         }
-        .fullScreenCover(isPresented: $scoring) {
+        // Leaving a finished game closes it, so the home screen stops offering to resume it.
+        .fullScreenCover(isPresented: $scoring, onDismiss: { app.closeFinishedGame() }) {
             if let session = app.session {
                 GameScreen(session: session, onLeave: { scoring = false })
             }
@@ -118,12 +128,12 @@ struct HomeView: View {
         let columns = [GridItem(.flexible(), spacing: Spacing.medium), GridItem(.flexible(), spacing: Spacing.medium)]
         return LazyVGrid(columns: columns, spacing: Spacing.medium) {
             HomeTile(title: "New game", isPrimary: true) { newGame() }
-            HomeTile(title: "Teams") { path.append(.teams) }
-            HomeTile(title: "Songs") { path.append(.songs) }
-            HomeTile(title: "Season stats") { path.append(.season) }
-            HomeTile(title: "Games") { path.append(.games) }
+            HomeTile(title: "Teams") { path.append(HomeRoute.teams) }
+            HomeTile(title: "Songs") { path.append(HomeRoute.songs) }
+            HomeTile(title: "Season stats") { path.append(HomeRoute.season) }
+            HomeTile(title: "Games") { path.append(HomeRoute.games) }
             HomeTile(title: "Last box score") {
-                if let game = app.lastFinishedGame { path.append(.boxScore(game.id)) } else { path.append(.games) }
+                if let game = app.lastFinishedGame { path.append(HomeRoute.boxScore(game.id)) } else { path.append(HomeRoute.games) }
             }
         }
     }

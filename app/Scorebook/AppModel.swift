@@ -44,13 +44,20 @@ final class AppModel {
     private(set) var gameSummaries: [GameSummary] = []
     /// Every finished game, oldest first, for the season stats.
     private(set) var finishedGames: [Game] = []
-    /// Saved files that could not be read (a damaged team or game), to mention on screen.
-    private(set) var damagedFiles: [DamagedFile] = []
+    /// Team files that could not be read, to mention on screen.
+    private(set) var damagedTeams: [DamagedFile] = []
+    /// Game files that could not be read, to mention on screen.
+    private(set) var damagedGames: [DamagedFile] = []
+    /// Every saved file that could not be read.
+    var damagedFiles: [DamagedFile] { damagedTeams + damagedGames }
 
     /// The game being scored, if one is open or waiting to be resumed.
     private(set) var session: GameSession?
     /// A message for the scorer when something could not be saved or read.
     var problem: String?
+    /// True when a simulator test started the app: the game screen then carries a hidden
+    /// readout of the game for the test to check.
+    private(set) var isUITest = false
 
     /// The league's rules, shared by every game.
     let engine = ScorebookRulesEngine()
@@ -62,6 +69,7 @@ final class AppModel {
     /// Opens storage and the audio player, reads everything saved, and finds a game in
     /// progress to resume. Called once, when the app starts.
     func load(using launch: LaunchOptions = .fromProcess) async {
+        isUITest = launch.isUITest
         do {
             let folders = try launch.folders()
             let storage = try FileStorage(dataFolder: folders.data, backupsFolder: folders.backups)
@@ -113,15 +121,22 @@ final class AppModel {
         }
     }
 
-    /// Saves one team (new or changed) and reads the list again.
+    /// Saves one team (new or changed). The list in memory changes at once, before the file
+    /// is written, so a second quick change (the next player in quick entry) builds on this one.
     func saveTeam(_ team: Team) async {
+        if let i = teams.firstIndex(where: { $0.id == team.id }) {
+            teams[i] = team
+        } else {
+            teams.append(team)
+            teams.sort { ($0.isOurs ? 0 : 1, $0.name) < ($1.isOurs ? 0 : 1, $1.name) }
+        }
         guard let storage else { return }
         do {
             try await storage.saveTeam(team)
         } catch {
             problem = "\(team.name) could not be saved. (\(error.localizedDescription))"
+            await reloadTeams()
         }
-        await reloadTeams()
     }
 
     /// Deletes one team and reads the list again.
@@ -137,7 +152,7 @@ final class AppModel {
         do {
             let loaded = try await storage.loadTeams()
             teams = loaded.items
-            damagedFiles = loaded.damaged
+            damagedTeams = loaded.damaged
         } catch {
             problem = "The teams could not be read. (\(error.localizedDescription))"
         }
@@ -153,7 +168,7 @@ final class AppModel {
             gameSummaries = list.items
             let finished = try await storage.finishedGames()
             finishedGames = finished.items
-            damagedFiles = (damagedFiles.filter { !$0.fileName.hasPrefix("games") }) + list.damaged
+            damagedGames = list.damaged
         } catch {
             problem = "The saved games could not be read. (\(error.localizedDescription))"
         }

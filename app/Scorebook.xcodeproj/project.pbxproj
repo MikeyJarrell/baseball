@@ -24,6 +24,12 @@
 		AE6F475EAE9F07058AE8D215 /* GameOverview in Frameworks */ = {isa = PBXBuildFile; productRef = C1FCA3533BCAF9FB5EA1A5B8 /* GameOverview */; };
 		928143ACDE54D17F036236D6 /* PostgameScreens in Frameworks */ = {isa = PBXBuildFile; productRef = F1776B435852E7A7A42C154E /* PostgameScreens */; };
 		5C0A11E2B7D04F6A9E31C201 /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C202 /* Scoring */; };
+		5C0A11E2B7D04F6A9E31C300 /* Model in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C301 /* Model */; };
+		5C0A11E2B7D04F6A9E31C302 /* SampleData in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C303 /* SampleData */; };
+		5C0A11E2B7D04F6A9E31C304 /* GameEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C305 /* GameEngine */; };
+		5C0A11E2B7D04F6A9E31C306 /* Stats in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C307 /* Stats */; };
+		5C0A11E2B7D04F6A9E31C308 /* BoxScoreText in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */; };
+		5C0A11E2B7D04F6A9E31C30A /* Scoring in Frameworks */ = {isa = PBXBuildFile; productRef = 5C0A11E2B7D04F6A9E31C30B /* Scoring */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -83,6 +89,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5C0A11E2B7D04F6A9E31C300 /* Model in Frameworks */,
+				5C0A11E2B7D04F6A9E31C302 /* SampleData in Frameworks */,
+				5C0A11E2B7D04F6A9E31C304 /* GameEngine in Frameworks */,
+				5C0A11E2B7D04F6A9E31C306 /* Stats in Frameworks */,
+				5C0A11E2B7D04F6A9E31C308 /* BoxScoreText in Frameworks */,
+				5C0A11E2B7D04F6A9E31C30A /* Scoring in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -167,6 +179,12 @@
 			);
 			name = ScorebookUITests;
 			packageProductDependencies = (
+				5C0A11E2B7D04F6A9E31C301 /* Model */,
+				5C0A11E2B7D04F6A9E31C303 /* SampleData */,
+				5C0A11E2B7D04F6A9E31C305 /* GameEngine */,
+				5C0A11E2B7D04F6A9E31C307 /* Stats */,
+				5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */,
+				5C0A11E2B7D04F6A9E31C30B /* Scoring */,
 			);
 			productName = ScorebookUITests;
 			productReference = 5C0A11E2B7D04F6A9E31C210 /* ScorebookUITests.xctest */;
@@ -533,6 +551,36 @@
 			productName = PostgameScreens;
 		};
 		5C0A11E2B7D04F6A9E31C202 /* Scoring */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Scoring;
+		};
+		5C0A11E2B7D04F6A9E31C301 /* Model */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Model;
+		};
+		5C0A11E2B7D04F6A9E31C303 /* SampleData */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = SampleData;
+		};
+		5C0A11E2B7D04F6A9E31C305 /* GameEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = GameEngine;
+		};
+		5C0A11E2B7D04F6A9E31C307 /* Stats */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = Stats;
+		};
+		5C0A11E2B7D04F6A9E31C309 /* BoxScoreText */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
+			productName = BoxScoreText;
+		};
+		5C0A11E2B7D04F6A9E31C30B /* Scoring */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 57D7544190A716225804BA13 /* XCLocalSwiftPackageReference "Packages/ScorebookCore" */;
 			productName = Scoring;
