@@ -377,20 +377,23 @@ public struct FieldDrawing: View {
         let tags: [(id: PlayerID, label: String, base: Base, isOut: Bool)] =
             runnerMarkers.map { ($0.runner, $0.to == .out ? "\($0.label) out" : $0.label, FieldLogic.tagBase(for: $0), $0.to == .out) }
             + runnersOnBases.sorted { $0.key.order < $1.key.order }.map { ($0.value.runner, $0.value.label, $0.key, false) }
-        let fontSize = max(12, 14 * map.scale)
+        // Tags grow with the drawing, but only up to a point: on an iPad the drawing is three
+        // times its iPhone size, and tags that big crowd the bases.
+        let tagScale = min(map.scale, 1.6)
+        let fontSize = max(12, 14 * tagScale)
         return ZStack(alignment: .topLeading) {
             ForEach(Array(tags.enumerated()), id: \.offset) { _, tag in
                 let sameBase = tags.filter { $0.base == tag.base }
                 let index = sameBase.firstIndex { $0.id == tag.id } ?? 0
-                let spread = (CGFloat(index) - CGFloat(sameBase.count - 1) / 2) * 76 * map.scale
+                let spread = (CGFloat(index) - CGFloat(sameBase.count - 1) / 2) * 76 * tagScale
                 Button { onTap?(.runner(tag.id)) } label: {
                     Text(tag.label)
                         .font(.system(size: fontSize, weight: .bold))
                         .lineLimit(1)
                         .fixedSize()
                         .foregroundStyle(tag.isOut ? ScorebookColor.out : runnerText)
-                        .padding(.horizontal, 10 * map.scale)
-                        .frame(minHeight: 28 * map.scale)
+                        .padding(.horizontal, 10 * tagScale)
+                        .frame(minHeight: 28 * tagScale)
                         .background {
                             if tag.isOut {
                                 Capsule().fill(ScorebookColor.surface)
