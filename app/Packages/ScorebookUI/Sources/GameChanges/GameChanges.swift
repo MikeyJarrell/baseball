@@ -38,6 +38,12 @@ public enum GameChangeResult: Equatable, Sendable {
     /// The scorer finished, and there is nothing to record: the designated non-runner runs
     /// themselves. Close the sheet and do not open it again for this runner.
     case nothingToRecord
+    /// Save this player's edits (if any), then open the shell's name recording for them, so
+    /// their pieced announcer introduction can be made: from the batter sheet's "Record name".
+    case recordName(PlayerEdit)
+    /// Record this event (adding any new players first), then open the name recording for
+    /// this player: from the add-a-hitter sheet's "Add and record name".
+    case recordThenRecordName(EnteredEvent, PlayerID)
     /// The scorer backed out ("Cancel" or "Later"). Nothing changes; a prompt the game raised,
     /// like the defense check, may be shown again later.
     case cancel

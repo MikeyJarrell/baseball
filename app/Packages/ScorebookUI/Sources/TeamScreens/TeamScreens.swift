@@ -224,6 +224,12 @@ public enum TeamScreensRequest: Equatable, Sendable {
 
     /// The scorer has read the messages in `TeamScreensAudio.problems`.
     case dismissProblems
+
+    // The announcer's pieced introduction
+
+    /// Record this player's name for their pieced introduction ("Now batting, number …,
+    /// name"). The app shell opens its name recorder and saves the result on the player.
+    case recordName(PlayerID)
 }
 
 // MARK: - Navigation

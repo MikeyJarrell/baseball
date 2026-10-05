@@ -43,12 +43,15 @@ enum GameSheet: Identifiable, Equatable {
     case pickSong(PlayerID)
     case gameDetails
     case warmUpSongs(PlayerID)
+    /// Record one of our players' names for their announcer introduction.
+    case recordName(PlayerID)
 
     var id: String {
         switch self {
         case .runnerActions(let id): "runner-\(id.rawValue)"
         case .pickSong(let id): "song-\(id.rawValue)"
         case .warmUpSongs(let id): "warm-up-\(id.rawValue)"
+        case .recordName(let id): "name-\(id.rawValue)"
         default: String(describing: self)
         }
     }
@@ -304,6 +307,14 @@ struct GameScreen: View {
             if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
                 WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
             }
+        case .recordName(let id):
+            if let player = session.setup.player(id) {
+                // The saved team's introduction, which may be newer than the game's copy.
+                NameRecordingSheet(player: app.withSavedSongs(player)) { kept in
+                    sheet = nil
+                    if let kept { Task { await app.setNameIntroduction(kept, for: id) } }
+                }
+            }
         }
     }
 
@@ -360,7 +371,31 @@ struct GameScreen: View {
             }
         case .keepOpen(let change):
             apply(change, from: shown)
+        case .recordName(let edit):
+            Task {
+                // Any edits first (a name typed in just now), then the recorder.
+                if edit.player != session.setup.player(edit.player.id) {
+                    guard await session.updatePlayer(edit.player, on: edit.side) else { return }
+                    await app.updateSavedPlayer(edit.player, teamID: session.setup[edit.side].teamID)
+                }
+                await openNameRecorder(for: edit.player.id)
+            }
+        case .recordThenRecordName(let entered, let player):
+            Task {
+                lastChangeWasUndo = false
+                guard await session.record(entered) else { return }
+                for addition in entered.newPlayers {
+                    await app.updateSavedPlayer(addition.player, teamID: session.setup[addition.side].teamID)
+                }
+                await openNameRecorder(for: player)
+            }
         }
+    }
+
+    /// Opens the name recorder once the sheet before it has slid away.
+    private func openNameRecorder(for id: PlayerID) async {
+        try? await Task.sleep(for: .milliseconds(450))
+        sheet = .recordName(id)
     }
 
     /// The scorer closed a prompt without answering: keep it closed until the next event.

@@ -79,7 +79,7 @@ public struct LineupsSheet: View {
                         playerRow(player, title: "\(spot + 1). \(context.name(player))",
                                   detail: LineupWording.position(player, side: side, in: context))
                     } else {
-                        OptionRow(title: "\(spot + 1). Empty spot") {
+                        OptionRow(title: "\(spot + 1). Empty spot", action: {}) {
                             IconBadge(systemName: "minus", tint: ScorebookColor.out)
                         }
                     }

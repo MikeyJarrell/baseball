@@ -191,6 +191,13 @@ public struct PlayerPage: View {
                           systemImage: "mic.fill")
                 }
                 .buttonStyle(WideButtonStyle(kind: .record))
+                // Just the name, pieced together with the shared "Now batting," and their number.
+                Button { onRequest(.recordName(player.id)) } label: {
+                    Label(player.introduction?.source == .pieced ? "Record name again" : "Record name",
+                          systemImage: "person.wave.2")
+                }
+                .buttonStyle(WideButtonStyle(kind: .quiet, compact: true))
+                .padding(.top, Spacing.medium)
                 AdaptiveStack {
                     Button {
                         onRequest(isListening ? .stopPlaying : .playIntroduction(player))

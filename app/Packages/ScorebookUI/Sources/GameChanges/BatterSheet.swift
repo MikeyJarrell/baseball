@@ -80,6 +80,16 @@ public struct BatterSheet: View {
                     SectionLabel("Bats")
                     SegmentedChoice(options: [(BattingSide.left, "Left"), (.right, "Right"), (.switchHitter, "Switch")],
                                     selection: $bats)
+                    if isOurs, let edited, !(edited.name ?? "").isEmpty {
+                        // Our hitter's name, recorded for the announcer's introduction.
+                        Card {
+                            OptionRow(title: "Record name", end: .chevron,
+                                      action: { onFinish(.recordName(PlayerEdit(side: side, player: edited))) }) {
+                                IconBadge(systemName: "mic")
+                            }
+                        }
+                        .padding(.top, Spacing.medium)
+                    }
                 }
             }
             .navigationDestination(isPresented: $pinchHitting) {

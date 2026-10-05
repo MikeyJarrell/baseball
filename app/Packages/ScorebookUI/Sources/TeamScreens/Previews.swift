@@ -99,6 +99,8 @@ public struct TeamScreensDemoState: Equatable, Sendable {
             data.audio.recording = .idle
         case .importIntroduction(let url, let player):
             data.audio.recording = .recorded(player, AnnouncerIntroduction(source: .imported, fileName: url.lastPathComponent))
+        case .recordName:
+            break   // the app shell's recorder; the demo has none
         case .introductionReplaced:
             break
         case .dismissProblems:
@@ -151,6 +153,7 @@ public struct TeamScreensDemoState: Equatable, Sendable {
         case .importIntroduction(let url, _): "Import introduction: \(url.lastPathComponent)"
         case .introductionReplaced(let intro): "No longer used: \(intro.fileName ?? "file")"
         case .dismissProblems: "Messages read"
+        case .recordName: "Record name"
         }
     }
 }
