@@ -214,4 +214,20 @@ struct TeamImportTests {
         #expect(player.lastName == "Torres")
         #expect(player.initialAndLastName == "J. Torres")
     }
+
+    @Test("A name recorded in the app is kept over Dropbox's copy only when it is newer")
+    func appNameRecordingWins() {
+        let early = Date(timeIntervalSince1970: 1_000), late = Date(timeIntervalSince1970: 2_000)
+        #expect(TeamImport.keepsAppRecording(appModified: late, dropboxModified: early))
+        #expect(!TeamImport.keepsAppRecording(appModified: early, dropboxModified: late))
+        #expect(!TeamImport.keepsAppRecording(appModified: nil, dropboxModified: late))
+        #expect(TeamImport.keepsAppRecording(appModified: late, dropboxModified: nil))
+    }
+
+    @Test("Name file stems match the Mac script's: accents dropped, one dash between words")
+    func nameStems() {
+        #expect(AnnouncerIntroduction.nameStem("Joaquín Cañas") == "joaquin-canas")
+        #expect(AnnouncerIntroduction.nameStem("Jackson  Cleary") == "jackson-cleary")
+        #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
+    }
 }

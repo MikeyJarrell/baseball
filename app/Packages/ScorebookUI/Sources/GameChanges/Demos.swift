@@ -264,6 +264,8 @@ func describe(_ result: GameChangeResult) -> String {
     case .updatePlayer(let edit): return "Updated player: \(edit.player.displayName)"
     case .nothingToRecord: return "Nothing to record"
     case .cancel: return "Cancelled"
+    case .recordName(let edit): return "Record name: \(edit.player.displayName)"
+    case .recordThenRecordName(let entered, let player): return "Recorded: \(entered.event.kind.label), then record name for \(player)"
     case .correctLineup(.wasReally(_, let shown, let really)): return "Lineup fixed: \(shown) was \(really.displayName)"
     case .correctLineup(.removeFromOrder(_, let player)): return "Taken out of the order: \(player)"
     case .changeDetails(let change): return "Game details: \(change.innings) innings\(change.switchHomeAndAway ? ", home and away switched" : "")"

@@ -90,9 +90,17 @@ public struct AddHitterSheet: View {
 
             InfoBox(whenTheyBat)
         } footer: {
-            Button(pick == nil ? "Pick a hitter" : "Add to the batting order", action: confirm)
-                .buttonStyle(PrimaryButtonStyle())
-                .disabled(pick == nil)
+            VStack(spacing: Spacing.small) {
+                Button(pick == nil ? "Pick a hitter" : "Add to the batting order") { confirm(recordName: false) }
+                    .buttonStyle(PrimaryButtonStyle())
+                    .disabled(pick == nil)
+                // Our new hitter's name, recorded for the announcer straight after adding them.
+                if context.setup[side].isOurs, pickedName != nil {
+                    Button("Add and record their name") { confirm(recordName: true) }
+                        .font(ScorebookFont.headline)
+                        .frame(minHeight: Spacing.minimumTapSize)
+                }
+            }
         }
     }
 
@@ -124,8 +132,17 @@ public struct AddHitterSheet: View {
         return Text("\(start) When the \(context.teamName(side)) bat next, \(ahead == 1 ? "1 hitter comes" : "\(ahead) hitters come") up first.")
     }
 
-    /// Builds the event and hands it back.
-    private func confirm() {
+    /// The name of the hitter picked, if they have one (for "Add and record their name").
+    private var pickedName: String? {
+        switch pick {
+        case .player(let id): context.player(id)?.name.flatMap { $0.isEmpty ? nil : $0 }
+        case .newPlayer: newName.trimmingCharacters(in: .whitespaces).isEmpty ? nil : newName
+        case nil: nil
+        }
+    }
+
+    /// Builds the event and hands it back, asking for the name recording next if wanted.
+    private func confirm(recordName: Bool) {
         guard let pick else { return }
         var newPlayers: [RosterAddition] = []
         let player: PlayerID
@@ -137,6 +154,7 @@ public struct AddHitterSheet: View {
             newPlayers.append(RosterAddition(side: side, player: made))
             player = made.id
         }
-        onFinish(.record(EnteredEvent(event: GameEvent(kind: .addHitter(AddHitter(team: side, player: player))), newPlayers: newPlayers)))
+        let entered = EnteredEvent(event: GameEvent(kind: .addHitter(AddHitter(team: side, player: player))), newPlayers: newPlayers)
+        onFinish(recordName ? .recordThenRecordName(entered, player) : .record(entered))
     }
 }

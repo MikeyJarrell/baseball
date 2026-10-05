@@ -201,9 +201,7 @@ public enum RosterWords {
     /// A plain file name stem from a player's name, as the Mac scripts make them:
     /// "Joaquín Cañas" is "joaquin-canas".
     public static func fileStem(_ name: String) -> String {
-        let plain = name.lowercased().folding(options: .diacriticInsensitive, locale: nil)
-        let words = plain.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : " " }
-        return String(words).split(separator: " ").joined(separator: "-")
+        AnnouncerIntroduction.nameStem(name)
     }
 
     /// A name for matching: lower case, no accents, single spaces. "Cañas" matches "Canas".
@@ -241,6 +239,15 @@ public struct ImportResult: Sendable {
 }
 
 public enum TeamImport {
+    /// True when a name recording already in the app (recorded there with Record name) should
+    /// be kept rather than replaced by Dropbox's copy: it is newer. Nothing is kept when the
+    /// app has no copy.
+    public static func keepsAppRecording(appModified: Date?, dropboxModified: Date?) -> Bool {
+        guard let appModified else { return false }
+        guard let dropboxModified else { return true }
+        return appModified > dropboxModified
+    }
+
     /// Our team's name and scoreboard name.
     public static let ourTeamName = "Diamond Dogs"
     public static let ourShortName = "DOGS"

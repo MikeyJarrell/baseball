@@ -81,6 +81,16 @@ public struct BatterSheet: View {
                     SegmentedChoice(options: [(BattingSide.left, "Left"), (.right, "Right"), (.switchHitter, "Switch")],
                                     selection: $bats)
                     InfoBox(Text("Kept for the whole game, and saved to the \(context.teamName(side)) roster for next time."))
+                    if isOurs, let edited, !(edited.name ?? "").isEmpty {
+                        // Our hitter's name, recorded for the announcer's introduction.
+                        Card {
+                            OptionRow(title: "Record name", detail: "For the announcer: “Now batting, … \(edited.name ?? "")”",
+                                      end: .chevron, action: { onFinish(.recordName(PlayerEdit(side: side, player: edited))) }) {
+                                IconBadge(systemName: "mic")
+                            }
+                        }
+                        .padding(.top, Spacing.medium)
+                    }
                 }
             }
             .navigationDestination(isPresented: $pinchHitting) {

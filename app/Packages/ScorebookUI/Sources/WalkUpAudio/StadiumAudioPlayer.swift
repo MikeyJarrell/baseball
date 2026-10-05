@@ -482,6 +482,49 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         if pendingRecording == introduction { pendingRecording = nil }
     }
 
+    // MARK: - A player's name, recorded in the app
+
+    /// True when "Now batting," is on the phone. Without it a pieced introduction cannot play.
+    public var hasNowBattingRecording: Bool {
+        FileManager.default.fileExists(atPath: audioFolder.appending(path: AnnouncerIntroduction.nowBattingFile).path)
+    }
+
+    /// Turns a raw take of a player's name (from `stopRecordingIntroduction`) into a name
+    /// piece to listen to: silence trimmed from both ends, rumble filtered out, the level
+    /// evened out to match the Mac's pieces. The raw take is deleted. The result is a pieced
+    /// introduction pointing at a trial file; `keepNameRecording` makes it the player's.
+    /// Throws a problem with a message when no voice was heard.
+    public func makeNameCandidate(from take: AnnouncerIntroduction) throws -> AnnouncerIntroduction {
+        guard let name = take.fileName else { throw NameTakeProblem.nothingRecorded }
+        let raw = audioFolder.appending(path: name)
+        defer { try? FileManager.default.removeItem(at: raw) }
+        let cleaned = try NameTake.clean(NameTake.readMono(raw))
+        let trial = "announcer-name-take-\(UUID().uuidString).m4a"
+        try NameTake.write(cleaned, to: audioFolder.appending(path: trial))
+        if pendingRecording == take { pendingRecording = nil }
+        return AnnouncerIntroduction(source: .pieced, fileName: trial)
+    }
+
+    /// Makes a trial name recording the player's: saved as their name piece (`nameFile(stem)`,
+    /// replacing any earlier one), so their introduction is "Now batting, number …, name".
+    /// Any introduction already made from the old recording is forgotten, so the next walk-up
+    /// uses the new one.
+    public func keepNameRecording(_ candidate: AnnouncerIntroduction, stem: String) throws -> AnnouncerIntroduction {
+        guard let trial = candidate.fileName else { throw NameTakeProblem.nothingRecorded }
+        let final = AnnouncerIntroduction.nameFile(stem)
+        let target = audioFolder.appending(path: final)
+        try? FileManager.default.removeItem(at: target)
+        try FileManager.default.moveItem(at: audioFolder.appending(path: trial), to: target)
+        readyIntroductions = readyIntroductions.filter { $0.value.madeFrom.introduction.fileName != final }
+        return AnnouncerIntroduction(source: .pieced, fileName: final)
+    }
+
+    /// Throws away a trial name recording the scorer did not keep.
+    public func discardNameCandidate(_ candidate: AnnouncerIntroduction) {
+        guard let trial = candidate.fileName, trial.hasPrefix("announcer-name-take-") else { return }
+        try? FileManager.default.removeItem(at: audioFolder.appending(path: trial))
+    }
+
     @concurrent nonisolated public func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction {
         let copy = try await SoundFileImporter.copyIn(file, to: audioFolder, prefix: "intro-")
         // An introduction is a few seconds of announcer; a whole song picked by mistake would

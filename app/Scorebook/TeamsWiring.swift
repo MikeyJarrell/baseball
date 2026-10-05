@@ -26,6 +26,8 @@ final class TeamsWiring {
     var problems: [String] = []
     /// The audio player's last message once the scorer has dismissed it, so it is not shown again.
     var dismissedAudioProblem: String?
+    /// The player whose name is being recorded from a player's page, if any.
+    var recordingNameFor: PlayerID?
 }
 
 extension AppModel {
@@ -137,6 +139,8 @@ extension AppModel {
                     wiring.problems.append("That recording could not be copied in. (\(error.localizedDescription))")
                 }
             }
+        case .recordName(let id):
+            wiring.recordingNameFor = id
         case .introductionReplaced(let introduction):
             deleteWhenUnused(introduction)
         case .dismissProblems:
@@ -176,6 +180,29 @@ extension AppModel {
         } else {
             teamsWiring.recording = .idle
         }
+    }
+
+    // MARK: A name recorded in the app
+
+    /// Gives a player the pieced introduction made from a name recorded in the app: on the
+    /// saved team, and on the game in progress if they are in it, so the next time they bat the
+    /// announcer reads it. A full introduction it replaces is deleted once nothing uses it.
+    func setNameIntroduction(_ introduction: AnnouncerIntroduction, for id: PlayerID) async {
+        if var team = teams.first(where: { $0.player(id) != nil }),
+           let i = team.roster.firstIndex(where: { $0.id == id }) {
+            let old = team.roster[i].introduction
+            team.roster[i].introduction = introduction
+            await saveTeam(team)
+            if let old, old != introduction, old.source == .recorded || old.source == .imported {
+                deleteWhenUnused(old)
+            }
+        }
+        if let session, !session.isFinished, let side = session.setup.side(of: id),
+           var player = session.setup.player(id) {
+            player.introduction = introduction
+            await session.updatePlayer(player, on: side)
+        }
+        cueOurNextHitter()
     }
 
     // MARK: Songs follow the saved team
