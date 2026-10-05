@@ -110,9 +110,11 @@ struct GameSessionTests {
         #expect(await session.record(events[firstPlay]))
         #expect(session.redoLabel == nil)
 
-        // Undo all the way back to the start, then nothing is left to undo.
+        // Undo all the way back to the start, then nothing is left to undo. The opening
+        // defense check stays: it records nothing, so Undo passes over it.
         while session.canUndo { #expect(await session.undo()) }
-        #expect(session.game.events.isEmpty)
+        let onlyTheCheck = session.game.events.allSatisfy { $0.isDefenseConfirmed }
+        #expect(onlyTheCheck)
         #expect(session.undoLabel == nil)
         #expect(await session.undo() == false)
     }

@@ -156,6 +156,17 @@ public struct OpponentRow: Equatable, Sendable {
 // MARK: - Turning text into the app's words
 
 public enum RosterWords {
+    /// The last name a player goes by on its own, when the roster's last name is two words
+    /// and not one name with a small word in front ("De La Cruz", "Van Dyke"): the first of
+    /// the two, as is usual with two Spanish last names. "Torres Benitez" gives "Torres".
+    /// Missing for a one-word last name.
+    public static func surname(fromLastName lastName: String) -> String? {
+        let words = lastName.split(whereSeparator: \.isWhitespace).map(String.init)
+        let smallWords: Set<String> = ["de", "la", "del", "van", "von", "da", "di", "du", "le", "st", "st.", "mc", "dos", "das", "do", "san", "santa"]
+        guard words.count >= 2, !smallWords.contains(words[0].lowercased()) else { return nil }
+        return words[0]
+    }
+
     /// "R", "L", "S" (or "B" for both) as a batting side; blank is unknown.
     public static func battingSide(_ text: String) -> BattingSide? {
         switch text.uppercased() {
@@ -294,6 +305,7 @@ public enum TeamImport {
             let index = ours.roster.firstIndex { names.contains(RosterWords.key($0.name ?? "")) }
             var player = index.map { ours.roster[$0] } ?? Player()
             player.name = row.displayName
+            player.surname = RosterWords.surname(fromLastName: row.lastName)
             // A number changed in the app during the season wins over the roster file; the
             // file only fills in a player with no number yet.
             let phoneNumber = player.number?.trimmingCharacters(in: .whitespaces) ?? ""
@@ -322,12 +334,16 @@ public enum TeamImport {
             if recordedNames.contains(stem), player.introduction == nil || player.introduction?.source == .pieced {
                 player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
             }
-            // Extra warm-up songs come only from the file, so its list replaces what is saved;
-            // a row whose song is not cut yet is skipped.
+            // Extra warm-up songs: the file's, in its order, then any added on the phone (during
+            // a game, say) that the file does not list, so a team load never loses them. A row
+            // whose song is not cut yet is skipped.
             var extras: [SongID] = []
             for extra in extraWarmUps where names.contains(RosterWords.key(extra.player)) {
                 if let id = song(file: extra.file, title: extra.song, artist: extra.artist, start: 0),
                    !extras.contains(id), id != player.warmUpSongID { extras.append(id) }
+            }
+            for id in player.extraWarmUpSongIDs where !extras.contains(id) && id != player.warmUpSongID {
+                extras.append(id)
             }
             player.extraWarmUpSongIDs = extras
             if let index {

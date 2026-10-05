@@ -5,7 +5,8 @@
 // "L. Ortiz" and Ana Ortiz as "A. Ortiz". If even the initials match (Luis and Leo Ortiz),
 // both print in full. A name that is only a number or a stand-in ("#22", "Batter 4")
 // is printed whole, since its last word alone would mean nothing. A last name of more
-// than one word keeps all of it: "Elly De La Cruz" is "De La Cruz".
+// than one word keeps all of it: "Elly De La Cruz" is "De La Cruz". A player with two Spanish
+// last names goes by the first, given as `Player.surname`: Jonathan Torres Benitez is "Torres".
 
 import Foundation
 import Model
@@ -37,25 +38,19 @@ public struct ShortNames: Equatable, Sendable {
                      n.caughtStealing, n.sacrificeFlies, n.sacrificeBunts, n.hitByPitch] {
             list.forEach { note($0.player, $0.name) }
         }
-        // Players named only in the footnotes or the newer notes, should any be missing above.
-        for team in [box.away, box.home] {
-            team.batting.compactMap(\.entered).forEach { note($0.replaced, $0.replacedName) }
-        }
+        // Players named only in the newer notes, should any be missing above.
         for hit in n.hitBatters {
             note(hit.batter, hit.batterName)
             if let pitcher = hit.pitcher, let name = hit.pitcherName { note(pitcher, name) }
         }
-        for ran in n.ranForNonRunners {
-            note(ran.runner, ran.runnerName)
-            note(ran.nonRunner, ran.nonRunnerName)
-        }
-        self.init(fullNames: order.map { ($0, fullNames[$0]!) })
+        self.init(fullNames: order.map { ($0, fullNames[$0]!) }, surnames: box.surnames ?? [:])
     }
 
-    /// Works out short names for a list of players and their full names.
-    public init(fullNames list: [(PlayerID, String)]) {
+    /// Works out short names for a list of players and their full names. `surnames` gives the
+    /// last name on its own for players whose last name is not the last word of their name.
+    public init(fullNames list: [(PlayerID, String)], surnames: [PlayerID: String] = [:]) {
         // Group the players by last name, ignoring capital letters.
-        let parts = list.map { (id: $0.0, parts: NameParts($0.1)) }
+        let parts = list.map { (id: $0.0, parts: NameParts($0.1, surname: surnames[$0.0])) }
         var countByLastName: [String: Int] = [:]
         for entry in parts {
             countByLastName[entry.parts.lastName.lowercased(), default: 0] += 1
@@ -107,7 +102,9 @@ struct NameParts {
         "van", "von", "ter", "ten", "st", "st.", "san", "santa", "mc", "bin", "ibn", "al", "el",
     ]
 
-    init(_ name: String) {
+    /// - Parameter surname: The last name to use, when it is not worked out from the words:
+    ///   "Torres" for "Jonathan Torres Benitez".
+    init(_ name: String, surname: String? = nil) {
         let words = name.split(whereSeparator: \.isWhitespace).map(String.init)
         fullName = words.joined(separator: " ")
         if fullName.isEmpty {
@@ -136,6 +133,7 @@ struct NameParts {
             lastWordCount += 1
         }
         lastName = words.suffix(lastWordCount).joined(separator: " ")
+        if let surname, !surname.isEmpty { lastName = surname }
         initialed = "\(words[0].prefix(1)). \(lastName)"
     }
 }
