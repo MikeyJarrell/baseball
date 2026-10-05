@@ -272,3 +272,26 @@ SESSLOG:[2026-10-04 17:52]
 
 ### Context
 Mikey’s list after the first phone install: easier mid-game fixes to lineups, rosters, game details and warm-up music, the fielders check on the diamond with first initials, song fade-outs, and Undo ignoring the defense check; then a cleaner box score. Everything is built, reviewed by a fresh agent (no way found to corrupt a game; its edge cases fixed and tested), and clicked through on the simulator, but not yet on the phone. A first try at the home and away switch refused silently after a pregame substitution; pregame lineup changes now move with their team.
+
+---
+
+## [2026-10-04 18:15] Stats website for teammates
+SESSLOG:[2026-10-04 18:15]
+
+**Project(s):** baseball
+
+### Decisions
+- The site lives at mikeyjarrell.com/dogs/, served by GitHub Pages from a separate public repository, `MikeyJarrell/dogs`, holding only the built pages; the app’s code stays private.
+- Full names, as on the roster (Mikey’s choice); unlisted: every page asks search engines not to list it, and `robots.txt` turns them away.
+- No export button in the app: the Mac reads the games straight off the plugged-in phone, as `tools/load_team.sh` already does, so the brief’s export step was dropped.
+- The pages use the app’s own rules engine and stats code, so they match the phone’s Season screen; only players who have played are listed.
+
+### Follow-ups
+- [ ] First publish: once Mikey plugs the phone in, run `tools/publish_stats.sh` (the Mac copies predate the October 4 game corrections, so publishing from them would be wrong).
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/StatsSite/` (the page builder), `tools/publish_stats.sh`, `plan/handoffs/stats-website.md`
+- [modified] `Package.swift`, `PROJECT_INDEX.md`, `AGENTS.md`, `plan/README.md`
+
+### Context
+Mikey asked whether teammates could see stats; the only sharing was the texted box score picture, and a stats-website brief sat unstarted. The site is built and previewed at phone width (record, games, sortable season batting and pitching, a box score page per game, a page per player) but not yet published, because no copy on the Mac has the corrected October 4 game.
