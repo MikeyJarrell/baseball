@@ -26,6 +26,7 @@ let package = Package(
         .library(name: "Scoring", targets: ["Scoring"]),
         .library(name: "TeamImport", targets: ["TeamImport"]),
         .executable(name: "TeamLoader", targets: ["TeamLoader"]),
+        .executable(name: "StatsSite", targets: ["StatsSite"]),
     ],
     targets: [
         // The shared vocabulary: players, teams, events, plays, the situation, box scores.
@@ -61,6 +62,10 @@ let package = Package(
         // The Mac command the loader script (tools/load_team.sh) runs on a copy of the
         // phone's saved files.
         .executableTarget(name: "TeamLoader", dependencies: ["Model", "Storage", "TeamImport"]),
+
+        // The Mac command the stats website script (tools/publish_stats.sh) runs on a copy of
+        // the phone's saved files, to write the public stats pages.
+        .executableTarget(name: "StatsSite", dependencies: ["Model", "Storage", "GameEngine", "Stats", "BoxScoreText"]),
 
         // Test helper: bundles the Tests/Scenarios folder and loads a scenario in one line.
         // It lives under Tests/ so the scenario files sit beside the tests that use them.
