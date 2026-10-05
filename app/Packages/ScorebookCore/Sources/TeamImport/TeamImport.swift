@@ -156,6 +156,17 @@ public struct OpponentRow: Equatable, Sendable {
 // MARK: - Turning text into the app's words
 
 public enum RosterWords {
+    /// The last name a player goes by on its own, when the roster's last name is two words
+    /// and not one name with a small word in front ("De La Cruz", "Van Dyke"): the first of
+    /// the two, as is usual with two Spanish last names. "Torres Benitez" gives "Torres".
+    /// Missing for a one-word last name.
+    public static func surname(fromLastName lastName: String) -> String? {
+        let words = lastName.split(whereSeparator: \.isWhitespace).map(String.init)
+        let smallWords: Set<String> = ["de", "la", "del", "van", "von", "da", "di", "du", "le", "st", "st.", "mc", "dos", "das", "do", "san", "santa"]
+        guard words.count >= 2, !smallWords.contains(words[0].lowercased()) else { return nil }
+        return words[0]
+    }
+
     /// "R", "L", "S" (or "B" for both) as a batting side; blank is unknown.
     public static func battingSide(_ text: String) -> BattingSide? {
         switch text.uppercased() {
@@ -294,6 +305,7 @@ public enum TeamImport {
             let index = ours.roster.firstIndex { names.contains(RosterWords.key($0.name ?? "")) }
             var player = index.map { ours.roster[$0] } ?? Player()
             player.name = row.displayName
+            player.surname = RosterWords.surname(fromLastName: row.lastName)
             // A number changed in the app during the season wins over the roster file; the
             // file only fills in a player with no number yet.
             let phoneNumber = player.number?.trimmingCharacters(in: .whitespaces) ?? ""

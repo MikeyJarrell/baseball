@@ -202,4 +202,16 @@ struct TeamImportTests {
         #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
         #expect(RosterWords.fileStem("J.T. O'Neil") == "j-t-o-neil")
     }
+
+    @Test("A player with two last names goes by the first: Torres Benitez is Torres")
+    func twoLastNames() {
+        #expect(RosterWords.surname(fromLastName: "Torres Benitez") == "Torres")
+        #expect(RosterWords.surname(fromLastName: "Rosas Lopez") == "Rosas")
+        #expect(RosterWords.surname(fromLastName: "Strong") == nil)
+        #expect(RosterWords.surname(fromLastName: "De La Cruz") == nil)
+        #expect(RosterWords.surname(fromLastName: "Hafey-Bagg") == nil)
+        let player = Player(name: "Jonathan Torres Benitez", surname: "Torres")
+        #expect(player.lastName == "Torres")
+        #expect(player.initialAndLastName == "J. Torres")
+    }
 }

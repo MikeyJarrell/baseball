@@ -244,3 +244,27 @@ The feature is built, reviewed twice and tested, but is not on the phone until t
 ## [2026-10-04 12:56] Changes after the first phone install
 
 Pregame got time wheels, a separate fielding step on the diamond, DH in place of “bats only,” and typeable opponent numbers with only the names-and-numbers and numbers-only choices. First and third base now sit in fair territory. Walk-up songs fade in under the announcer and reach full volume at their start point as the announcer finishes. Games can be deleted from the Games list or a box score (the app backs up first), and the game menu has a way home. Installed on the phone except delete-a-game, which goes on at the next install; a test game is still on the phone, and the phone’s files were backed up to Dropbox before any of this.
+
+## [2026-10-04 17:52] Mid-game fixes and box score tidy-up
+SESSLOG:[2026-10-04 17:52]
+
+**Project(s):** baseball
+
+### Decisions
+- Stopping a song fades it out over two seconds; a second tap stops it at once.
+- A late lineup card is handled by saying a player “was really” someone else: the two trade places in the whole game, every recorded play included, so stats go to the right person.
+- Home and away switch only before the first pitch; innings never go below the inning being played; a hitter comes out of the order only before the first pitch with nothing recorded for his team.
+- Undo passes over a confirmed defense check.
+- Box score: one team per headline line, positions in capitals (Mikey’s preference; traditional newspapers use lowercase), no lettered pinch-hitter notes, no “ran for” notes, one note per line.
+- Players with two last names go by the first (Torres, Rosas), taken from the roster file’s last-name column.
+- Warm-up songs added on the phone survive team loads; a file song removed on the phone returns unless its row is deleted too.
+
+### Follow-ups
+- [ ] Reinstall the app and load the team once the phone is plugged in (names with two last names need the team load).
+
+### Files
+- [created] `GameChanges/LineupsSheet.swift`, `GameChanges/GameDetailsSheet.swift`, `Model/LineupCorrection.swift`, `ScoringTests/MidGameFixTests.swift`, `plan/handoffs/mid-game-editing.md`, `feedback/ai/mid-game-editing-review.md`
+- [modified] `GameSession.swift`, `People.swift`, `BoxScore.swift`, `BoxScoreBuilder.swift`, BoxScoreText, BoxScorePicture, `DefenseSheet.swift`, `FieldingStep.swift`, batting screen controls and menu, `GameScreen.swift`, `AppSheets.swift`, `AppModel.swift`, `TeamImport.swift`, tests, `team/README.md`, `PROJECT_INDEX.md`
+
+### Context
+Mikey’s list after the first phone install: easier mid-game fixes to lineups, rosters, game details and warm-up music, the fielders check on the diamond with first initials, song fade-outs, and Undo ignoring the defense check; then a cleaner box score. Everything is built, reviewed by a fresh agent (no way found to corrupt a game; its edge cases fixed and tested), and clicked through on the simulator, but not yet on the phone. A first try at the home and away switch refused silently after a pregame substitution; pregame lineup changes now move with their team.

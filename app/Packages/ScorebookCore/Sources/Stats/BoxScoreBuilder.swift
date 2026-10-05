@@ -39,8 +39,19 @@ struct BoxScoreBuilder {
             lineScore: tally.lineScore(),
             notes: tally.notes(away: away, home: home),
             isFinal: log.isFinal,
-            gameLength: log.gameLength
+            gameLength: log.gameLength,
+            surnames: surnames
         )
+    }
+
+    /// Players whose last name on its own is not the last word of their name ("Torres" for
+    /// Jonathan Torres Benitez), so the box score prints the right one.
+    private var surnames: [PlayerID: String]? {
+        var found: [PlayerID: String] = [:]
+        for player in log.setup.away.roster + log.setup.home.roster {
+            if let surname = player.surname, !surname.isEmpty { found[player.id] = surname }
+        }
+        return found.isEmpty ? nil : found
     }
 }
 

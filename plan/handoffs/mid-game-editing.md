@@ -12,6 +12,8 @@ Mikey’s list after the first phone install, plus his box score notes.
 
 **Fielders on the diamond.** The defense check and the Fielders sheet show the field drawing, as the pregame fielding step does, with the first initial and last name (`Player.initialAndLastName`, “Y. Teodosio”), and the pregame step uses the same names. Tapping a position opens the roster to pick from.
 
+**Two last names.** A player whose roster last name is two words goes by the first: Jonathan Torres Benitez is “Torres”, Erick Rosas Lopez is “Rosas”, on the diamond, the batting screen and the box score (`Player.surname`, set by the team load from `team/roster.csv`; `BoxScore.surnames` carries it to the printed names). A last name with a small word in front, like “De La Cruz”, stays whole.
+
 **Undo skips the defense check.** “Everyone’s where they were” records nothing worth undoing, so Undo passes over it to the last real entry and takes the check with it; the check opens again when that entry is redone.
 
 **Box score.** The headline puts each team on its own line. Positions are in capitals (“Kurt 2B-RF”). The lettered pinch-hitter and pinch-runner notes under the totals are gone; a substitute still sits pushed in under the player he replaced, marked PH or PR. “Webb ran for Quinn” notes are gone. Each kind of note (E, DP, LOB…, then HBP, pitches-strikes, T) prints on its own line, in the picture and the copied text.

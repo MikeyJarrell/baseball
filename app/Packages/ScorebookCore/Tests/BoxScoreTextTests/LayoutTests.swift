@@ -209,4 +209,14 @@ struct NotesTests {
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
         #expect(notes.first == "HBP—Ford, Webb.")
     }
+
+    @Test("A player with two last names is printed by the first")
+    func twoLastNames() {
+        var box = SampleGame.boxScore
+        let ortiz = box.away.batting[0].player
+        box.away.batting[0].name = "Luis Ortiz Vega"
+        box.surnames = [ortiz: "Ortiz"]
+        let layout = BoxScorePrinter.layout(box, timeZone: pacific)
+        #expect(layout.batting[0].rows[0].label == "Ortiz CF")
+    }
 }
