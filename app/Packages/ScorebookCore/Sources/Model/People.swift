@@ -129,6 +129,16 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         return String(last)
     }
 
+    /// The first initial and the last name, for the field drawing and other tight spots where
+    /// teammates share a last name: "J. Webb". Just the name when it is one word, else
+    /// `displayName`.
+    public var initialAndLastName: String {
+        guard let name else { return displayName }
+        let words = name.split(separator: " ")
+        guard words.count > 1, let initial = words.first?.first else { return lastName }
+        return "\(initial). \(lastName)"
+    }
+
     /// True when the scorer knows neither a name nor a number yet.
     public var isUnnamed: Bool {
         (name?.isEmpty ?? true) && (number?.isEmpty ?? true)

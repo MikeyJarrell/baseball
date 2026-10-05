@@ -322,12 +322,16 @@ public enum TeamImport {
             if recordedNames.contains(stem), player.introduction == nil || player.introduction?.source == .pieced {
                 player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
             }
-            // Extra warm-up songs come only from the file, so its list replaces what is saved;
-            // a row whose song is not cut yet is skipped.
+            // Extra warm-up songs: the file's, in its order, then any added on the phone (during
+            // a game, say) that the file does not list, so a team load never loses them. A row
+            // whose song is not cut yet is skipped.
             var extras: [SongID] = []
             for extra in extraWarmUps where names.contains(RosterWords.key(extra.player)) {
                 if let id = song(file: extra.file, title: extra.song, artist: extra.artist, start: 0),
                    !extras.contains(id), id != player.warmUpSongID { extras.append(id) }
+            }
+            for id in player.extraWarmUpSongIDs where !extras.contains(id) && id != player.warmUpSongID {
+                extras.append(id)
             }
             player.extraWarmUpSongIDs = extras
             if let index {

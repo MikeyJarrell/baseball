@@ -96,7 +96,7 @@ struct TeamImportTests {
         #expect(!second.teamsToSave.contains { !$0.isOurs })
     }
 
-    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load replaces the list")
+    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load keeps the ones already saved")
     func extraWarmUps() throws {
         let (roster, opponents) = try realRows()
         let extras = ExtraWarmUpRow.read("""
@@ -120,11 +120,20 @@ struct TeamImportTests {
         // A song listed twice is in his list once; a misspelled name is reported.
         #expect(chris.extraWarmUpSongIDs.count == 2)
         #expect(first.notes.contains { $0.contains("Kris Strong") })
-        // Loading again with one row gone drops that song from his list but keeps its id in the library.
-        let again = TeamImport.merge(teams: first.teamsToSave, library: first.library, roster: roster,
+        // Songs can be added on the phone too, during a game, so loading again never drops
+        // one: with a row gone from the file and a song added on the phone, he keeps all three,
+        // the file's first.
+        var team = first.teamsToSave
+        let phoneSong = Song(title: "Picked on the phone", fileName: "phone.m4a")
+        var library = first.library
+        library.songs.append(phoneSong)
+        if let t = team.firstIndex(where: \.isOurs), let p = team[t].roster.firstIndex(where: { $0.id == chris.id }) {
+            team[t].roster[p].extraWarmUpSongIDs.insert(phoneSong.id, at: 0)
+        }
+        let again = TeamImport.merge(teams: team, library: library, roster: roster,
                                      opponents: opponents, extraWarmUps: Array(extras.prefix(1)))
         let chrisAgain = try #require(again.teamsToSave.first { $0.isOurs }?.roster.first { $0.id == chris.id })
-        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0]])
+        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0], phoneSong.id, chris.extraWarmUpSongIDs[1]])
     }
 
     @Test("A warm-up track never takes over a teammate's walk-up clip of the same song")
