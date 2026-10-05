@@ -42,7 +42,7 @@ struct PitchersStep: View {
                         draft.theirs.pitcher = choice.id
                     }
                 }
-                ChoiceRow(title: "Not known yet", detail: "Name them when you find out",
+                ChoiceRow(title: "Not known yet",
                           isOn: theirPitcherUnknown, action: { draft.theirs.pitcher = nil }) {
                     PlayerNumberBadge("?", look: .theirs, size: 36).accessibilityHidden(true)
                 }
@@ -51,7 +51,7 @@ struct PitchersStep: View {
                     .cardRow()
                 if newOpen { newPitcherForm.cardRow() }
             } header: {
-                SectionHeader(title: "\(draft.opponentName) · from their saved roster")
+                SectionHeader(title: draft.opponentName)
             }
         }
     }

@@ -29,7 +29,6 @@ public struct SongLibraryScreen: View {
         List {
             Section {
                 VStack(spacing: Spacing.small) {
-                    InfoBox(text: "Walk-up songs play when our hitter comes up. A pitcher’s warm-up song plays at the changeover when we take the field.")
                     ProblemsBox(problems: data.audio.problems) { onRequest(.dismissProblems) }
                     if data.audio.isImporting {
                         HStack(spacing: Spacing.small) {
@@ -47,7 +46,7 @@ public struct SongLibraryScreen: View {
             if songs.isEmpty {
                 Section {
                     VStack(spacing: Spacing.medium) {
-                        Text("No songs yet. Import MP3, M4A, WAV or AAC files from the Files app, such as the clips in Dropbox.")
+                        Text("No songs yet. Import MP3, M4A, WAV or AAC files.")
                             .font(ScorebookFont.body)
                             .foregroundStyle(ScorebookColor.textSecondary)
                             .frame(maxWidth: .infinity, alignment: .leading)

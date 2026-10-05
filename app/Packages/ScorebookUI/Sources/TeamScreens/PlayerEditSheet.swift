@@ -55,10 +55,6 @@ struct PlayerEditSheet: View {
                 } footer: {
                     if let twin = numberTwin {
                         Text("\(twin.displayName) also wears \(number).")
-                    } else if team.isOurs {
-                        Text("A number or a name is enough. Fill in the rest later.")
-                    } else {
-                        Text("A number is enough for their players.")
                     }
                 }
 
@@ -80,8 +76,6 @@ struct PlayerEditSheet: View {
                     }
                     Toggle("Leads off", isOn: $draft.usuals.leadsOff)
                     Toggle("Starts on the bench", isOn: $draft.usuals.startsOnBench)
-                } footer: {
-                    Text("Pregame starts the lineup from these.")
                 }
 
                 if !draft.isNew {

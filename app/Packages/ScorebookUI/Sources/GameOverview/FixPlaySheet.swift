@@ -37,23 +37,17 @@ public enum FixPlay {
     public static func editorDescription(for event: GameEvent) -> String? {
         switch event.kind {
         case .pitch(let pitch):
-            return pitch.droppedThirdStrike == nil ? nil : "Opens the dropped third strike steps with it filled in"
-        case .ballInPlay: return "Opens the in-play steps with it filled in"
-        case .runnerAction: return "Opens the runner moves with them filled in"
-        case .errorWithNoAdvance: return "Opens the error with it filled in"
+            return pitch.droppedThirdStrike == nil ? nil : "Dropped third strike steps"
+        case .ballInPlay: return "In-play steps"
+        case .runnerAction: return "Runner moves"
+        case .errorWithNoAdvance: return "Error"
         case .substitution, .runnerForNonRunner, .pitchingChange, .addHitter:
-            return "Opens the change with it filled in"
-        case .timeLimitChange: return "Opens the time limit"
-        case .manualAdjustment: return "Opens the manual adjustment with it filled in"
+            return "The change"
+        case .timeLimitChange: return "Time limit"
+        case .manualAdjustment: return "Manual adjustment"
         case .intentionalWalk, .defenseConfirmed, .battingHole, .automaticOut, .keepPlaying, .endOfGame:
             return nil
         }
-    }
-
-    /// The word for the Delete button and its question: "pitch" or "play".
-    static func noun(for event: GameEvent) -> String {
-        if case .pitch(let pitch) = event.kind, pitch.droppedThirdStrike == nil { return "pitch" }
-        return "play"
     }
 }
 
@@ -84,13 +78,6 @@ public struct FixPlaySheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     summary
-                    Text("Changing or deleting a \(FixPlay.noun(for: row.event)) recalculates everything after it: the count, the runners, the score and every stat.")
-                        .font(ScorebookFont.body)
-                        .foregroundStyle(ScorebookColor.textSecondary)
-                        .padding(Spacing.medium)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(ScorebookColor.surfaceSecondary,
-                                    in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
                     pitchChoices
                     actions
                 }

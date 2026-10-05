@@ -34,19 +34,19 @@ public struct GameOverSheet: View {
         "\(context.teamName(.away)) \(score.away), \(context.teamName(.home)) \(score.home)"
     }
 
-    /// Why the app is asking, in words, with the rule.
+    /// Why the app is asking, in a few words.
     private var why: String {
         let rules = context.setup.rules
         switch reason {
         case .timeLimit:
-            let limit = context.situation.timeLimitEndsAt.map { ", \($0.formatted(date: .omitted, time: .shortened))," } ?? ""
+            let limit = context.situation.timeLimitEndsAt.map { ", \($0.formatted(date: .omitted, time: .shortened))" } ?? ""
             let tie = score.away == score.home ? " A tie at the time limit stays a tie (rule 9.1 H)." : ""
-            return "The time limit\(limit) has passed and the inning is over. No new inning starts after the limit (rule 9.1 G).\(tie)"
+            return "Past the time limit\(limit).\(tie)"
         case .runRule:
             let margin = rules.runRuleMargin ?? 12
-            return "A \(margin)-run lead from the end of the \(ordinal(rules.runRuleInning)) inning on ends the game under the mercy rule (rule 9.13)."
+            return "Mercy rule: \(margin) or more ahead after \(rules.runRuleInning) innings."
         case .regulation:
-            return "The scheduled \(rules.scheduledInnings) innings are complete, or the home team has taken the lead in its last at-bat."
+            return "\(rules.scheduledInnings) innings complete, or the home team ahead in its last at-bat."
         case .called:
             return "Play has stopped."
         }
@@ -59,8 +59,7 @@ public struct GameOverSheet: View {
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
                 .padding(.top, Spacing.small)
-            InfoBox(Text("\(why) The umpire makes the call; the app only asks."))
-            FootNote("Keep playing carries on, and the app will not ask again for this reason.")
+            InfoBox(Text(why))
         } footer: {
             Button("End game") {
                 let event = GameEvent(kind: .endOfGame(EndOfGame(reason: reason, finalScore: score)))

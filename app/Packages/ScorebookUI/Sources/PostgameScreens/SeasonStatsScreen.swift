@@ -85,7 +85,7 @@ public struct SeasonStatsScreen: View {
             case .pitching: pitchingTable
             }
 
-            Text("Tap a column to sort. The table scrolls sideways; names stay put.")
+            Text("Tap a column to sort.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
                 .padding(.horizontal, Spacing.large)
@@ -128,7 +128,7 @@ public struct SeasonStatsScreen: View {
         }
         return Group {
             if rows.isEmpty {
-                emptyMessage("No hitters yet. Stats appear here after the first game.")
+                emptyMessage("No hitters yet.")
             } else {
                 StatsTable(
                     rows: rows, nameTitle: "Player", name: \.name, columns: columns,

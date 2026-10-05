@@ -37,7 +37,7 @@ struct FixPlayTests {
     @Test func aBallInPlayOpensTheInPlaySteps() {
         let play = GameEvent(id: "e3", kind: .ballInPlay(Play(batterResult: .out, fielders: [.shortstop, .firstBase])))
         #expect(FixPlay.pitchAlternatives(for: play).isEmpty)
-        #expect(FixPlay.editorDescription(for: play) == "Opens the in-play steps with it filled in")
+        #expect(FixPlay.editorDescription(for: play) == "In-play steps")
     }
 
     @Test func somethingWithNothingToChangeCanOnlyBeDeleted() {
