@@ -1,5 +1,6 @@
 // The two sheets the batting screen opens itself: the game menu (manual adjustment, an error
-// with nobody moving, the time limit, editing the batter, the walk-up song length, end game)
+// with nobody moving, the time limit, editing the batter, the game details, our pitcher's
+// warm-up songs, the walk-up song length, end game)
 // and the "Is the game over?" pop-up. Neither records anything itself: each hands its choice
 // back to the screen as an `AtBatAction`.
 
@@ -31,6 +32,14 @@ struct GameMenuSheet: View {
                     }
                     row("Edit this batter", detail: "Name, number, batting side", icon: "pencil") {
                         choose(.openBatterOptions)
+                    }
+                    row("Game details", detail: "Date, start time, innings, home and away", icon: "calendar") {
+                        choose(.openGameDetails)
+                    }
+                    if let pitcher = ourPitcher {
+                        row("Warm-up songs", detail: "For \(pitcher.displayName): add more, or play one", icon: "music.note.list") {
+                            choose(.pickWarmUpSongs(pitcher))
+                        }
                     }
                     row("Home screen", detail: "Teams, songs, games; the game stays in progress", icon: "house") {
                         choose(.goHome)
@@ -74,6 +83,12 @@ struct GameMenuSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    /// Our pitcher now, when our team has one in the game.
+    private var ourPitcher: Player? {
+        guard let ours = info.setup.ourSide else { return nil }
+        return info.situation[ours].pitcher.flatMap(info.setup.player)
     }
 
     /// The reasons to offer, the one the rules engine is asking about first.
