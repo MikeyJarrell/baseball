@@ -37,7 +37,7 @@ struct TheirLineupStep: View {
                         hasNames ? "From the saved \(team.name) roster" : "No saved names yet")
                     .disabled(!hasNames)
                     .opacity(hasNames ? 1 : 0.5)
-                modeRow(.numbers, "Numbers only", "Type the numbers in batting order")
+                modeRow(.numbers, "Numbers only", nil)
             }
             switch theirs.mode {
             case .names: namesSection
@@ -53,7 +53,7 @@ struct TheirLineupStep: View {
     }
 
     /// One of the two ways in, as a choice row.
-    private func modeRow(_ mode: TheirLineupMode, _ title: String, _ detail: String) -> some View {
+    private func modeRow(_ mode: TheirLineupMode, _ title: String, _ detail: String?) -> some View {
         ChoiceRow(title: title, detail: detail, isOn: theirs.mode == mode,
                   action: { draft.theirs.mode = mode }) { EmptyView() }
             .cardRow()
@@ -146,7 +146,7 @@ struct TheirLineupStep: View {
         } header: {
             SectionHeader(title: "Batting order · \(theirs.battingOrder(for: team).count)")
         } footer: {
-            Text("Hold a row and drag to reorder. Numbers you type are saved to the \(team.name) roster.")
+            Text("Hold a row and drag to reorder.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
         }
@@ -208,7 +208,7 @@ struct TheirLineupStep: View {
         } header: {
             SectionHeader(title: "Batting order · \(theirs.numbers.count)")
         } footer: {
-            Text("Hold a row and drag to reorder. A blank number is “Batter 4” until you name them. Numbers you type are saved to the \(team.name) roster.")
+            Text("Hold a row and drag to reorder.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
         }

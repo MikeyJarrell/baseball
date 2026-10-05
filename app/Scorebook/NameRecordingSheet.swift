@@ -46,7 +46,7 @@ struct NameRecordingSheet: View {
                 Text("Say the name")
                     .font(ScorebookFont.sectionLabel)
                     .foregroundStyle(ScorebookColor.textSecondary)
-                Text(name.isEmpty ? "Give this player a name first" : name)
+                Text(name.isEmpty ? "No name yet" : name)
                     .font(.system(size: 40, weight: .heavy))
                     .multilineTextAlignment(.center)
                     .minimumScaleFactor(0.5)
@@ -67,7 +67,7 @@ struct NameRecordingSheet: View {
                         .multilineTextAlignment(.center)
                 }
                 if audio?.hasNowBattingRecording == false {
-                    Text("“Now batting” is not on the phone yet, so the introduction will not play until the team is loaded from the Mac.")
+                    Text("No “Now batting” recording on this phone yet.")
                         .font(ScorebookFont.caption)
                         .foregroundStyle(ScorebookColor.textSecondary)
                         .multilineTextAlignment(.center)
@@ -107,7 +107,7 @@ struct NameRecordingSheet: View {
                     if case .recorded(let take) = step { keep(take) }
                 }
             } message: {
-                Text("Their introduction becomes “Now batting,” their number and this name. The full recording is deleted once no game in progress uses it.")
+                Text("This replaces their full recording.")
             }
         }
         // A recording that stopped by itself (30 seconds, or a phone call) is collected.
@@ -147,7 +147,7 @@ struct NameRecordingSheet: View {
                             Text("Recording · \(Int(context.date.timeIntervalSince(since)))s · tap to stop")
                         }
                     } else {
-                        Text(step == .ready ? "Tap, say the name, tap again" : "Tap to record again")
+                        Text(step == .ready ? "Tap to record" : "Tap to record again")
                     }
                 }
                 .font(ScorebookFont.body)
@@ -167,7 +167,7 @@ struct NameRecordingSheet: View {
         problem = nil
         Task {
             guard await audio.requestMicrophoneAccess() else {
-                problem = "The Scorebook is not allowed to use the microphone. Turn it on in the Settings app, under Scorebook, then Microphone."
+                problem = "Microphone is off for Scorebook. Turn it on in Settings."
                 return
             }
             do {

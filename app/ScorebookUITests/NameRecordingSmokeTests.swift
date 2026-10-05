@@ -37,8 +37,13 @@ final class NameRecordingSmokeTests: XCTestCase {
     func testRecordNameFromTheBatterSheet() throws {
         let app = try launchWithOurTeamBatting()
         XCTAssertTrue(app.buttons["Game menu"].waitForExistence(timeout: 10))
-        app.buttons["Game menu"].tap()
-        button(app, startingWith: "Edit this batter").tap()
+        // A tap while the batting screen is still sliding up is lost: tap until the menu opens.
+        let editBatter = button(app, startingWith: "Edit this batter")
+        for _ in 0..<3 where !editBatter.exists {
+            app.buttons["Game menu"].tap()
+            _ = editBatter.waitForExistence(timeout: 2)
+        }
+        editBatter.tap()
         let record = button(app, startingWith: "Record name")
         XCTAssertTrue(record.waitForExistence(timeout: 5), "Record name on the batter sheet")
         record.tap()
@@ -61,7 +66,7 @@ final class NameRecordingSmokeTests: XCTestCase {
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.tap()
         name.typeText("Jackson Cleary")
-        let addAndRecord = app.buttons["Add and record their name"]
+        let addAndRecord = app.buttons["Add and record name"]
         XCTAssertTrue(addAndRecord.waitForExistence(timeout: 5))
         addAndRecord.tap()
         let prompt = app.staticTexts["name-prompt"]

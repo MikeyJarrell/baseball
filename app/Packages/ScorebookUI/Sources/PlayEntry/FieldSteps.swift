@@ -104,7 +104,7 @@ struct FieldersStep: View {
     }
 }
 
-/// On a hit: tap where the ball landed, for a spray chart later, or go straight on.
+/// On a hit: tap where the ball landed, or go straight on.
 struct HitLocationStep: View {
     let model: PlayEntryModel
 
@@ -127,7 +127,7 @@ struct HitLocationStep: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomBar(title: "Where is optional", detail: "For a spray chart later") {
+            BottomBar(title: "Where is optional", detail: "") {
                 if model.needsRunnerStep {
                     RunnersButton(enabled: true) { model.perform(.goToRunners) }
                 } else {
@@ -141,7 +141,7 @@ struct HitLocationStep: View {
 
     /// "Single to left field", or how to use the step before anything is tapped.
     private var detail: String {
-        guard let location = model.draft.hitLocation else { return "Tap where it landed, or go straight on" }
+        guard let location = model.draft.hitLocation else { return "Tap where it landed" }
         return "\(model.stepTitle) to \(location.name)"
     }
 }
@@ -179,7 +179,7 @@ struct ErrorStep: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomBar(title: "Batter reaches", detail: "Next: where everyone ended up") {
+            BottomBar(title: "Batter reaches", detail: "") {
                 RunnersButton(enabled: model.canGoToRunners) { model.perform(.goToRunners) }
             }
         }

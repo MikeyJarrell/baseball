@@ -65,7 +65,7 @@ public struct LineupsSheet: View {
     }
 
     public var body: some View {
-        SheetFrame(title: "Lineups and rosters", subtitle: "Fix names, numbers and who batted where",
+        SheetFrame(title: "Lineups and rosters",
                    onCancel: { onFinish(.cancel) }) {
             SegmentedChoice(options: [(TeamSide.away, context.teamName(.away)), (.home, context.teamName(.home))],
                             selection: Binding(get: { side }, set: { if let new = $0 { side = new } }))
@@ -79,13 +79,13 @@ public struct LineupsSheet: View {
                         playerRow(player, title: "\(spot + 1). \(context.name(player))",
                                   detail: LineupWording.position(player, side: side, in: context))
                     } else {
-                        OptionRow(title: "\(spot + 1). Empty spot", detail: "Nobody bats here") {
+                        OptionRow(title: "\(spot + 1). Empty spot", action: {}) {
                             IconBadge(systemName: "minus", tint: ScorebookColor.out)
                         }
                     }
                 }
                 RowDivider()
-                OptionRow(title: "Add a hitter", detail: "To the bottom of the order", end: .chevron,
+                OptionRow(title: "Add a hitter", end: .chevron,
                           action: { open = .addHitter }) {
                     IconBadge(systemName: "person.badge.plus")
                 }
@@ -109,13 +109,13 @@ public struct LineupsSheet: View {
                               detail: LineupWording.whereIs(player.id, side: side, in: context))
                     RowDivider()
                 }
-                OptionRow(title: "Add a player to the roster", detail: "Someone not listed yet", end: .chevron,
+                OptionRow(title: "Add a player to the roster", end: .chevron,
                           action: { open = .addPlayer }) {
                     IconBadge(systemName: "plus")
                 }
             }
 
-            FootNote("Tap a player to fix their name or number, or to say it was really someone else. Changes save as you make them.")
+            FootNote("Changes save as you make them.")
         } footer: {
             Button("Done") { onFinish(.cancel) }
                 .buttonStyle(PrimaryButtonStyle())
@@ -201,7 +201,7 @@ struct PlayerFixPage: View {
                         }
                     }
                     if !others.isEmpty { RowDivider() }
-                    OptionRow(title: "Someone new", detail: "Type their number and name",
+                    OptionRow(title: "Someone new",
                               end: typingNew ? .close : .chevron, action: { typingNew.toggle() }) {
                         IconBadge(systemName: "plus")
                     }
@@ -219,12 +219,11 @@ struct PlayerFixPage: View {
                         .background(ScorebookColor.surfaceSecondary)
                     }
                 }
-                FootNote("Everything recorded for \(context.name(player)) moves to the player you pick. If they were in the game too, the two trade places.")
             }
 
             if canRemove {
                 Card {
-                    OptionRow(title: "Take out of the batting order", detail: "Before the first pitch only",
+                    OptionRow(title: "Take out of the batting order",
                               action: { onDone(.correctLineup(.removeFromOrder(side: side, player: player))) }) {
                         IconBadge(systemName: "minus", tint: ScorebookColor.out)
                     }
@@ -247,7 +246,7 @@ struct PlayerFixPage: View {
                 onDone(.correctLineup(.wasReally(side: side, shown: player, really: really)))
             }
         } message: {
-            Text("Every play already recorded for \(context.name(player)) becomes \(confirming?.displayName ?? "theirs")’s. If both were in the game, they trade places.")
+            Text("Every play recorded for \(context.name(player)) becomes \(confirming?.displayName ?? "theirs")’s. If both were in the game, they trade places.")
         }
     }
 
@@ -287,7 +286,7 @@ struct NewRosterPlayerPage: View {
             SectionLabel("Bats")
             SegmentedChoice(options: [(BattingSide.left, "Left"), (.right, "Right"), (.switchHitter, "Switch")],
                             selection: $bats)
-            InfoBox(Text("Added to the \(context.teamName(side)) roster for this game and next time. Bring them in with a substitution or Add a hitter."))
+            InfoBox(Text("They start on the bench."))
         } footer: {
             Button("Add to the roster") {
                 let player = NewPlayerFields.makePlayer(number: number, name: name, bats: bats)

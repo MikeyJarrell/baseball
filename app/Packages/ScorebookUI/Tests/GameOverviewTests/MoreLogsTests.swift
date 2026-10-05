@@ -101,7 +101,7 @@ struct MoreLogsTests {
         let strikeout = rows[3]
         #expect(strikeout.text == "Webb struck out swinging")
         #expect(strikeout.earlierPitches == ["Ball", "Called strike", "Foul"])
-        #expect(strikeout.deleteEffect.hasPrefix("Deletes strike three only. Webb is back at the plate with the count at 1–2"))
+        #expect(strikeout.deleteEffect.hasPrefix("Deletes strike three only. Webb is back up at 1–2"))
         #expect(rows[4].earlierPitches.isEmpty)
         // The fix sheet asks about the play by name and half-inning.
         #expect(FixPlaySheet(row: strikeout) { _ in }.deleteQuestion == "Delete “Webb struck out swinging” (Bottom 2nd)?")

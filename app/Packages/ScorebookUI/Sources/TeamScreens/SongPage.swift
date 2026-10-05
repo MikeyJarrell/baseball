@@ -149,7 +149,7 @@ public struct SongPage: View {
                 }
                 .buttonStyle(WideButtonStyle(kind: .ours))
                 Button { onRequest(.playPreview(song.id, from: 0)) } label: {
-                    Label("Play from the top, to find the hook", systemImage: "backward.end.fill")
+                    Label("Play from the top", systemImage: "backward.end.fill")
                 }
                 .buttonStyle(WideButtonStyle(kind: .quiet, compact: true))
             }

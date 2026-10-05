@@ -153,7 +153,7 @@ struct BottomBar<Buttons: View>: View {
                         .foregroundStyle(ScorebookColor.out)
                 } else if showsInningOver {
                     InningOverTag()
-                } else {
+                } else if !detail.isEmpty {
                     Text(detail)
                         .font(ScorebookFont.caption)
                         .foregroundStyle(ScorebookColor.textSecondary)

@@ -32,7 +32,7 @@ struct RunnersStep: View {
                     .battingTeam(model.battingLook)
                     .frame(maxHeight: 230)
                     .padding(.horizontal, Spacing.screenEdge)
-                Text("Dot = the app’s guess. Tap any base to change it.")
+                Text("Dot = a guess. Tap a base to change it.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,7 +54,7 @@ struct RunnersStep: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomBar(title: bottomTitle(preview), detail: bottomDetail(preview), problem: model.runnerProblem) {
+            BottomBar(title: bottomTitle(preview), detail: "", problem: model.runnerProblem) {
                 SaveButton(enabled: model.canSave) { model.perform(.save) }
             }
         }
@@ -117,13 +117,6 @@ struct RunnersStep: View {
     /// The bold line in the bottom bar: the outs after the play.
     private func bottomTitle(_ preview: PlayPreview) -> String {
         preview.endsHalfInning ? "Three outs" : "\(PlayWords.outs(preview.outsAfter)) after this"
-    }
-
-    /// The line under it: what saving does next.
-    private func bottomDetail(_ preview: PlayPreview) -> String {
-        if preview.endsHalfInning { return "Saving switches sides" }
-        if preview.endsGame { return "Home team ahead: the app asks if the game is over" }
-        return "Then the next batter is up"
     }
 }
 

@@ -63,16 +63,7 @@ public struct RosterScreen: View {
                             }
                     }
                 } header: {
-                    HStack {
-                        ListHeader(TeamWording.playerCount(team.roster.count))
-                        Spacer()
-                        Text(team.isOurs ? "Songs and intro on each page" : "Tap a player to edit")
-                            .font(ScorebookFont.caption.weight(.semibold))
-                            .foregroundStyle(ScorebookColor.textSecondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.7)
-                            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                    }
+                    ListHeader(TeamWording.playerCount(team.roster.count))
                 }
             }
         }
@@ -165,10 +156,10 @@ public struct RosterScreen: View {
         .padding(.top, Spacing.small)
     }
 
-    /// The empty roster: a word of explanation and the two ways to add players.
+    /// The empty roster: a note that it is empty and the two ways to add players.
     private func emptyRoster(_ team: Team) -> some View {
         VStack(spacing: Spacing.medium) {
-            InfoBox(text: "No players yet. Quick entry is the fastest way to type a whole roster: number and name, then Return, for each player.")
+            InfoBox(text: "No players yet.")
             Button { showsQuickEntry = true } label: {
                 Label("Quick entry", systemImage: "list.bullet")
             }

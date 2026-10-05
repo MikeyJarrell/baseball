@@ -157,9 +157,9 @@ struct HomeView: View {
     /// must be finished first, so two games are never open at once.
     private func newGame() {
         if let session = app.session, !session.isFinished {
-            app.problem = "A game is still in progress. Resume it and end it before starting a new one."
+            app.problem = "A game is still in progress. End it first."
         } else if app.ourTeam == nil {
-            app.problem = "Set up your team first: open Teams and add your team and its players."
+            app.problem = "Set up your team first, in Teams."
         } else {
             app.closeFinishedGame()
             settingUpGame = true

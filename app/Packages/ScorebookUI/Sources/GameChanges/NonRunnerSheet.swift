@@ -78,12 +78,12 @@ public struct NonRunnerSheet: View {
 
     public var body: some View {
         let title = nonRunner.map { "Who runs for \(context.shortName($0))?" } ?? "Runner for a non-runner"
-        SheetFrame(title: title, subtitle: "A suggestion, by rule 9.11", cancelTitle: "Later",
+        SheetFrame(title: title, cancelTitle: "Later",
                    onCancel: { onFinish(.cancel) }) {
             if let nonRunner, let onBase {
                 content(nonRunner, onBase)
             } else {
-                EmptyNote("No designated non-runner is on base right now. This sheet opens by itself when one reaches.")
+                EmptyNote("No designated non-runner is on base.")
             }
         } footer: {
             Button(confirmTitle, action: confirm)
@@ -94,17 +94,17 @@ public struct NonRunnerSheet: View {
 
     @ViewBuilder private func content(_ nonRunner: PlayerID, _ onBase: BaseRunner) -> some View {
         let short = context.shortName(nonRunner)
-        InfoBox(Text("\(Text(context.name(nonRunner)).bold().foregroundStyle(ScorebookColor.textPrimary)) is a designated non-runner and just reached \(baseName(onBase.base)). Pick before the next pitch."))
+        InfoBox(Text("\(Text(context.name(nonRunner)).bold().foregroundStyle(ScorebookColor.textPrimary)) just reached \(baseName(onBase.base)). Pick before the next pitch."))
 
         Card {
             if let suggested {
-                OptionRow(title: context.name(suggested), detail: "The league rule’s pick: the team’s last recorded out",
+                OptionRow(title: context.name(suggested), detail: "Last recorded out",
                           end: .radio(pick == .runner(suggested)), action: { pick = .runner(suggested) }) {
                     PlayerNumberBadge(context.number(suggested), look: look, size: 40)
                 }
                 RowDivider()
             }
-            OptionRow(title: "\(short) runs", detail: "Nobody replaces them",
+            OptionRow(title: "\(short) runs",
                       end: .radio(pick == .themselves), action: { pick = .themselves }) {
                 PlayerNumberBadge(context.number(nonRunner), look: look, size: 40)
             }
@@ -121,7 +121,7 @@ public struct NonRunnerSheet: View {
             Card {
                 ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                     if i > 0 { RowDivider() }
-                    PlayerChoiceRow(context: context, player: player.id, detail: "Your call", look: look,
+                    PlayerChoiceRow(context: context, player: player.id, detail: nil, look: look,
                                     isSelected: pick == .runner(player.id)) { pick = .runner(player.id) }
                 }
             }
@@ -147,7 +147,7 @@ public struct NonRunnerSheet: View {
                 Card {
                     ForEach(Array(others.enumerated()), id: \.element.id) { i, player in
                         if i > 0 { RowDivider() }
-                        PlayerChoiceRow(context: context, player: player.id, detail: "Your call", look: look,
+                        PlayerChoiceRow(context: context, player: player.id, detail: nil, look: look,
                                         isSelected: pick == .pinchRunner(player.id)) { pick = .pinchRunner(player.id) }
                     }
                 }
@@ -156,7 +156,7 @@ public struct NonRunnerSheet: View {
             }
         }
 
-        FootNote("With a runner for \(short), \(short) stays in the batting order, and if the runner scores, the run is \(short)’s. The rule’s runner is the team’s last recorded out; if that player is batting, the out before; in the first inning before any out, the last batter on the lineup card.")
+        FootNote("If the runner scores, the run is \(short)’s.")
     }
 
     /// Opens or closes the bench list for a pinch runner.

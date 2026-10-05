@@ -32,7 +32,7 @@ struct PregameCover: View {
                 }
             }
         } else {
-            EmptyPage(text: "Set up your team first: open Teams and add your team and its players.")
+            EmptyPage(text: "Set up your team first, in Teams.")
                 .onTapGesture(perform: onCancel)
         }
     }
@@ -55,8 +55,6 @@ struct SongSettingsSheet: View {
                             in: 4...60, step: 1) {
                         Text("\(Int(app.settings.walkUpSongSeconds)) seconds of song")
                     }
-                } footer: {
-                    Text("The last two seconds are the fade. A song’s own length, set on its page, wins.")
                 }
                 Section {
                     Toggle("Fade on the first pitch", isOn: Binding(
@@ -95,7 +93,7 @@ struct SongPickerSheet: View {
             List {
                 let songs = app.audio?.library.songs ?? []
                 if songs.isEmpty {
-                    Text("No songs yet. Add songs from the home screen’s Songs page.")
+                    Text("No songs yet. Add them on the Songs page.")
                         .foregroundStyle(ScorebookColor.textSecondary)
                 }
                 ForEach(songs) { song in
@@ -159,12 +157,10 @@ struct WarmUpSongsSheet: View {
                 if !hisSongs.isEmpty {
                     Section {
                         ForEach(hisSongs, id: \.self) { id in
-                            row(id, isHis: true, note: id == player?.warmUpSongID ? "His first inning" : "Later innings")
+                            row(id, isHis: true, note: id == player?.warmUpSongID ? "First inning" : "Later innings")
                         }
                     } header: {
-                        Text("His warm-up songs")
-                    } footer: {
-                        Text("The first plays his first inning; the others take turns after that. Tap one to take it off.")
+                        Text("Their warm-up songs")
                     }
                 }
                 Section {
@@ -213,8 +209,8 @@ struct WarmUpSongsSheet: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(song?.title ?? "Song"))
-            .accessibilityValue(Text(isHis ? "One of his warm-up songs" : "Not one of his"))
-            .accessibilityHint(Text(isHis ? "Takes it off his list" : "Adds it to his list"))
+            .accessibilityValue(Text(isHis ? "One of their warm-up songs" : "Not one of theirs"))
+            .accessibilityHint(Text(isHis ? "Takes it off their list" : "Adds it to their list"))
         }
     }
 
@@ -325,7 +321,7 @@ struct OverviewPage: View {
             TimeLimitSheet(context: context, onFinish: done)
         default:
             // Pitches are changed on the overview itself; anything else can only be deleted.
-            EmptyPage(text: "This kind of event can be deleted from the play-by-play, then entered again.")
+            EmptyPage(text: "Delete it from the play-by-play, then enter it again.")
                 .onTapGesture { fixingOther = nil }
         }
     }

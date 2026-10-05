@@ -48,7 +48,7 @@ public struct TeamsListScreen: View {
 
             Section {
                 if opponents.isEmpty {
-                    Text("No opponents saved yet. They are added here when you set up a game, or with Add a team.")
+                    Text("No opponents saved yet.")
                         .font(ScorebookFont.body)
                         .foregroundStyle(ScorebookColor.textSecondary)
                         .padding(.vertical, Spacing.small)
