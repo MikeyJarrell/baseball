@@ -76,7 +76,8 @@ public struct LineupsSheet: View {
                 ForEach(order, id: \.spot) { spot, player in
                     if spot > 0 { RowDivider() }
                     if let player {
-                        playerRow(player, title: "\(spot + 1). \(context.name(player))")
+                        playerRow(player, title: "\(spot + 1). \(context.name(player))",
+                                  detail: LineupWording.position(player, side: side, in: context))
                     } else {
                         OptionRow(title: "\(spot + 1). Empty spot", detail: "Nobody bats here") {
                             IconBadge(systemName: "minus", tint: ScorebookColor.out)
@@ -95,7 +96,8 @@ public struct LineupsSheet: View {
                 Card {
                     ForEach(Array(fieldingOnly.enumerated()), id: \.element) { i, player in
                         if i > 0 { RowDivider() }
-                        playerRow(player, title: context.name(player))
+                        playerRow(player, title: context.name(player),
+                                  detail: LineupWording.whereIs(player, side: side, in: context))
                     }
                 }
             }
@@ -103,7 +105,8 @@ public struct LineupsSheet: View {
             SectionLabel("Rest of the roster")
             Card {
                 ForEach(restOfRoster) { player in
-                    playerRow(player.id, title: player.displayName)
+                    playerRow(player.id, title: player.displayName,
+                              detail: LineupWording.whereIs(player.id, side: side, in: context))
                     RowDivider()
                 }
                 OptionRow(title: "Add a player to the roster", detail: "Someone not listed yet", end: .chevron,
@@ -136,8 +139,8 @@ public struct LineupsSheet: View {
     }
 
     /// One player: number badge, name, and where they are in the game now.
-    private func playerRow(_ id: PlayerID, title: String) -> some View {
-        OptionRow(title: title, detail: LineupWording.whereIs(id, side: side, in: context), end: .chevron,
+    private func playerRow(_ id: PlayerID, title: String, detail: String) -> some View {
+        OptionRow(title: title, detail: detail, end: .chevron,
                   action: { open = .player(id) }) {
             PlayerNumberBadge(context.number(id), look: look, size: 36)
         }
@@ -242,7 +245,7 @@ struct PlayerFixPage: View {
                 onDone(.correctLineup(.wasReally(side: side, shown: player, really: really)))
             }
         } message: {
-            Text("Every play already recorded for \(context.name(player)) becomes theirs.")
+            Text("Every play already recorded for \(context.name(player)) becomes \(confirming?.displayName ?? "theirs")’s. If both were in the game, they trade places.")
         }
     }
 
@@ -297,6 +300,11 @@ struct NewRosterPlayerPage: View {
 // MARK: - Words
 
 enum LineupWording {
+    /// Where a hitter plays in the field now: "Shortstop", or "Not in the field".
+    static func position(_ id: PlayerID, side: TeamSide, in context: GameChangeContext) -> String {
+        context.state(side).fielders.first { $0.player == id }.map { positionTitle($0.position) } ?? "Not in the field"
+    }
+
     /// Where a player is in the game now: "Bats 4th · SS", "Pitcher · doesn’t bat", "Bench",
     /// "Left the game".
     static func whereIs(_ id: PlayerID, side: TeamSide, in context: GameChangeContext) -> String {

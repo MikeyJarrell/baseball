@@ -1,5 +1,6 @@
 // Smaller pages the app shell shows itself: the pregame screens' cover, the walk-up song
-// settings, the song picker, the game overview and the teams and songs pages.
+// settings, the song picker, our pitcher's warm-up songs, the game overview and the teams and
+// songs pages.
 
 import SwiftUI
 import Model
@@ -111,6 +112,131 @@ struct SongPickerSheet: View {
             .navigationTitle("Walk-up song")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { onFinish(nil) } } }
+        }
+    }
+}
+
+// MARK: - Warm-up songs
+
+/// Our pitcher's warm-up songs, from the batting screen during a game: the songs he has (his
+/// first-inning song, then the extras shuffled for his later innings), then the rest of the
+/// library. Tapping a song adds it to his list or takes it off; its play button plays it now as
+/// his warm-up song. Each change saves to the team at once, so it holds for this game and the
+/// next ones.
+struct WarmUpSongsSheet: View {
+    @Environment(AppModel.self) private var app
+    var pitcher: PlayerID
+    var onClose: () -> Void
+
+    @State private var search = ""
+
+    /// The pitcher as the saved team has him now.
+    private var player: Player? { app.ourTeam?.player(pitcher) }
+
+    /// His warm-up songs: the first-inning song, then the extras.
+    private var hisSongs: [SongID] {
+        guard let player else { return [] }
+        return (player.warmUpSongID.map { [$0] } ?? []) + player.extraWarmUpSongIDs.filter { $0 != player.warmUpSongID }
+    }
+
+    /// The rest of the library, alphabetical, narrowed by the search.
+    private var otherSongs: [Song] {
+        let his = Set(hisSongs)
+        return (app.audio?.library.songs ?? [])
+            .filter { !his.contains($0.id) }
+            .filter { search.isEmpty || $0.title.localizedCaseInsensitiveContains(search)
+                      || ($0.artist ?? "").localizedCaseInsensitiveContains(search) }
+            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if !hisSongs.isEmpty {
+                    Section {
+                        ForEach(hisSongs, id: \.self) { id in
+                            row(id, isHis: true, note: id == player?.warmUpSongID ? "His first inning" : "Later innings")
+                        }
+                    } header: {
+                        Text("His warm-up songs")
+                    } footer: {
+                        Text("The first plays his first inning; the others take turns after that. Tap one to take it off.")
+                    }
+                }
+                Section {
+                    ForEach(otherSongs) { song in row(song.id, isHis: false, note: song.artist) }
+                } header: {
+                    Text("Add a song")
+                }
+            }
+            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search songs")
+            .navigationTitle("Warm-up songs for \(player?.lastName ?? "pitcher")")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", action: onClose) } }
+        }
+    }
+
+    /// One song: a play button, the title over a smaller line, and a check when it is his.
+    private func row(_ id: SongID, isHis: Bool, note: String?) -> some View {
+        let song = app.audio?.library.song(id)
+        let playback = app.audio?.playback
+        let playingThis = playback?.phase == .warmUp && playback?.song == id
+        return HStack(spacing: Spacing.small) {
+            Button {
+                if playingThis { app.audio?.fadeOut() } else { playNow(id) }
+            } label: {
+                Image(systemName: playingThis ? "stop.fill" : "play.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .frame(width: 40, height: 40)
+                    .background(ScorebookColor.surfaceSecondary, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(playingThis ? "Fade out \(song?.title ?? "song")" : "Play \(song?.title ?? "song") now"))
+            Button {
+                Task { await toggle(id, isHis: isHis) }
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(song?.title ?? "A song no longer in the library").foregroundStyle(ScorebookColor.textPrimary)
+                        if let note { Text(note).font(.caption).foregroundStyle(ScorebookColor.textSecondary) }
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: isHis ? "checkmark.circle.fill" : "plus.circle")
+                        .font(.title3)
+                        .foregroundStyle(isHis ? ScorebookColor.highlight : ScorebookColor.textSecondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(song?.title ?? "Song"))
+            .accessibilityValue(Text(isHis ? "One of his warm-up songs" : "Not one of his"))
+            .accessibilityHint(Text(isHis ? "Takes it off his list" : "Adds it to his list"))
+        }
+    }
+
+    /// Plays one song now as his warm-up song.
+    private func playNow(_ id: SongID) {
+        guard var pitcherNow = player else { return }
+        pitcherNow.warmUpSongID = id
+        app.audio?.playWarmUp(for: pitcherNow)
+    }
+
+    /// Adds a song to his list (as his first-inning song if he has none) or takes it off.
+    private func toggle(_ id: SongID, isHis: Bool) async {
+        guard let team = app.ourTeam else { return }
+        await app.changeWarmUpSongs(for: pitcher, teamID: team.id) { player in
+            if isHis {
+                if player.warmUpSongID == id {
+                    player.warmUpSongID = player.extraWarmUpSongIDs.first
+                    if !player.extraWarmUpSongIDs.isEmpty { player.extraWarmUpSongIDs.removeFirst() }
+                } else {
+                    player.extraWarmUpSongIDs.removeAll { $0 == id }
+                }
+            } else if player.warmUpSongID == nil {
+                player.warmUpSongID = id
+            } else if !player.extraWarmUpSongIDs.contains(id) {
+                player.extraWarmUpSongIDs.append(id)
+            }
         }
     }
 }

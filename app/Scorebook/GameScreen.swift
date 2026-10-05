@@ -298,9 +298,9 @@ struct GameScreen: View {
                 if let song { Task { await giveWalkUpSong(song, to: player) } }
             }
         case .gameDetails:
-            GameDetailsSheet(context: context, onFinish: done)
+            GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
         case .warmUpSongs(let pitcher):
-            WarmUpSongsSheet(pitcher: pitcher, playingNow: withThisInningsWarmUp) { sheet = nil }
+            WarmUpSongsSheet(pitcher: pitcher) { sheet = nil }
         }
     }
 
@@ -347,7 +347,7 @@ struct GameScreen: View {
             }
         case .changeDetails(let details):
             Task {
-                if details.switchHomeAndAway { guard await session.switchHomeAndAway() else { return } }
+                if details.switchHomeAndAway { await session.switchHomeAndAway() }
                 await session.changeDetails { setup in
                     setup.scheduledStart = details.scheduledStart
                     setup.rules.scheduledInnings = details.innings

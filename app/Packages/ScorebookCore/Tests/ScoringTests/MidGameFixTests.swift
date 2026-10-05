@@ -136,6 +136,19 @@ struct MidGameFixTests {
         #expect(session.setup.away == wasHome)
     }
 
+    @Test("A substitution before the first pitch moves with its team when home and away switch")
+    func switchAfterPregameSubstitution() async throws {
+        let session = try await emptySampleSession()
+        let bench = try #require(session.setup.home.bench.first)
+        let change = Substitution(team: .home, defense: [FielderAssignment(position: .shortstop, player: bench.id)])
+        await session.record(GameEvent(kind: .substitution(change)))
+        #expect(session.canSwitchHomeAndAway)
+        #expect(await session.switchHomeAndAway())
+        guard case .substitution(let moved) = session.game.events.first?.kind else { Issue.record("no substitution"); return }
+        #expect(moved.team == .away)
+        #expect(session.situation.away.fielders.contains { $0.player == bench.id && $0.position == .shortstop })
+    }
+
     @Test("Date, start time and innings change mid-game, and the game is replayed under them")
     func changeDetails() async throws {
         let session = try await emptySampleSession()

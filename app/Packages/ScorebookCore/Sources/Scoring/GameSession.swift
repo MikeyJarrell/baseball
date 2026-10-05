@@ -396,9 +396,16 @@ public final class GameSession {
     // MARK: Fixing the game's details and lineups
 
     /// True until the first pitch: home and away can only be switched while nobody has batted,
-    /// since the top of the first belongs to whoever was away.
+    /// since the top of the first belongs to whoever was away. Lineup business before then (a
+    /// substitution, a pitching change, an added hitter, a batting hole) moves with its team.
     public var canSwitchHomeAndAway: Bool {
-        game.events.allSatisfy { !$0.happenedOnTheField }
+        game.events.allSatisfy { event in
+            switch event.kind {
+            case .defenseConfirmed, .automaticOut, .battingHole, .timeLimitChange,
+                 .substitution, .pitchingChange, .addHitter: true
+            default: false
+            }
+        }
     }
 
     /// Changes the setup's date, start time or innings and replays. Clears Redo.
@@ -414,7 +421,7 @@ public final class GameSession {
 
     /// Swaps the two teams, and with them the side named in each pregame entry: a defense check
     /// is dropped (it was for the team that was fielding first) and will be asked again, a
-    /// batting hole moves with its team, and automatic outs are worked out again.
+    /// batting hole or lineup change moves with its team, and automatic outs are worked out again.
     @discardableResult
     private func switchHomeAndAwayNow() async -> Bool {
         guard canSwitchHomeAndAway else { return false }
@@ -427,6 +434,15 @@ public final class GameSession {
             case .battingHole(var hole):
                 hole.team = hole.team.opponent
                 event.kind = .battingHole(hole)
+            case .substitution(var change):
+                change.team = change.team.opponent
+                event.kind = .substitution(change)
+            case .pitchingChange(var change):
+                change.team = change.team.opponent
+                event.kind = .pitchingChange(change)
+            case .addHitter(var added):
+                added.team = added.team.opponent
+                event.kind = .addHitter(added)
             default: break
             }
             return event

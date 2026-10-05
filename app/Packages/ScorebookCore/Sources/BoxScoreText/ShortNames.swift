@@ -37,17 +37,10 @@ public struct ShortNames: Equatable, Sendable {
                      n.caughtStealing, n.sacrificeFlies, n.sacrificeBunts, n.hitByPitch] {
             list.forEach { note($0.player, $0.name) }
         }
-        // Players named only in the footnotes or the newer notes, should any be missing above.
-        for team in [box.away, box.home] {
-            team.batting.compactMap(\.entered).forEach { note($0.replaced, $0.replacedName) }
-        }
+        // Players named only in the newer notes, should any be missing above.
         for hit in n.hitBatters {
             note(hit.batter, hit.batterName)
             if let pitcher = hit.pitcher, let name = hit.pitcherName { note(pitcher, name) }
-        }
-        for ran in n.ranForNonRunners {
-            note(ran.runner, ran.runnerName)
-            note(ran.nonRunner, ran.nonRunnerName)
         }
         self.init(fullNames: order.map { ($0, fullNames[$0]!) })
     }

@@ -10,6 +10,8 @@ import DesignSystem
 /// Fix the date, start time, innings, or home and away. Hands back `.changeDetails`.
 public struct GameDetailsSheet: View {
     var context: GameChangeContext
+    /// True while home and away can still switch: before the first pitch.
+    var canSwitch: Bool
     var onFinish: (GameChangeResult) -> Void
 
     @State private var start: Date
@@ -19,17 +21,17 @@ public struct GameDetailsSheet: View {
 
     /// - Parameters:
     ///   - context: The game's setup and the situation now.
+    ///   - canSwitchHomeAndAway: True before the first pitch, from the game session.
     ///   - onFinish: Called once with the new details, or `.cancel`.
-    public init(context: GameChangeContext, onFinish: @escaping (GameChangeResult) -> Void) {
+    public init(context: GameChangeContext, canSwitchHomeAndAway: Bool,
+                onFinish: @escaping (GameChangeResult) -> Void) {
         self.context = context
+        self.canSwitch = canSwitchHomeAndAway
         self.onFinish = onFinish
         _start = State(initialValue: context.setup.scheduledStart)
         _innings = State(initialValue: context.setup.scheduledInnings)
         _homeTeam = State(initialValue: .home)
     }
-
-    /// True before the first pitch, while home and away can still switch.
-    private var canSwitch: Bool { context.situation.gameStartedAt == nil }
 
     private var change: GameDetailsChange {
         GameDetailsChange(scheduledStart: start, innings: innings, switchHomeAndAway: homeTeam == .away)

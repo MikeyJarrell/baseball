@@ -1,7 +1,8 @@
 // BoxScorePicture: a box score in, a newspaper-style picture out, for texting to the team.
 //
 // `BoxScorePicture` draws the layout worked out by the BoxScoreText module: the date and
-// headline, each team's batting lines, the line score, the notes, and the pitching lines,
+// headline, each team's batting lines, the line score, the notes (one kind to a line), and
+// the pitching lines,
 // in black ink on newsprint. `BoxScoreRenderer` turns it into an image at three times
 // screen resolution, and `BoxScoreShareLink` hands it to the iPhone share sheet.
 
@@ -38,15 +39,16 @@ public struct BoxScorePicture: View {
             LineScoreView(lineScore: layout.lineScore)
             Rule().padding(.vertical, 6)
 
+            // Each kind of note on its own line.
             if !layout.notes.isEmpty {
-                Paragraph(text: layout.notes.joined(separator: " "))
+                NoteLines(notes: layout.notes)
                 Rule().padding(.vertical, 6)
             }
 
             PitchingTablesView(tables: layout.pitching)
 
             if !layout.pitchingNotes.isEmpty {
-                Paragraph(text: layout.pitchingNotes.joined(separator: " "))
+                NoteLines(notes: layout.pitchingNotes)
                     .padding(.top, 6)
             }
         }
@@ -62,16 +64,20 @@ public struct BoxScorePicture: View {
         .accessibilityLabel("Box score: \(layout.headline)")
     }
 
-    /// The date in small spaced capitals, the headline in big bold type, and "In progress"
-    /// for a game that has not ended.
+    /// The date in small spaced capitals, the headline in big bold type with one team to a
+    /// line (shrunk a little rather than broken if a name is long), and "In progress" for a
+    /// game that has not ended.
     private var masthead: some View {
         VStack(spacing: 3) {
             Text(layout.dateLine.uppercased())
                 .font(Newsprint.font(Newsprint.dateSize))
                 .tracking(2)
-            Text(layout.headline)
-                .font(Newsprint.font(Newsprint.headlineSize, .heavy))
-                .multilineTextAlignment(.center)
+            ForEach(Array(layout.headline.split(separator: "\n").enumerated()), id: \.offset) { _, line in
+                Text(String(line))
+                    .font(Newsprint.font(Newsprint.headlineSize, .heavy))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+            }
             if let status = layout.status {
                 Text(status)
                     .font(Newsprint.font(Newsprint.bodySize).italic())
@@ -84,8 +90,7 @@ public struct BoxScorePicture: View {
 // MARK: - Tables
 
 /// One team's batting lines: a heading row with the team name and "ab r h bi", a row per
-/// batter, the totals in bold, and under them the footnotes for any pinch hitters and
-/// pinch runners ("a-popped out for Collins in the 4th.").
+/// batter, and the totals in bold.
 struct BattingTableView: View {
     let table: NewspaperTable
 
@@ -94,10 +99,6 @@ struct BattingTableView: View {
             HeadingRow(title: table.title, columns: table.columns)
             ForEach(Array(table.rows.enumerated()), id: \.offset) { _, row in
                 NumberRow(row: row)
-            }
-            if !table.footnotes.isEmpty {
-                Paragraph(text: table.footnotes.joined(separator: " "))
-                    .padding(.top, 2)
             }
         }
     }
@@ -226,6 +227,19 @@ struct DoubleRule: View {
         VStack(spacing: 1.5) {
             Rule()
             Rule()
+        }
+    }
+}
+
+/// Notes, one to a line: "E—Kim, Tate." then "DP—Mudcats 2." Each wraps if it is long.
+struct NoteLines: View {
+    let notes: [String]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
+                Paragraph(text: note)
+            }
         }
     }
 }
