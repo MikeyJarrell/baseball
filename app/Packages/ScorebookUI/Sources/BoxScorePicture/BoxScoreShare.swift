@@ -26,7 +26,7 @@ public struct BoxScoreShareItem: Transferable, Sendable {
         guard let png = BoxScoreRenderer.pngData(for: layout) else { return nil }
         self.png = png
         self.text = BoxScorePrinter.text(box, timeZone: timeZone)
-        self.headline = layout.headline
+        self.headline = layout.headline.replacingOccurrences(of: "\n", with: ", ")
     }
 
     /// The picture first, then the text: a receiving app takes the first one it accepts.

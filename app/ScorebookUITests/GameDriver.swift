@@ -695,6 +695,6 @@ final class GameDriver {
     /// The box score with the game's length taken out ("T—3:12."): the app's clock runs while
     /// the test taps, so its length is minutes, not the book's hours.
     static func withoutGameLength(_ box: String) -> String {
-        box.replacingOccurrences(of: #" ?T—\d+:\d\d\."#, with: "", options: .regularExpression)
+        box.replacingOccurrences(of: #"[ \n]?T—\d+:\d\d\."#, with: "", options: .regularExpression)
     }
 }
