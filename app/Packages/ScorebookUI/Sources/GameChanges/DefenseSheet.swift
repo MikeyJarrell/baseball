@@ -1,6 +1,9 @@
-// The defense check and the fielders sheet: the nine positions with who is at each.
+// The defense check and the fielders sheet: the field drawing with who is at each position
+// (first initial and last name, since teammates can share a last name), and the nine positions
+// listed under it, as on the pregame fielding step. Tapping a position on the drawing or in the
+// list opens the team's roster to pick who plays there.
 //
-// - Defense check: each time our team takes the field, a compact list of the nine positions.
+// - Defense check: each time our team takes the field, the drawing and the nine positions.
 //   One tap confirms nobody moved; tapping a position swaps in another player. The app can
 //   hand in a suggested defense, such as two players who alternate at first base by inning:
 //   the sheet starts from the suggestion, marks each position that differs from now ("Ruiz at
@@ -41,7 +44,7 @@ public struct DefenseSheet: View {
     /// Who is at each position as the scorer has it on this sheet.
     @State private var draft: [Position: PlayerID]
     /// The position whose player list is open.
-    @State private var openPosition: Position?
+    @State private var openPosition: OpenPosition?
 
     /// - Parameters:
     ///   - context: The game's setup and the situation now.
@@ -127,19 +130,38 @@ public struct DefenseSheet: View {
             if let plan, !plan.reasons.isEmpty, !changedPositions.isEmpty {
                 InfoBox(Text("Set up from the plan for this inning. Check the marked positions, then save."))
             }
+            FieldDrawing(highlightedPositions: Set(changedPositions), onTap: { tap in
+                if case .position(let position) = tap { openPosition = OpenPosition(position: position) }
+            })
+            .fielderNames(fielderNames)
+            .frame(height: 300)
+            .frame(maxWidth: .infinity)
+            .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
+            .padding(.bottom, Spacing.small)
+            FootNote("Tap a position to put someone else there. Picking someone already in the field swaps the two.")
             Card {
                 ForEach(Array(Position.allCases.enumerated()), id: \.element) { i, position in
                     if i > 0 { RowDivider() }
                     positionRow(position)
-                    if openPosition == position {
-                        playerPicker(for: position)
-                    }
                 }
             }
-            FootNote("Tap a position to put someone else there. Picking someone already in the field swaps the two.")
+            .padding(.top, Spacing.small)
         } footer: {
             confirmButton
         }
+        .sheet(item: $openPosition) { open in
+            playerPicker(for: open.position)
+                .presentationDetents([.medium, .large])
+        }
+    }
+
+    /// The name on the drawing at each position: first initial and last name, "J. Webb".
+    private var fielderNames: [Position: String] {
+        var names: [Position: String] = [:]
+        for (position, id) in draft {
+            names[position] = context.player(id)?.initialAndLastName ?? context.shortName(id)
+        }
+        return names
     }
 
     private var subtitle: String {
@@ -165,9 +187,9 @@ public struct DefenseSheet: View {
         }
         return OptionRow(title: player.map { context.name($0) } ?? "Nobody",
                          detail: detail,
-                         end: openPosition == position ? .close : .swap,
+                         end: .swap,
                          isChanged: changed,
-                         action: { openPosition = openPosition == position ? nil : position }) {
+                         action: { openPosition = OpenPosition(position: position) }) {
             PositionCircle(position: position)
         }
         .accessibilityLabel("\(positionTitle(position)): \(player.map { context.name($0) } ?? "nobody")\(changed ? ", changed" : "")")
@@ -179,37 +201,37 @@ public struct DefenseSheet: View {
         plan?.fielders.first { $0.position == position }?.player
     }
 
-    /// The chips for choosing who plays a position: everyone on the roster except the player
-    /// there now, each marked with where they are on the sheet, plus "Nobody".
+    /// The list for choosing who plays a position: everyone on the roster, each with their
+    /// number and where they are on the sheet now, plus "Nobody". A pick closes the list.
     private func playerPicker(for position: Position) -> some View {
         let here = draft[position]
         let whereOnSheet = Dictionary(draft.map { ($0.value, $0.key) }, uniquingKeysWith: { first, _ in first })
-        return WrappingChips {
-            ForEach(context.team(side).roster.filter { $0.id != here }) { player in
-                Button {
-                    put(player.id, at: position)
-                } label: {
-                    HStack(spacing: Spacing.extraSmall) {
-                        Text(player.lastName)
-                        if let at = whereOnSheet[player.id] {
-                            Text(at.abbreviation).opacity(0.6)
+        return NavigationStack {
+            ScrollView {
+                Card {
+                    ForEach(Array(context.team(side).roster.enumerated()), id: \.element.id) { i, player in
+                        if i > 0 { RowDivider() }
+                        PlayerChoiceRow(context: context, player: player.id,
+                                        detail: whereOnSheet[player.id].map { "Now at \(positionTitle($0))" } ?? "Not in the field",
+                                        look: look, isSelected: here == player.id,
+                                        action: { put(player.id, at: position) })
+                    }
+                    if here != nil {
+                        RowDivider()
+                        OptionRow(title: "Nobody", detail: "Leave \(position.name) empty", action: { put(nil, at: position) }) {
+                            IconBadge(systemName: "xmark", tint: ScorebookColor.out)
                         }
                     }
                 }
-                .buttonStyle(ChipStyle(isOn: false, fill: ScorebookColor.surface))
-                .accessibilityLabel("\(player.displayName)\(whereOnSheet[player.id].map { ", now at \($0.name)" } ?? "")")
+                .padding(Spacing.large)
             }
-            if here != nil {
-                Button("Nobody") { put(nil, at: position) }
-                    .buttonStyle(ChipStyle(isOn: false, fill: ScorebookColor.surface))
-                    .accessibilityLabel("Leave \(position.name) empty")
+            .background(ScorebookColor.background)
+            .navigationTitle("Who plays \(position.name)?")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) { Button("Done") { openPosition = nil } }
             }
         }
-        .padding(.horizontal, Spacing.large - 2)
-        .padding(.top, Spacing.small + 2)
-        .padding(.bottom, Spacing.large - 2)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(ScorebookColor.surfaceSecondary)
     }
 
     /// Puts a player at a position on the sheet (see `DefenseBuilder.put`).
@@ -253,4 +275,10 @@ public struct DefenseSheet: View {
         guard let change = DefenseBuilder.substitution(team: side, current: current, draft: draft) else { return }
         onFinish(.record(EnteredEvent(event: GameEvent(kind: .substitution(change)))))
     }
+}
+
+/// A position picked on the drawing or in the list, so its player list can open as a sheet.
+struct OpenPosition: Identifiable, Equatable {
+    var position: Position
+    var id: Int { position.rawValue }
 }

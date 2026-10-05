@@ -314,6 +314,14 @@ final class AppModel {
         await saveTeam(team)
     }
 
+    /// Changes one player's warm-up songs on a saved team: the main one and the extras.
+    func changeWarmUpSongs(for id: PlayerID, teamID: TeamID, _ change: (inout Player) -> Void) async {
+        guard var team = teams.first(where: { $0.id == teamID }),
+              let i = team.roster.firstIndex(where: { $0.id == id }) else { return }
+        change(&team.roster[i])
+        await saveTeam(team)
+    }
+
     // MARK: Settings and songs
 
     /// Changes the settings, saves them, and passes the walk-up length to the audio player.

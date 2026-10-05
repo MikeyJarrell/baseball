@@ -52,14 +52,15 @@ struct FieldingStep: View {
         }
     }
 
-    /// The short name written under each position on the drawing: "Quinn", or "Quinn/Nash" for
-    /// a position shared by turns.
+    /// The name written under each position on the drawing, with the first initial since
+    /// teammates can share a last name: "J. Quinn", or "J. Quinn/K. Nash" for a position
+    /// shared by turns.
     private var fielderNames: [Position: String] {
         var names: [Position: String] = [:]
         for (position, id) in lineup.defense {
             guard let starter = lineup.player(id) else { continue }
             let second = lineup.alternates[position].flatMap(lineup.player)
-            names[position] = second.map { "\(starter.lastName)/\($0.lastName)" } ?? starter.lastName
+            names[position] = second.map { "\(starter.initialAndLastName)/\($0.initialAndLastName)" } ?? starter.initialAndLastName
         }
         return names
     }
