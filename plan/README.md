@@ -83,7 +83,7 @@ Each job below has its own brief in [briefs/](briefs/). A brief says what the jo
 | Screen builder: the game-so-far screen and batter history | [game overview](briefs/screen-game-overview.md) | After foundation and mockup approval |
 | Screen builder: end of game and season stats | [postgame and season screens](briefs/screen-postgame-and-season.md) | After foundation and mockup approval |
 | Reviewer: a fresh reader who checks each job before it is accepted | [rules-for-agents.md](rules-for-agents.md) | As each job finishes |
-| Website builder | [stats website](briefs/stats-website.md) | Later |
+| Website builder | [stats website](briefs/stats-website.md) | Built ([handoff](handoffs/stats-website.md)) |
 
 Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten things at once. A good first wave is foundation and design together; then the rules engine and test scenarios together, with stats, storage and the box score printer; then audio and the screens once the mockups are approved.
 
