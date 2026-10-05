@@ -248,3 +248,26 @@ Pregame got time wheels, a separate fielding step on the diamond, DH in place of
 ## [2026-10-04 17:46] Corrections to the October 4 game
 
 Fixed the first real game on the phone after a backup: our starting fielders (Nojadera catching, Jarrell at first, Jackson Cleary #99 in left, Strong in right; Torres Benitez and Erick Rosas Lopez removed), the GWW Whales lineup matched to their registered names and numbers with Holliday, Fitzpatrick, Nuñez and Lopez added, Ortiz and Holliday as their pitchers, Soler and Carney as designated non-runners with the two runs-for-Carney entries corrected, and the Whales roster cleaned of placeholder players. Replayed before and after: 9-4 both times, nothing flagged. team/opponents.csv and team/roster.csv carry the same corrections. App feedback from the game is being handled in another session.
+
+---
+
+## [2026-10-04 18:15] Stats website for teammates
+SESSLOG:[2026-10-04 18:15]
+
+**Project(s):** baseball
+
+### Decisions
+- The site lives at mikeyjarrell.com/dogs/, served by GitHub Pages from a separate public repository, `MikeyJarrell/dogs`, holding only the built pages; the app’s code stays private.
+- Full names, as on the roster (Mikey’s choice); unlisted: every page asks search engines not to list it, and `robots.txt` turns them away.
+- No export button in the app: the Mac reads the games straight off the plugged-in phone, as `tools/load_team.sh` already does, so the brief’s export step was dropped.
+- The pages use the app’s own rules engine and stats code, so they match the phone’s Season screen; only players who have played are listed.
+
+### Follow-ups
+- [ ] First publish: once Mikey plugs the phone in, run `tools/publish_stats.sh` (the Mac copies predate the October 4 game corrections, so publishing from them would be wrong).
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/StatsSite/` (the page builder), `tools/publish_stats.sh`, `plan/handoffs/stats-website.md`
+- [modified] `Package.swift`, `PROJECT_INDEX.md`, `AGENTS.md`, `plan/README.md`
+
+### Context
+Mikey asked whether teammates could see stats; the only sharing was the texted box score picture, and a stats-website brief sat unstarted. The site is built and previewed at phone width (record, games, sortable season batting and pitching, a box score page per game, a page per player) but not yet published, because no copy on the Mac has the corrected October 4 game.
