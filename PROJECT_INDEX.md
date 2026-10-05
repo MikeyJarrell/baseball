@@ -14,6 +14,7 @@
 | The app on Mikey’s iPhone | Installed; the Diamond Dogs (16 players, 24 songs) and 8 opponents loaded with `tools/load_team.sh`; weekly reinstall with `tools/install_on_phone.sh` ([handoff](plan/handoffs/load-team.md)) |
 | Announcer introductions | Built: pieced together from Mikey’s recordings of “Now batting,” every number and each name, recorded on the Mac with `tools/record_intros.py` ([handoff](plan/handoffs/announcer-pieces.md)); all recorded and on the phone with the jersey numbers, not yet heard there |
 | Several warm-up songs per pitcher | Built: main song his first inning, extras from `team/warmup_extras.csv` shuffled for later innings; on the phone after the next reinstall and team load. Extra songs listed for Chris, Erick and Gaven |
+| Stats website | Built: `tools/publish_stats.sh` reads the games off the plugged-in phone and publishes season stats, box scores and player pages to mikeyjarrell.com/dogs/ (full names, hidden from search engines) ([handoff](plan/handoffs/stats-website.md)); not yet published |
 | Dress rehearsal | Not started: Mikey scores a televised game on his phone |
 
 No deadlines have been assigned.
