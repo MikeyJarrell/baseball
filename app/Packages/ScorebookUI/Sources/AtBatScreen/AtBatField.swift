@@ -61,7 +61,7 @@ struct AtBatFieldArea: View {
         if info.clock.isLastInning {
             BannerCard(
                 title: "Time’s up — finish this inning",
-                detail: info.clock.timeLimitEndsAt.map { "No new inning after \(AtBatWording.clockTime($0))" },
+                detail: nil,
                 fill: ScorebookColor.out,
                 text: .white
             ) { defenseButton }

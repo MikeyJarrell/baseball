@@ -105,7 +105,7 @@ public struct DefenseSheet: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Dropped third strike instead")
                                 .font(ScorebookFont.headline)
-                            Text("The batter ran on strike three: enter it, and the inning may go on")
+                            Text("The batter reached on strike three")
                                 .font(ScorebookFont.caption)
                                 .foregroundStyle(ScorebookColor.textSecondary)
                         }
@@ -128,7 +128,7 @@ public struct DefenseSheet: View {
                     .padding(.bottom, Spacing.medium)
             }
             if let plan, !plan.reasons.isEmpty, !changedPositions.isEmpty {
-                InfoBox(Text("Set up from the plan for this inning. Check the marked positions, then save."))
+                InfoBox(Text("Set from this inning’s plan. Check the marked positions."))
             }
             FieldDrawing(highlightedPositions: Set(changedPositions), onTap: { tap in
                 if case .position(let position) = tap { openPosition = OpenPosition(position: position) }
@@ -138,7 +138,7 @@ public struct DefenseSheet: View {
             .frame(maxWidth: .infinity)
             .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
             .padding(.bottom, Spacing.small)
-            FootNote("Tap a position to put someone else there. Picking someone already in the field swaps the two.")
+            FootNote("Picking someone already in the field swaps the two.")
             Card {
                 ForEach(Array(Position.allCases.enumerated()), id: \.element) { i, position in
                     if i > 0 { RowDivider() }
@@ -168,8 +168,8 @@ public struct DefenseSheet: View {
         let half = context.situation.half == .top ? "Top" : "Bottom"
         let team = context.teamName(side)
         return purpose == .check
-            ? "\(half) \(ordinal(context.situation.inning)) · \(team): check who is where"
-            : "\(team) · move players or bring them in"
+            ? "\(half) \(ordinal(context.situation.inning)) · \(team)"
+            : team
     }
 
     /// One position: its number, who is there, and what changed.

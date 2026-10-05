@@ -72,7 +72,7 @@ struct PlaysTab: View {
                     }
                 }
 
-                Text("Newest first. Tap any play to fix it; everything after it recalculates.")
+                Text("Tap a play to fix it.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .padding(.horizontal, Spacing.extraSmall)

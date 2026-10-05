@@ -303,7 +303,7 @@ public enum OverviewWording {
     }
 
     /// What "Delete it" will do, in plain words, for the fix sheet: "Deletes strike three only.
-    /// Kim is back at the plate with the count at 1–2." Uses the count the play log had just
+    /// Kim is back up at 1–2." Uses the count the play log had just
     /// before the event.
     public static func deleteEffect(_ entry: PlayLogEntry, setup: GameSetup) -> String {
         let batter = name(entry.batter, in: setup)
@@ -318,17 +318,17 @@ public enum OverviewWording {
                 case .hitByPitch: which = "the pitch that hit \(batter)"
                 default: which = "this pitch"
                 }
-                return "Deletes \(which) only. \(batter) is back at the plate with the count at \(count); the pitches before it stay, and any runners it moved go back."
+                return "Deletes \(which) only. \(batter) is back up at \(count); any runners it moved go back."
             }
-            return "Deletes this \(pitch.result.label) only. The count before it was \(count); the pitches after it are counted again from there."
+            return "Deletes this \(pitch.result.label) only. The count before it was \(count)."
         case .intentionalWalk:
-            return "Deletes the intentional walk. \(batter) is back at the plate with the count at \(count)."
+            return "Deletes the intentional walk. \(batter) is back up at \(count)."
         case .ballInPlay:
-            return "Deletes the whole play. \(batter) is back at the plate with the count at \(count), and the runners go back where they were."
+            return "Deletes the whole play. \(batter) is back up at \(count), and the runners go back."
         case .runnerAction:
-            return "Deletes this runner move. The runners go back where they were before it; the count stays \(count)."
+            return "Deletes this runner move. The runners go back where they were."
         default:
-            return "Deletes this \(entry.event.kind.label). Everything after it is worked out again."
+            return "Deletes this \(entry.event.kind.label)."
         }
     }
 

@@ -37,15 +37,15 @@ struct GameMenuSheet: View {
                         choose(.openGameDetails)
                     }
                     if let pitcher = ourPitcher {
-                        row("Warm-up songs", detail: "For \(pitcher.displayName): add more, or play one", icon: "music.note.list") {
+                        row("Warm-up songs", detail: pitcher.displayName, icon: "music.note.list") {
                             choose(.pickWarmUpSongs(pitcher))
                         }
                     }
-                    row("Home screen", detail: "Teams, songs, games; the game stays in progress", icon: "house") {
+                    row("Home screen", detail: "The game stays in progress", icon: "house") {
                         choose(.goHome)
                     }
                     row("Walk-up song length",
-                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds of song, then it fades",
+                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds",
                         icon: "speaker.wave.2") {
                         choose(.openSongSettings)
                     }
@@ -53,10 +53,7 @@ struct GameMenuSheet: View {
                 Section {
                     Button(role: .destructive) { confirmingEnd = true } label: {
                         Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("End game").font(ScorebookFont.headline)
-                                Text("Time limit reached, or the last out").font(ScorebookFont.caption)
-                            }
+                            Text("End game").font(ScorebookFont.headline)
                         } icon: {
                             Image(systemName: "flag.checkered")
                         }
@@ -141,7 +138,7 @@ struct GameOverSheet: View {
             Text(AtBatWording.scoreLine(info.setup, info.situation.score))
                 .font(ScorebookFont.scoreboardSmall)
                 .multilineTextAlignment(.center)
-            Text("\(AtBatWording.gameOverReason(reason, setup: info.setup, clock: info.clock)) The umpire makes the call; the app only asks.")
+            Text(AtBatWording.gameOverReason(reason, setup: info.setup, clock: info.clock))
                 .font(ScorebookFont.body)
                 .foregroundStyle(ScorebookColor.textSecondary)
                 .multilineTextAlignment(.leading)

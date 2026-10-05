@@ -32,7 +32,7 @@ struct FieldingStep: View {
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
                 .bareRow()
-                Text("Tap a position to pick who plays it. Anyone can field, whether or not they bat.")
+                Text("Tap a position to pick who plays it.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .padding(.horizontal, Spacing.extraSmall)
@@ -149,7 +149,7 @@ struct FielderPicker: View {
                     } header: {
                         SectionHeader(title: "Alternate with…")
                     } footer: {
-                        Text("\(starterPlayer.lastName) plays \(position.name) in odd innings and the player you pick plays it in even innings. The defense check offers the right one each time we take the field.")
+                        Text("\(starterPlayer.lastName) plays \(position.name) in odd innings; the player you pick, in even innings.")
                             .font(ScorebookFont.caption)
                             .foregroundStyle(ScorebookColor.textSecondary)
                     }
