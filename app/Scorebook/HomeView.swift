@@ -100,6 +100,14 @@ struct HomeView: View {
         } message: {
             Text(app.problem ?? "")
         }
+        // A name recorded from a player's page.
+        .sheet(item: Binding(get: { app.teamsWiring.recordingNameFor.flatMap { id in app.teams.lazy.compactMap { $0.player(id) }.first } },
+                             set: { if $0 == nil { app.teamsWiring.recordingNameFor = nil } })) { player in
+            NameRecordingSheet(player: player) { kept in
+                app.teamsWiring.recordingNameFor = nil
+                if let kept { Task { await app.setNameIntroduction(kept, for: player.id) } }
+            }
+        }
         // A recording that stopped by itself (the 30-second limit, a phone call) is collected,
         // so the recording sheet offers Listen and Keep.
         .onChange(of: app.audio?.isRecording) { _, _ in app.collectRecordingThatStopped() }

@@ -40,6 +40,11 @@ func playableLength(_ file: URL) async -> TimeInterval? {
     return duration.seconds
 }
 
+/// When a file was last changed, or nothing if it is not there.
+func modified(_ file: URL) -> Date? {
+    (try? FileManager.default.attributesOfItem(atPath: file.path))?[.modificationDate] as? Date
+}
+
 /// Opens the app's saved files in a folder, as the app does. Backups (which the loader never
 /// makes) would go to a scratch folder.
 func openStorage(_ dataFolder: URL) throws -> FileStorage {
@@ -146,6 +151,13 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
     for piece in pieces {
         let target = storage.audioFolder.appendingPathComponent(piece.appName)
         if !FileManager.default.contentsEqual(atPath: piece.source.path, andPath: target.path) {
+            // A name recorded in the app that is newer than Dropbox's stays: the scorer re-did
+            // it on the phone. (tools/load_team.sh copies it to Dropbox before loading.)
+            if piece.appName.hasPrefix(namePrefix),
+               TeamImport.keepsAppRecording(appModified: modified(target), dropboxModified: modified(piece.source)) {
+                print("Kept the name recorded on the phone: \(piece.appName)")
+                continue
+            }
             try? FileManager.default.removeItem(at: target)
             try FileManager.default.copyItem(at: piece.source, to: target)
             copiedPieces += 1

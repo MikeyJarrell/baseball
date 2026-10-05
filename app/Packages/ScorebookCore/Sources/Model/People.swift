@@ -209,6 +209,16 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
     public static func nameFile(_ stem: String) -> String {
         "announcer-name-\(stem).m4a"
     }
+
+    /// The plain file name stem for a player's name: "Joaquín Cañas" gives "joaquin-canas".
+    /// Lower case, accents dropped, every run of other characters a single dash. The team
+    /// loader, tools/record_intros.py and a name recorded in the app all use this rule, so a
+    /// name recording made in either place has the same file name.
+    public static func nameStem(_ name: String) -> String {
+        let plain = name.lowercased().folding(options: .diacriticInsensitive, locale: nil)
+        let words = plain.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : " " }
+        return String(words).split(separator: " ").joined(separator: "-")
+    }
 }
 
 /// A team: ours, or an opponent. Opponents are saved too, so their roster can be
