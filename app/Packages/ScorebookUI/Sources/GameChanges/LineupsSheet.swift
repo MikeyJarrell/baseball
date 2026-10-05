@@ -170,8 +170,10 @@ struct PlayerFixPage: View {
             || context.leftTheGame(side).contains(player)
     }
 
-    /// True before the first pitch, while a hitter can still come out of the order.
-    private var beforeFirstPitch: Bool { context.situation.gameStartedAt == nil }
+    /// True while this hitter can still come out of the starting order (before the first pitch).
+    private var canRemove: Bool {
+        context.startingOrderOpen.contains(side) && context.team(side).battingOrder.contains(player)
+    }
 
     /// Everyone else on the team, to pick the one who was really there.
     private var others: [Player] {
@@ -220,7 +222,7 @@ struct PlayerFixPage: View {
                 FootNote("Everything recorded for \(context.name(player)) moves to the player you pick. If they were in the game too, the two trade places.")
             }
 
-            if beforeFirstPitch, context.inBattingOrder(side).contains(player) {
+            if canRemove {
                 Card {
                     OptionRow(title: "Take out of the batting order", detail: "Before the first pitch only",
                               action: { onDone(.correctLineup(.removeFromOrder(side: side, player: player))) }) {

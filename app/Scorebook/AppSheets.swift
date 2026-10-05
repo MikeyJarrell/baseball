@@ -125,13 +125,17 @@ struct SongPickerSheet: View {
 /// next ones.
 struct WarmUpSongsSheet: View {
     @Environment(AppModel.self) private var app
-    var pitcher: PlayerID
+    /// The pitcher as this game has him.
+    var pitcher: Player
+    /// His saved team.
+    var teamID: TeamID
     var onClose: () -> Void
 
     @State private var search = ""
 
-    /// The pitcher as the saved team has him now.
-    private var player: Player? { app.ourTeam?.player(pitcher) }
+    /// The pitcher as the saved team has him now, or as this game has him if he is not on the
+    /// saved team yet (a pitcher typed in by number during the game).
+    private var player: Player? { app.ourTeam?.player(pitcher.id) ?? pitcher }
 
     /// His warm-up songs: the first-inning song, then the extras.
     private var hisSongs: [SongID] {
@@ -221,10 +225,11 @@ struct WarmUpSongsSheet: View {
         app.audio?.playWarmUp(for: pitcherNow)
     }
 
-    /// Adds a song to his list (as his first-inning song if he has none) or takes it off.
+    /// Adds a song to his list (as his first-inning song if he has none) or takes it off. A
+    /// pitcher not on the saved team yet goes on it first.
     private func toggle(_ id: SongID, isHis: Bool) async {
-        guard let team = app.ourTeam else { return }
-        await app.changeWarmUpSongs(for: pitcher, teamID: team.id) { player in
+        if app.ourTeam?.player(pitcher.id) == nil { await app.updateSavedPlayer(pitcher, teamID: teamID) }
+        await app.changeWarmUpSongs(for: pitcher.id, teamID: teamID) { player in
             if isHis {
                 if player.warmUpSongID == id {
                     player.warmUpSongID = player.extraWarmUpSongIDs.first

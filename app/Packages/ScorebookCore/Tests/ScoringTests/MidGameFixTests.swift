@@ -116,6 +116,29 @@ struct MidGameFixTests {
         #expect(session.setup.away.battingOrder.contains(next))
     }
 
+    @Test("A hitter cannot come out of the order once that team has a batting hole, which is kept by spot")
+    func noRemovalAfterABattingHole() async throws {
+        let session = try await emptySampleSession()
+        await session.record(GameEvent(kind: .battingHole(BattingHole(team: .away, spotIndex: 4))))
+        let second = session.setup.away.battingOrder[1]
+        #expect(!session.canRemoveFromOrder(second, on: .away))
+        #expect(await session.correctLineup(.removeFromOrder(side: .away, player: second)) == false)
+        #expect(session.setup.away.battingOrder.contains(second))
+        #expect(session.saveProblem != nil)
+        // The other team's order is still open.
+        #expect(session.canChangeStartingOrder(.home))
+    }
+
+    @Test("Changing the game's details clears Redo, so nothing is put back after a new end")
+    func detailsClearRedo() async throws {
+        let session = try await emptySampleSession()
+        await session.record(GameEvent(kind: .pitch(Pitch(.ball))))
+        #expect(await session.undo())
+        #expect(session.redoLabel != nil)
+        #expect(await session.changeDetails { $0.rules.scheduledInnings = 7 })
+        #expect(session.redoLabel == nil)
+    }
+
     @Test("Home and away switch before the first pitch, and not after it")
     func switchHomeAndAway() async throws {
         let session = try await emptySampleSession()

@@ -55,7 +55,9 @@ public struct GameDetailsSheet: View {
                     .frame(minHeight: Spacing.minimumTapSize)
                     .padding(.horizontal, Spacing.large - 2)
                 RowDivider()
-                Stepper(value: $innings, in: 1...15) {
+                // Never fewer innings than the one being played, which would end the game
+                // partway through what is already recorded.
+                Stepper(value: $innings, in: max(1, context.situation.inning)...max(15, context.situation.inning)) {
                     Text("\(innings) innings").font(ScorebookFont.headline).monospacedDigit()
                 }
                 .frame(minHeight: Spacing.minimumTapSize)

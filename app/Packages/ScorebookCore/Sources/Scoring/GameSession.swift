@@ -408,6 +408,29 @@ public final class GameSession {
         }
     }
 
+    /// True when a hitter can come out of the starting batting order: before the first pitch,
+    /// he is in the starting order, and nothing is recorded for his team but a defense check.
+    public func canRemoveFromOrder(_ player: PlayerID, on side: TeamSide) -> Bool {
+        canChangeStartingOrder(side) && game.setup[side].battingOrder.contains(player)
+    }
+
+    /// True before the first pitch while nothing but a defense check is recorded for a team,
+    /// so its starting batting order can still lose a hitter.
+    public func canChangeStartingOrder(_ side: TeamSide) -> Bool {
+        guard canSwitchHomeAndAway else { return false }
+        return game.events.allSatisfy { event in
+            switch event.kind {
+            case .defenseConfirmed, .timeLimitChange: true
+            case .battingHole(let e): e.team != side
+            case .automaticOut(let e): e.team != side
+            case .substitution(let e): e.team != side
+            case .pitchingChange(let e): e.team != side
+            case .addHitter(let e): e.team != side
+            default: false
+            }
+        }
+    }
+
     /// Changes the setup's date, start time or innings and replays. Clears Redo.
     @discardableResult
     private func changeDetailsNow(_ change: @MainActor (inout GameSetup) -> Void) async -> Bool {
@@ -416,7 +439,9 @@ public final class GameSession {
         changed.setup.scheduledStart = changed.setup.scheduledStart.wholeSecond
         changed.setup.rules.scheduledInnings = max(1, changed.setup.rules.scheduledInnings)
         guard changed != game else { return true }
-        return await saveWhole(changed)
+        guard await saveWhole(changed) else { return false }
+        redoStack.removeAll()
+        return true
     }
 
     /// Swaps the two teams, and with them the side named in each pregame entry: a defense check
@@ -424,7 +449,10 @@ public final class GameSession {
     /// batting hole or lineup change moves with its team, and automatic outs are worked out again.
     @discardableResult
     private func switchHomeAndAwayNow() async -> Bool {
-        guard canSwitchHomeAndAway else { return false }
+        guard canSwitchHomeAndAway else {
+            saveProblem = "Home and away can switch only before the first pitch. Undo back to before it, then switch."
+            return false
+        }
         var changed = game
         swap(&changed.setup.away, &changed.setup.home)
         changed.events = changed.events.compactMap { event in
@@ -461,11 +489,19 @@ public final class GameSession {
         switch correction {
         case .wasReally(let side, let shown, let really):
             guard shown != really.id else { return true }
-            guard let fixed = Self.swapping(shown, with: really, on: side, in: changed) else { return false }
+            guard let fixed = Self.swapping(shown, with: really, on: side, in: changed) else {
+                saveProblem = "That lineup fix could not be made, so nothing changed."
+                return false
+            }
             changed = fixed
         case .removeFromOrder(let side, let player):
-            // Before the first pitch only: once a spot has come up, it is part of the game.
-            guard canSwitchHomeAndAway else { return false }
+            // Before the first pitch only, and only from the starting order with nothing yet
+            // recorded for that team: batting holes and automatic outs are kept by spot number,
+            // which taking a hitter out would shift.
+            guard canRemoveFromOrder(player, on: side) else {
+                saveProblem = "A hitter can come out of the order only before the first pitch, and only before any batting hole or lineup change for that team."
+                return false
+            }
             changed.setup[side].battingOrder.removeAll { $0 == player }
             changed.setup[side].designatedNonRunners.removeAll { $0 == player }
         }
@@ -596,16 +632,6 @@ extension GameEvent {
     var isDefenseConfirmed: Bool {
         if case .defenseConfirmed = kind { return true }
         return false
-    }
-
-    /// True for anything that happened on the field: a pitch, a play, a runner move, a
-    /// substitution. False for lineup business before the first pitch (the defense check, a
-    /// batting hole, an automatic out for one, a time limit change).
-    public var happenedOnTheField: Bool {
-        switch kind {
-        case .defenseConfirmed, .battingHole, .timeLimitChange, .automaticOut: false
-        default: true
-        }
     }
 }
 

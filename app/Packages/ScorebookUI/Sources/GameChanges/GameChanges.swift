@@ -84,10 +84,16 @@ public struct PlayerEdit: Equatable, Sendable {
 public struct GameChangeContext: Equatable, Sendable {
     public var setup: GameSetup
     public var situation: Situation
+    /// The teams whose starting batting order can still lose a hitter: before the first pitch,
+    /// with nothing but a defense check recorded for them. The game session says which.
+    public var startingOrderOpen: Set<TeamSide>
 
-    public init(setup: GameSetup, situation: Situation) {
+    /// - Parameter startingOrderOpen: Leave it out for both teams before the first pitch and
+    ///   neither after it.
+    public init(setup: GameSetup, situation: Situation, startingOrderOpen: Set<TeamSide>? = nil) {
         self.setup = setup
         self.situation = situation
+        self.startingOrderOpen = startingOrderOpen ?? (situation.gameStartedAt == nil ? [.away, .home] : [])
     }
 
     // MARK: Teams

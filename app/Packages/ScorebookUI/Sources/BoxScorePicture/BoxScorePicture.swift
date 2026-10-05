@@ -61,7 +61,7 @@ public struct BoxScorePicture: View {
         // The picture is the same size at every text-size setting.
         .environment(\.dynamicTypeSize, .large)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Box score: \(layout.headline)")
+        .accessibilityLabel("Box score: \(layout.headline.replacingOccurrences(of: "\n", with: ", "))")
     }
 
     /// The date in small spaced capitals, the headline in big bold type with one team to a

@@ -3,7 +3,7 @@
 // listed under it, as on the pregame fielding step. Tapping a position on the drawing or in the
 // list opens the team's roster to pick who plays there.
 //
-// - Defense check: each time our team takes the field, a compact list of the nine positions.
+// - Defense check: each time our team takes the field, the drawing and the nine positions.
 //   One tap confirms nobody moved; tapping a position swaps in another player. The app can
 //   hand in a suggested defense, such as two players who alternate at first base by inning:
 //   the sheet starts from the suggestion, marks each position that differs from now ("Ruiz at

@@ -257,7 +257,8 @@ struct GameScreen: View {
 
     /// The setup and situation, as the sheets want them.
     private var context: GameChangeContext {
-        GameChangeContext(setup: session.setup, situation: session.situation)
+        GameChangeContext(setup: session.setup, situation: session.situation,
+                          startingOrderOpen: Set(TeamSide.allCases.filter(session.canChangeStartingOrder)))
     }
 
     @ViewBuilder
@@ -300,7 +301,9 @@ struct GameScreen: View {
         case .gameDetails:
             GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
         case .warmUpSongs(let pitcher):
-            WarmUpSongsSheet(pitcher: pitcher) { sheet = nil }
+            if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
+                WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
+            }
         }
     }
 
@@ -347,7 +350,8 @@ struct GameScreen: View {
             }
         case .changeDetails(let details):
             Task {
-                if details.switchHomeAndAway { await session.switchHomeAndAway() }
+                // A refused switch says why (the "Not saved" message) and changes nothing else.
+                if details.switchHomeAndAway { guard await session.switchHomeAndAway() else { return } }
                 await session.changeDetails { setup in
                     setup.scheduledStart = details.scheduledStart
                     setup.rules.scheduledInnings = details.innings
