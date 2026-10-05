@@ -139,4 +139,5 @@ The game-over sheet and game menu in `GameChanges` (shown only in the design dem
 
 - `MoreLogsTests`, `FixPlayAndWordingTests` and `TeamScreensTests` updated to the new delete line, editor description and introduction status. A comment in `SmokeTests` that described the old button detail now matches the button.
 - `xcodebuild test -scheme ScorebookUI-Package` on the iPhone 17 simulator: every test passes.
-- The app builds for the iPhone 17 simulator, with its UI tests. The walkthroughs find buttons by the start of their labels (“Batter out”, “Thrown out at first”, “Took the base, no throw”, “End game”, “Home screen”), and none of those labels changed.
+- The app builds for the iPhone 17 simulator, with its UI tests.
+- `xcodebuild test -scheme Scorebook` (UI tests): both full-game walkthroughs and four of the five smoke tests pass. `testDeleteAGameFromTheGamesList` fails at “Home screen in the game menu”: the game menu never opens after the tap. It fails the same way on unchanged `main` (d13e3b0), so it predates this change. The walkthroughs find buttons by the start of their labels (“Batter out”, “Thrown out at first”, “Took the base, no throw”, “End game”, “Home screen”), and none of those labels changed.
