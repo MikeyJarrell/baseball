@@ -244,3 +244,7 @@ The feature is built, reviewed twice and tested, but is not on the phone until t
 ## [2026-10-04 12:56] Changes after the first phone install
 
 Pregame got time wheels, a separate fielding step on the diamond, DH in place of “bats only,” and typeable opponent numbers with only the names-and-numbers and numbers-only choices. First and third base now sit in fair territory. Walk-up songs fade in under the announcer and reach full volume at their start point as the announcer finishes. Games can be deleted from the Games list or a box score (the app backs up first), and the game menu has a way home. Installed on the phone except delete-a-game, which goes on at the next install; a test game is still on the phone, and the phone’s files were backed up to Dropbox before any of this.
+
+## [2026-10-04 17:46] Corrections to the October 4 game
+
+Fixed the first real game on the phone after a backup: our starting fielders (Nojadera catching, Jarrell at first, Jackson Cleary #99 in left, Strong in right; Torres Benitez and Erick Rosas Lopez removed), the GWW Whales lineup matched to their registered names and numbers with Holliday, Fitzpatrick, Nuñez and Lopez added, Ortiz and Holliday as their pitchers, Soler and Carney as designated non-runners with the two runs-for-Carney entries corrected, and the Whales roster cleaned of placeholder players. Replayed before and after: 9-4 both times, nothing flagged. team/opponents.csv and team/roster.csv carry the same corrections. App feedback from the game is being handled in another session.
