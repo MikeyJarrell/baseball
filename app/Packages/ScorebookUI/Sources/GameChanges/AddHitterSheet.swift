@@ -61,7 +61,7 @@ public struct AddHitterSheet: View {
                                     isSelected: pick == .player(player.id)) { pick = .player(player.id) }
                     RowDivider()
                 }
-                OptionRow(title: "New player", detail: "Number, name and batting side",
+                OptionRow(title: "New player",
                           end: .radio(pick == .newPlayer), action: { pick = .newPlayer }) {
                     IconBadge(systemName: "plus")
                 }
@@ -80,7 +80,7 @@ public struct AddHitterSheet: View {
                 Card {
                     ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                         if i > 0 { RowDivider() }
-                        PlayerChoiceRow(context: context, player: player.id, detail: "Left the game · your call", look: look,
+                        PlayerChoiceRow(context: context, player: player.id, detail: "Left the game", look: look,
                                         isSelected: pick == .player(player.id)) { pick = .player(player.id) }
                     }
                 }
@@ -96,10 +96,10 @@ public struct AddHitterSheet: View {
         }
     }
 
-    /// A line about a player who could be added: "Playing shortstop, not batting yet", or
+    /// A line about a player who could be added: "Playing shortstop", or
     /// "Bench · bats left".
     private func detail(for player: Player) -> String {
-        if let position = state.position(of: player.id) { return "Playing \(position.name), not batting yet" }
+        if let position = state.position(of: player.id) { return "Playing \(position.name)" }
         return ["Bench", batsText(player)].compactMap { $0 }.joined(separator: " · ")
     }
 

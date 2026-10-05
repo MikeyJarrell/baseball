@@ -80,7 +80,6 @@ public struct BatterSheet: View {
                     SectionLabel("Bats")
                     SegmentedChoice(options: [(BattingSide.left, "Left"), (.right, "Right"), (.switchHitter, "Switch")],
                                     selection: $bats)
-                    InfoBox(Text("Kept for the whole game, and saved to the \(context.teamName(side)) roster for next time."))
                 }
             }
             .navigationDestination(isPresented: $pinchHitting) {

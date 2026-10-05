@@ -30,7 +30,7 @@ struct HomeDestination: View {
                                   minimumInnings: app.settings.minimumInnings,
                                   onRequest: handle)
             } else {
-                EmptyPage(text: "Set up your team in Teams, and the season stats will build up game by game.")
+                EmptyPage(text: "Set up your team first, in Teams.")
             }
         case .games:
             GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count,
@@ -148,7 +148,7 @@ struct BackupsPage: View {
                     }
                 }
             } footer: {
-                Text("A backup is also made at the end of every game. In the Files app, backups are under On My iPhone, Scorebook.")
+                Text("A backup is also made after every game. In the Files app: On My iPhone, Scorebook.")
             }
             Section("Put everything back as it was") {
                 if files.isEmpty { Text("No backups yet.").foregroundStyle(ScorebookColor.textSecondary) }
@@ -172,7 +172,7 @@ struct BackupsPage: View {
                 restoring = nil
             }
         } message: {
-            Text("Teams, games, songs and settings go back to how they were. What is there now is saved first as its own backup.")
+            Text("Teams, games, songs and settings go back to the backup. What is there now is backed up first.")
         }
     }
 }

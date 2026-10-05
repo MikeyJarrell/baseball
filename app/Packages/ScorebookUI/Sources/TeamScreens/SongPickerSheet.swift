@@ -138,8 +138,6 @@ struct AssignSongSheet: View {
                         ForEach(team.roster) { player in
                             playerRow(player, team: team)
                         }
-                    } footer: {
-                        Text("Tap a player to give them “\(song.title)”, and again to take it away. A player has one \(slot == .walkUp ? "walk-up" : "warm-up") song, so it replaces theirs.")
                     }
                 }
             }

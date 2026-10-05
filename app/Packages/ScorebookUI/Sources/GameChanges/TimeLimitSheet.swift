@@ -56,7 +56,7 @@ public struct TimeLimitSheet: View {
                     }
                 }
 
-                InfoBox(Text("No new inning starts after this time (rule 9.1 G). The app set it to \(limitLength) after the first pitch; match it to the plate umpire, who keeps the official time."))
+                InfoBox(Text("Match it to the plate umpire’s clock."))
 
                 if context.situation.gameStartedAt != nil {
                     Button("Go back to \(limitLength) after the first pitch") {

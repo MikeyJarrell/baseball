@@ -53,7 +53,7 @@ public struct GameMenuSheet: View {
                     }
                 }
                 Card {
-                    OptionRow(title: "End game", detail: "Time limit reached, or the last out", end: .chevron,
+                    OptionRow(title: "End game", end: .chevron,
                               action: { askingToEnd = true }) {
                         IconBadge(systemName: "flag.checkered", tint: ScorebookColor.out)
                     }
@@ -91,12 +91,7 @@ public struct GameMenuSheet: View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             HStack(spacing: Spacing.medium) {
                 IconBadge(systemName: "speaker.wave.2")
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Walk-up song length").font(ScorebookFont.headline)
-                    Text("Fades by itself after the introduction and this much song")
-                        .font(ScorebookFont.caption)
-                        .foregroundStyle(ScorebookColor.textSecondary)
-                }
+                Text("Walk-up song length").font(ScorebookFont.headline)
             }
             Stepper(value: seconds, in: 4...60, step: 1) {
                 Text("\(Int(seconds.wrappedValue)) seconds").font(ScorebookFont.headline).monospacedDigit()

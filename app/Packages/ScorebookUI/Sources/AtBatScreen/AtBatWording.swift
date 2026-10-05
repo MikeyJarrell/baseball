@@ -153,19 +153,18 @@ enum AtBatWording {
 
     // MARK: "Is the game over?"
 
-    /// Why the app is asking, in a sentence, with the league's rule number.
+    /// Why the app is asking, in a few words.
     static func gameOverReason(_ reason: EndOfGame.Reason, setup: GameSetup, clock: GameClock) -> String {
         switch reason {
         case .timeLimit:
-            let limit = clock.timeLimitEndsAt.map { "The time limit, \(clockTime($0)), has passed" } ?? "The time limit has passed"
-            return "\(limit) and the inning is over. No new inning starts after the limit (rule 9.1 G)."
+            return clock.timeLimitEndsAt.map { "Past the time limit, \(clockTime($0))." } ?? "Past the time limit."
         case .runRule:
             let margin = setup.rules.runRuleMargin ?? 12
-            return "A lead of \(margin) runs or more after \(setup.rules.runRuleInning) innings ends the game under the run rule (rule 9.13)."
+            return "Run rule: \(margin) or more ahead after \(setup.rules.runRuleInning) innings."
         case .regulation:
-            return "The scheduled \(setup.scheduledInnings) innings are complete."
+            return "\(setup.scheduledInnings) innings complete."
         case .called:
-            return "Play has stopped, for rain, darkness or anything else."
+            return "Play has stopped."
         }
     }
 

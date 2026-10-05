@@ -22,7 +22,7 @@ struct ResultStep: View {
                 .accessibilityAddTraits(.isHeader)
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    answer(.out, "Batter out", detail: "ground, fly, line, pop, bunt", kind: .dark, large: true)
+                    answer(.out, "Batter out", kind: .dark, large: true)
                         .gridCellColumns(2)
                 }
                 GridRow {
@@ -35,7 +35,7 @@ struct ResultStep: View {
                 }
                 GridRow {
                     answer(.reachedOnError, "Reached on error", kind: .light)
-                    answer(.fieldersChoice, "Fielder’s choice", detail: "batter safe, runner out", kind: .light)
+                    answer(.fieldersChoice, "Fielder’s choice", kind: .light)
                 }
                 if model.showsMore {
                     GridRow {
@@ -78,7 +78,7 @@ struct DroppedThirdStrikeStep: View {
     var body: some View {
         VStack(spacing: Spacing.medium) {
             Button { model.perform(.droppedThirdStrikeOut) } label: {
-                BigChoiceLabel(title: "Thrown out at first", detail: "Tap the throw next: catcher, then first (K 2-3)", large: true)
+                BigChoiceLabel(title: "Thrown out at first", large: true)
             }
             .buttonStyle(BigChoiceButtonStyle(kind: .dark))
             .frame(maxHeight: 170)
