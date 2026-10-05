@@ -21,6 +21,9 @@ public struct BoxScore: Codable, Equatable, Sendable {
     /// How long the game took, in seconds, from the first pitch to the end-of-game event: the
     /// "T—1:58" line. Missing until the game is final.
     public var gameLength: TimeInterval?
+    /// Players whose last name on its own is not the last word of their name, by id: "Torres"
+    /// for Jonathan Torres Benitez (see `Player.surname`). Missing in box scores made before.
+    public var surnames: [PlayerID: String]?
 
     public init(
         gameID: GameID,
@@ -30,7 +33,8 @@ public struct BoxScore: Codable, Equatable, Sendable {
         lineScore: LineScore,
         notes: BoxScoreNotes,
         isFinal: Bool,
-        gameLength: TimeInterval? = nil
+        gameLength: TimeInterval? = nil,
+        surnames: [PlayerID: String]? = nil
     ) {
         self.gameID = gameID
         self.date = date
@@ -40,6 +44,7 @@ public struct BoxScore: Codable, Equatable, Sendable {
         self.notes = notes
         self.isFinal = isFinal
         self.gameLength = gameLength
+        self.surnames = surnames
     }
 
     /// One team's half of the box score, by side.
