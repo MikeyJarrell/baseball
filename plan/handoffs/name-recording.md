@@ -21,7 +21,7 @@
 
 ## Also fixed
 
-- **The delete-a-game smoke test** failed on main because the test tapped the game menu while the batting screen was still sliding up at launch, and the tap was lost (the app was fine: Mikey deletes games on the phone). The test now taps again until the menu opens; the batter-sheet name test does the same.
+- **The delete-a-game smoke test** failed on main for two test reasons, not an app fault (Mikey deletes games on the phone): it tapped the game menu while the batting screen was still sliding up at launch, so the tap was lost; and after the text cleanup added rows, “Home screen” sits below the half-height menu’s fold, where the test could not see it. The test now taps until the menu opens and scrolls the menu to Home screen; the batter-sheet name test also taps until the menu opens.
 - **Lineups, “Empty spot”:** the row’s minus icon was being passed as the row’s tap action, so no icon showed. It now shows (`GameChanges/LineupsSheet.swift`).
 - **Merged main’s text cleanup** and kept its shorter text; the new text here follows it (“Record name”, “Add and record name”, “Tap to record”).
 
@@ -29,7 +29,7 @@
 
 - `swift test` in `app/Packages/ScorebookCore`: every test passes, including the new “A name recorded in the app is kept over Dropbox’s copy only when it is newer” and the name stems.
 - `xcodebuild test -scheme ScorebookUI-Package`: every test passes, including `NameRecordingTests`: a quiet tone between silences trimmed to 0.70 s and raised under the peak limit; silence refused; a 44.1 kHz take made into `announcer-name-jackson-cleary.m4a` at 48 kHz mono with the raw take and the trial file gone; “Now batting,” then the name with no number.
-- `xcodebuild test -scheme Scorebook` on the iPhone 17 simulator: both full-game walkthroughs and every smoke test pass, including `NameRecordingSmokeTests`: the recorder opens with the right name from the batter sheet (Alex Moreno), after adding Jackson Cleary as a new hitter (“Now batting, Jackson Cleary.”, and he was added), and from Alex Moreno’s player page.
+- `xcodebuild test -scheme Scorebook` on the iPhone 17 simulator: both full-game walkthroughs and every smoke test pass (the smoke tests rerun on their own after the delete test’s fix), including `NameRecordingSmokeTests`: the recorder opens with the right name from the batter sheet (Alex Moreno), after adding Jackson Cleary as a new hitter (“Now batting, Jackson Cleary.”, and he was added), and from Alex Moreno’s player page.
 
 ## Not checked
 

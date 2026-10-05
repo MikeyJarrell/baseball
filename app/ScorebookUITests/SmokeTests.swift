@@ -85,11 +85,14 @@ final class SmokeTests: XCTestCase {
         XCTAssertTrue(app.buttons["Ball"].waitForExistence(timeout: 10))
         // The batting screen slides up over the home screen when the app opens; a tap while it
         // is still sliding is lost, so tap the menu again until it opens.
-        let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Home screen")).firstMatch
-        for _ in 0..<3 where !home.exists {
+        let firstRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Manual adjustment")).firstMatch
+        for _ in 0..<3 where !firstRow.exists {
             app.buttons["Game menu"].tap()
-            _ = home.waitForExistence(timeout: 2)
+            _ = firstRow.waitForExistence(timeout: 2)
         }
+        // The menu opens half-height, with Home screen further down its list.
+        let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Home screen")).firstMatch
+        for _ in 0..<4 where !home.isHittable { firstRow.swipeUp() }
         XCTAssertTrue(home.exists, "Home screen in the game menu")
         home.tap()
 
