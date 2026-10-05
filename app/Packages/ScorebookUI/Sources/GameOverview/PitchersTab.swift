@@ -28,7 +28,7 @@ struct PitchersTab: View {
                 .padding(.vertical, Spacing.extraSmall)
                 .overviewCard()
 
-                Text("IP is innings pitched: 2⅓ is two innings and one out. P-S is pitches and strikes. BF is batters faced.")
+                Text("P-S is pitches and strikes. BF is batters faced.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .padding(.horizontal, Spacing.extraSmall)

@@ -375,7 +375,7 @@ struct SongButton: View {
         case .noSong(let player):
             Button { onAction(.pickSong(for: player.id)) } label: {
                 SongButtonLabel(icon: "plus", title: "No song for \(AtBatWording.shortName(player))",
-                                detail: "Tap to pick one", iconFill: ScorebookColor.textSecondary)
+                                detail: "", iconFill: ScorebookColor.textSecondary)
             }
             .buttonStyle(QuietBarStyle())
             .accessibilityLabel(Text("No walk-up song for \(player.displayName)"))
@@ -385,8 +385,8 @@ struct SongButton: View {
             HStack(spacing: Spacing.small) {
                 Button { onAction(playing ? .stopSong : .playWarmUp(pitcher)) } label: {
                     SongButtonLabel(icon: playing ? "stop.fill" : "play.fill", title: title,
-                                    detail: playing ? "Playing · tap to fade out"
-                                                    : "Warm-up for \(AtBatWording.shortName(pitcher)), our pitcher",
+                                    detail: playing ? "Playing"
+                                                    : "Warm-up for \(AtBatWording.shortName(pitcher))",
                                     iconFill: ScorebookColor.onTheirTeam.opacity(0.25),
                                     iconColor: ScorebookColor.onTheirTeam)
                         .foregroundStyle(ScorebookColor.onTheirTeam)
@@ -407,7 +407,7 @@ struct SongButton: View {
         case .noWarmUp(let pitcher):
             Button { onAction(.pickWarmUpSongs(pitcher)) } label: {
                 SongButtonLabel(icon: "plus", title: "No warm-up song for \(AtBatWording.shortName(pitcher))",
-                                detail: "Tap to pick one", iconFill: ScorebookColor.textSecondary)
+                                detail: "", iconFill: ScorebookColor.textSecondary)
             }
             .buttonStyle(QuietBarStyle())
             .accessibilityLabel(Text("No warm-up song for \(pitcher.displayName)"))
@@ -438,8 +438,8 @@ struct SongButton: View {
                     icon: playing ? "stop.fill" : "play.fill",
                     title: title,
                     detail: playing
-                        ? (info.songPlayback == .introduction ? "Introduction · song next" : "Tap to fade out")
-                        : (withIntro ? "Introduction, then \(seconds) seconds of song" : "\(seconds) seconds, then fades"),
+                        ? (info.songPlayback == .introduction ? "Introduction · song next" : "Playing")
+                        : (withIntro ? "Introduction, then \(seconds) seconds" : "\(seconds) seconds"),
                     iconFill: ScorebookColor.onOurTeam,
                     iconColor: ScorebookColor.ourTeam
                 )
@@ -471,7 +471,8 @@ struct SongButtonLabel: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text(title).font(ScorebookFont.headline)
-                Text(detail).font(ScorebookFont.caption)
+                // An empty detail leaves the title alone on the button.
+                if !detail.isEmpty { Text(detail).font(ScorebookFont.caption) }
             }
             .lineLimit(1)
             .minimumScaleFactor(0.7)

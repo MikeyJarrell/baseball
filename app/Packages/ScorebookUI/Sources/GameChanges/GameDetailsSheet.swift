@@ -71,12 +71,10 @@ public struct GameDetailsSheet: View {
                             selection: $homeTeam)
                 .disabled(!canSwitch)
                 .opacity(canSwitch ? 1 : 0.5)
-            if canSwitch {
-                FootNote("The home team bats second, in the bottom of each inning.")
-            } else {
-                FootNote("Home and away can switch only before the first pitch. Undo back to before it to switch them.")
+            if !canSwitch {
+                FootNote("Set before the first pitch only.")
             }
-            InfoBox(Text("The time limit runs from the first pitch, so a new start time changes it only before then. Match the time limit itself from the game menu."))
+            InfoBox(Text("Once play starts, change the time limit from the game menu."))
         } footer: {
             Button("Save") { onFinish(.changeDetails(change)) }
                 .buttonStyle(PrimaryButtonStyle())

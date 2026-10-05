@@ -61,7 +61,7 @@ final class NameRecordingSmokeTests: XCTestCase {
         XCTAssertTrue(name.waitForExistence(timeout: 5))
         name.tap()
         name.typeText("Jackson Cleary")
-        let addAndRecord = app.buttons["Add and record their name"]
+        let addAndRecord = app.buttons["Add and record name"]
         XCTAssertTrue(addAndRecord.waitForExistence(timeout: 5))
         addAndRecord.tap()
         let prompt = app.staticTexts["name-prompt"]

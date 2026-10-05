@@ -57,7 +57,7 @@ public struct RunnerActionSheet: View {
     }
 
     public var body: some View {
-        SheetFrame(title: title, subtitle: "Between pitches", onCancel: { onFinish(.cancel) }) {
+        SheetFrame(title: title, onCancel: { onFinish(.cancel) }) {
             VStack(alignment: .leading, spacing: 0) {
                 if context.situation.runners.isEmpty {
                     EmptyNote("Nobody is on base.")
@@ -66,7 +66,7 @@ public struct RunnerActionSheet: View {
                     actionGrid
                     SectionLabel("Also")
                     Card {
-                        OptionRow(title: "Took the base, no throw", detail: "Defensive indifference: not a stolen base",
+                        OptionRow(title: "Took the base, no throw", detail: "Defensive indifference",
                                   end: .chevron, action: { reason = .defensiveIndifference }) {
                             IconBadge(systemName: "figure.walk")
                         }
@@ -223,7 +223,7 @@ struct RunnerActionConfirmPage: View {
     }
 
     var body: some View {
-        SheetFrame(title: reasonTitle(reason), subtitle: "Check where each runner ended up") {
+        SheetFrame(title: reasonTitle(reason)) {
             FieldDrawing(
                 highlightedPositions: errorFielder.map { [$0] } ?? [],
                 tapSequence: activeMove?.outBy ?? [],
@@ -250,12 +250,7 @@ struct RunnerActionConfirmPage: View {
                 SectionLabel("Strikeout")
                 Card {
                     Toggle(isOn: $sameStrikeoutPitch) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Same pitch as the strikeout").font(ScorebookFont.headline)
-                            Text("Strike three and this out make one double play")
-                                .font(ScorebookFont.caption)
-                                .foregroundStyle(ScorebookColor.textSecondary)
-                        }
+                        Text("Same pitch as the strikeout").font(ScorebookFont.headline)
                     }
                     .tint(ScorebookColor.highlight)
                     .padding(.horizontal, Spacing.large - 2)
@@ -287,7 +282,7 @@ struct RunnerActionConfirmPage: View {
                     .padding(.top, Spacing.small)
             } else {
                 Card {
-                    OptionRow(title: "Add an error", detail: "Such as the catcher throwing the ball away on a steal",
+                    OptionRow(title: "Add an error",
                               end: .chevron, action: { hasError = true; tappingError = true }) {
                         IconBadge(systemName: "exclamationmark.circle", tint: ScorebookColor.out)
                     }
@@ -316,7 +311,7 @@ struct RunnerActionConfirmPage: View {
     private var drawingHint: String {
         if tappingError { return "Tap the fielder who made the error." }
         if let active = activeMove { return "Tap the fielders who put \(context.shortName(active.runner)) out, in order." }
-        return "Tap a runner’s bases below to change where they ended up."
+        return "Check where each runner ended up."
     }
 
     /// One runner: where they started, and a button for every place they could have ended up.

@@ -90,7 +90,7 @@ enum PostgameWording {
     }
 
     /// Under the delete question.
-    static let deleteWarning = "This can’t be undone in the app. A backup of everything is written first."
+    static let deleteWarning = "This can’t be undone in the app. A backup is made first."
 
     /// A short date for a game log row: "Oct 3".
     static func shortDate(_ date: Date, calendar: Calendar = .current) -> String {
