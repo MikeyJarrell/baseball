@@ -5,8 +5,9 @@
 // the game session (which saves it, then replays the game) or to the audio player, and opens
 // the next screen:
 //   - the in-play sequence, full screen, for "In play" and "Dropped 3rd strike";
-//   - the sheets for runner moves, pitching changes, substitutions, the batter, the time
-//     limit, manual adjustments and errors;
+//   - the sheets for runner moves, pitching changes, substitutions (with lineups and rosters),
+//     the batter, the time limit, the game details, manual adjustments, errors and our
+//     pitcher's warm-up songs;
 //   - two prompts the game raises by itself: the defense check when our team takes the
 //     field, and "who runs?" when a designated non-runner reaches base;
 //   - the game overview (the Box score button, or a swipe to the left);
@@ -40,11 +41,17 @@ enum GameSheet: Identifiable, Equatable {
     case error
     case songSettings
     case pickSong(PlayerID)
+    case gameDetails
+    case warmUpSongs(PlayerID)
+    /// Record one of our players' names for their announcer introduction.
+    case recordName(PlayerID)
 
     var id: String {
         switch self {
         case .runnerActions(let id): "runner-\(id.rawValue)"
         case .pickSong(let id): "song-\(id.rawValue)"
+        case .warmUpSongs(let id): "warm-up-\(id.rawValue)"
+        case .recordName(let id): "name-\(id.rawValue)"
         default: String(describing: self)
         }
     }
@@ -216,12 +223,20 @@ struct GameScreen: View {
             sheet = .songSettings
         case .pickSong(let player):
             sheet = .pickSong(player)
+        case .openGameDetails:
+            sheet = .gameDetails
+        case .pickWarmUpSongs(let pitcher):
+            sheet = .warmUpSongs(pitcher.id)
+        case .goHome:
+            onLeave()
         case .playWalkUp(let player, let withIntroduction):
             app.audio?.playWalkUp(for: player, withIntroduction: withIntroduction && app.settings.playIntroductions)
         case .playWarmUp(let player):
             app.audio?.playWarmUp(for: player)
         case .stopSong:
-            app.audio?.stop()
+            // A two-second fade, the same for walk-up and warm-up songs; a second tap while it
+            // fades stops it at once.
+            if app.audio?.isFadingOut == true { app.audio?.stop() } else { app.audio?.fadeOut() }
         case .fadeOutSong:
             app.audio?.fadeOut()
         }
@@ -245,7 +260,8 @@ struct GameScreen: View {
 
     /// The setup and situation, as the sheets want them.
     private var context: GameChangeContext {
-        GameChangeContext(setup: session.setup, situation: session.situation)
+        GameChangeContext(setup: session.setup, situation: session.situation,
+                          startingOrderOpen: Set(TeamSide.allCases.filter(session.canChangeStartingOrder)))
     }
 
     @ViewBuilder
@@ -285,12 +301,36 @@ struct GameScreen: View {
                 sheet = nil
                 if let song { Task { await giveWalkUpSong(song, to: player) } }
             }
+        case .gameDetails:
+            GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
+        case .warmUpSongs(let pitcher):
+            if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
+                WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
+            }
+        case .recordName(let id):
+            if let player = session.setup.player(id) {
+                // The saved team's introduction, which may be newer than the game's copy.
+                NameRecordingSheet(player: app.withSavedSongs(player)) { kept in
+                    sheet = nil
+                    if let kept { Task { await app.setNameIntroduction(kept, for: id) } }
+                }
+            }
         }
     }
 
-    /// Acts on what a sheet handed back, then closes it.
+    /// Acts on what a sheet handed back, then closes it, unless the sheet asked to stay open
+    /// (the lineups page, while the scorer works through a lineup card).
     private func finish(_ result: GameChangeResult, from shown: GameSheet) {
+        if case .keepOpen(let change) = result {
+            apply(change, from: shown)
+            return
+        }
         sheet = nil
+        apply(result, from: shown)
+    }
+
+    /// Acts on what a sheet handed back.
+    private func apply(_ result: GameChangeResult, from shown: GameSheet) {
         switch result {
         case .record(let entered):
             lastChangeWasUndo = false
@@ -310,7 +350,52 @@ struct GameScreen: View {
             if shown == .nonRunner { session.letNonRunnerRun() }
         case .cancel:
             backOut(of: shown)
+        case .correctLineup(let correction):
+            Task {
+                guard await session.correctLineup(correction) else { return }
+                // Someone typed in from a lineup card goes on the saved team too.
+                if case .wasReally(let side, _, let really) = correction {
+                    await app.updateSavedPlayer(really, teamID: session.setup[side].teamID)
+                }
+                cueOurNextHitter()
+            }
+        case .changeDetails(let details):
+            Task {
+                // A refused switch says why (the "Not saved" message) and changes nothing else.
+                if details.switchHomeAndAway { guard await session.switchHomeAndAway() else { return } }
+                await session.changeDetails { setup in
+                    setup.scheduledStart = details.scheduledStart
+                    setup.rules.scheduledInnings = details.innings
+                }
+                cueOurNextHitter()
+            }
+        case .keepOpen(let change):
+            apply(change, from: shown)
+        case .recordName(let edit):
+            Task {
+                // Any edits first (a name typed in just now), then the recorder.
+                if edit.player != session.setup.player(edit.player.id) {
+                    guard await session.updatePlayer(edit.player, on: edit.side) else { return }
+                    await app.updateSavedPlayer(edit.player, teamID: session.setup[edit.side].teamID)
+                }
+                await openNameRecorder(for: edit.player.id)
+            }
+        case .recordThenRecordName(let entered, let player):
+            Task {
+                lastChangeWasUndo = false
+                guard await session.record(entered) else { return }
+                for addition in entered.newPlayers {
+                    await app.updateSavedPlayer(addition.player, teamID: session.setup[addition.side].teamID)
+                }
+                await openNameRecorder(for: player)
+            }
         }
+    }
+
+    /// Opens the name recorder once the sheet before it has slid away.
+    private func openNameRecorder(for id: PlayerID) async {
+        try? await Task.sleep(for: .milliseconds(450))
+        sheet = .recordName(id)
     }
 
     /// The scorer closed a prompt without answering: keep it closed until the next event.

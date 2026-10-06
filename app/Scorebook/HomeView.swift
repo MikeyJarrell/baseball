@@ -100,6 +100,14 @@ struct HomeView: View {
         } message: {
             Text(app.problem ?? "")
         }
+        // A name recorded from a player's page.
+        .sheet(item: Binding(get: { app.teamsWiring.recordingNameFor.flatMap { id in app.teams.lazy.compactMap { $0.player(id) }.first } },
+                             set: { if $0 == nil { app.teamsWiring.recordingNameFor = nil } })) { player in
+            NameRecordingSheet(player: player) { kept in
+                app.teamsWiring.recordingNameFor = nil
+                if let kept { Task { await app.setNameIntroduction(kept, for: player.id) } }
+            }
+        }
         // A recording that stopped by itself (the 30-second limit, a phone call) is collected,
         // so the recording sheet offers Listen and Keep.
         .onChange(of: app.audio?.isRecording) { _, _ in app.collectRecordingThatStopped() }
@@ -149,9 +157,9 @@ struct HomeView: View {
     /// must be finished first, so two games are never open at once.
     private func newGame() {
         if let session = app.session, !session.isFinished {
-            app.problem = "A game is still in progress. Resume it and end it before starting a new one."
+            app.problem = "A game is still in progress. End it first."
         } else if app.ourTeam == nil {
-            app.problem = "Set up your team first: open Teams and add your team and its players."
+            app.problem = "Set up your team first, in Teams."
         } else {
             app.closeFinishedGame()
             settingUpGame = true

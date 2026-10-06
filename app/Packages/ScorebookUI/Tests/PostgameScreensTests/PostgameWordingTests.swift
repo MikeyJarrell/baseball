@@ -141,3 +141,33 @@ struct BoxScoreWordingTests {
         #expect(PostgameWording.innings([3, 5, 7]) == "the 3rd, 5th and 7th")
     }
 }
+
+@Suite("The question before deleting a game")
+struct DeleteQuestionTests {
+    let pacific: Calendar = {
+        var c = Calendar(identifier: .gregorian)
+        c.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+        return c
+    }()
+
+    @Test("From the games list: our name, home or away, the opponent and the date")
+    func fromTheList() {
+        let date = pacific.date(from: DateComponents(year: 2026, month: 10, day: 4, hour: 9))!
+        let home = GameSummary(id: "g", date: date, opponentName: "Mudcats", weAreHome: true, finalScore: nil, isFinished: false)
+        #expect(PostgameWording.deleteQuestion(home, ourTeamName: "Diamond Dogs", calendar: pacific)
+                == "Delete Diamond Dogs vs Mudcats, Oct 4?")
+        var away = home
+        away.weAreHome = false
+        #expect(PostgameWording.deleteQuestion(away, ourTeamName: nil, calendar: pacific)
+                == "Delete the game at Mudcats, Oct 4?")
+    }
+
+    @Test("From a box score: our team first, or the visitors at the home team when neither is ours")
+    func fromTheBoxScore() {
+        let box = SampleGame.boxScore
+        let ours = PostgameWording.deleteQuestion(box, ourSide: .home, calendar: pacific)
+        #expect(ours.hasPrefix("Delete \(box.home.name) vs \(box.away.name), "))
+        let neither = PostgameWording.deleteQuestion(box, ourSide: nil, calendar: pacific)
+        #expect(neither.hasPrefix("Delete \(box.away.name) at \(box.home.name), "))
+    }
+}

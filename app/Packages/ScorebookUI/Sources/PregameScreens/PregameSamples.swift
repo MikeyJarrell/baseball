@@ -3,7 +3,7 @@
 // Our last game was at the Bombers (known only by numbers) on May 9; the game before that was
 // the Mudcats at home on May 2, with Pat Quinn and Robin Nash taking turns at first base. The
 // saved opponents are the Mudcats (full roster), the Bombers (numbers only) and the Riverhawks
-// (no saved roster, so their lineup is unknown). Today is Saturday, May 23.
+// (no saved roster, so their lineup starts as nine blank numbers). Today is Saturday, May 23.
 
 import Foundation
 import Model
@@ -43,7 +43,7 @@ public enum PregameSamples {
     )
 
     /// Our team before the first game, with each player's usual position and role filled in
-    /// as the roster screen would record them: Moreno usually leads off, Cole bats only, and
+    /// as the roster screen would record them: Moreno usually leads off, Cole is the DH, and
     /// Nash and Voss usually start on the bench.
     public static let diamondDogsWithUsuals: Team = {
         let usual: [PlayerID: (Position?, UsualRole, Bool)] = [

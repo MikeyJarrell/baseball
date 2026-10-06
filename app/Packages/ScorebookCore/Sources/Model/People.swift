@@ -16,6 +16,10 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var number: String?
     /// The stand-in label used until the scorer names this hitter: "Batter 4".
     public var placeholder: String?
+    /// The last name to use on its own, when it is not the last word of `name`: "Torres" for
+    /// Jonathan Torres Benitez, who goes by his first last name, as is usual with two
+    /// Spanish last names. Missing means the last word of the name.
+    public var surname: String?
     /// Which side of the plate they bat from, if known.
     public var bats: BattingSide?
     /// Which hand they throw with, if known.
@@ -44,6 +48,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         name: String? = nil,
         number: String? = nil,
         placeholder: String? = nil,
+        surname: String? = nil,
         bats: BattingSide? = nil,
         throwsWith: Hand? = nil,
         walkUpSongID: SongID? = nil,
@@ -58,6 +63,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         self.name = name
         self.number = number
         self.placeholder = placeholder
+        self.surname = surname
         self.bats = bats
         self.throwsWith = throwsWith
         self.walkUpSongID = walkUpSongID
@@ -72,7 +78,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     // MARK: Reading and writing JSON
 
     private enum CodingKeys: String, CodingKey {
-        case id, name, number, placeholder, bats, throwsWith, walkUpSongID, warmUpSongID, extraWarmUpSongIDs, introduction
+        case id, name, number, placeholder, surname, bats, throwsWith, walkUpSongID, warmUpSongID, extraWarmUpSongIDs, introduction
         case usualPosition, usualRole, usuallyLeadsOff
     }
 
@@ -84,6 +90,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         name = try c.decodeIfPresent(String.self, forKey: .name)
         number = try c.decodeIfPresent(String.self, forKey: .number)
         placeholder = try c.decodeIfPresent(String.self, forKey: .placeholder)
+        surname = try c.decodeIfPresent(String.self, forKey: .surname)
         bats = try c.decodeIfPresent(BattingSide.self, forKey: .bats)
         throwsWith = try c.decodeIfPresent(Hand.self, forKey: .throwsWith)
         walkUpSongID = try c.decodeIfPresent(SongID.self, forKey: .walkUpSongID)
@@ -103,6 +110,7 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         try c.encodeIfPresent(name, forKey: .name)
         try c.encodeIfPresent(number, forKey: .number)
         try c.encodeIfPresent(placeholder, forKey: .placeholder)
+        try c.encodeIfPresent(surname, forKey: .surname)
         try c.encodeIfPresent(bats, forKey: .bats)
         try c.encodeIfPresent(throwsWith, forKey: .throwsWith)
         try c.encodeIfPresent(walkUpSongID, forKey: .walkUpSongID)
@@ -123,10 +131,22 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         return "Unknown player"
     }
 
-    /// The last word of the name, for box scores ("Jeter"). Falls back to `displayName`.
+    /// The last name on its own, for box scores and tight spots: the `surname` when there is
+    /// one ("Torres"), else the last word of the name ("Jeter"). Falls back to `displayName`.
     public var lastName: String {
+        if let surname, !surname.isEmpty, name?.isEmpty == false { return surname }
         guard let name, let last = name.split(separator: " ").last else { return displayName }
         return String(last)
+    }
+
+    /// The first initial and the last name, for the field drawing and other tight spots where
+    /// teammates share a last name: "J. Webb". Just the name when it is one word, else
+    /// `displayName`.
+    public var initialAndLastName: String {
+        guard let name else { return displayName }
+        let words = name.split(separator: " ")
+        guard words.count > 1, let initial = words.first?.first else { return lastName }
+        return "\(initial). \(lastName)"
     }
 
     /// True when the scorer knows neither a name nor a number yet.
@@ -159,6 +179,10 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
         case imported
         /// The iPhone's built-in speech voice reads the number and name.
         case phoneVoice
+        /// Put together at play time from short recordings shared by the whole team
+        /// ("Now batting," and every number) and one of this player's name, so a new jersey
+        /// number needs no new recording. `fileName` is the name recording.
+        case pieced
     }
 
     public var source: Source
@@ -168,6 +192,32 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
     public init(source: Source, fileName: String? = nil) {
         self.source = source
         self.fileName = fileName
+    }
+
+    // The shared pieces of a `pieced` introduction, in the app's audio folder. The team
+    // loader copies them in from ~/Dropbox/baseball/intros/.
+
+    /// "Now batting,"
+    public static let nowBattingFile = "announcer-now-batting.m4a"
+
+    /// "Number twenty-two," said mid-sentence, for jersey number "22" (or "00").
+    public static func numberFile(_ number: String) -> String {
+        "announcer-number-\(number).m4a"
+    }
+
+    /// A player's name recording, from the plain file name stem "aidan-kurt".
+    public static func nameFile(_ stem: String) -> String {
+        "announcer-name-\(stem).m4a"
+    }
+
+    /// The plain file name stem for a player's name: "Joaquín Cañas" gives "joaquin-canas".
+    /// Lower case, accents dropped, every run of other characters a single dash. The team
+    /// loader, tools/record_intros.py and a name recorded in the app all use this rule, so a
+    /// name recording made in either place has the same file name.
+    public static func nameStem(_ name: String) -> String {
+        let plain = name.lowercased().folding(options: .diacriticInsensitive, locale: nil)
+        let words = plain.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : " " }
+        return String(words).split(separator: " ").joined(separator: "-")
     }
 }
 

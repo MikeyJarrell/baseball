@@ -11,7 +11,7 @@ import Foundation
 public struct NewspaperBoxScore: Equatable, Sendable {
     /// The small line above the headline: the game's date, "Saturday, May 2".
     public var dateLine: String
-    /// The big line: the leader first, "Diamond Dogs 5, Mudcats 3".
+    /// The big lines: the leader first, one team to a line, "Diamond Dogs 5\nMudcats 3".
     public var headline: String
     /// "In progress" for a box score of a game that has not ended; missing once it is final.
     public var status: String?
@@ -19,12 +19,13 @@ public struct NewspaperBoxScore: Equatable, Sendable {
     public var batting: [NewspaperTable]
     /// Runs by inning for both teams, with runs, hits and errors at the end.
     public var lineScore: NewspaperLineScore
-    /// The notes under the line score, one per kind: "E—Kim, Tate.", "DP—Mudcats 2, ...".
+    /// The notes under the line score, one per kind, each printed on its own line:
+    /// "E—Kim, Tate.", "DP—Mudcats 2, ...".
     public var notes: [String]
     /// The visitors' pitchers, then the home team's.
     public var pitching: [NewspaperTable]
-    /// The notes under the pitching lines: who was hit by a pitch, pitches and strikes, and
-    /// how long the game took ("T—3:12.").
+    /// The notes under the pitching lines, each on its own line: who was hit by a pitch,
+    /// pitches and strikes, and how long the game took ("T—3:12.").
     public var pitchingNotes: [String]
 
     public init(
@@ -60,23 +61,18 @@ public struct NewspaperTable: Equatable, Sendable {
     public var columns: [String]
     /// One row per player, and for batters a totals row at the end.
     public var rows: [NewspaperRow]
-    /// The lines printed right under a batting table, one per pinch hitter or pinch runner,
-    /// matching the letter in front of their name: "a-popped out for Collins in the 4th.".
-    /// Empty for pitching tables and for a team that used nobody off the bench that way.
-    public var footnotes: [String]
 
-    public init(title: String, columns: [String], rows: [NewspaperRow], footnotes: [String] = []) {
+    public init(title: String, columns: [String], rows: [NewspaperRow]) {
         self.title = title
         self.columns = columns
         self.rows = rows
-        self.footnotes = footnotes
     }
 }
 
 /// One line of a table: a name on the left, numbers in columns on the right.
 public struct NewspaperRow: Equatable, Sendable {
-    /// What is printed on the left: "Ortiz cf", "a-Moss ph" (a pinch hitter, lettered for
-    /// the footnote), "Barros W" (the winning pitcher), "Totals".
+    /// What is printed on the left: "Ortiz CF", "Moss PH" (a pinch hitter), "Barros W" (the
+    /// winning pitcher), "Totals".
     public var label: String
     /// True for a player who came into the game after it started, who is printed a little
     /// to the right, under the player they replaced.

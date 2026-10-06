@@ -96,7 +96,7 @@ struct TeamImportTests {
         #expect(!second.teamsToSave.contains { !$0.isOurs })
     }
 
-    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load replaces the list")
+    @Test("Extra warm-up songs attach to their pitcher, in order, and a second load keeps the ones already saved")
     func extraWarmUps() throws {
         let (roster, opponents) = try realRows()
         let extras = ExtraWarmUpRow.read("""
@@ -120,11 +120,20 @@ struct TeamImportTests {
         // A song listed twice is in his list once; a misspelled name is reported.
         #expect(chris.extraWarmUpSongIDs.count == 2)
         #expect(first.notes.contains { $0.contains("Kris Strong") })
-        // Loading again with one row gone drops that song from his list but keeps its id in the library.
-        let again = TeamImport.merge(teams: first.teamsToSave, library: first.library, roster: roster,
+        // Songs can be added on the phone too, during a game, so loading again never drops
+        // one: with a row gone from the file and a song added on the phone, he keeps all three,
+        // the file's first.
+        var team = first.teamsToSave
+        let phoneSong = Song(title: "Picked on the phone", fileName: "phone.m4a")
+        var library = first.library
+        library.songs.append(phoneSong)
+        if let t = team.firstIndex(where: \.isOurs), let p = team[t].roster.firstIndex(where: { $0.id == chris.id }) {
+            team[t].roster[p].extraWarmUpSongIDs.insert(phoneSong.id, at: 0)
+        }
+        let again = TeamImport.merge(teams: team, library: library, roster: roster,
                                      opponents: opponents, extraWarmUps: Array(extras.prefix(1)))
         let chrisAgain = try #require(again.teamsToSave.first { $0.isOurs }?.roster.first { $0.id == chris.id })
-        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0]])
+        #expect(chrisAgain.extraWarmUpSongIDs == [chris.extraWarmUpSongIDs[0], phoneSong.id, chris.extraWarmUpSongIDs[1]])
     }
 
     @Test("A warm-up track never takes over a teammate's walk-up clip of the same song")
@@ -150,5 +159,75 @@ struct TeamImportTests {
         #expect(RosterWords.position("SS") == .shortstop)
         #expect(RosterWords.position("DH") == nil)
         #expect(RosterWords.key("Joaquín  Cañas") == RosterWords.key("joaquin canas"))
+    }
+
+    @Test("Players whose names were recorded get a pieced introduction; one recorded in the app is kept")
+    func piecedIntroductions() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        // Mikey recorded Chris's introduction in the app, and switched Darin to the iPhone voice.
+        let chris = try #require(teams[o].roster.firstIndex { $0.name == "Chris Strong" })
+        teams[o].roster[chris].introduction = AnnouncerIntroduction(source: .recorded, fileName: "intro-chris.m4a")
+        let darin = try #require(teams[o].roster.firstIndex { $0.name == "Darin Dietrich" })
+        teams[o].roster[darin].introduction = AnnouncerIntroduction(source: .phoneVoice)
+
+        let result = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents,
+                                      recordedNames: ["aidan-kurt", "chris-strong", "darin-dietrich"])
+        let ours = try #require(result.teamsToSave.first { $0.isOurs })
+        let intro = { (name: String) in ours.roster.first { $0.name == name }?.introduction }
+        #expect(intro("Aidan Kurt") == AnnouncerIntroduction(source: .pieced, fileName: "announcer-name-aidan-kurt.m4a"))
+        #expect(intro("Chris Strong")?.source == .recorded)
+        #expect(intro("Darin Dietrich")?.source == .phoneVoice)
+        #expect(intro("Mikey Jarrell") == nil)
+    }
+
+    @Test("A number changed in the app is kept over the roster file’s; a blank one is filled in")
+    func numbersFromTheApp() throws {
+        let (roster, opponents) = try realRows()
+        var teams = TeamImport.merge(teams: [], library: SongLibrary(), roster: roster, opponents: opponents).teamsToSave
+        let o = try #require(teams.firstIndex { $0.isOurs })
+        let aidan = try #require(teams[o].roster.firstIndex { $0.name == "Aidan Kurt" })
+        #expect(teams[o].roster[aidan].number == "3")   // from roster.csv
+        teams[o].roster[aidan].number = "9"
+        let again = TeamImport.merge(teams: teams, library: SongLibrary(), roster: roster, opponents: opponents)
+        let ours = try #require(again.teamsToSave.first { $0.isOurs })
+        #expect(ours.roster[aidan].number == "9")
+        #expect(again.notes.contains { $0.contains("Aidan Kurt wears 9") })
+    }
+
+    @Test("File name stems match the Mac scripts: no accents, words joined by dashes")
+    func fileStems() {
+        #expect(RosterWords.fileStem("Joaquín Cañas") == "joaquin-canas")
+        #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
+        #expect(RosterWords.fileStem("J.T. O'Neil") == "j-t-o-neil")
+    }
+
+    @Test("A player with two last names goes by the first: Torres Benitez is Torres")
+    func twoLastNames() {
+        #expect(RosterWords.surname(fromLastName: "Torres Benitez") == "Torres")
+        #expect(RosterWords.surname(fromLastName: "Rosas Lopez") == "Rosas")
+        #expect(RosterWords.surname(fromLastName: "Strong") == nil)
+        #expect(RosterWords.surname(fromLastName: "De La Cruz") == nil)
+        #expect(RosterWords.surname(fromLastName: "Hafey-Bagg") == nil)
+        let player = Player(name: "Jonathan Torres Benitez", surname: "Torres")
+        #expect(player.lastName == "Torres")
+        #expect(player.initialAndLastName == "J. Torres")
+    }
+
+    @Test("A name recorded in the app is kept over Dropbox's copy only when it is newer")
+    func appNameRecordingWins() {
+        let early = Date(timeIntervalSince1970: 1_000), late = Date(timeIntervalSince1970: 2_000)
+        #expect(TeamImport.keepsAppRecording(appModified: late, dropboxModified: early))
+        #expect(!TeamImport.keepsAppRecording(appModified: early, dropboxModified: late))
+        #expect(!TeamImport.keepsAppRecording(appModified: nil, dropboxModified: late))
+        #expect(TeamImport.keepsAppRecording(appModified: late, dropboxModified: nil))
+    }
+
+    @Test("Name file stems match the Mac script's: accents dropped, one dash between words")
+    func nameStems() {
+        #expect(AnnouncerIntroduction.nameStem("Joaquín Cañas") == "joaquin-canas")
+        #expect(AnnouncerIntroduction.nameStem("Jackson  Cleary") == "jackson-cleary")
+        #expect(RosterWords.fileStem("Erick Rosas Lopez") == "erick-rosas-lopez")
     }
 }

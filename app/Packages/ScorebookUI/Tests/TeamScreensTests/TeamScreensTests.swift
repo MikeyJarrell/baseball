@@ -12,16 +12,16 @@ import SampleData
 
 @Suite("The stadium announcer’s words")
 struct AnnouncerWordingTests {
-    @Test("Name and number: the number, the name, then the number again")
+    @Test("Name and number: the number, then the name")
     func nameAndNumber() {
         let jeter = Player(name: "Derek Jeter", number: "2")
-        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter. Number two.")
+        #expect(TeamWording.announcerScript(for: jeter) == "Now batting, number two, Derek Jeter.")
     }
 
     @Test("Only a name, or only a number")
     func partial() {
         #expect(TeamWording.announcerScript(for: Player(name: "Jordan Webb")) == "Now batting, Jordan Webb.")
-        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two. Number twenty-two.")
+        #expect(TeamWording.announcerScript(for: Player(number: "22")) == "Now batting, number twenty-two.")
         #expect(TeamWording.announcerScript(for: Player(placeholder: "Batter 4")) == "Now batting.")
     }
 
@@ -41,7 +41,7 @@ struct AnnouncerWordingTests {
         let recorded = AnnouncerIntroduction(source: .recorded, fileName: "intro-d1.m4a")
         #expect(TeamWording.introductionStatus(recorded, echo: 0.6) == "Recorded in your voice · stadium echo on")
         #expect(TeamWording.introductionStatus(recorded, echo: 0) == "Recorded in your voice · no stadium echo")
-        #expect(TeamWording.introductionStatus(nil, echo: 0.6) == "Nothing yet. Until there is, the song plays alone.")
+        #expect(TeamWording.introductionStatus(nil, echo: 0.6) == "No introduction yet")
         #expect(TeamWording.introductionShort(AnnouncerIntroduction(source: .phoneVoice)) == "iPhone voice intro")
     }
 }
@@ -69,7 +69,7 @@ struct RosterWordingTests {
     func usuals() {
         #expect(TeamWording.usualText(PlayerUsuals(position: .centerField)) == "Center field")
         #expect(TeamWording.usualText(PlayerUsuals(position: .shortstop, leadsOff: true)) == "Shortstop, leads off")
-        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "Bats only, leads off")
+        #expect(TeamWording.usualText(PlayerUsuals(leadsOff: true)) == "DH, leads off")
         #expect(TeamWording.usualText(PlayerUsuals(position: .pitcher, startsOnBench: true)) == "Pitcher, starts on the bench")
         #expect(TeamWording.usualText(PlayerUsuals()) == "")
     }

@@ -52,4 +52,6 @@ public enum PostgameRequest: Equatable, Sendable {
     /// The scorer picked a new minimum innings pitched for pitchers' per-inning rates. Keep it
     /// and hand it back as `minimumInnings` the next time the season stats open.
     case setMinimumInnings(Int)
+    /// Delete this game, after the scorer confirmed. The app writes a backup first.
+    case deleteGame(GameID)
 }

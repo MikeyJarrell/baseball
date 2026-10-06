@@ -242,6 +242,30 @@ final class AppModel {
         if session?.isFinished == true { session = nil }
     }
 
+    /// Deletes one saved game, after the scorer confirmed: writes a backup of everything first
+    /// (so the game can still be brought back from Backups), then removes that game's file and
+    /// nothing else. Deleting the game in progress closes it, so the home screen stops offering
+    /// to resume it. The games list, the season stats and the last box score read the games
+    /// again.
+    func deleteGame(_ id: GameID) async {
+        guard let storage else { return }
+        do {
+            _ = try await storage.makeBackup()
+        } catch {
+            problem = "The game was not deleted: the backup before it could not be written. (\(error.localizedDescription))"
+            return
+        }
+        do {
+            try await storage.deleteGame(id)
+        } catch {
+            problem = "The game could not be deleted. (\(error.localizedDescription))"
+            return
+        }
+        if session?.game.id == id { session = nil }
+        await reloadGames()
+        deleteIntroductionsNoLongerUsed()
+    }
+
     /// One finished game's box score.
     func boxScore(for game: Game) -> BoxScore {
         stats.boxScore(for: engine.replay(game).log)
@@ -287,6 +311,14 @@ final class AppModel {
         guard var team = teams.first(where: { $0.id == teamID }),
               let i = team.roster.firstIndex(where: { $0.id == id }) else { return }
         team.roster[i].walkUpSongID = song
+        await saveTeam(team)
+    }
+
+    /// Changes one player's warm-up songs on a saved team: the main one and the extras.
+    func changeWarmUpSongs(for id: PlayerID, teamID: TeamID, _ change: (inout Player) -> Void) async {
+        guard var team = teams.first(where: { $0.id == teamID }),
+              let i = team.roster.firstIndex(where: { $0.id == id }) else { return }
+        change(&team.roster[i])
         await saveTeam(team)
     }
 

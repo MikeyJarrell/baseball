@@ -1,5 +1,6 @@
 // Smaller pages the app shell shows itself: the pregame screens' cover, the walk-up song
-// settings, the song picker, the game overview and the teams and songs pages.
+// settings, the song picker, our pitcher's warm-up songs, the game overview and the teams and
+// songs pages.
 
 import SwiftUI
 import Model
@@ -31,7 +32,7 @@ struct PregameCover: View {
                 }
             }
         } else {
-            EmptyPage(text: "Set up your team first: open Teams and add your team and its players.")
+            EmptyPage(text: "Set up your team first, in Teams.")
                 .onTapGesture(perform: onCancel)
         }
     }
@@ -54,8 +55,6 @@ struct SongSettingsSheet: View {
                             in: 4...60, step: 1) {
                         Text("\(Int(app.settings.walkUpSongSeconds)) seconds of song")
                     }
-                } footer: {
-                    Text("The last two seconds are the fade. A song’s own length, set on its page, wins.")
                 }
                 Section {
                     Toggle("Fade on the first pitch", isOn: Binding(
@@ -94,7 +93,7 @@ struct SongPickerSheet: View {
             List {
                 let songs = app.audio?.library.songs ?? []
                 if songs.isEmpty {
-                    Text("No songs yet. Add songs from the home screen’s Songs page.")
+                    Text("No songs yet. Add them on the Songs page.")
                         .foregroundStyle(ScorebookColor.textSecondary)
                 }
                 ForEach(songs) { song in
@@ -111,6 +110,134 @@ struct SongPickerSheet: View {
             .navigationTitle("Walk-up song")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { onFinish(nil) } } }
+        }
+    }
+}
+
+// MARK: - Warm-up songs
+
+/// Our pitcher's warm-up songs, from the batting screen during a game: the songs he has (his
+/// first-inning song, then the extras shuffled for his later innings), then the rest of the
+/// library. Tapping a song adds it to his list or takes it off; its play button plays it now as
+/// his warm-up song. Each change saves to the team at once, so it holds for this game and the
+/// next ones.
+struct WarmUpSongsSheet: View {
+    @Environment(AppModel.self) private var app
+    /// The pitcher as this game has him.
+    var pitcher: Player
+    /// His saved team.
+    var teamID: TeamID
+    var onClose: () -> Void
+
+    @State private var search = ""
+
+    /// The pitcher as the saved team has him now, or as this game has him if he is not on the
+    /// saved team yet (a pitcher typed in by number during the game).
+    private var player: Player? { app.ourTeam?.player(pitcher.id) ?? pitcher }
+
+    /// His warm-up songs: the first-inning song, then the extras.
+    private var hisSongs: [SongID] {
+        guard let player else { return [] }
+        return (player.warmUpSongID.map { [$0] } ?? []) + player.extraWarmUpSongIDs.filter { $0 != player.warmUpSongID }
+    }
+
+    /// The rest of the library, alphabetical, narrowed by the search.
+    private var otherSongs: [Song] {
+        let his = Set(hisSongs)
+        return (app.audio?.library.songs ?? [])
+            .filter { !his.contains($0.id) }
+            .filter { search.isEmpty || $0.title.localizedCaseInsensitiveContains(search)
+                      || ($0.artist ?? "").localizedCaseInsensitiveContains(search) }
+            .sorted { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                if !hisSongs.isEmpty {
+                    Section {
+                        ForEach(hisSongs, id: \.self) { id in
+                            row(id, isHis: true, note: id == player?.warmUpSongID ? "First inning" : "Later innings")
+                        }
+                    } header: {
+                        Text("Their warm-up songs")
+                    }
+                }
+                Section {
+                    ForEach(otherSongs) { song in row(song.id, isHis: false, note: song.artist) }
+                } header: {
+                    Text("Add a song")
+                }
+            }
+            .searchable(text: $search, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search songs")
+            .navigationTitle("Warm-up songs for \(player?.lastName ?? "pitcher")")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done", action: onClose) } }
+        }
+    }
+
+    /// One song: a play button, the title over a smaller line, and a check when it is his.
+    private func row(_ id: SongID, isHis: Bool, note: String?) -> some View {
+        let song = app.audio?.library.song(id)
+        let playback = app.audio?.playback
+        let playingThis = playback?.phase == .warmUp && playback?.song == id
+        return HStack(spacing: Spacing.small) {
+            Button {
+                if playingThis { app.audio?.fadeOut() } else { playNow(id) }
+            } label: {
+                Image(systemName: playingThis ? "stop.fill" : "play.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .frame(width: 40, height: 40)
+                    .background(ScorebookColor.surfaceSecondary, in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(playingThis ? "Fade out \(song?.title ?? "song")" : "Play \(song?.title ?? "song") now"))
+            Button {
+                Task { await toggle(id, isHis: isHis) }
+            } label: {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(song?.title ?? "A song no longer in the library").foregroundStyle(ScorebookColor.textPrimary)
+                        if let note { Text(note).font(.caption).foregroundStyle(ScorebookColor.textSecondary) }
+                    }
+                    Spacer(minLength: 0)
+                    Image(systemName: isHis ? "checkmark.circle.fill" : "plus.circle")
+                        .font(.title3)
+                        .foregroundStyle(isHis ? ScorebookColor.highlight : ScorebookColor.textSecondary)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text(song?.title ?? "Song"))
+            .accessibilityValue(Text(isHis ? "One of their warm-up songs" : "Not one of theirs"))
+            .accessibilityHint(Text(isHis ? "Takes it off their list" : "Adds it to their list"))
+        }
+    }
+
+    /// Plays one song now as his warm-up song.
+    private func playNow(_ id: SongID) {
+        guard var pitcherNow = player else { return }
+        pitcherNow.warmUpSongID = id
+        app.audio?.playWarmUp(for: pitcherNow)
+    }
+
+    /// Adds a song to his list (as his first-inning song if he has none) or takes it off. A
+    /// pitcher not on the saved team yet goes on it first.
+    private func toggle(_ id: SongID, isHis: Bool) async {
+        if app.ourTeam?.player(pitcher.id) == nil { await app.updateSavedPlayer(pitcher, teamID: teamID) }
+        await app.changeWarmUpSongs(for: pitcher.id, teamID: teamID) { player in
+            if isHis {
+                if player.warmUpSongID == id {
+                    player.warmUpSongID = player.extraWarmUpSongIDs.first
+                    if !player.extraWarmUpSongIDs.isEmpty { player.extraWarmUpSongIDs.removeFirst() }
+                } else {
+                    player.extraWarmUpSongIDs.removeAll { $0 == id }
+                }
+            } else if player.warmUpSongID == nil {
+                player.warmUpSongID = id
+            } else if !player.extraWarmUpSongIDs.contains(id) {
+                player.extraWarmUpSongIDs.append(id)
+            }
         }
     }
 }
@@ -194,7 +321,7 @@ struct OverviewPage: View {
             TimeLimitSheet(context: context, onFinish: done)
         default:
             // Pitches are changed on the overview itself; anything else can only be deleted.
-            EmptyPage(text: "This kind of event can be deleted from the play-by-play, then entered again.")
+            EmptyPage(text: "Delete it from the play-by-play, then enter it again.")
                 .onTapGesture { fixingOther = nil }
         }
     }

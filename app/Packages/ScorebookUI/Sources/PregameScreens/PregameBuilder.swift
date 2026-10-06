@@ -41,15 +41,21 @@ public struct GameDetails: Equatable, Sendable {
         innings = min(max(innings + step, 1), 15)
     }
 
-    /// Moves the scheduled start (the mockup uses 15 minutes a tap). The time limit moves with it,
-    /// staying the same length.
-    public mutating func moveStart(by minutes: Int) {
-        startMinutes = min(max(startMinutes + minutes, 0), 23 * 60 + 45)
+    /// Sets the scheduled start to a clock time picked on the time wheel (any minute: 1:03 PM).
+    /// The time limit moves with it, staying the same length (three hours unless changed).
+    public mutating func setStart(_ time: Date, calendar: Calendar = .current) {
+        let parts = calendar.dateComponents([.hour, .minute], from: time)
+        startMinutes = (parts.hour ?? 9) * 60 + (parts.minute ?? 0)
     }
 
-    /// Moves the time limit's clock time (the mockup uses 5 minutes a tap). Never before the start.
-    public mutating func moveTimeLimit(by minutes: Int) {
-        timeLimitMinutes = max(timeLimitMinutes + minutes, 5)
+    /// Sets the time limit to a clock time picked on the time wheel. The setup keeps it as the
+    /// time from the start to the limit, so a late first pitch moves it later (rule 9.1 G). A
+    /// clock time at or before the start is taken as after midnight.
+    public mutating func setTimeLimitEnd(_ time: Date, calendar: Calendar = .current) {
+        let parts = calendar.dateComponents([.hour, .minute], from: time)
+        var length = (parts.hour ?? 0) * 60 + (parts.minute ?? 0) - startMinutes
+        if length <= 0 { length += 24 * 60 }
+        timeLimitMinutes = length
     }
 
     /// Switches championship rules on or off. A time limit still at the usual length for the old
@@ -126,7 +132,7 @@ public struct PregameDraft: Equatable, Sendable {
             ours = OurLineup.fromRoster(input.ourTeam.roster)
             lineupStartedFrom = nil
         }
-        theirs = TheirLineup(mode: .unknown)
+        theirs = TheirLineup(mode: .numbers)
     }
 
     /// Picks the opponent, and starts their lineup from their saved roster and the last game against them.
@@ -279,16 +285,18 @@ public enum PregameBuilder {
     }
 
     /// A saved team brought up to date from a game's roster, for saving after "Play ball": anyone
-    /// typed in on the pregame screens (a number, a new pitcher) joins the roster, and details the
-    /// saved team was missing (a throwing hand, a number) are filled in. Placeholders nobody has
-    /// named ("Batter 4", "Pitcher") are left off, and nothing the saved team already knew changes.
+    /// typed in on the pregame screens (a number, a new pitcher) joins the roster; a jersey number
+    /// typed in replaces the saved one; details the saved team was missing (a throwing hand) are
+    /// filled in. Placeholders nobody has named ("Batter 4", "Pitcher") are left off. Our team's
+    /// game roster is a copy of the saved one, so for our team nothing changes but throwing hands.
     public static func updatedTeam(saved: Team, from game: GameTeam) -> Team {
         var team = saved
         for player in game.roster {
             if let i = team.roster.firstIndex(where: { $0.id == player.id }) {
                 var known = team.roster[i]
                 known.name = known.name ?? player.name
-                known.number = known.number ?? player.number
+                // A number typed on the pregame screens replaces the saved one.
+                if let typed = player.number, !typed.isEmpty { known.number = typed }
                 known.bats = known.bats ?? player.bats
                 known.throwsWith = known.throwsWith ?? player.throwsWith
                 team.roster[i] = known

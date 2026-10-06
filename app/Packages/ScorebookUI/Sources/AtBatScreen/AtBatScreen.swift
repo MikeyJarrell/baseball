@@ -67,12 +67,20 @@ public enum AtBatAction: Equatable, Sendable {
     case openSongSettings
     /// Open the song picker for one of our hitters who has no walk-up song.
     case pickSong(for: PlayerID)
+    /// Go to the home screen (the game menu's Home screen). The game stays in progress, saved,
+    /// and the home screen's Resume scoring brings it back.
+    case goHome
 
     /// Play our hitter's walk-up song, with the announcer introduction first when asked.
     case playWalkUp(Player, withIntroduction: Bool)
     /// Play our pitcher's warm-up song at the changeover when our team takes the field.
     case playWarmUp(Player)
-    /// Stop whatever is playing now (a tap on a playing song button).
+    /// Open the game details: date, start time, innings, home and away.
+    case openGameDetails
+    /// Open the warm-up songs for our pitcher: pick more, or play a different one now.
+    case pickWarmUpSongs(Player)
+    /// Stop whatever is playing now (a tap on a playing song button). It fades out over two
+    /// seconds; a second tap while it fades stops it at once.
     case stopSong
     /// Fade out whatever is playing: a pitch was recorded while the warm-up song played, or
     /// while a walk-up song played with "fade on the first pitch" switched on.

@@ -145,9 +145,12 @@ public final class GameSession {
 
     // MARK: Undo and redo
 
-    /// The scorer's own last event: the last one that is not an automatic out the app added.
+    /// The scorer's own last entry: the last event that is neither an automatic out the app
+    /// added nor a defense check confirmed with no changes. A confirmed check changes nothing
+    /// in the game, so Undo passes over it to the last real entry (and takes the check with it,
+    /// so the check comes back once that entry is put back).
     private var lastScorerEventIndex: Int? {
-        game.events.lastIndex { !$0.isAutomaticOut }
+        game.events.lastIndex { !$0.isAutomaticOut && !$0.isDefenseConfirmed }
     }
 
     /// True when there is something to undo.
@@ -240,6 +243,25 @@ public final class GameSession {
     @discardableResult
     public func apply(_ edit: EventEdit) async -> Bool {
         await oneAtATime { await self.applyNow(edit) }
+    }
+
+    /// Changes the game's details mid-game: the date and start time, or the number of innings.
+    @discardableResult
+    public func changeDetails(_ change: @escaping @MainActor (inout GameSetup) -> Void) async -> Bool {
+        await oneAtATime { await self.changeDetailsNow(change) }
+    }
+
+    /// Swaps which team is home and which is away. Only before the first pitch (see
+    /// `canSwitchHomeAndAway`).
+    @discardableResult
+    public func switchHomeAndAway() async -> Bool {
+        await oneAtATime { await self.switchHomeAndAwayNow() }
+    }
+
+    /// Fixes who a player in the game really was (see `LineupCorrection`).
+    @discardableResult
+    public func correctLineup(_ correction: LineupCorrection) async -> Bool {
+        await oneAtATime { await self.correctLineupNow(correction) }
     }
 
     // MARK: Recording
@@ -371,6 +393,154 @@ public final class GameSession {
         return true
     }
 
+    // MARK: Fixing the game's details and lineups
+
+    /// True until the first pitch: home and away can only be switched while nobody has batted,
+    /// since the top of the first belongs to whoever was away. Lineup business before then (a
+    /// substitution, a pitching change, an added hitter, a batting hole) moves with its team.
+    public var canSwitchHomeAndAway: Bool {
+        game.events.allSatisfy { event in
+            switch event.kind {
+            case .defenseConfirmed, .automaticOut, .battingHole, .timeLimitChange,
+                 .substitution, .pitchingChange, .addHitter: true
+            default: false
+            }
+        }
+    }
+
+    /// True when a hitter can come out of the starting batting order: before the first pitch,
+    /// he is in the starting order, and nothing is recorded for his team but a defense check.
+    public func canRemoveFromOrder(_ player: PlayerID, on side: TeamSide) -> Bool {
+        canChangeStartingOrder(side) && game.setup[side].battingOrder.contains(player)
+    }
+
+    /// True before the first pitch while nothing but a defense check is recorded for a team,
+    /// so its starting batting order can still lose a hitter.
+    public func canChangeStartingOrder(_ side: TeamSide) -> Bool {
+        guard canSwitchHomeAndAway else { return false }
+        return game.events.allSatisfy { event in
+            switch event.kind {
+            case .defenseConfirmed, .timeLimitChange: true
+            case .battingHole(let e): e.team != side
+            case .automaticOut(let e): e.team != side
+            case .substitution(let e): e.team != side
+            case .pitchingChange(let e): e.team != side
+            case .addHitter(let e): e.team != side
+            default: false
+            }
+        }
+    }
+
+    /// Changes the setup's date, start time or innings and replays. Clears Redo.
+    @discardableResult
+    private func changeDetailsNow(_ change: @MainActor (inout GameSetup) -> Void) async -> Bool {
+        var changed = game
+        change(&changed.setup)
+        changed.setup.scheduledStart = changed.setup.scheduledStart.wholeSecond
+        changed.setup.rules.scheduledInnings = max(1, changed.setup.rules.scheduledInnings)
+        guard changed != game else { return true }
+        guard await saveWhole(changed) else { return false }
+        redoStack.removeAll()
+        return true
+    }
+
+    /// Swaps the two teams, and with them the side named in each pregame entry: a defense check
+    /// is dropped (it was for the team that was fielding first) and will be asked again, a
+    /// batting hole or lineup change moves with its team, and automatic outs are worked out again.
+    @discardableResult
+    private func switchHomeAndAwayNow() async -> Bool {
+        guard canSwitchHomeAndAway else {
+            saveProblem = "Home and away can switch only before the first pitch. Undo back to before it, then switch."
+            return false
+        }
+        var changed = game
+        swap(&changed.setup.away, &changed.setup.home)
+        changed.events = changed.events.compactMap { event in
+            var event = event
+            switch event.kind {
+            case .defenseConfirmed, .automaticOut: return nil
+            case .battingHole(var hole):
+                hole.team = hole.team.opponent
+                event.kind = .battingHole(hole)
+            case .substitution(var change):
+                change.team = change.team.opponent
+                event.kind = .substitution(change)
+            case .pitchingChange(var change):
+                change.team = change.team.opponent
+                event.kind = .pitchingChange(change)
+            case .addHitter(var added):
+                added.team = added.team.opponent
+                event.kind = .addHitter(added)
+            default: break
+            }
+            return event
+        }
+        guard await saveWhole(changed) else { return false }
+        redoStack.removeAll()
+        defenseCheckPostponedAt = nil
+        await recordAutomaticOuts()
+        return true
+    }
+
+    /// Applies a lineup correction and replays. Clears Redo.
+    @discardableResult
+    private func correctLineupNow(_ correction: LineupCorrection) async -> Bool {
+        var changed = game
+        switch correction {
+        case .wasReally(let side, let shown, let really):
+            guard shown != really.id else { return true }
+            guard let fixed = Self.swapping(shown, with: really, on: side, in: changed) else {
+                saveProblem = "That lineup fix could not be made, so nothing changed."
+                return false
+            }
+            changed = fixed
+        case .removeFromOrder(let side, let player):
+            // Before the first pitch only, and only from the starting order with nothing yet
+            // recorded for that team: batting holes and automatic outs are kept by spot number,
+            // which taking a hitter out would shift.
+            guard canRemoveFromOrder(player, on: side) else {
+                saveProblem = "A hitter can come out of the order only before the first pitch, and only before any batting hole or lineup change for that team."
+                return false
+            }
+            changed.setup[side].battingOrder.removeAll { $0 == player }
+            changed.setup[side].designatedNonRunners.removeAll { $0 == player }
+        }
+        guard await saveWhole(changed) else { return false }
+        redoStack.removeAll()
+        await recordAutomaticOuts()
+        return true
+    }
+
+    /// The game with two players' places exchanged everywhere: the starting batting order and
+    /// defense, the designated non-runners, the fielding turns and every event. `really` is
+    /// added to the team's roster if new. When `really` was not in the game, this simply puts
+    /// them where `shown` was, and `shown` goes to the bench.
+    static func swapping(_ shown: PlayerID, with really: Player, on side: TeamSide, in game: Game) -> Game? {
+        var changed = game
+        changed.setup.add(really, to: side)
+        let a = shown, b = really.id
+        func swapped(_ id: PlayerID) -> PlayerID { id == a ? b : (id == b ? a : id) }
+        var team = changed.setup[side]
+        team.battingOrder = team.battingOrder.map(swapped)
+        team.defense = team.defense.map { FielderAssignment(position: $0.position, player: swapped($0.player)) }
+        team.designatedNonRunners = team.designatedNonRunners.map(swapped)
+        team.fieldingRotations = team.fieldingRotations.map { FieldingRotation(position: $0.position, players: $0.players.map(swapped)) }
+        changed.setup[side] = team
+
+        // Every event that names either player: rewritten through its saved form, so no kind
+        // of event can be missed. Player ids are long random codes, so the quoted id matches
+        // nothing else.
+        guard let data = try? ScorebookJSON.encode(changed.events),
+              var text = String(data: data, encoding: .utf8) else { return nil }
+        let placeholder = "\"swap-\(UUID().uuidString)\""
+        text = text.replacingOccurrences(of: "\"\(a.rawValue)\"", with: placeholder)
+            .replacingOccurrences(of: "\"\(b.rawValue)\"", with: "\"\(a.rawValue)\"")
+            .replacingOccurrences(of: placeholder, with: "\"\(b.rawValue)\"")
+        guard let events = try? ScorebookJSON.decoder().decode([GameEvent].self, from: Data(text.utf8)) else { return nil }
+        changed.events = events
+        return changed
+    }
+
     // MARK: Prompts
 
     /// The scorer let the designated non-runner run themselves: keep the prompt closed for them.
@@ -455,6 +625,12 @@ extension GameEvent {
     /// True for an automatic out: one the app records itself when a batting hole comes up.
     var isAutomaticOut: Bool {
         if case .automaticOut = kind { return true }
+        return false
+    }
+
+    /// True for a defense check confirmed with nobody moving.
+    var isDefenseConfirmed: Bool {
+        if case .defenseConfirmed = kind { return true }
         return false
     }
 }

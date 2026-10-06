@@ -55,10 +55,6 @@ struct PlayerEditSheet: View {
                 } footer: {
                     if let twin = numberTwin {
                         Text("\(twin.displayName) also wears \(number).")
-                    } else if team.isOurs {
-                        Text("A number or a name is enough. Fill in the rest later.")
-                    } else {
-                        Text("A number is enough for their players.")
                     }
                 }
 
@@ -73,15 +69,13 @@ struct PlayerEditSheet: View {
 
                 Section {
                     Picker("Usual position", selection: $draft.usuals.position) {
-                        Text("None (bats only)").tag(Position?.none)
+                        Text("None (DH)").tag(Position?.none)
                         ForEach(Position.allCases, id: \.self) { position in
                             Text("\(position.number) · \(position.name.capitalizedFirst)").tag(Position?.some(position))
                         }
                     }
                     Toggle("Leads off", isOn: $draft.usuals.leadsOff)
                     Toggle("Starts on the bench", isOn: $draft.usuals.startsOnBench)
-                } footer: {
-                    Text("Pregame starts the lineup from these.")
                 }
 
                 if !draft.isNew {

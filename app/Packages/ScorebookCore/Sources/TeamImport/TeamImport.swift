@@ -10,8 +10,10 @@
 // The merge never throws anything away. It matches what is already saved by name: a team by
 // its name, a player by their name within the team, a song by its file name. A match keeps
 // its id (so season stats carry over) and anything the CSV leaves blank (a jersey number
-// typed into the app, an announcer introduction). Players, teams and songs the CSV does not
-// mention stay as they are. Games are never touched.
+// typed into the app; a jersey number changed in the app, which wins over the file). A player
+// whose name was recorded on the Mac (tools/record_intros.py) and who has no introduction yet
+// gets one pieced together from those recordings; one chosen in the app is never touched. Players, teams and songs the CSV
+// does not mention stay as they are. Games are never touched.
 //
 // The command-line loader (Sources/TeamLoader) reads and writes the files; this module only
 // works out what the teams and the song library should become, so it can be tested.
@@ -154,6 +156,17 @@ public struct OpponentRow: Equatable, Sendable {
 // MARK: - Turning text into the app's words
 
 public enum RosterWords {
+    /// The last name a player goes by on its own, when the roster's last name is two words
+    /// and not one name with a small word in front ("De La Cruz", "Van Dyke"): the first of
+    /// the two, as is usual with two Spanish last names. "Torres Benitez" gives "Torres".
+    /// Missing for a one-word last name.
+    public static func surname(fromLastName lastName: String) -> String? {
+        let words = lastName.split(whereSeparator: \.isWhitespace).map(String.init)
+        let smallWords: Set<String> = ["de", "la", "del", "van", "von", "da", "di", "du", "le", "st", "st.", "mc", "dos", "das", "do", "san", "santa"]
+        guard words.count >= 2, !smallWords.contains(words[0].lowercased()) else { return nil }
+        return words[0]
+    }
+
     /// "R", "L", "S" (or "B" for both) as a batting side; blank is unknown.
     public static func battingSide(_ text: String) -> BattingSide? {
         switch text.uppercased() {
@@ -183,6 +196,12 @@ public enum RosterWords {
     public static func seconds(_ text: String) -> TimeInterval {
         let parts = text.split(separator: ":").map { Double($0.trimmingCharacters(in: .whitespaces)) ?? 0 }
         return parts.reduce(0) { $0 * 60 + $1 }
+    }
+
+    /// A plain file name stem from a player's name, as the Mac scripts make them:
+    /// "Joaquín Cañas" is "joaquin-canas".
+    public static func fileStem(_ name: String) -> String {
+        AnnouncerIntroduction.nameStem(name)
     }
 
     /// A name for matching: lower case, no accents, single spaces. "Cañas" matches "Canas".
@@ -220,6 +239,15 @@ public struct ImportResult: Sendable {
 }
 
 public enum TeamImport {
+    /// True when a name recording already in the app (recorded there with Record name) should
+    /// be kept rather than replaced by Dropbox's copy: it is newer. Nothing is kept when the
+    /// app has no copy.
+    public static func keepsAppRecording(appModified: Date?, dropboxModified: Date?) -> Bool {
+        guard let appModified else { return false }
+        guard let dropboxModified else { return true }
+        return appModified > dropboxModified
+    }
+
     /// Our team's name and scoreboard name.
     public static let ourTeamName = "Diamond Dogs"
     public static let ourShortName = "DOGS"
@@ -233,8 +261,11 @@ public enum TeamImport {
     ///   - opponents: Every opponent's players, from `team/opponents.csv`.
     ///   - extraWarmUps: Our pitchers' extra warm-up songs, from `team/warmup_extras.csv`.
     ///   - durations: Each song file's length in seconds, by file name, where known.
+    ///   - recordedNames: The players whose names were recorded for a pieced introduction,
+    ///     by their file name stem ("aidan-kurt").
     public static func merge(teams: [Team], library: SongLibrary, roster: [RosterRow], opponents: [OpponentRow],
-                             extraWarmUps: [ExtraWarmUpRow] = [], durations: [String: TimeInterval] = [:]) -> ImportResult {
+                             extraWarmUps: [ExtraWarmUpRow] = [], durations: [String: TimeInterval] = [:],
+                             recordedNames: Set<String> = []) -> ImportResult {
         var notes: [String] = []
         var library = library
         var audioFiles: [String] = []
@@ -281,7 +312,15 @@ public enum TeamImport {
             let index = ours.roster.firstIndex { names.contains(RosterWords.key($0.name ?? "")) }
             var player = index.map { ours.roster[$0] } ?? Player()
             player.name = row.displayName
-            if !row.number.isEmpty { player.number = row.number }
+            player.surname = RosterWords.surname(fromLastName: row.lastName)
+            // A number changed in the app during the season wins over the roster file; the
+            // file only fills in a player with no number yet.
+            let phoneNumber = player.number?.trimmingCharacters(in: .whitespaces) ?? ""
+            if phoneNumber.isEmpty, !row.number.isEmpty {
+                player.number = row.number
+            } else if !row.number.isEmpty, phoneNumber != row.number {
+                notes.append("\(row.displayName) wears \(phoneNumber) in the app and \(row.number) in roster.csv; the app’s number was kept")
+            }
             player.bats = RosterWords.battingSide(row.bats) ?? player.bats
             player.throwsWith = RosterWords.hand(row.throwsWith) ?? player.throwsWith
             player.usualPosition = RosterWords.position(row.position)
@@ -296,12 +335,22 @@ public enum TeamImport {
             }
             if let walkUp { player.walkUpSongID = walkUp }
             if let warmUp { player.warmUpSongID = warmUp }
-            // Extra warm-up songs come only from the file, so its list replaces what is saved;
-            // a row whose song is not cut yet is skipped.
+            // The pieced introduction for a player with none yet. One chosen in the app (a
+            // recording, an import, the iPhone voice) is kept.
+            let stem = RosterWords.fileStem(row.displayName)
+            if recordedNames.contains(stem), player.introduction == nil || player.introduction?.source == .pieced {
+                player.introduction = AnnouncerIntroduction(source: .pieced, fileName: AnnouncerIntroduction.nameFile(stem))
+            }
+            // Extra warm-up songs: the file's, in its order, then any added on the phone (during
+            // a game, say) that the file does not list, so a team load never loses them. A row
+            // whose song is not cut yet is skipped.
             var extras: [SongID] = []
             for extra in extraWarmUps where names.contains(RosterWords.key(extra.player)) {
                 if let id = song(file: extra.file, title: extra.song, artist: extra.artist, start: 0),
                    !extras.contains(id), id != player.warmUpSongID { extras.append(id) }
+            }
+            for id in player.extraWarmUpSongIDs where !extras.contains(id) && id != player.warmUpSongID {
+                extras.append(id)
             }
             player.extraWarmUpSongIDs = extras
             if let index {

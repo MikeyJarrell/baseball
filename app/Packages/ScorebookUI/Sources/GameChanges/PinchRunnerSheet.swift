@@ -51,8 +51,8 @@ public struct PinchRunnerSheet: View {
                             .buttonStyle(ChipStyle(isOn: base == r.base))
                     }
                 }
-                if let runner {
-                    InfoBox(explanation(for: runner))
+                if let runner, let explanation = explanation(for: runner) {
+                    InfoBox(explanation)
                 }
 
                 SectionLabel("Runner")
@@ -61,7 +61,7 @@ public struct PinchRunnerSheet: View {
                     if bench.isEmpty { EmptyNote("Nobody on the bench.") }
                     ForEach(Array(bench.enumerated()), id: \.element.id) { i, player in
                         if i > 0 { RowDivider() }
-                        PlayerChoiceRow(context: context, player: player.id, detail: "Bench", look: look,
+                        PlayerChoiceRow(context: context, player: player.id, detail: nil, look: look,
                                         isSelected: pick == player.id) { pick = player.id }
                     }
                 }
@@ -71,7 +71,7 @@ public struct PinchRunnerSheet: View {
                     Card {
                         ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                             if i > 0 { RowDivider() }
-                            PlayerChoiceRow(context: context, player: player.id, detail: "\(whereNow(player.id)) · your call",
+                            PlayerChoiceRow(context: context, player: player.id, detail: whereNow(player.id),
                                             look: look, isSelected: pick == player.id) { pick = player.id }
                         }
                     }
@@ -86,19 +86,20 @@ public struct PinchRunnerSheet: View {
         }
     }
 
-    /// What a pinch runner does to the batting order, for this runner.
-    private func explanation(for runner: BaseRunner) -> Text {
+    /// What a pinch runner does to the batting order, for a runner tied to a designated
+    /// non-runner; nothing for an ordinary runner.
+    private func explanation(for runner: BaseRunner) -> Text? {
         let name = Text(context.shortName(runner.runner)).bold().foregroundStyle(ScorebookColor.textPrimary)
         if let nonRunner = runner.standingInFor {
             // The runner is already running for a designated non-runner [9.11 N].
-            return Text("The new runner takes \(name)’s own spot in the batting order and keeps running for \(context.shortName(nonRunner)), who stays in the order (rule 9.11 N).")
+            return Text("The new runner takes \(name)’s batting spot and keeps running for \(context.shortName(nonRunner)).")
         }
         if let spot = context.battingSpot(of: runner.runner, side),
            context.state(side).battingOrder.slots[spot].isDesignatedNonRunner {
             // A pinch runner for a designated non-runner takes them out of the order [9.11 M].
-            return Text("\(name) is a designated non-runner. A pinch runner takes them out of the batting order (rule 9.11 M). To keep them in it, use Runner for a non-runner instead.")
+            return Text("A pinch runner takes \(name) out of the batting order. To keep them in, use Runner for a non-runner.")
         }
-        return Text("The runner takes over \(name)’s spot in the batting order, and \(name) leaves the game.")
+        return nil
     }
 
     /// Where a player is now: "Bats 4th", "Playing shortstop", "Left the game".

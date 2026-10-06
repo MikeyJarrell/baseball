@@ -2,10 +2,11 @@
 // actually makes sound.
 //
 // What it does, in game terms:
-// - When our hitter comes up, one tap plays their announcer introduction (if they have one)
-//   and then their walk-up song from its start point. The song fades out by itself after
-//   12 seconds of song (the walk-up length setting), or sooner when the button is tapped
-//   again, with a fade of about two seconds.
+// - When our hitter comes up, one tap plays their walk-up song. If they have an announcer
+//   introduction, the song fades in underneath the voice, the way stadiums do it, and reaches
+//   full volume at its start point (the hook) just as the announcer finishes. The song then
+//   fades out by itself after 12 seconds of song (the walk-up length setting), or sooner
+//   when the button is tapped again, with a fade of about two seconds.
 // - When our team takes the field, it plays the pitcher's warm-up song over and over until
 //   it is stopped or the first pitch is recorded, and fades by itself after five minutes in
 //   case nobody stops it.
@@ -149,7 +150,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Goes up by one every time something new starts or stops. A message from the audio
     /// system about an older play carries an older number and is ignored.
     @ObservationIgnored private var playNumber = 0
-    /// The 20-times-a-second heartbeat that runs fades and updates the countdown.
+    /// The 50-times-a-second heartbeat that runs fades and updates the countdown.
     @ObservationIgnored private var ticker: Task<Void, Never>?
     /// The current play's timing, in seconds on the phone's audio clock.
     @ObservationIgnored private var timing = Timing()
@@ -190,7 +191,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
     /// When the parts of the current play start and stop, on the audio clock.
     private struct Timing {
-        /// When the song part starts (after any introduction).
+        /// When the song starts sounding: with an introduction, the same moment as the voice.
         var songStart: Double?
         /// Seconds into the track where the song starts.
         var songOffset: TimeInterval = 0
@@ -203,6 +204,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         var loopLength: TimeInterval?
         /// When the introduction finishes.
         var introductionEnd: Double?
+        /// While the song fades in under the announcer: when the fade-in started and how long
+        /// the introduction is (the song is at full volume when it ends).
+        var fadeInStart: Double?
+        var fadeInLength: TimeInterval = 0
         /// When an introduction played on its own, echo tail included, is over.
         var introductionOnlyEnd: Double?
         /// When the current fade started, how long it lasts, and the volume it started from.
@@ -287,7 +292,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         let level = min(max(volume, 0), 1)
         changeSong(song) { $0.volume = level }
         // Turn it up or down right away if it is the song playing now.
-        if nowPlaying == song, activity != .introduction { graph.songNode.volume = Float(level) }
+        // (While it fades in under the announcer, the next heartbeat uses the new level.)
+        if nowPlaying == song, activity != .introduction, timing.fadeInStart == nil {
+            graph.songNode.volume = Float(level)
+        }
     }
 
     public func setAnnouncerEcho(_ amount: Double) {
@@ -465,10 +473,56 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Throws away an introduction the scorer did not keep (“redo”), or one being replaced,
     /// deleting its sound file. The phone voice has no file, so nothing happens for it.
     public func discardIntroduction(_ introduction: AnnouncerIntroduction) {
-        guard introduction.source != .phoneVoice, let name = introduction.fileName else { return }
+        // The phone's voice has no file, and a pieced introduction's name recording belongs
+        // to the team loader, which copies it in again on every load.
+        guard introduction.source != .phoneVoice, introduction.source != .pieced,
+              let name = introduction.fileName else { return }
         try? FileManager.default.removeItem(at: audioFolder.appending(path: name))
         readyIntroductions = readyIntroductions.filter { $0.value.madeFrom.introduction != introduction }
         if pendingRecording == introduction { pendingRecording = nil }
+    }
+
+    // MARK: - A player's name, recorded in the app
+
+    /// True when "Now batting," is on the phone. Without it a pieced introduction cannot play.
+    public var hasNowBattingRecording: Bool {
+        FileManager.default.fileExists(atPath: audioFolder.appending(path: AnnouncerIntroduction.nowBattingFile).path)
+    }
+
+    /// Turns a raw take of a player's name (from `stopRecordingIntroduction`) into a name
+    /// piece to listen to: silence trimmed from both ends, rumble filtered out, the level
+    /// evened out to match the Mac's pieces. The raw take is deleted. The result is a pieced
+    /// introduction pointing at a trial file; `keepNameRecording` makes it the player's.
+    /// Throws a problem with a message when no voice was heard.
+    public func makeNameCandidate(from take: AnnouncerIntroduction) throws -> AnnouncerIntroduction {
+        guard let name = take.fileName else { throw NameTakeProblem.nothingRecorded }
+        let raw = audioFolder.appending(path: name)
+        defer { try? FileManager.default.removeItem(at: raw) }
+        let cleaned = try NameTake.clean(NameTake.readMono(raw))
+        let trial = "announcer-name-take-\(UUID().uuidString).m4a"
+        try NameTake.write(cleaned, to: audioFolder.appending(path: trial))
+        if pendingRecording == take { pendingRecording = nil }
+        return AnnouncerIntroduction(source: .pieced, fileName: trial)
+    }
+
+    /// Makes a trial name recording the player's: saved as their name piece (`nameFile(stem)`,
+    /// replacing any earlier one), so their introduction is "Now batting, number …, name".
+    /// Any introduction already made from the old recording is forgotten, so the next walk-up
+    /// uses the new one.
+    public func keepNameRecording(_ candidate: AnnouncerIntroduction, stem: String) throws -> AnnouncerIntroduction {
+        guard let trial = candidate.fileName else { throw NameTakeProblem.nothingRecorded }
+        let final = AnnouncerIntroduction.nameFile(stem)
+        let target = audioFolder.appending(path: final)
+        try? FileManager.default.removeItem(at: target)
+        try FileManager.default.moveItem(at: audioFolder.appending(path: trial), to: target)
+        readyIntroductions = readyIntroductions.filter { $0.value.madeFrom.introduction.fileName != final }
+        return AnnouncerIntroduction(source: .pieced, fileName: final)
+    }
+
+    /// Throws away a trial name recording the scorer did not keep.
+    public func discardNameCandidate(_ candidate: AnnouncerIntroduction) {
+        guard let trial = candidate.fileName, trial.hasPrefix("announcer-name-take-") else { return }
+        try? FileManager.default.removeItem(at: audioFolder.appending(path: trial))
     }
 
     @concurrent nonisolated public func importIntroduction(from file: URL) async throws -> AnnouncerIntroduction {
@@ -528,7 +582,12 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         return playNumber
     }
 
-    /// Plays the introduction, then the song right after it, timed to the sample.
+    /// Plays a walk-up. With an introduction, the song starts at the same moment as the
+    /// voice, from early enough that it reaches its start point just as the announcer
+    /// finishes: silent at first, about a third of full volume under the voice, full volume at
+    /// the end of the introduction (see `WalkUpMath.walkUpPlan` and `fadeInVolume`). Then the
+    /// usual length of song plays. Without one, the song starts at its start point at full
+    /// volume. Timed to the sample.
     private func startWalkUp(song: Song?, introduction: AVAudioPCMBuffer?) {
         currentIntroduction = introduction
         let file = song.flatMap { openFile(for: $0) }
@@ -539,22 +598,30 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         // Start a twentieth of a second from now, so the introduction and the song share
         // one clock reading.
         let begin = Self.audioClockNow() + 0.05
-        var songStart = begin
+        var introductionLength: TimeInterval = 0
         if let introduction {
             graph.connectIntroPlayer(format: introduction.format)
             graph.introNode.scheduleBuffer(introduction, at: nil, options: [], completionCallbackType: .dataPlayedBack) { @Sendable _ in }
             graph.introNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: begin)))
-            let seconds = Double(introduction.frameLength) / introduction.format.sampleRate
-            timing.introductionEnd = begin + seconds
+            introductionLength = Double(introduction.frameLength) / introduction.format.sampleRate
+            timing.introductionEnd = begin + introductionLength
             isPlayingIntroduction = true
-            // A short breath after “Number two.” before the music hits.
-            songStart = begin + seconds + 0.3
         }
         if let song, let file {
-            let length = WalkUpMath.songLength(for: song, walkUpLength: walkUpLength)
-            scheduleSong(song, file: file, from: song.startTime, length: length, repeating: false,
-                         startingAt: songStart)
-            graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: songStart)))
+            let plan = WalkUpMath.walkUpPlan(
+                startPoint: song.startTime, introductionLength: introductionLength,
+                songLength: WalkUpMath.songLength(for: song, walkUpLength: walkUpLength))
+            // The whole walk-up is one stretch of song: from where it starts under the voice,
+            // for the introduction plus the usual length. The countdown and the automatic fade
+            // at the end work on that stretch.
+            scheduleSong(song, file: file, from: plan.startsAt, length: plan.totalLength, repeating: false,
+                         startingAt: begin)
+            if introduction != nil {
+                graph.songNode.volume = 0   // silent at first; `tick` raises it
+                timing.fadeInStart = begin
+                timing.fadeInLength = plan.fullVolumeAfter
+            }
+            graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: begin)))
         } else {
             // An introduction with no song: done once the echo dies away.
             timing.introductionOnlyEnd = (timing.introductionEnd ?? begin) + 1.5
@@ -723,8 +790,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
 
         switch activity {
         case .walkUp:
-            if let start = old.songStart, now >= start, let length = old.songLength, let song = currentSong {
-                // In the song: carry on with the time that was left.
+            let inIntroduction = old.introductionEnd.map { now < $0 } ?? false
+            if !inIntroduction, let start = old.songStart, now >= start, let length = old.songLength,
+               let song = currentSong {
+                // Past the announcer: carry on with the time that was left, at full volume.
                 let intoSong = now - start
                 let left = length - intoSong
                 guard left > 0.5 else { finish(); return }
@@ -758,13 +827,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         startTicker()
     }
 
-    /// Runs `tick` twenty times a second while something is playing or recording.
+    /// Runs `tick` fifty times a second while something is playing or recording, often enough
+    /// that fades sound smooth.
     private func startTicker() {
         guard ticker == nil else { return }
         ticker = Task { [weak self] in
             while !Task.isCancelled {
                 self?.tick()
-                try? await Task.sleep(for: .milliseconds(50))
+                try? await Task.sleep(for: .milliseconds(20))
             }
         }
     }
@@ -793,9 +863,18 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             return
         }
 
-        // The introduction has finished and the song has begun.
+        // The introduction has finished and the song is at full volume.
         if isPlayingIntroduction, let end = timing.introductionEnd, now >= end {
             isPlayingIntroduction = false
+        }
+
+        // The song fading in under the announcer: raise it a step. Its own volume level (from
+        // the song library) is the top.
+        if let fadeInStart = timing.fadeInStart {
+            let fullLevel = Float(currentSong.flatMap { library.song($0.id)?.volume } ?? 1)
+            let shape = WalkUpMath.fadeInVolume(elapsed: now - fadeInStart, introductionLength: timing.fadeInLength)
+            graph.songNode.volume = fullLevel * shape
+            if shape >= 1 { timing.fadeInStart = nil }   // done: full volume from here
         }
 
         // An introduction on its own (or with no song after it) is over once its echo fades.
@@ -941,9 +1020,14 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         if introductionJobs[player.id]?.madeFrom == recipe { introductionJobs[player.id] = nil }
 
         guard let sound else {
-            lastProblem = introduction.source == .phoneVoice
-                ? "The phone’s voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
-                : "The introduction recording for \(player.displayName) is missing or too long. Record it again."
+            switch introduction.source {
+            case .phoneVoice:
+                lastProblem = "The phone’s voice could not read the introduction for \(player.displayName). It needs a name or number; try again."
+            case .pieced:
+                lastProblem = "The recorded pieces of \(player.displayName)’s introduction are not all on the phone. Load the team from the Mac again."
+            case .recorded, .imported:
+                lastProblem = "The introduction recording for \(player.displayName) is missing or too long. Record it again."
+            }
             return nil
         }
         // Keep a modest number ready: plenty for a whole lineup.
@@ -977,6 +1061,12 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             return await voice.render(for: player)
         case .recorded, .imported:
             return introduction.fileName.flatMap { readIntroductionFile(audioFolder.appending(path: $0)) }
+        case .pieced:
+            let folder = audioFolder
+            let pieces = PiecedIntroduction.pieces(for: player) { name in
+                FileManager.default.fileExists(atPath: folder.appending(path: name).path)
+            }
+            return pieces.flatMap { PiecedIntroduction.render($0, from: folder, read: readIntroductionFile) }
         }
     }
 

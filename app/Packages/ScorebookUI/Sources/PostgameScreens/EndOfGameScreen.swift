@@ -29,8 +29,10 @@ import DesignSystem
 ///   - ourSide: Which team is ours, for the logo and our color. Leave it out for neither.
 ///   - showsDoneButton: True for the screen that appears when a game ends (Done goes home);
 ///     false when opened from the games list.
-///   - onRequest: Called with Done, Copy as text, Season stats, and (from the plain share
-///     button) Share.
+///   - canDelete: True to offer "Delete game" in a menu in the top bar (for a saved game opened
+///     from the games list). It asks first, naming the game, then hands back `.deleteGame`.
+///   - onRequest: Called with Done, Copy as text, Season stats, Delete, and (from the plain
+///     share button) Share.
 ///   - picture: The box score to show. The wiring job puts the newspaper picture here; it is
 ///     shrunk to fit the screen's width if it is wider.
 ///   - shareButton: The big share button. The wiring job puts the share link here.
@@ -38,17 +40,21 @@ public struct EndOfGameScreen<Picture: View, ShareButton: View>: View {
     public var box: BoxScore
     public var ourSide: TeamSide?
     public var showsDoneButton: Bool
+    public var canDelete: Bool
     public var onRequest: (PostgameRequest) -> Void
     private let picture: Picture
     private let shareButton: ShareButton
     /// True when the picture slot holds a picture handed in, which is set on a gray mat and
     /// shrunk to fit; false for the plain table, which handles its own width.
     private let isHandedInPicture: Bool
+    /// True while the "Delete …?" question is open.
+    @State private var askingToDelete = false
 
     public init(
         box: BoxScore,
         ourSide: TeamSide? = nil,
         showsDoneButton: Bool = true,
+        canDelete: Bool = false,
         onRequest: @escaping (PostgameRequest) -> Void,
         @ViewBuilder picture: () -> Picture,
         @ViewBuilder shareButton: () -> ShareButton
@@ -56,6 +62,7 @@ public struct EndOfGameScreen<Picture: View, ShareButton: View>: View {
         self.box = box
         self.ourSide = ourSide
         self.showsDoneButton = showsDoneButton
+        self.canDelete = canDelete
         self.onRequest = onRequest
         self.picture = picture()
         self.shareButton = shareButton()
@@ -106,6 +113,22 @@ public struct EndOfGameScreen<Picture: View, ShareButton: View>: View {
                     Button("Done") { onRequest(.done) }
                 }
             }
+            if canDelete {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("Delete game", systemImage: "trash", role: .destructive) { askingToDelete = true }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
+                    .accessibilityLabel(Text("More"))
+                }
+            }
+        }
+        .confirmationDialog(PostgameWording.deleteQuestion(box, ourSide: ourSide), isPresented: $askingToDelete,
+                            titleVisibility: .visible) {
+            Button("Delete game", role: .destructive) { onRequest(.deleteGame(box.gameID)) }
+        } message: {
+            Text(PostgameWording.deleteWarning)
         }
     }
 }
@@ -118,6 +141,7 @@ extension EndOfGameScreen where Picture == BoxScoreTable, ShareButton == PlainSh
         self.box = box
         self.ourSide = ourSide
         self.showsDoneButton = showsDoneButton
+        self.canDelete = false
         self.onRequest = onRequest
         self.picture = BoxScoreTable(box: box, ourSide: ourSide)
         self.shareButton = PlainShareButton { onRequest(.shareBoxScore(box.gameID)) }

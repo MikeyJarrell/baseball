@@ -30,10 +30,11 @@ struct HomeDestination: View {
                                   minimumInnings: app.settings.minimumInnings,
                                   onRequest: handle)
             } else {
-                EmptyPage(text: "Set up your team in Teams, and the season stats will build up game by game.")
+                EmptyPage(text: "Set up your team first, in Teams.")
             }
         case .games:
-            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count, onRequest: handle)
+            GamesListScreen(games: app.gameSummaries, unreadableGames: app.damagedGames.count,
+                            ourTeamName: app.ourTeam?.name, onRequest: handle)
         case .boxScore(let id):
             SavedBoxScore(id: id, onRequest: handle)
         case .player(let id):
@@ -66,6 +67,10 @@ struct HomeDestination: View {
             Task { await app.updateSettings { $0.minimumPlateAppearances = n } }
         case .setMinimumInnings(let n):
             Task { await app.updateSettings { $0.minimumInnings = n } }
+        case .deleteGame(let id):
+            // Deleted from its own box score: go back to the list it was opened from.
+            if route == .boxScore(id), !path.isEmpty { path.removeLast() }
+            Task { await app.deleteGame(id) }
         }
     }
 }
@@ -80,7 +85,8 @@ struct SavedBoxScore: View {
     var body: some View {
         Group {
             if let box {
-                BoxScorePage(box: box, ourSide: app.ourSide(in: id), showsDoneButton: false, onRequest: onRequest)
+                BoxScorePage(box: box, ourSide: app.ourSide(in: id), showsDoneButton: false, canDelete: true,
+                             onRequest: onRequest)
             } else {
                 ProgressView()
             }
@@ -94,10 +100,13 @@ struct BoxScorePage: View {
     var box: BoxScore
     var ourSide: TeamSide?
     var showsDoneButton: Bool
+    /// True to offer "Delete game" in the top bar's menu: for a saved game from the games list.
+    var canDelete = false
     var onRequest: (PostgameRequest) -> Void
 
     var body: some View {
-        EndOfGameScreen(box: box, ourSide: ourSide, showsDoneButton: showsDoneButton, onRequest: onRequest) {
+        EndOfGameScreen(box: box, ourSide: ourSide, showsDoneButton: showsDoneButton, canDelete: canDelete,
+                        onRequest: onRequest) {
             BoxScorePicture(box)
         } shareButton: {
             BoxScoreShareLink(box)
@@ -139,7 +148,7 @@ struct BackupsPage: View {
                     }
                 }
             } footer: {
-                Text("A backup is also made at the end of every game. In the Files app, backups are under On My iPhone, Scorebook.")
+                Text("A backup is also made after every game. In the Files app: On My iPhone, Scorebook.")
             }
             Section("Put everything back as it was") {
                 if files.isEmpty { Text("No backups yet.").foregroundStyle(ScorebookColor.textSecondary) }
@@ -163,7 +172,7 @@ struct BackupsPage: View {
                 restoring = nil
             }
         } message: {
-            Text("Teams, games, songs and settings go back to how they were. What is there now is saved first as its own backup.")
+            Text("Teams, games, songs and settings go back to the backup. What is there now is backed up first.")
         }
     }
 }

@@ -1,8 +1,9 @@
 #!/bin/bash
 # Loads the Diamond Dogs onto the phone: every player from team/roster.csv (with their usual
 # position and role, walk-up song and its start point, and a pitcher's warm-up songs, with his
-# extra ones from team/warmup_extras.csv), every
-# opponent from team/opponents.csv, and every song file from ~/Dropbox/baseball/songs/.
+# extra ones from team/warmup_extras.csv), every opponent from team/opponents.csv, every song
+# file from ~/Dropbox/baseball/songs/, and the announcer recordings from ~/Dropbox/baseball/intros/
+# (made with tools/record_intros.py).
 #
 # Run it from anywhere, with the iPhone plugged into the Mac and unlocked:
 #
@@ -28,6 +29,7 @@ set -euo pipefail
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BUNDLE_ID="com.mikeyjarrell.scorebook"
 SONGS="$HOME/Dropbox/baseball/songs"
+INTROS="$HOME/Dropbox/baseball/intros"
 STAMP="$(date +%Y-%m-%d-%H%M%S)"
 # Where the app keeps its saved files, inside its own folder on the phone.
 DATA_PATH="Library/Application Support/Scorebook"
@@ -39,6 +41,25 @@ if [[ "${1:-}" == "--simulator" ]]; then MODE="simulator"; fi
 echo "Building the loader…"
 swift build -c release --package-path "$REPO/app/Packages/ScorebookCore" --product TeamLoader >/dev/null
 LOADER="$(swift build -c release --package-path "$REPO/app/Packages/ScorebookCore" --show-bin-path)/TeamLoader"
+
+# A name recorded on the phone (the Record name button) goes back to Dropbox first, into
+# intros/names/, when Dropbox has no recording of that name or an older, different one. The
+# load that follows then keeps it, and the Mac and the phone agree. Its arguments: the copy of
+# the app's files just taken off the device, and the names folder to copy into.
+copy_back_names() {
+    local audio="$1/$DATA_PATH/songs/audio" names="$2" file base stem dest
+    mkdir -p "$names"
+    for file in "$audio"/announcer-name-*.m4a; do
+        [[ -e "$file" ]] || continue
+        base="$(basename "$file")"; stem="${base#announcer-name-}"; stem="${stem%.m4a}"
+        [[ "$stem" == take-* ]] && continue   # a take never kept
+        dest="$names/$stem.m4a"
+        if [[ ! -e "$dest" ]] || { ! cmp -s "$file" "$dest" && [[ "$file" -nt "$dest" ]]; }; then
+            cp -p "$file" "$dest"
+            echo "   The name recorded on the device for $stem is now in $names"
+        fi
+    done
+}
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -52,11 +73,14 @@ if [[ "$MODE" == "simulator" ]]; then
     echo "1. Stopping the app on the simulator"
     xcrun simctl terminate "$SIM" "$BUNDLE_ID" 2>/dev/null || true
     echo "2. Copying its saved files aside (simulator copies are not kept)"
-    mkdir -p "$BACKUP" && cp -R "$CONTAINER/." "$BACKUP/"
+    mkdir -p "$BACKUP" && cp -Rp "$CONTAINER/." "$BACKUP/"
     echo "3. Loading the team"
     mkdir -p "$WORK/Scorebook"
-    [[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
-    "$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+    [[ -d "$BACKUP/$DATA_PATH" ]] && cp -Rp "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
+    # A trial run must not write into Dropbox: names recorded in the simulator are copied
+    # aside instead.
+    copy_back_names "$BACKUP" "$WORK/names-from-simulator"
+    "$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS" "$INTROS"
     echo "4. Copying the teams and songs into the app, and starting it"
     mkdir -p "$CONTAINER/$DATA_PATH"
     cp -R "$WORK/Scorebook/teams" "$WORK/Scorebook/songs" "$CONTAINER/$DATA_PATH/"
@@ -115,8 +139,9 @@ done
 
 echo "3. Loading the team"
 mkdir -p "$WORK/Scorebook"
-[[ -d "$BACKUP/$DATA_PATH" ]] && cp -R "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
-"$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS"
+[[ -d "$BACKUP/$DATA_PATH" ]] && cp -Rp "$BACKUP/$DATA_PATH/." "$WORK/Scorebook/"
+copy_back_names "$BACKUP" "$INTROS/names"
+"$LOADER" load "$WORK/Scorebook" "$REPO/team" "$SONGS" "$INTROS"
 
 echo "4. Copying the teams and songs into the app, and starting it"
 # Only the teams and songs folders go back; files already the same are skipped, and nothing

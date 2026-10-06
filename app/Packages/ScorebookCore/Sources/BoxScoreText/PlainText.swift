@@ -37,8 +37,9 @@ enum PlainText {
 
         sections.append(lineScoreLines(box.lineScore, labelWidth: labelWidth, battingWidths: battingWidths))
 
+        // Each kind of note on its own line.
         if !box.notes.isEmpty {
-            sections.append([box.notes.joined(separator: " ")])
+            sections.append(box.notes)
         }
 
         // Both pitching tables in one block, each under its own heading.
@@ -46,22 +47,20 @@ enum PlainText {
         sections.append(box.pitching.flatMap { lines(for: $0, labelWidth: labelWidth, columnWidths: pitchingWidths) })
 
         if !box.pitchingNotes.isEmpty {
-            sections.append([box.pitchingNotes.joined(separator: " ")])
+            sections.append(box.pitchingNotes)
         }
 
         return sections.map { $0.joined(separator: "\n") }.joined(separator: "\n\n")
     }
 
-    /// One table as lines of text: the heading line, then a line per row, then any pinch
-    /// hitters' and runners' footnotes together on one line right under the totals.
+    /// One table as lines of text: the heading line, then a line per row.
     static func lines(for table: NewspaperTable, labelWidth: Int, columnWidths: [Int]) -> [String] {
         let heading = row(label: table.title.uppercased(), cells: table.columns,
                           labelWidth: labelWidth, columnWidths: columnWidths)
         let body = table.rows.map {
             row(label: $0.paddedLabel, cells: $0.cells, labelWidth: labelWidth, columnWidths: columnWidths)
         }
-        let footnotes = table.footnotes.isEmpty ? [] : [table.footnotes.joined(separator: " ")]
-        return [heading] + body + footnotes
+        return [heading] + body
     }
 
     /// A label padded out to the label width, then each number right-aligned in its column,

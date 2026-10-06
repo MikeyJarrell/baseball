@@ -5,12 +5,15 @@
 // tools/load_team.sh runs it on files copied off the phone (or the simulator), then copies the
 // result back. It can also be run by hand:
 //
-//   swift run TeamLoader load  <app data folder> <team folder> <songs folder>
+//   swift run TeamLoader load  <app data folder> <team folder> <songs folder> [<intros folder>]
 //   swift run TeamLoader check <app data folder>
 //
 // - The app data folder is the app's `Library/Application Support/Scorebook`.
 // - `load` merges `roster.csv`, `warmup_extras.csv` (if there is one) and `opponents.csv` into it and copies each song file into its
 //   `songs/audio` folder. Games and settings are never touched.
+// - The intros folder (~/Dropbox/baseball/intros/) holds the announcer pieces recorded by
+//   tools/record_intros.py. Every piece is copied into `songs/audio` under the name the app
+//   looks for, and each player with a name recording gets a pieced introduction.
 // - `check` lists what is there: teams, our players, songs, and whether every song's file is
 //   present and plays. It ends with an error if anything is missing.
 
@@ -37,6 +40,11 @@ func playableLength(_ file: URL) async -> TimeInterval? {
     return duration.seconds
 }
 
+/// When a file was last changed, or nothing if it is not there.
+func modified(_ file: URL) -> Date? {
+    (try? FileManager.default.attributesOfItem(atPath: file.path))?[.modificationDate] as? Date
+}
+
 /// Opens the app's saved files in a folder, as the app does. Backups (which the loader never
 /// makes) would go to a scratch folder.
 func openStorage(_ dataFolder: URL) throws -> FileStorage {
@@ -44,8 +52,33 @@ func openStorage(_ dataFolder: URL) throws -> FileStorage {
     return try FileStorage(dataFolder: dataFolder, backupsFolder: scratch)
 }
 
-/// `load`: merges the CSV files into the saved files and copies the songs in.
-func load(dataFolder: URL, teamFolder: URL, songsFolder: URL) async throws {
+/// Every announcer piece in the intros folder, from its file there to its name in the app:
+/// "now-batting.m4a", "numbers/22.m4a" and "names/aidan-kurt.m4a" become
+/// the names in `AnnouncerIntroduction`.
+func announcerPieces(in introsFolder: URL) -> [(source: URL, appName: String)] {
+    var pieces: [(source: URL, appName: String)] = []
+    let nowBatting = introsFolder.appendingPathComponent("now-batting.m4a")
+    if FileManager.default.fileExists(atPath: nowBatting.path) {
+        pieces.append((nowBatting, AnnouncerIntroduction.nowBattingFile))
+    }
+    let kinds: [(folder: String, appName: (String) -> String)] = [
+        ("numbers", AnnouncerIntroduction.numberFile),
+        ("names", AnnouncerIntroduction.nameFile),
+    ]
+    for kind in kinds {
+        let folder = introsFolder.appendingPathComponent(kind.folder)
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: folder.path)) ?? []
+        for file in files.sorted() where file.hasSuffix(".m4a") {
+            let stem = String(file.dropLast(4))
+            pieces.append((folder.appendingPathComponent(file), kind.appName(stem)))
+        }
+    }
+    return pieces
+}
+
+/// `load`: merges the CSV files into the saved files and copies the songs and announcer
+/// pieces in.
+func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?) async throws {
     let rosterText = try String(contentsOf: teamFolder.appendingPathComponent("roster.csv"), encoding: .utf8)
     let opponentsText = try String(contentsOf: teamFolder.appendingPathComponent("opponents.csv"), encoding: .utf8)
     let roster = RosterRow.read(rosterText)
@@ -70,12 +103,38 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL) async throws {
         durations[file] = length
     }
 
+    // Every announcer piece must play too. Without "Now batting," no pieced introduction
+    // can be made, so the names are only used when it is there.
+    // A piece that will not play (not yet downloaded by Dropbox, say) is left out with a
+    // warning rather than stopping the whole load.
+    var pieces: [(source: URL, appName: String)] = []
+    for piece in introsFolder.map(announcerPieces) ?? [] {
+        if await playableLength(piece.source) == nil {
+            print("WARNING: \(piece.source.path) will not play, so it was left off the phone. Record it again with tools/record_intros.py.")
+        } else {
+            pieces.append(piece)
+        }
+    }
+    let hasNowBatting = pieces.contains { $0.appName == AnnouncerIntroduction.nowBattingFile }
+    let namePrefix = AnnouncerIntroduction.nameFile("").dropLast(4)   // "announcer-name-"
+    let recordedNames = hasNowBatting
+        ? Set(pieces.filter { $0.appName.hasPrefix(namePrefix) }.map { String($0.appName.dropFirst(namePrefix.count).dropLast(4)) })
+        : []
+    // A name recording that matches nobody on the roster is a spelling or file-name slip.
+    let rosterStems = Set(roster.map { RosterWords.fileStem($0.displayName) })
+    for stem in recordedNames.subtracting(rosterStems).sorted() {
+        print("WARNING: the name recording “\(stem)” matches nobody in roster.csv")
+    }
+    if !pieces.isEmpty && !hasNowBatting {
+        print("No “Now batting” recording yet, so no pieced introductions were set up.")
+    }
+
     let storage = try openStorage(dataFolder)
     let saved = try await storage.loadTeams()
     if !saved.damaged.isEmpty { fail("some saved team files could not be read: \(saved.damaged.map(\.fileName))") }
     let library = try await storage.loadSongLibrary()
     let result = TeamImport.merge(teams: saved.items, library: library, roster: roster, opponents: opponents,
-                                  extraWarmUps: extraWarmUps, durations: durations)
+                                  extraWarmUps: extraWarmUps, durations: durations, recordedNames: recordedNames)
 
     // Song files first, then the library that names them, then the teams that use them.
     for file in Set(result.audioFiles).sorted() {
@@ -88,11 +147,28 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL) async throws {
             print("Copied \(file)")
         }
     }
+    var copiedPieces = 0
+    for piece in pieces {
+        let target = storage.audioFolder.appendingPathComponent(piece.appName)
+        if !FileManager.default.contentsEqual(atPath: piece.source.path, andPath: target.path) {
+            // A name recorded in the app that is newer than Dropbox's stays: the scorer re-did
+            // it on the phone. (tools/load_team.sh copies it to Dropbox before loading.)
+            if piece.appName.hasPrefix(namePrefix),
+               TeamImport.keepsAppRecording(appModified: modified(target), dropboxModified: modified(piece.source)) {
+                print("Kept the name recorded on the phone: \(piece.appName)")
+                continue
+            }
+            try? FileManager.default.removeItem(at: target)
+            try FileManager.default.copyItem(at: piece.source, to: target)
+            copiedPieces += 1
+        }
+    }
+    if copiedPieces > 0 { print("Copied \(copiedPieces) announcer recording(s)") }
     if result.library != library { try await storage.saveSongLibrary(result.library) }
     for team in result.teamsToSave { try await storage.saveTeam(team) }
 
     for note in result.notes { print(note) }
-    if result.notes.isEmpty { print("Nothing changed: the saved files already match the roster.") }
+    if result.notes.isEmpty && copiedPieces == 0 { print("Nothing changed: the saved files already match the roster.") }
 }
 
 /// `check`: lists what is saved and checks every song file. Returns false if anything is wrong.
@@ -119,12 +195,27 @@ func check(dataFolder: URL) async throws -> Bool {
             if let warmUp { line += " · warm-up: \(warmUp.title)" }
             let extras = p.extraWarmUpSongIDs.compactMap { songsByID[$0] }
             if !extras.isEmpty { line += " · extra warm-ups: \(extras.map(\.title).joined(separator: ", "))" }
+            line += " · intro: \(p.introduction.map { $0.source.rawValue } ?? "none")"
             print(line)
+            if let intro = p.introduction, intro.source != .phoneVoice {
+                let needed = (intro.fileName.map { [$0] } ?? [])
+                    + (intro.source == .pieced ? [AnnouncerIntroduction.nowBattingFile] : [])
+                for file in needed where await playableLength(storage.audioFolder.appendingPathComponent(file)) == nil {
+                    print("  MISSING introduction recording \(file)"); ok = false
+                }
+                if intro.source == .pieced, let number = p.number, !number.isEmpty,
+                   !FileManager.default.fileExists(atPath: storage.audioFolder.appendingPathComponent(AnnouncerIntroduction.numberFile(number)).path) {
+                    print("  No recording of number \(number) yet, so the introduction leaves the number out")
+                }
+            }
             if p.walkUpSongID != nil && walkUp == nil { print("  MISSING walk-up song in the library"); ok = false }
             if p.warmUpSongID != nil && warmUp == nil { print("  MISSING warm-up song in the library"); ok = false }
             if extras.count != p.extraWarmUpSongIDs.count { print("  MISSING extra warm-up song in the library"); ok = false }
         }
     }
+    let audioFiles = (try? FileManager.default.contentsOfDirectory(atPath: storage.audioFolder.path)) ?? []
+    let numbers = audioFiles.filter { $0.hasPrefix(AnnouncerIntroduction.numberFile("").dropLast(4)) }
+    print("Announcer recordings: \(audioFiles.contains(AnnouncerIntroduction.nowBattingFile) ? "“Now batting”" : "no “Now batting”"), \(numbers.count) numbers")
     print("Songs: \(library.songs.count)")
     for song in library.songs {
         let file = storage.audioFolder.appendingPathComponent(song.fileName)
@@ -142,11 +233,12 @@ func check(dataFolder: URL) async throws -> Bool {
 
 let args = CommandLine.arguments
 switch (args.count > 1 ? args[1] : "", args.count) {
-case ("load", 5):
+case ("load", 5), ("load", 6):
     try await load(dataFolder: URL(fileURLWithPath: args[2]), teamFolder: URL(fileURLWithPath: args[3]),
-                   songsFolder: URL(fileURLWithPath: args[4]))
+                   songsFolder: URL(fileURLWithPath: args[4]),
+                   introsFolder: args.count == 6 ? URL(fileURLWithPath: args[5]) : nil)
 case ("check", 3):
     if try await !check(dataFolder: URL(fileURLWithPath: args[2])) { fail("the check found problems (above)") }
 default:
-    fail("usage: TeamLoader load <app data folder> <team folder> <songs folder> | TeamLoader check <app data folder>")
+    fail("usage: TeamLoader load <app data folder> <team folder> <songs folder> [<intros folder>] | TeamLoader check <app data folder>")
 }
