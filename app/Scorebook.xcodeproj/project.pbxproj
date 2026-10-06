@@ -129,6 +129,7 @@
 				FCA229C23F166EBB0BA5029E /* Sources */,
 				059DB2086B49B680F85B3555 /* Frameworks */,
 				B9C6EB6F79FC54535ACB3053 /* Resources */,
+				A1B2C3D4E5F60718293A4B5C /* Copy the starter team */,
 			);
 			buildRules = (
 			);
@@ -250,6 +251,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A1B2C3D4E5F60718293A4B5C /* Copy the starter team */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy the starter team";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copies a starter team (teams, song list, song files, announcer recordings) into the app\n# when the build is given one, as tools/upload_to_testflight.sh does. Other builds carry none.\nset -e\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/StarterTeam\"\nrm -rf \"$DEST\"\nif [ -n \"$SCOREBOOK_STARTER_TEAM\" ]; then\n  cp -R \"$SCOREBOOK_STARTER_TEAM\" \"$DEST\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		FCA229C23F166EBB0BA5029E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -337,6 +360,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scorebook-Info.plist";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
@@ -371,6 +395,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Scorebook-Info.plist";
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Scorebook;
 				INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace = YES;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Records the stadium announcer introductions you make for your players.";
