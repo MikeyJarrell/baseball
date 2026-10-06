@@ -2,7 +2,7 @@
 
 **Goal:** Erick Rosas Lopez scores Diamond Dogs games on his own iPhone while Mikey is out of town, with the team, songs and announcer introductions already in the app, and without his phone ever being plugged into Mikey’s Mac.
 
-**Status:** planned, October 6, 2026. Nothing below is built yet.
+**Status:** October 6, 2026. The app side is built and checked on the simulator: a copy with the team inside opens with all 9 teams, and every song and announcer file plays. The first upload stopped because the Scorebook has no App Store Connect page yet; that is the next step.
 
 ## How he gets the app
 
@@ -27,10 +27,10 @@ Each TestFlight copy opens for 90 days. Uploading a new copy restarts the 90 day
 
 | Step | Who | What |
 |---|---|---|
-| 1 | Claude | Build the three pieces above and check them on the simulator |
-| 2 | Mikey | Sign in at appstoreconnect.apple.com in the browser pane and accept any agreements Apple shows (Claude cannot enter passwords) |
-| 3 | Claude | Create the Scorebook’s App Store Connect page (bundle id `com.mikeyjarrell.scorebook`) and upload the first copy |
-| 4 | Claude | Add the teammate as a user with the Marketing role, limited to the Scorebook, and add him to an internal test group. Needs his name and the email address of his Apple account |
+| 1 | Claude | Build the three pieces above and check them on the simulator. Done |
+| 2 | Mikey, or Claude once Mikey signs in on the Mac mini | Create the app’s page in App Store Connect: name “Diamond Dogs Scorebook” (App Store names must be unique; the phone still shows “Scorebook”), bundle id `com.mikeyjarrell.scorebook`, SKU `scorebook`. Claude cannot enter passwords |
+| 3 | Claude, on the Mac mini | Run `tools/upload_to_testflight.sh`, which takes the team from the newest phone backup |
+| 4 | Mikey or Claude | Add Erick as a user with the Marketing role, limited to the Scorebook, and add him to an internal test group. Needs his name and the email address of his Apple account |
 | 5 | Mikey | Text him [teammate-instructions.md](teammate-instructions.md) |
 | 6 | Teammate | Follows the instructions; Mikey checks he can see the Diamond Dogs and hear a walk-up song |
 

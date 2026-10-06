@@ -12,7 +12,7 @@ Open the App Store, search for “TestFlight” (it’s made by Apple, with a bl
 
 **3. Open the second email.**
 
-It’s from TestFlight, titled something like “Scorebook is now available to test.” Tap “View in TestFlight”. TestFlight opens. Tap “Accept”, then “Install”.
+It’s from TestFlight, titled something like “Diamond Dogs Scorebook is now available to test.” Tap “View in TestFlight”. TestFlight opens. Tap “Accept”, then “Install”.
 
 If the second email hasn’t come yet, wait a few minutes, check your junk folder, and text me if it still isn’t there.
 
