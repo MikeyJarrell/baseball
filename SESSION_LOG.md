@@ -321,3 +321,24 @@ SESSLOG:[2026-10-06 14:02]
 
 ### Context
 After the first real game, the app was corrected and tightened from Mikey’s use: the game’s lineups and rosters were fixed by editing copies of the phone’s files on the Mac, replaying the game to confirm the same 9-4 result with nothing flagged, then copying them back after a backup. Every phone change was preceded by a backup in ~/Dropbox/baseball/phone-backups/. Xcode reorders app/Scorebook.xcodeproj/project.pbxproj whenever Mikey opens the project; that reshuffle is safe to discard.
+
+---
+
+## [2026-10-06 14:15] More warm-up songs for six players
+SESSLOG:[2026-10-06 14:15]
+
+**Project(s):** baseball
+
+### Decisions
+- Added 18 extra warm-up songs (Garrett, Gaven, Mikey, Darin, Allan, Saul), each the official album track found through YouTube Music.
+- “I Knew You Were Trouble” is the original 2012 recording, not Taylor’s Version; Seal’s “Crazy” is the 4½-minute single, not the album cut.
+
+### Follow-ups
+- (none)
+
+### Files
+- [modified] `team/warmup_extras.csv` — 18 new rows with sources and file names
+- [modified] `PROJECT_INDEX.md` — which players have extra warm-up songs
+
+### Context
+Mikey asked what pitcher warm-up songs existed, then listed new ones. All 18 were downloaded whole into `~/Dropbox/baseball/songs/` and loaded onto the phone with `tools/load_team.sh`, which checked every file plays.
