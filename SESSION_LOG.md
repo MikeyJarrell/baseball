@@ -313,7 +313,7 @@ SESSLOG:[2026-10-06 14:02]
 ### Follow-ups
 - [ ] Run tools/load_team.sh with the phone plugged in, to bring the extra warm-up songs over and copy Jackson’s recorded name back to Dropbox.
 - [ ] Dress rehearsal on a televised game; problems into notes/dress-rehearsal-<date>.md.
-- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+- [x] Publish the stats website (done October 6; live at mikeyjarrell.com/dogs/).
 
 ### Files
 - [modified] team/opponents.csv, team/roster.csv, PROJECT_INDEX.md

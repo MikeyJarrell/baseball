@@ -18,6 +18,6 @@
 
 - Built from the October 4 phone copy (`phone-backups/2026-10-04-173202-just-before-game-edits`, before that game’s corrections): 1 game, 11 player pages; record 1–0, Diamond Dogs 9, GWW Whales 4. Looked at in a browser at phone width: tables scroll sideways with names held in place, sorting works, the box score fits without sideways scrolling.
 
-## Not done yet
+## Published
 
-- **First publish.** Needs the phone plugged in, so the site carries the corrected October 4 game; no Mac copy has the corrections.
+- First published October 6, 2026, from the phone, with the corrected October 4 game: 1 game, 11 player pages, live at https://mikeyjarrell.com/dogs/. Rerun `tools/publish_stats.sh` with the phone plugged in after each game.
