@@ -17,6 +17,6 @@
 | Mid-game fixes and box score tidy-up | Built: songs fade out over two seconds when stopped; Lineups and rosters in the Subs menu (late lineup cards, names, numbers, new players); warm-up songs added mid-game; game details (date, start, innings, home and away); the fielders check on the diamond with first initials; players with two last names go by the first (Torres, Rosas); Undo skips the defense check; box score with one team per headline line, capital positions, one note per line, no pinch-hitter or “ran for” notes ([handoff](plan/handoffs/mid-game-editing.md)). On the phone |
 | On-screen text | Trimmed: about 125 self-evident or explanatory lines shortened or cut ([handoff](plan/handoffs/trim-app-text.md)); on the phone |
 | Stats website | Built: `tools/publish_stats.sh` reads the games off the plugged-in phone and publishes season stats, box scores and player pages to mikeyjarrell.com/dogs/ (full names, hidden from search engines) ([handoff](plan/handoffs/stats-website.md)); published October 6 with the corrected Whales game. Rerun after each game |
-| Dress rehearsal | Not started: Mikey scores a televised game on his phone |
+| In use at games | Live: the first real game was scored on the phone on October 4, 2026; fixes from it are on the phone |
 
 No deadlines have been assigned.
