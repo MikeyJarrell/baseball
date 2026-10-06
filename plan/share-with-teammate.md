@@ -2,7 +2,7 @@
 
 **Goal:** Erick Rosas Lopez scores Diamond Dogs games on his own iPhone while Mikey is out of town, with the team, songs and announcer introductions already in the app, and without his phone ever being plugged into Mikey’s Mac.
 
-**Status:** October 6, 2026. Built, checked on the simulator, and the first copy (202610061426) uploaded to App Store Connect as “Diamond Dogs Scorebook”, with the team from the phone backup of 14:14 that day. Next: Erick accepts his App Store Connect invitation, then joins the internal test group.
+**Status:** October 6, 2026. The first copy (build 202610061426) is uploaded to App Store Connect as “Diamond Dogs Scorebook,” with the team from the phone backup of 14:14 that day. Erick (erickrosaslopez6@gmail.com) is invited to Mikey’s App Store Connect account with the Marketing role, limited to this app, and has been texted [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
 
 ## How he gets the app
 
@@ -47,3 +47,13 @@ The app on Mikey’s phone is signed with the paid account, whose permission run
 ## Not in this plan
 
 Bringing Erick’s games back into Mikey’s season stats. Mikey handles that on his return.
+
+## Picking this up
+
+What remains once Erick has accepted his App Store Connect invitation:
+
+1. Mikey, in App Store Connect from any browser: Apps, Diamond Dogs Scorebook, TestFlight tab; click + beside Internal Testing, name the group “Team,” add Erick, and add build 202610061426 if the group lacks it. That sends Erick the email with the install button.
+2. If Erick is not offered in the group, he has not accepted the invitation yet. If the build shows “Processing,” Apple is not done with it.
+3. Erick opens the app and should see the Diamond Dogs logo, 9 teams, and hear a walk-up song.
+
+Claude cannot do any of this remotely: the App Store Connect pages need Mikey signed in, and Claude cannot enter his password. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
