@@ -295,3 +295,29 @@ SESSLOG:[2026-10-04 18:15]
 
 ### Context
 Mikey asked whether teammates could see stats; the only sharing was the texted box score picture, and a stats-website brief sat unstarted. The site is built and previewed at phone width (record, games, sortable season batting and pitching, a box score page per game, a page per player) but not yet published, because no copy on the Mac has the corrected October 4 game.
+
+---
+
+## [2026-10-06 14:02] First real game corrected; name recording; leaner app text
+SESSLOG:[2026-10-06 14:02]
+
+**Project(s):** baseball
+
+### Decisions
+- The October 4 game was corrected on the phone from Mikey’s account: our starting nine (Nojadera catching, Jackson Cleary #99 in left), the GWW Whales lineup matched to their registered names and numbers, Ortiz and Holliday pitching, Soler and Carney as designated non-runners, every Whale right-handed, Jackson bats right and throws left.
+- Games are deleted inside the app (Games list or a box score, backup first); the Mac cannot delete files inside the app’s folder on the phone.
+- A player’s name can be recorded on the phone mid-game for the pieced announcer introduction; heard on the phone and working.
+- On-screen text that explains how the app works or justifies itself is cut; only facts, step instructions and data-loss warnings stay.
+- Pregame: time wheels, a separate fielding step on the diamond, DH in place of “bats only,” typeable opponent numbers, no “unknown” opponent lineup. First and third base sit in fair territory. Walk-up songs fade in under the announcer.
+
+### Follow-ups
+- [ ] Run tools/load_team.sh with the phone plugged in, to bring the extra warm-up songs over and copy Jackson’s recorded name back to Dropbox.
+- [ ] Dress rehearsal on a televised game; problems into notes/dress-rehearsal-<date>.md.
+- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+
+### Files
+- [modified] team/opponents.csv, team/roster.csv, PROJECT_INDEX.md
+- [created] plan/handoffs/name-recording.md, plan/handoffs/trim-app-text.md
+
+### Context
+After the first real game, the app was corrected and tightened from Mikey’s use: the game’s lineups and rosters were fixed by editing copies of the phone’s files on the Mac, replaying the game to confirm the same 9-4 result with nothing flagged, then copying them back after a backup. Every phone change was preceded by a backup in ~/Dropbox/baseball/phone-backups/. Xcode reorders app/Scorebook.xcodeproj/project.pbxproj whenever Mikey opens the project; that reshuffle is safe to discard.
