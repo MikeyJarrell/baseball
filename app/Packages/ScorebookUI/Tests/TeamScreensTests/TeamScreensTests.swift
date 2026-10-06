@@ -41,7 +41,7 @@ struct AnnouncerWordingTests {
         let recorded = AnnouncerIntroduction(source: .recorded, fileName: "intro-d1.m4a")
         #expect(TeamWording.introductionStatus(recorded, echo: 0.6) == "Recorded in your voice · stadium echo on")
         #expect(TeamWording.introductionStatus(recorded, echo: 0) == "Recorded in your voice · no stadium echo")
-        #expect(TeamWording.introductionStatus(nil, echo: 0.6) == "Nothing yet. Until there is, the song plays alone.")
+        #expect(TeamWording.introductionStatus(nil, echo: 0.6) == "No introduction yet")
         #expect(TeamWording.introductionShort(AnnouncerIntroduction(source: .phoneVoice)) == "iPhone voice intro")
     }
 }

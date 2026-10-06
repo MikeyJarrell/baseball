@@ -1,8 +1,10 @@
 // GameChanges: the sheets that slide up from the batting screen for anything other than a
 // pitch or a ball in play.
 //
-// - The changes menu (`ChangesMenuSheet`) and the six sheets it opens: pitching change,
-//   fielders, pinch hitter, pinch runner, runner for a designated non-runner, add a hitter.
+// - The changes menu (`ChangesMenuSheet`) and the sheets it opens: lineups and rosters,
+//   pitching change, fielders, pinch hitter, pinch runner, runner for a designated
+//   non-runner, add a hitter.
+// - The game details (`GameDetailsSheet`): date, start time, innings, home and away.
 // - The defense check when our team takes the field (`DefenseSheet`).
 // - Runner actions between pitches: steals, pickoffs, wild pitches and the rest (`RunnerActionSheet`).
 // - The game menu (`GameMenuSheet`) and what it opens: manual adjustment, an error with
@@ -36,9 +38,38 @@ public enum GameChangeResult: Equatable, Sendable {
     /// The scorer finished, and there is nothing to record: the designated non-runner runs
     /// themselves. Close the sheet and do not open it again for this runner.
     case nothingToRecord
+    /// Save this player's edits (if any), then open the shell's name recording for them, so
+    /// their pieced announcer introduction can be made: from the batter sheet's "Record name".
+    case recordName(PlayerEdit)
+    /// Record this event (adding any new players first), then open the name recording for
+    /// this player: from the add-a-hitter sheet's "Add and record name".
+    case recordThenRecordName(EnteredEvent, PlayerID)
     /// The scorer backed out ("Cancel" or "Later"). Nothing changes; a prompt the game raised,
     /// like the defense check, may be shown again later.
     case cancel
+    /// Fix who was in the game: the lineup card came late, or the wrong player was picked.
+    case correctLineup(LineupCorrection)
+    /// Change the game's details: the date and start time, innings, or home and away.
+    case changeDetails(GameDetailsChange)
+    /// Do this, and leave the sheet open: the lineups page stays up while the scorer works
+    /// through a whole lineup card.
+    indirect case keepOpen(GameChangeResult)
+}
+
+/// The game's details as the scorer set them on the game details sheet.
+public struct GameDetailsChange: Equatable, Sendable {
+    /// The scheduled start: the game's date and time.
+    public var scheduledStart: Date
+    /// Innings in a full game.
+    public var innings: Int
+    /// True to swap home and away. Only before the first pitch.
+    public var switchHomeAndAway: Bool
+
+    public init(scheduledStart: Date, innings: Int, switchHomeAndAway: Bool) {
+        self.scheduledStart = scheduledStart
+        self.innings = innings
+        self.switchHomeAndAway = switchHomeAndAway
+    }
 }
 
 /// A changed player, to put in place of the one with the same id on one team's game roster.
@@ -59,10 +90,16 @@ public struct PlayerEdit: Equatable, Sendable {
 public struct GameChangeContext: Equatable, Sendable {
     public var setup: GameSetup
     public var situation: Situation
+    /// The teams whose starting batting order can still lose a hitter: before the first pitch,
+    /// with nothing but a defense check recorded for them. The game session says which.
+    public var startingOrderOpen: Set<TeamSide>
 
-    public init(setup: GameSetup, situation: Situation) {
+    /// - Parameter startingOrderOpen: Leave it out for both teams before the first pitch and
+    ///   neither after it.
+    public init(setup: GameSetup, situation: Situation, startingOrderOpen: Set<TeamSide>? = nil) {
         self.setup = setup
         self.situation = situation
+        self.startingOrderOpen = startingOrderOpen ?? (situation.gameStartedAt == nil ? [.away, .home] : [])
     }
 
     // MARK: Teams

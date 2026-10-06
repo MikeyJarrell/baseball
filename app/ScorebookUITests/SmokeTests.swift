@@ -60,7 +60,7 @@ final class SmokeTests: XCTestCase {
         keepScreenshot(app, named: "defense check after a strikeout")
 
         link.tap()
-        // The big answer buttons read their title and detail together: "Thrown out at first: …".
+        // The big answer button "Thrown out at first".
         let thrownOut = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Thrown out at first")).firstMatch
         XCTAssertTrue(thrownOut.waitForExistence(timeout: 5), "the dropped-third-strike steps")
         keepScreenshot(app, named: "dropped third strike steps")
@@ -83,9 +83,17 @@ final class SmokeTests: XCTestCase {
                                                             games: [finished, started]))
         // The game in progress opens first; the game menu's Home screen goes back home.
         XCTAssertTrue(app.buttons["Ball"].waitForExistence(timeout: 10))
-        app.buttons["Game menu"].tap()
+        // The batting screen slides up over the home screen when the app opens; a tap while it
+        // is still sliding is lost, so tap the menu again until it opens.
+        let firstRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Manual adjustment")).firstMatch
+        for _ in 0..<3 where !firstRow.exists {
+            app.buttons["Game menu"].tap()
+            _ = firstRow.waitForExistence(timeout: 2)
+        }
+        // The menu opens half-height, with Home screen further down its list.
         let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Home screen")).firstMatch
-        XCTAssertTrue(home.waitForExistence(timeout: 3), "Home screen in the game menu")
+        for _ in 0..<4 where !home.isHittable { firstRow.swipeUp() }
+        XCTAssertTrue(home.exists, "Home screen in the game menu")
         home.tap()
 
         XCTAssertTrue(app.buttons["Games"].waitForExistence(timeout: 5))

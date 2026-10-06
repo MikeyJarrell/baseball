@@ -41,7 +41,7 @@ public struct GamesListScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 if games.isEmpty {
-                    Text("No games yet. A game shows up here once it starts.")
+                    Text("No games yet.")
                         .font(ScorebookFont.body)
                         .foregroundStyle(ScorebookColor.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)

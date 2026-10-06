@@ -98,7 +98,7 @@ public struct PitchingChangeSheet: View {
                 Card {
                     ForEach(Array(canPitchAgain.enumerated()), id: \.element) { i, id in
                         if i > 0 { RowDivider() }
-                        row(for: id, detail: [throwsText(context.player(id)), "Pitched earlier today; may come back once (rule 9.12 B)"])
+                        row(for: id, detail: [throwsText(context.player(id)), "Pitched earlier today; can return once"])
                     }
                 }
             }
@@ -109,7 +109,7 @@ public struct PitchingChangeSheet: View {
                     row(for: player.id, detail: [throwsText(player), whereNow(player.id)])
                     RowDivider()
                 }
-                OptionRow(title: "New pitcher", detail: "Number, name and throwing hand",
+                OptionRow(title: "New pitcher",
                           end: .radio(pick == .newPlayer), action: { pick = .newPlayer }) {
                     IconBadge(systemName: "plus")
                 }
@@ -121,7 +121,7 @@ public struct PitchingChangeSheet: View {
                     Card {
                         ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                             if i > 0 { RowDivider() }
-                            row(for: player.id, detail: ["Already pitched today", "your call"])
+                            row(for: player.id, detail: ["Already pitched today"])
                         }
                     }
                 } else {
@@ -156,7 +156,7 @@ public struct PitchingChangeSheet: View {
             InfoBox(Text("Coming out: \(Text(context.name(outgoing) + hand).bold().foregroundStyle(ScorebookColor.textPrimary)) · \(work)"))
             let count = context.situation.count
             if side == context.situation.fieldingSide, count != .fresh, let batter = context.situation.batter {
-                FootNote("Mid-count: \(count.balls)–\(count.strikes) to \(context.shortName(batter)). The league asks a pitcher to finish the batter unless hurt (rule 9.12 B 2). Your call.")
+                FootNote("Mid-count, \(count.balls)–\(count.strikes) to \(context.shortName(batter)). League rule: a pitcher finishes the batter unless hurt.")
             }
         } else {
             InfoBox(Text("Nobody is pitching for the \(context.teamName(side)) yet."))
@@ -209,9 +209,11 @@ public struct PitchingChangeSheet: View {
                     Text(battingSpotOf.map(spotWords) ?? "Doesn’t bat")
                         .font(ScorebookFont.headline)
                         .foregroundStyle(ScorebookColor.textPrimary)
-                    Text(battingSpotOf.map { "\(context.shortName($0)) leaves the batting order" } ?? "Tap to put the new pitcher in the batting order")
-                        .font(ScorebookFont.caption)
-                        .foregroundStyle(ScorebookColor.textSecondary)
+                    if let battingSpotOf {
+                        Text("\(context.shortName(battingSpotOf)) leaves the batting order")
+                            .font(ScorebookFont.caption)
+                            .foregroundStyle(ScorebookColor.textSecondary)
+                    }
                 }
                 Spacer()
                 Image(systemName: "chevron.up.chevron.down")

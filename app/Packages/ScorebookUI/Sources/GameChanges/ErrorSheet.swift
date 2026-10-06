@@ -44,7 +44,7 @@ public struct ErrorSheet: View {
 
             InfoBox(Text(fielder.map { position in
                 let who = context.state(fieldingSide).fielder(at: position).map { " (\(context.name($0)))" } ?? ""
-                return "Error on the \(position.name)\(who): E\(position.number). The count, the outs and the runners stay as they are."
+                return "Error on the \(position.name)\(who): E\(position.number)."
             } ?? "Tap the fielder who made the error."))
 
             SectionLabel("Kind of error (optional)")

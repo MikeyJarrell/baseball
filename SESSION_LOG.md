@@ -248,3 +248,76 @@ Pregame got time wheels, a separate fielding step on the diamond, DH in place of
 ## [2026-10-04 17:46] Corrections to the October 4 game
 
 Fixed the first real game on the phone after a backup: our starting fielders (Nojadera catching, Jarrell at first, Jackson Cleary #99 in left, Strong in right; Torres Benitez and Erick Rosas Lopez removed), the GWW Whales lineup matched to their registered names and numbers with Holliday, Fitzpatrick, Nuñez and Lopez added, Ortiz and Holliday as their pitchers, Soler and Carney as designated non-runners with the two runs-for-Carney entries corrected, and the Whales roster cleaned of placeholder players. Replayed before and after: 9-4 both times, nothing flagged. team/opponents.csv and team/roster.csv carry the same corrections. App feedback from the game is being handled in another session.
+
+## [2026-10-04 17:52] Mid-game fixes and box score tidy-up
+SESSLOG:[2026-10-04 17:52]
+
+**Project(s):** baseball
+
+### Decisions
+- Stopping a song fades it out over two seconds; a second tap stops it at once.
+- A late lineup card is handled by saying a player “was really” someone else: the two trade places in the whole game, every recorded play included, so stats go to the right person.
+- Home and away switch only before the first pitch; innings never go below the inning being played; a hitter comes out of the order only before the first pitch with nothing recorded for his team.
+- Undo passes over a confirmed defense check.
+- Box score: one team per headline line, positions in capitals (Mikey’s preference; traditional newspapers use lowercase), no lettered pinch-hitter notes, no “ran for” notes, one note per line.
+- Players with two last names go by the first (Torres, Rosas), taken from the roster file’s last-name column.
+- Warm-up songs added on the phone survive team loads; a file song removed on the phone returns unless its row is deleted too.
+
+### Follow-ups
+- [ ] Reinstall the app and load the team once the phone is plugged in (names with two last names need the team load).
+
+### Files
+- [created] `GameChanges/LineupsSheet.swift`, `GameChanges/GameDetailsSheet.swift`, `Model/LineupCorrection.swift`, `ScoringTests/MidGameFixTests.swift`, `plan/handoffs/mid-game-editing.md`, `feedback/ai/mid-game-editing-review.md`
+- [modified] `GameSession.swift`, `People.swift`, `BoxScore.swift`, `BoxScoreBuilder.swift`, BoxScoreText, BoxScorePicture, `DefenseSheet.swift`, `FieldingStep.swift`, batting screen controls and menu, `GameScreen.swift`, `AppSheets.swift`, `AppModel.swift`, `TeamImport.swift`, tests, `team/README.md`, `PROJECT_INDEX.md`
+
+### Context
+Mikey’s list after the first phone install: easier mid-game fixes to lineups, rosters, game details and warm-up music, the fielders check on the diamond with first initials, song fade-outs, and Undo ignoring the defense check; then a cleaner box score. Everything is built, reviewed by a fresh agent (no way found to corrupt a game; its edge cases fixed and tested), and clicked through on the simulator, but not yet on the phone. A first try at the home and away switch refused silently after a pregame substitution; pregame lineup changes now move with their team.
+
+---
+
+## [2026-10-04 18:15] Stats website for teammates
+SESSLOG:[2026-10-04 18:15]
+
+**Project(s):** baseball
+
+### Decisions
+- The site lives at mikeyjarrell.com/dogs/, served by GitHub Pages from a separate public repository, `MikeyJarrell/dogs`, holding only the built pages; the app’s code stays private.
+- Full names, as on the roster (Mikey’s choice); unlisted: every page asks search engines not to list it, and `robots.txt` turns them away.
+- No export button in the app: the Mac reads the games straight off the plugged-in phone, as `tools/load_team.sh` already does, so the brief’s export step was dropped.
+- The pages use the app’s own rules engine and stats code, so they match the phone’s Season screen; only players who have played are listed.
+
+### Follow-ups
+- [ ] First publish: once Mikey plugs the phone in, run `tools/publish_stats.sh` (the Mac copies predate the October 4 game corrections, so publishing from them would be wrong).
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/StatsSite/` (the page builder), `tools/publish_stats.sh`, `plan/handoffs/stats-website.md`
+- [modified] `Package.swift`, `PROJECT_INDEX.md`, `AGENTS.md`, `plan/README.md`
+
+### Context
+Mikey asked whether teammates could see stats; the only sharing was the texted box score picture, and a stats-website brief sat unstarted. The site is built and previewed at phone width (record, games, sortable season batting and pitching, a box score page per game, a page per player) but not yet published, because no copy on the Mac has the corrected October 4 game.
+
+---
+
+## [2026-10-06 14:02] First real game corrected; name recording; leaner app text
+SESSLOG:[2026-10-06 14:02]
+
+**Project(s):** baseball
+
+### Decisions
+- The October 4 game was corrected on the phone from Mikey’s account: our starting nine (Nojadera catching, Jackson Cleary #99 in left), the GWW Whales lineup matched to their registered names and numbers, Ortiz and Holliday pitching, Soler and Carney as designated non-runners, every Whale right-handed, Jackson bats right and throws left.
+- Games are deleted inside the app (Games list or a box score, backup first); the Mac cannot delete files inside the app’s folder on the phone.
+- A player’s name can be recorded on the phone mid-game for the pieced announcer introduction; heard on the phone and working.
+- On-screen text that explains how the app works or justifies itself is cut; only facts, step instructions and data-loss warnings stay.
+- Pregame: time wheels, a separate fielding step on the diamond, DH in place of “bats only,” typeable opponent numbers, no “unknown” opponent lineup. First and third base sit in fair territory. Walk-up songs fade in under the announcer.
+
+### Follow-ups
+- [ ] Run tools/load_team.sh with the phone plugged in, to bring the extra warm-up songs over and copy Jackson’s recorded name back to Dropbox.
+- [ ] Dress rehearsal on a televised game; problems into notes/dress-rehearsal-<date>.md.
+- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+
+### Files
+- [modified] team/opponents.csv, team/roster.csv, PROJECT_INDEX.md
+- [created] plan/handoffs/name-recording.md, plan/handoffs/trim-app-text.md
+
+### Context
+After the first real game, the app was corrected and tightened from Mikey’s use: the game’s lineups and rosters were fixed by editing copies of the phone’s files on the Mac, replaying the game to confirm the same 9-4 result with nothing flagged, then copying them back after a backup. Every phone change was preceded by a backup in ~/Dropbox/baseball/phone-backups/. Xcode reorders app/Scorebook.xcodeproj/project.pbxproj whenever Mikey opens the project; that reshuffle is safe to discard.

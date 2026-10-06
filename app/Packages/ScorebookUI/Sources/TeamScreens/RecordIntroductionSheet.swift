@@ -145,7 +145,7 @@ struct RecordIntroductionSheet: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(isRecording ? "Stop recording" : "Record")
-            Text(isRecording ? "Recording · tap to stop" : "Tap to record. Take your time; silence at the ends is trimmed.")
+            Text(isRecording ? "Recording" : "Silence at the ends is trimmed.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
                 .multilineTextAlignment(.center)

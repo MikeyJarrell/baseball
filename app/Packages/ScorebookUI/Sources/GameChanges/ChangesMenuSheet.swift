@@ -1,6 +1,7 @@
 // The changes menu: what the batting screen's one big substitution button opens. A short
-// list of every kind of change, each opening its own sheet inside this one: pitcher,
-// fielders, pinch hitter, pinch runner, runner for a designated non-runner, add a hitter.
+// list of every kind of change, each opening its own sheet inside this one: lineups and
+// rosters (fixing names, numbers and who batted where), pitcher, fielders, pinch hitter, pinch
+// runner, runner for a designated non-runner, add a hitter.
 
 import SwiftUI
 import Model
@@ -15,7 +16,7 @@ public struct ChangesMenuSheet: View {
 
     /// The sheet open on top of the list.
     private enum Item: Hashable {
-        case pitcher, fielders, pinchHitter, pinchRunner, nonRunner, addHitter
+        case lineups, pitcher, fielders, pinchHitter, pinchRunner, nonRunner, addHitter
     }
 
     @State private var open: Item?
@@ -34,23 +35,28 @@ public struct ChangesMenuSheet: View {
         SheetFrame(title: "Changes", subtitle: "\(context.teamName(situation.battingSide)) batting",
                    onCancel: { onFinish(.cancel) }) {
             Card {
+                row(.lineups, icon: "list.number", title: "Lineups and rosters",
+                    detail: "Names, numbers, batting order")
+            }
+            .padding(.bottom, Spacing.medium)
+            Card {
                 row(.pitcher, icon: "baseball", title: "Pitching change", detail: pitcherDetail)
                 RowDivider()
-                row(.fielders, icon: "shield.lefthalf.filled", title: "Fielders", detail: "Move players or bring them in")
+                row(.fielders, icon: "shield.lefthalf.filled", title: "Fielders")
                 RowDivider()
                 row(.pinchHitter, icon: "hand.raised", title: "Pinch hitter",
                     detail: situation.batter.map { "Bat for \(context.shortName($0))" } ?? "Nobody is up")
                 RowDivider()
                 row(.pinchRunner, icon: "figure.run", title: "Pinch runner",
-                    detail: situation.runners.isEmpty ? "Nobody is on base" : "Takes over a runner’s spot in the order")
+                    detail: situation.runners.isEmpty ? "Nobody is on base" : nil)
                 RowDivider()
-                row(.nonRunner, icon: "figure.run.circle", title: "Runner for a non-runner",
-                    detail: "For a designated non-runner on base")
+                row(.nonRunner, icon: "figure.run.circle", title: "Runner for a non-runner")
                 RowDivider()
-                row(.addHitter, icon: "person.badge.plus", title: "Add a hitter", detail: "To the bottom of the order")
+                row(.addHitter, icon: "person.badge.plus", title: "Add a hitter")
             }
             .navigationDestination(item: $open) { item in
                 switch item {
+                case .lineups: LineupsSheet(context: context, onFinish: onFinish)
                 case .pitcher: PitchingChangeSheet(context: context, onFinish: onFinish)
                 case .fielders: DefenseSheet(context: context, purpose: .changes, onFinish: onFinish)
                 case .pinchHitter: PinchHitterSheet(context: context, onFinish: onFinish)
@@ -70,7 +76,7 @@ public struct ChangesMenuSheet: View {
     }
 
     /// One item in the list.
-    private func row(_ item: Item, icon: String, title: String, detail: String) -> some View {
+    private func row(_ item: Item, icon: String, title: String, detail: String? = nil) -> some View {
         OptionRow(title: title, detail: detail, end: .chevron, action: { open = item }) {
             IconBadge(systemName: icon)
         }

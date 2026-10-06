@@ -126,7 +126,7 @@ public struct PlayerPage: View {
                 if let song {
                     SongLine(title: song.title, details: TeamWording.songDetails(song))
                 } else {
-                    SongLine(title: "No song yet", details: "Pick one from the library")
+                    SongLine(title: "No song yet", details: "")
                 }
                 AdaptiveStack {
                     Button {
@@ -157,18 +157,15 @@ public struct PlayerPage: View {
         for id in player.extraWarmUpSongIDs where id != mainID {
             if let title = data.library.song(id)?.title, !extras.contains(title) { extras.append(title) }
         }
-        let who = player.lastName
         return VStack(alignment: .leading, spacing: 0) {
             SectionLabel("Pitcher warm-up song")
             Card {
                 SongLine(title: song?.title ?? "No warm-up song",
-                         details: extras.isEmpty
-                            ? "Plays at the changeover when we take the field with \(who) pitching"
-                            : "Plays at \(who)’s first changeover each game")
+                         details: extras.isEmpty ? "" : "First inning")
                 // Extra songs come from the roster files; later innings shuffle through them.
                 if !extras.isEmpty {
                     SongLine(title: extras.joined(separator: " · "),
-                             details: "Later innings: one of these at random, each once before any repeats")
+                             details: "Later innings, shuffled")
                         .padding(.top, Spacing.medium)
                 }
                 Button(song == nil ? "Pick a warm-up song" : "Change warm-up song") { picking = .warmUp }
@@ -194,6 +191,13 @@ public struct PlayerPage: View {
                           systemImage: "mic.fill")
                 }
                 .buttonStyle(WideButtonStyle(kind: .record))
+                // Just the name, pieced together with the shared "Now batting," and their number.
+                Button { onRequest(.recordName(player.id)) } label: {
+                    Label(player.introduction?.source == .pieced ? "Record name again" : "Record name",
+                          systemImage: "person.wave.2")
+                }
+                .buttonStyle(WideButtonStyle(kind: .quiet, compact: true))
+                .padding(.top, Spacing.medium)
                 AdaptiveStack {
                     Button {
                         onRequest(isListening ? .stopPlaying : .playIntroduction(player))
@@ -231,7 +235,7 @@ public struct PlayerPage: View {
         return Button {
             onRequest(isPlaying ? .stopPlaying : .playWalkUp(player))
         } label: {
-            Label(isPlaying ? "Stop" : (player.introduction == nil ? "Test: the song as it plays in a game" : "Test: introduction, then song"),
+            Label(isPlaying ? "Stop" : (player.introduction == nil ? "Test the song" : "Test: introduction, then song"),
                   systemImage: isPlaying ? "stop.fill" : "speaker.wave.2.fill")
         }
         .buttonStyle(WideButtonStyle(kind: .ours))

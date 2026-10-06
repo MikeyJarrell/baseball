@@ -257,8 +257,10 @@ struct SongLine: View {
             if !typeSize.isAccessibilitySize { SongArt() }
             VStack(alignment: .leading, spacing: 2) {
                 Text(title).font(ScorebookFont.headline).foregroundStyle(ScorebookColor.textPrimary)
-                Text(details).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                if !details.isEmpty {
+                    Text(details).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 0)
         }

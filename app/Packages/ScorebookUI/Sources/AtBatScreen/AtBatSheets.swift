@@ -1,5 +1,6 @@
 // The two sheets the batting screen opens itself: the game menu (manual adjustment, an error
-// with nobody moving, the time limit, editing the batter, the walk-up song length, end game)
+// with nobody moving, the time limit, editing the batter, the game details, our pitcher's
+// warm-up songs, the walk-up song length, end game)
 // and the "Is the game over?" pop-up. Neither records anything itself: each hands its choice
 // back to the screen as an `AtBatAction`.
 
@@ -32,11 +33,19 @@ struct GameMenuSheet: View {
                     row("Edit this batter", detail: "Name, number, batting side", icon: "pencil") {
                         choose(.openBatterOptions)
                     }
-                    row("Home screen", detail: "Teams, songs, games; the game stays in progress", icon: "house") {
+                    row("Game details", detail: "Date, start time, innings, home and away", icon: "calendar") {
+                        choose(.openGameDetails)
+                    }
+                    if let pitcher = ourPitcher {
+                        row("Warm-up songs", detail: pitcher.displayName, icon: "music.note.list") {
+                            choose(.pickWarmUpSongs(pitcher))
+                        }
+                    }
+                    row("Home screen", detail: "The game stays in progress", icon: "house") {
                         choose(.goHome)
                     }
                     row("Walk-up song length",
-                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds of song, then it fades",
+                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds",
                         icon: "speaker.wave.2") {
                         choose(.openSongSettings)
                     }
@@ -44,10 +53,7 @@ struct GameMenuSheet: View {
                 Section {
                     Button(role: .destructive) { confirmingEnd = true } label: {
                         Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("End game").font(ScorebookFont.headline)
-                                Text("Time limit reached, or the last out").font(ScorebookFont.caption)
-                            }
+                            Text("End game").font(ScorebookFont.headline)
                         } icon: {
                             Image(systemName: "flag.checkered")
                         }
@@ -74,6 +80,12 @@ struct GameMenuSheet: View {
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    /// Our pitcher now, when our team has one in the game.
+    private var ourPitcher: Player? {
+        guard let ours = info.setup.ourSide else { return nil }
+        return info.situation[ours].pitcher.flatMap(info.setup.player)
     }
 
     /// The reasons to offer, the one the rules engine is asking about first.
@@ -126,7 +138,7 @@ struct GameOverSheet: View {
             Text(AtBatWording.scoreLine(info.setup, info.situation.score))
                 .font(ScorebookFont.scoreboardSmall)
                 .multilineTextAlignment(.center)
-            Text("\(AtBatWording.gameOverReason(reason, setup: info.setup, clock: info.clock)) The umpire makes the call; the app only asks.")
+            Text(AtBatWording.gameOverReason(reason, setup: info.setup, clock: info.clock))
                 .font(ScorebookFont.body)
                 .foregroundStyle(ScorebookColor.textSecondary)
                 .multilineTextAlignment(.leading)
