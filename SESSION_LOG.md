@@ -366,3 +366,39 @@ SESSLOG:[2026-10-06 14:15]
 
 ### Context
 Mikey asked what pitcher warm-up songs existed, then listed new ones. All 18 were downloaded whole into `~/Dropbox/baseball/songs/` and loaded onto the phone with `tools/load_team.sh`, which checked every file plays.
+
+---
+
+## [2026-10-06 14:20] Cleary into the Whales game’s starting order
+SESSLOG:[2026-10-06 14:20]
+
+**Project(s):** baseball
+
+### Decisions
+- Jackson Cleary batted tenth from the first time through the order but had been added mid-game as an extra hitter, so the box score indented him like a substitute. He is now the tenth batter in the starting order; his line and every stat are unchanged. Backup first in ~/Dropbox/baseball/phone-backups/2026-10-06-141428-before-cleary-tenth; the site was republished.
+- The box score keeps listing only players who batted: Saul Teodosio, who only fielded, stays off it (Mikey).
+
+### Follow-ups
+- (none)
+
+### Files
+- [phone] games/D682B449-….json: Cleary in the starting batting order; the extra-hitter entry removed
+
+---
+
+## [2026-10-06 14:37] Scorebook app live; team reloaded
+SESSLOG:[2026-10-06 14:37]
+
+**Project(s):** baseball
+
+### Decisions
+- The app is live: the October 4 game was a real game scored on the phone, so the televised dress rehearsal is dropped from the plan.
+
+### Follow-ups
+- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+
+### Files
+- [modified] PROJECT_INDEX.md, plan/README.md
+
+### Context
+The team reload found nothing to change (another session had already loaded the extra warm-up songs; all 24 warm-up and walk-up files play), and it copied Jackson Cleary’s name recording from the phone back to ~/Dropbox/baseball/intros/names/.
