@@ -22,3 +22,4 @@
 
 - First published October 6, 2026, from the phone, with the corrected October 4 game: 1 game, 11 player pages, live at https://mikeyjarrell.com/dogs/. Rerun `tools/publish_stats.sh` with the phone plugged in after each game.
 - October 6, after the first publish: Holliday (GWW Whales) put at second base for the innings before he pitched, on the phone and the site.
+- October 6: Cleary moved into the Whales game’s starting order as the tenth batter (he had been entered as an extra hitter), so the box score no longer indents him.

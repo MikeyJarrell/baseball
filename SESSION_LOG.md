@@ -337,7 +337,6 @@ SESSLOG:[2026-10-06 14:11]
 
 ### Follow-ups
 - [ ] Rerun tools/publish_stats.sh with the phone plugged in after each game.
-- [ ] Run tools/load_team.sh with the phone plugged in (extra warm-up songs; Jackson’s recorded name back to Dropbox).
 - [ ] Dress rehearsal on a televised game.
 
 ### Files
@@ -346,3 +345,41 @@ SESSLOG:[2026-10-06 14:11]
 
 ### Context
 Mikey asked whether the Whales box score was ready to send and the website ready to go. The box score checked out; the site was published from the phone for the first time. Holliday batted second all game with no position; the game file’s setup showed the Whales’ fielders at only six spots, so he went to second at Mikey’s word, edited in a copy, confirmed that only his line changed, copied back, and republished.
+
+---
+
+## [2026-10-06 14:15] More warm-up songs for six players
+SESSLOG:[2026-10-06 14:15]
+
+**Project(s):** baseball
+
+### Decisions
+- Added 18 extra warm-up songs (Garrett, Gaven, Mikey, Darin, Allan, Saul), each the official album track found through YouTube Music.
+- “I Knew You Were Trouble” is the original 2012 recording, not Taylor’s Version; Seal’s “Crazy” is the 4½-minute single, not the album cut.
+
+### Follow-ups
+- (none)
+
+### Files
+- [modified] `team/warmup_extras.csv` — 18 new rows with sources and file names
+- [modified] `PROJECT_INDEX.md` — which players have extra warm-up songs
+
+### Context
+Mikey asked what pitcher warm-up songs existed, then listed new ones. All 18 were downloaded whole into `~/Dropbox/baseball/songs/` and loaded onto the phone with `tools/load_team.sh`, which checked every file plays.
+
+---
+
+## [2026-10-06 14:20] Cleary into the Whales game’s starting order
+SESSLOG:[2026-10-06 14:20]
+
+**Project(s):** baseball
+
+### Decisions
+- Jackson Cleary batted tenth from the first time through the order but had been added mid-game as an extra hitter, so the box score indented him like a substitute. He is now the tenth batter in the starting order; his line and every stat are unchanged. Backup first in ~/Dropbox/baseball/phone-backups/2026-10-06-141428-before-cleary-tenth; the site was republished.
+- The box score keeps listing only players who batted: Saul Teodosio, who only fielded, stays off it (Mikey).
+
+### Follow-ups
+- (none)
+
+### Files
+- [phone] games/D682B449-….json: Cleary in the starting batting order; the extra-hitter entry removed
