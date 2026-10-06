@@ -295,3 +295,24 @@ SESSLOG:[2026-10-04 18:15]
 
 ### Context
 Mikey asked whether teammates could see stats; the only sharing was the texted box score picture, and a stats-website brief sat unstarted. The site is built and previewed at phone width (record, games, sortable season batting and pitching, a box score page per game, a page per player) but not yet published, because no copy on the Mac has the corrected October 4 game.
+
+---
+
+## [2026-10-06 14:15] More warm-up songs for six players
+SESSLOG:[2026-10-06 14:15]
+
+**Project(s):** baseball
+
+### Decisions
+- Added 18 extra warm-up songs (Garrett, Gaven, Mikey, Darin, Allan, Saul), each the official album track found through YouTube Music.
+- “I Knew You Were Trouble” is the original 2012 recording, not Taylor’s Version; Seal’s “Crazy” is the 4½-minute single, not the album cut.
+
+### Follow-ups
+- (none)
+
+### Files
+- [modified] `team/warmup_extras.csv` — 18 new rows with sources and file names
+- [modified] `PROJECT_INDEX.md` — which players have extra warm-up songs
+
+### Context
+Mikey asked what pitcher warm-up songs existed, then listed new ones. All 18 were downloaded whole into `~/Dropbox/baseball/songs/` and loaded onto the phone with `tools/load_team.sh`, which checked every file plays.
