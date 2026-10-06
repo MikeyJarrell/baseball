@@ -313,7 +313,7 @@ SESSLOG:[2026-10-06 14:02]
 ### Follow-ups
 - [ ] Run tools/load_team.sh with the phone plugged in, to bring the extra warm-up songs over and copy Jackson’s recorded name back to Dropbox.
 - [ ] Dress rehearsal on a televised game; problems into notes/dress-rehearsal-<date>.md.
-- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+- [x] Publish the stats website (done October 6; live at mikeyjarrell.com/dogs/).
 
 ### Files
 - [modified] team/opponents.csv, team/roster.csv, PROJECT_INDEX.md
@@ -321,6 +321,30 @@ SESSLOG:[2026-10-06 14:02]
 
 ### Context
 After the first real game, the app was corrected and tightened from Mikey’s use: the game’s lineups and rosters were fixed by editing copies of the phone’s files on the Mac, replaying the game to confirm the same 9-4 result with nothing flagged, then copying them back after a backup. Every phone change was preceded by a backup in ~/Dropbox/baseball/phone-backups/. Xcode reorders app/Scorebook.xcodeproj/project.pbxproj whenever Mikey opens the project; that reshuffle is safe to discard.
+
+---
+
+## [2026-10-06 14:11] Whales box score checked; stats website published
+SESSLOG:[2026-10-06 14:11]
+
+**Project(s):** baseball
+
+### Decisions
+- The corrected October 4 box score reconciles: batting totals, pitchers’ hits and runs against the other side’s totals, eight innings a side. Cleary’s win follows the app’s rule (Dietrich left one inning short of five; Cleary got the most relief outs).
+- Kalid Teodosio’s “RF-PH-LF” is what happened (Mikey).
+- Holliday is put at second base for the innings before he pitched (Mikey’s best recollection). The Whales’ first base and right field stay unrecorded: with two designated hitters, those fielders never batted.
+- The stats website is live at mikeyjarrell.com/dogs/ (public repository MikeyJarrell/dogs).
+
+### Follow-ups
+- [ ] Rerun tools/publish_stats.sh with the phone plugged in after each game.
+- [ ] Dress rehearsal on a televised game.
+
+### Files
+- [modified] PROJECT_INDEX.md, plan/handoffs/stats-website.md, SESSION_LOG.md
+- [phone] games/D682B449-….json: Holliday added at second base; backup first in ~/Dropbox/baseball/phone-backups/2026-10-06-140901-before-holliday-2b
+
+### Context
+Mikey asked whether the Whales box score was ready to send and the website ready to go. The box score checked out; the site was published from the phone for the first time. Holliday batted second all game with no position; the game file’s setup showed the Whales’ fielders at only six spots, so he went to second at Mikey’s word, edited in a copy, confirmed that only his line changed, copied back, and republished.
 
 ---
 
