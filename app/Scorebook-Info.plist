@@ -9,6 +9,8 @@
   or the scorer switches apps.
   UIFileSharingEnabled: the Files app shows the app's Documents folder, which holds only
   the backups folder (the live files are kept privately, in Application Support).
+  ITSAppUsesNonExemptEncryption: the app uses no encryption of its own, so uploads to
+  TestFlight skip Apple's export-compliance question.
 -->
 <plist version="1.0">
 <dict>
@@ -16,6 +18,8 @@
 	<array>
 		<string>audio</string>
 	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>UIFileSharingEnabled</key>
 	<true/>
 </dict>
