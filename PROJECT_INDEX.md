@@ -15,6 +15,6 @@
 | Announcer introductions | Built: pieced together from Mikey’s recordings of “Now batting,” every number and each name, recorded on the Mac with `tools/record_intros.py` ([handoff](plan/handoffs/announcer-pieces.md)); all recorded and on the phone with the jersey numbers, not yet heard there |
 | Several warm-up songs per pitcher | Built: main song his first inning, extras from `team/warmup_extras.csv` shuffled for later innings; on the phone after the next reinstall and team load. Extra songs listed for Chris, Erick and Gaven |
 | Dress rehearsal | Not started: Mikey scores a televised game on his phone |
-| A teammate’s iPhone | Planned: through TestFlight on Mikey’s paid developer account, with the team built into the app and his games sent back by file ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
+| Erick’s iPhone | Planned: through TestFlight on Mikey’s paid developer account, with the team and songs built into the app ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
 
 No deadlines have been assigned.

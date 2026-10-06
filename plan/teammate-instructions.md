@@ -24,7 +24,6 @@ It’s on your home screen. Our team, the opponents, everyone’s walk-up songs 
 
 - Turn the volume up for the walk-up songs. They keep playing if the phone locks.
 - If TestFlight says there’s an update, tap “Update”. Your games stay.
-- After each game, tap “Send games” and text me the file, so the games count toward our season stats.
 - If the app ever says it has expired, text me and I’ll send a new copy.
 
 Thanks for covering!
