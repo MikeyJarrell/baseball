@@ -383,3 +383,22 @@ SESSLOG:[2026-10-06 14:20]
 
 ### Files
 - [phone] games/D682B449-….json: Cleary in the starting batting order; the extra-hitter entry removed
+
+---
+
+## [2026-10-06 14:37] Scorebook app live; team reloaded
+SESSLOG:[2026-10-06 14:37]
+
+**Project(s):** baseball
+
+### Decisions
+- The app is live: the October 4 game was a real game scored on the phone, so the televised dress rehearsal is dropped from the plan.
+
+### Follow-ups
+- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+
+### Files
+- [modified] PROJECT_INDEX.md, plan/README.md
+
+### Context
+The team reload found nothing to change (another session had already loaded the extra warm-up songs; all 24 warm-up and walk-up files play), and it copied Jackson Cleary’s name recording from the phone back to ~/Dropbox/baseball/intros/names/.
