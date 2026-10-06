@@ -10,7 +10,7 @@ The other files in this folder hold the detail. [architecture.md](architecture.m
 
 **Stadium announcer.** Before the song, an optional introduction in the old Yankee Stadium style: “Now batting, number two, Derek Jeter. Number two.” Mikey records each player’s introduction in his own impression, straight into the app from that player’s page, and the app adds a stadium echo. A player without a recording yet can use the iPhone’s built-in voice, slowed to that cadence. One tap plays the introduction with the song fading in underneath it, reaching full volume at the hook as the announcer finishes. This is a nice-to-have, built after the walk-up songs work.
 
-**Pitcher warm-up music.** Each of our pitchers can pick a warm-up song. When we take the field, the music button plays the current pitcher’s song until it is stopped or the first pitch is recorded. Nothing plays while the other team warms up.
+**Pitcher warm-up music.** Each of our pitchers can pick a warm-up song. When we take the field, the music button plays the current pitcher’s song until it is stopped or the first pitch is recorded. A pitcher may also have extra warm-up songs: his main song plays his first inning, and each later inning plays one of the extras at random, each once before any repeats. Nothing plays while the other team warms up.
 
 **Keeping the book.** The main screen is the batter at the plate. Four big buttons do most of the work: ball, strike, foul, in play. Four balls and three strikes take care of themselves. Tapping “in play” opens a short sequence that starts from the batter: batter out, a hit, reached on error, or fielder’s choice (batter safe, someone else out), then for an out, the fielders tapped on a drawing of the field in the order they touched the ball, so tapping the shortstop and then the first baseman writes “6-3.” The app then shows where it thinks every runner ended up, using the obvious default (runners forced along on a walk, runners moving up as far as the batter on a hit), and the scorer fixes anything that went differently by tapping that runner. A single where the batter takes second on an error is entered as a single; moving the batter to second then asks whether it was on the throw or on an error, and by whom, and the book reads “1B 7, E7.” A 5-4-3 with a runner on first is three taps on the field and a confirm.
 
@@ -83,13 +83,13 @@ Each job below has its own brief in [briefs/](briefs/). A brief says what the jo
 | Screen builder: the game-so-far screen and batter history | [game overview](briefs/screen-game-overview.md) | After foundation and mockup approval |
 | Screen builder: end of game and season stats | [postgame and season screens](briefs/screen-postgame-and-season.md) | After foundation and mockup approval |
 | Reviewer: a fresh reader who checks each job before it is accepted | [rules-for-agents.md](rules-for-agents.md) | As each job finishes |
-| Website builder | [stats website](briefs/stats-website.md) | Later |
+| Website builder | [stats website](briefs/stats-website.md) | Built ([handoff](handoffs/stats-website.md)) |
 
 Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten things at once. A good first wave is foundation and design together; then the rules engine and test scenarios together, with stats, storage and the box score printer; then audio and the screens once the mockups are approved.
 
 ## What Mikey has to do
 
-1. Plug the phone into the Mac when the first version is ready to install. The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
+1. Put the app on the phone: plug it into the Mac and follow [install-on-iphone.md](install-on-iphone.md). The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
 2. Collect each player’s song and the time it should start, into [team/roster.csv](../team/roster.csv). On the Mac, `python3 tools/walkup_songs.py` downloads each song, cuts a clip around the hook, evens out the loudness, and saves it to the Dropbox folder `baseball/songs/`; on the phone, the app imports them from Dropbox through the Files app.
 3. Record the announcer introductions in the app, once it can record.
 4. Score a televised game as the dress rehearsal.

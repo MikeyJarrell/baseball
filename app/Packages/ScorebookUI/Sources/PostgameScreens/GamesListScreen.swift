@@ -1,5 +1,8 @@
 // The games list: every game, newest first, with the opponent, the date and the result
 // ("W 7–5"). Tapping a game asks for its box score. As in the approved mockup.
+//
+// A game can be deleted: Edit in the top bar puts a Delete button on every row (a long press
+// on a row offers it too), and a question naming the game comes up before anything happens.
 
 import SwiftUI
 import Model
@@ -12,15 +15,25 @@ import DesignSystem
 ///   - games: The games, in any order; the screen puts the newest first.
 ///   - unreadableGames: How many saved games could not be read (storage's damaged files), so
 ///     the scorer knows something is missing. 0 shows nothing.
-///   - onRequest: Called with the game the scorer taps.
+///   - ourTeamName: Our team's name, for the delete question ("Delete Diamond Dogs vs
+///     Mudcats, Oct 4?").
+///   - onRequest: Called with the game the scorer taps, or the game to delete once confirmed.
 public struct GamesListScreen: View {
     public var games: [GameSummary]
     public var unreadableGames: Int
+    public var ourTeamName: String?
     public var onRequest: (PostgameRequest) -> Void
 
-    public init(games: [GameSummary], unreadableGames: Int = 0, onRequest: @escaping (PostgameRequest) -> Void) {
+    /// True while the rows show their Delete buttons.
+    @State private var editing = false
+    /// The game the scorer asked to delete, waiting for them to confirm.
+    @State private var deleting: GameSummary?
+
+    public init(games: [GameSummary], unreadableGames: Int = 0, ourTeamName: String? = nil,
+                onRequest: @escaping (PostgameRequest) -> Void) {
         self.games = games
         self.unreadableGames = unreadableGames
+        self.ourTeamName = ourTeamName
         self.onRequest = onRequest
     }
 
@@ -28,7 +41,7 @@ public struct GamesListScreen: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 if games.isEmpty {
-                    Text("No games yet. A game shows up here once it starts.")
+                    Text("No games yet.")
                         .font(ScorebookFont.body)
                         .foregroundStyle(ScorebookColor.textSecondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -38,7 +51,20 @@ public struct GamesListScreen: View {
                     VStack(spacing: 0) {
                         let ordered = StatSorting.newestFirst(games)
                         ForEach(ordered) { game in
-                            GameRow(game: game) { onRequest(.openGame(game.id)) }
+                            HStack(spacing: 0) {
+                                GameRow(game: game, showsChevron: !editing) { onRequest(.openGame(game.id)) }
+                                if editing {
+                                    Button("Delete", role: .destructive) { deleting = game }
+                                        .font(ScorebookFont.chip)
+                                        .buttonStyle(.borderedProminent)
+                                        .tint(ScorebookColor.out)
+                                        .padding(.trailing, Spacing.medium)
+                                        .accessibilityLabel(Text("Delete \(PostgameWording.opponent(game)), \(PostgameWording.listDate(game.date))"))
+                                }
+                            }
+                            .contextMenu {
+                                Button("Delete game", systemImage: "trash", role: .destructive) { deleting = game }
+                            }
                             if game.id != ordered.last?.id {
                                 Rectangle().fill(ScorebookColor.divider).frame(height: 0.5)
                                     .padding(.leading, Spacing.large)
@@ -61,12 +87,31 @@ public struct GamesListScreen: View {
         }
         .background(ScorebookColor.background)
         .navigationTitle("Games")
+        .toolbar {
+            if !games.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(editing ? "Done" : "Edit") { editing.toggle() }
+                }
+            }
+        }
+        .confirmationDialog(deleting.map { PostgameWording.deleteQuestion($0, ourTeamName: ourTeamName) } ?? "",
+                            isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+                            titleVisibility: .visible, presenting: deleting) { game in
+            Button("Delete game", role: .destructive) {
+                onRequest(.deleteGame(game.id))
+                deleting = nil
+            }
+        } message: { _ in
+            Text(PostgameWording.deleteWarning)
+        }
     }
 }
 
 /// One game in the list: "vs Mudcats" over "Sat, Oct 3", and the result on the right.
 private struct GameRow: View {
     var game: GameSummary
+    /// The arrow on the right; hidden while the Delete buttons show.
+    var showsChevron = true
     var onTap: () -> Void
 
     /// At the accessibility text sizes the result goes under the date instead of beside it.
@@ -86,9 +131,11 @@ private struct GameRow: View {
                 }
                 Spacer(minLength: Spacing.small)
                 if !textSize.isAccessibilitySize { result }
-                Image(systemName: "chevron.right")
-                    .font(ScorebookFont.caption.weight(.semibold))
-                    .foregroundStyle(ScorebookColor.textSecondary)
+                if showsChevron {
+                    Image(systemName: "chevron.right")
+                        .font(ScorebookFont.caption.weight(.semibold))
+                        .foregroundStyle(ScorebookColor.textSecondary)
+                }
             }
             .padding(.horizontal, Spacing.large)
             .padding(.vertical, Spacing.small)
@@ -116,7 +163,7 @@ private struct GameRow: View {
         }
     }
 
-    private func color(for outcome: PostgameWording.Outcome) -> Color {
+    private func color(for outcome: GameResult) -> Color {
         switch outcome {
         case .win: ScorebookColor.success
         case .loss: ScorebookColor.out

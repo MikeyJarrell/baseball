@@ -80,7 +80,7 @@ public struct PinchHitterSheet: View {
                     Card {
                         ForEach(Array(reentering.enumerated()), id: \.element) { i, id in
                             if i > 0 { RowDivider() }
-                            row(id, detail: ["Started in this spot (rule 9.9)", batsText(context.player(id))])
+                            row(id, detail: ["Started in this spot", batsText(context.player(id))])
                         }
                     }
                 }
@@ -88,10 +88,10 @@ public struct PinchHitterSheet: View {
                 SectionLabel("Bench")
                 Card {
                     ForEach(bench) { player in
-                        row(player.id, detail: ["Bench", batsText(player)])
+                        row(player.id, detail: [batsText(player)])
                         RowDivider()
                     }
-                    OptionRow(title: "New hitter", detail: "Number, name and batting side",
+                    OptionRow(title: "New hitter",
                               end: .radio(pick == .newPlayer), action: { pick = .newPlayer }) {
                         IconBadge(systemName: "plus")
                     }
@@ -110,7 +110,7 @@ public struct PinchHitterSheet: View {
                     Card {
                         ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                             if i > 0 { RowDivider() }
-                            row(player.id, detail: [whereNow(player.id), "your call"])
+                            row(player.id, detail: [whereNow(player.id)])
                         }
                     }
                 } else if !everyoneElse.isEmpty {
@@ -120,7 +120,7 @@ public struct PinchHitterSheet: View {
                 SectionLabel("Nobody to bat")
                 Card {
                     OptionRow(title: "Leave a batting hole",
-                              detail: "\(context.shortName(batter)) is lost with nobody to take the spot: an automatic out each time it comes up (rule 9.5 C)",
+                              detail: "An automatic out each time the spot comes up",
                               end: .chevron, action: { askingAboutHole = true }) {
                         IconBadge(systemName: "circle.slash", tint: ScorebookColor.out)
                     }
@@ -136,26 +136,27 @@ public struct PinchHitterSheet: View {
         .confirmationDialog("Leave a batting hole?", isPresented: $askingAboutHole, titleVisibility: .visible) {
             Button("Leave a batting hole", role: .destructive, action: recordHole)
         } message: {
-            Text("\(batter.map { context.shortName($0) } ?? "This hitter")’s turn now is an out right away. After that, the \(ordinal(spot + 1)) spot is an automatic out each time it comes up. Putting someone in the spot later fills it again.")
+            Text("\(batter.map { context.shortName($0) } ?? "This hitter")’s turn now is an out, and so is every turn of the \(ordinal(spot + 1)) spot until someone fills it.")
         }
     }
 
     /// One player to choose.
     private func row(_ id: PlayerID, detail: [String?]) -> some View {
-        PlayerChoiceRow(context: context, player: id, detail: detail.compactMap { $0 }.joined(separator: " · "),
+        let words = detail.compactMap { $0 }.joined(separator: " · ")
+        return PlayerChoiceRow(context: context, player: id, detail: words.isEmpty ? nil : words,
                         look: look, isSelected: pick == .player(id)) {
             pick = .player(id)
         }
     }
 
-    /// Where a player is now, for "Someone else": "Already bats 4th", "Playing shortstop,
-    /// not batting", "Can re-enter in the 2nd spot", "Left the game".
+    /// Where a player is now, for "Someone else": "Already bats 4th", "Playing shortstop",
+    /// "Can re-enter in the 2nd spot", "Left the game".
     private func whereNow(_ id: PlayerID) -> String {
         if let at = context.battingSpot(of: id, side) { return "Already bats \(ordinal(at + 1))" }
         if let option = state.eligibleToReenter.first(where: { $0.player == id }) {
             return "Can re-enter in the \(ordinal(option.spotIndex + 1)) spot"
         }
-        if let position = state.position(of: id) { return "Playing \(position.name), not batting" }
+        if let position = state.position(of: id) { return "Playing \(position.name)" }
         if context.leftTheGame(side).contains(id) { return "Left the game" }
         return "Not batting"
     }

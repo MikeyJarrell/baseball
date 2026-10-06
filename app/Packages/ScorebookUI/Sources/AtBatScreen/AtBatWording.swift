@@ -28,14 +28,6 @@ enum AtBatWording {
 
     // MARK: Teams and players
 
-    /// A team's short name for the scoreboard: the last word if it is four letters or fewer
-    /// ("DOGS"), else its first three letters ("MUD" for Mudcats). Never more than four letters,
-    /// so it always fits whole. A stand-in until the team's own short name arrives in Model.
-    static func shortTeamName(_ name: String) -> String {
-        let last = name.split(separator: " ").last.map(String.init) ?? name
-        return (last.count <= 4 ? last : String(last.prefix(3))).uppercased()
-    }
-
     /// The batter's name as the big line beside their number: ours by name; theirs by
     /// number and name, "#23 Vega", or the number alone when we have no name.
     static func batterName(_ player: Player, ours: Bool) -> String {
@@ -129,12 +121,10 @@ enum AtBatWording {
             : "End \(ordinal(max(1, situation.inning - 1)))"
     }
 
-    /// The score for banners and the game-over question, our team first:
-    /// "Diamond Dogs 4, Mudcats 2". With no team of ours, the visitors first.
+    /// The score for banners and the game-over question, the visiting team first, as in the
+    /// newspaper box score: "Mudcats 2, Diamond Dogs 4" when we are home.
     static func scoreLine(_ setup: GameSetup, _ score: Score) -> String {
-        let first = setup.ourSide ?? .away
-        let second = first.opponent
-        return "\(setup[first].name) \(score[first]), \(setup[second].name) \(score[second])"
+        "\(setup.away.name) \(score.away), \(setup.home.name) \(score.home)"
     }
 
     // MARK: The time limit
@@ -163,19 +153,18 @@ enum AtBatWording {
 
     // MARK: "Is the game over?"
 
-    /// Why the app is asking, in a sentence, with the league's rule number.
+    /// Why the app is asking, in a few words.
     static func gameOverReason(_ reason: EndOfGame.Reason, setup: GameSetup, clock: GameClock) -> String {
         switch reason {
         case .timeLimit:
-            let limit = clock.timeLimitEndsAt.map { "The time limit, \(clockTime($0)), has passed" } ?? "The time limit has passed"
-            return "\(limit) and the inning is over. No new inning starts after the limit (rule 9.1 G)."
+            return clock.timeLimitEndsAt.map { "Past the time limit, \(clockTime($0))." } ?? "Past the time limit."
         case .runRule:
             let margin = setup.rules.runRuleMargin ?? 12
-            return "A lead of \(margin) runs or more after \(setup.rules.runRuleInning) innings ends the game under the run rule (rule 9.13)."
+            return "Run rule: \(margin) or more ahead after \(setup.rules.runRuleInning) innings."
         case .regulation:
-            return "The scheduled \(setup.scheduledInnings) innings are complete."
+            return "\(setup.scheduledInnings) innings complete."
         case .called:
-            return "Play has stopped, for rain, darkness or anything else."
+            return "Play has stopped."
         }
     }
 
@@ -192,25 +181,14 @@ enum AtBatWording {
     // MARK: The small line under each count button
 
     // These say what a tap will do, as in the approved mockup ("makes it 2–1", "walk",
-    // "strikeout"). They are labels only: the rules engine still works out the real count.
-    // The handoff asks for the rules engine to provide them, so the count rules live in one place.
+    // "strikeout"). The words come from the rules engine (`RulesEngine.countAfter(_:in:)`), so
+    // the count rules live in one place; the screen only adds "hold for bunt" under Foul.
 
-    /// Under Ball: "makes it 2–1", or "walk" on ball four.
-    static func ballHint(_ count: Count) -> String {
-        count.balls >= 3 ? "walk" : "makes it \(count.balls + 1)–\(count.strikes)"
-    }
-
-    /// Under Strike: "makes it 1–2", or "strikeout" on strike three.
-    static func strikeHint(_ count: Count) -> String {
-        count.strikes >= 2 ? "strikeout" : "makes it \(count.balls)–\(count.strikes + 1)"
-    }
-
-    /// Under Foul: "makes it 1–2", or with two strikes "stays 2–2 · hold for bunt", since a foul
-    /// is never strike three but a foul bunt is, and holding the button down records one.
-    static func foulHint(_ count: Count) -> String {
-        count.strikes >= 2
-            ? "stays \(count.balls)–\(count.strikes) · hold for bunt"
-            : "makes it \(count.balls)–\(count.strikes + 1)"
+    /// The words under one count button, from the rules engine's answer for that pitch.
+    /// Under Foul with two strikes the count stays the same, and the screen adds that holding
+    /// the button records a foul bunt, which is strike three: "stays 2–2 · hold for bunt".
+    static func hint(_ change: CountChange, isFoul: Bool = false) -> String {
+        isFoul && change.isUnchanged ? "\(change.hint) · hold for bunt" : change.hint
     }
 
     /// Under In play.

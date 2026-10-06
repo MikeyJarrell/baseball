@@ -1,4 +1,4 @@
-// Step four of five: each team's starting pitcher, with throwing hand.
+// Step five of six: each team's starting pitcher, with throwing hand.
 //
 // Ours lists the roster with whoever pitched most recently first. Picking someone puts them at
 // position 1; if they were fielding somewhere else, the old pitcher takes that position (the
@@ -10,7 +10,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The fourth pregame step: starting pitchers.
+/// The fifth pregame step: starting pitchers.
 struct PitchersStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
@@ -22,7 +22,7 @@ struct PitchersStep: View {
     @State private var newHand: Hand?
 
     var body: some View {
-        StepPage(step: 4, title: "Starting pitchers", buttonTitle: "Next: review", onButton: onNext) {
+        StepPage(step: 5, title: "Starting pitchers", buttonTitle: "Next: review", onButton: onNext) {
             Section {
                 ForEach(draft.ourPitcherChoices) { choice in
                     pitcherRow(choice, look: .ours,
@@ -42,7 +42,7 @@ struct PitchersStep: View {
                         draft.theirs.pitcher = choice.id
                     }
                 }
-                ChoiceRow(title: "Not known yet", detail: "Name them when you find out",
+                ChoiceRow(title: "Not known yet",
                           isOn: theirPitcherUnknown, action: { draft.theirs.pitcher = nil }) {
                     PlayerNumberBadge("?", look: .theirs, size: 36).accessibilityHidden(true)
                 }
@@ -51,7 +51,7 @@ struct PitchersStep: View {
                     .cardRow()
                 if newOpen { newPitcherForm.cardRow() }
             } header: {
-                SectionHeader(title: "\(draft.opponentName) · from their saved roster")
+                SectionHeader(title: draft.opponentName)
             }
         }
     }

@@ -16,6 +16,10 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var number: String?
     /// The stand-in label used until the scorer names this hitter: "Batter 4".
     public var placeholder: String?
+    /// The last name to use on its own, when it is not the last word of `name`: "Torres" for
+    /// Jonathan Torres Benitez, who goes by his first last name, as is usual with two
+    /// Spanish last names. Missing means the last word of the name.
+    public var surname: String?
     /// Which side of the plate they bat from, if known.
     public var bats: BattingSide?
     /// Which hand they throw with, if known.
@@ -24,29 +28,98 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var walkUpSongID: SongID?
     /// Their warm-up song, for our pitchers: played while they warm up when our team takes the field.
     public var warmUpSongID: SongID?
+    /// More warm-up songs for our pitchers, shuffled for their later innings. The main
+    /// warm-up song above plays their first inning of each game.
+    public var extraWarmUpSongIDs: [SongID]
     /// The stadium announcer introduction played before their song, if they have one.
     public var introduction: AnnouncerIntroduction?
+    /// The position they usually play, for our players: the first game's lineup puts them
+    /// there. Missing when they have no usual position.
+    public var usualPosition: Position?
+    /// Whether they usually bat, field, both, or start on the bench. Missing when nobody has
+    /// said; the first game's lineup then has them bat, and field at their usual position if
+    /// they have one.
+    public var usualRole: UsualRole?
+    /// True for our usual leadoff hitter, who heads the first game's batting order.
+    public var usuallyLeadsOff: Bool
 
     public init(
         id: PlayerID = .make(),
         name: String? = nil,
         number: String? = nil,
         placeholder: String? = nil,
+        surname: String? = nil,
         bats: BattingSide? = nil,
         throwsWith: Hand? = nil,
         walkUpSongID: SongID? = nil,
         warmUpSongID: SongID? = nil,
-        introduction: AnnouncerIntroduction? = nil
+        extraWarmUpSongIDs: [SongID] = [],
+        introduction: AnnouncerIntroduction? = nil,
+        usualPosition: Position? = nil,
+        usualRole: UsualRole? = nil,
+        usuallyLeadsOff: Bool = false
     ) {
         self.id = id
         self.name = name
         self.number = number
         self.placeholder = placeholder
+        self.surname = surname
         self.bats = bats
         self.throwsWith = throwsWith
         self.walkUpSongID = walkUpSongID
         self.warmUpSongID = warmUpSongID
+        self.extraWarmUpSongIDs = extraWarmUpSongIDs
         self.introduction = introduction
+        self.usualPosition = usualPosition
+        self.usualRole = usualRole
+        self.usuallyLeadsOff = usuallyLeadsOff
+    }
+
+    // MARK: Reading and writing JSON
+
+    private enum CodingKeys: String, CodingKey {
+        case id, name, number, placeholder, surname, bats, throwsWith, walkUpSongID, warmUpSongID, extraWarmUpSongIDs, introduction
+        case usualPosition, usualRole, usuallyLeadsOff
+    }
+
+    /// Reads a player from a saved file. Files saved before a player had a usual position,
+    /// role, leadoff mark or extra warm-up songs read with none.
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(PlayerID.self, forKey: .id)
+        name = try c.decodeIfPresent(String.self, forKey: .name)
+        number = try c.decodeIfPresent(String.self, forKey: .number)
+        placeholder = try c.decodeIfPresent(String.self, forKey: .placeholder)
+        surname = try c.decodeIfPresent(String.self, forKey: .surname)
+        bats = try c.decodeIfPresent(BattingSide.self, forKey: .bats)
+        throwsWith = try c.decodeIfPresent(Hand.self, forKey: .throwsWith)
+        walkUpSongID = try c.decodeIfPresent(SongID.self, forKey: .walkUpSongID)
+        warmUpSongID = try c.decodeIfPresent(SongID.self, forKey: .warmUpSongID)
+        extraWarmUpSongIDs = try c.decodeIfPresent([SongID].self, forKey: .extraWarmUpSongIDs) ?? []
+        introduction = try c.decodeIfPresent(AnnouncerIntroduction.self, forKey: .introduction)
+        usualPosition = try c.decodeIfPresent(Position.self, forKey: .usualPosition)
+        usualRole = try c.decodeIfPresent(UsualRole.self, forKey: .usualRole)
+        usuallyLeadsOff = try c.decodeIfPresent(Bool.self, forKey: .usuallyLeadsOff) ?? false
+    }
+
+    /// Writes a player to a file, leaving out the leadoff mark when it is off and the extra
+    /// warm-up songs when there are none, so files stay short.
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(id, forKey: .id)
+        try c.encodeIfPresent(name, forKey: .name)
+        try c.encodeIfPresent(number, forKey: .number)
+        try c.encodeIfPresent(placeholder, forKey: .placeholder)
+        try c.encodeIfPresent(surname, forKey: .surname)
+        try c.encodeIfPresent(bats, forKey: .bats)
+        try c.encodeIfPresent(throwsWith, forKey: .throwsWith)
+        try c.encodeIfPresent(walkUpSongID, forKey: .walkUpSongID)
+        try c.encodeIfPresent(warmUpSongID, forKey: .warmUpSongID)
+        if !extraWarmUpSongIDs.isEmpty { try c.encode(extraWarmUpSongIDs, forKey: .extraWarmUpSongIDs) }
+        try c.encodeIfPresent(introduction, forKey: .introduction)
+        try c.encodeIfPresent(usualPosition, forKey: .usualPosition)
+        try c.encodeIfPresent(usualRole, forKey: .usualRole)
+        if usuallyLeadsOff { try c.encode(true, forKey: .usuallyLeadsOff) }
     }
 
     /// What to call this player on screen: their name, else "#22", else the
@@ -58,16 +131,42 @@ public struct Player: Identifiable, Codable, Equatable, Hashable, Sendable {
         return "Unknown player"
     }
 
-    /// The last word of the name, for box scores ("Jeter"). Falls back to `displayName`.
+    /// The last name on its own, for box scores and tight spots: the `surname` when there is
+    /// one ("Torres"), else the last word of the name ("Jeter"). Falls back to `displayName`.
     public var lastName: String {
+        if let surname, !surname.isEmpty, name?.isEmpty == false { return surname }
         guard let name, let last = name.split(separator: " ").last else { return displayName }
         return String(last)
+    }
+
+    /// The first initial and the last name, for the field drawing and other tight spots where
+    /// teammates share a last name: "J. Webb". Just the name when it is one word, else
+    /// `displayName`.
+    public var initialAndLastName: String {
+        guard let name else { return displayName }
+        let words = name.split(separator: " ")
+        guard words.count > 1, let initial = words.first?.first else { return lastName }
+        return "\(initial). \(lastName)"
     }
 
     /// True when the scorer knows neither a name nor a number yet.
     public var isUnnamed: Bool {
         (name?.isEmpty ?? true) && (number?.isEmpty ?? true)
     }
+}
+
+/// Whether a player usually bats, fields, both, or starts on the bench. The league lets a team
+/// bat any number of hitters while nine players field, so some players only bat and some only
+/// field. Used for the first game's lineup, before there is a last game to copy.
+public enum UsualRole: String, Codable, Sendable, CaseIterable {
+    /// Bats and plays the field (at their usual position, if they have one).
+    case batsAndFields
+    /// Bats but does not play the field.
+    case batsOnly
+    /// Plays the field but does not bat.
+    case fieldsOnly
+    /// Usually starts the game on the bench.
+    case startsOnBench
 }
 
 /// The stadium announcer's "Now batting, number two, Derek Jeter. Number two."
@@ -80,6 +179,10 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
         case imported
         /// The iPhone's built-in speech voice reads the number and name.
         case phoneVoice
+        /// Put together at play time from short recordings shared by the whole team
+        /// ("Now batting," and every number) and one of this player's name, so a new jersey
+        /// number needs no new recording. `fileName` is the name recording.
+        case pieced
     }
 
     public var source: Source
@@ -89,6 +192,32 @@ public struct AnnouncerIntroduction: Codable, Equatable, Hashable, Sendable {
     public init(source: Source, fileName: String? = nil) {
         self.source = source
         self.fileName = fileName
+    }
+
+    // The shared pieces of a `pieced` introduction, in the app's audio folder. The team
+    // loader copies them in from ~/Dropbox/baseball/intros/.
+
+    /// "Now batting,"
+    public static let nowBattingFile = "announcer-now-batting.m4a"
+
+    /// "Number twenty-two," said mid-sentence, for jersey number "22" (or "00").
+    public static func numberFile(_ number: String) -> String {
+        "announcer-number-\(number).m4a"
+    }
+
+    /// A player's name recording, from the plain file name stem "aidan-kurt".
+    public static func nameFile(_ stem: String) -> String {
+        "announcer-name-\(stem).m4a"
+    }
+
+    /// The plain file name stem for a player's name: "Joaquín Cañas" gives "joaquin-canas".
+    /// Lower case, accents dropped, every run of other characters a single dash. The team
+    /// loader, tools/record_intros.py and a name recorded in the app all use this rule, so a
+    /// name recording made in either place has the same file name.
+    public static func nameStem(_ name: String) -> String {
+        let plain = name.lowercased().folding(options: .diacriticInsensitive, locale: nil)
+        let words = plain.map { $0.isASCII && ($0.isLetter || $0.isNumber) ? $0 : " " }
+        return String(words).split(separator: " ").joined(separator: "-")
     }
 }
 
@@ -138,6 +267,8 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
     public var id: SongID
     /// The name shown in the app. Starts as the file name; the scorer can rename it.
     public var title: String
+    /// Who recorded it, if the scorer knows or the file said: "AC/DC". Shown under the title.
+    public var artist: String?
     /// The audio file's name inside the app's `songs/audio/` folder.
     public var fileName: String
     /// Seconds into the track where the walk-up clip starts (the hook).
@@ -157,10 +288,12 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
         startTime: TimeInterval = 0,
         playLength: TimeInterval? = nil,
         volume: Double = 1,
-        duration: TimeInterval? = nil
+        duration: TimeInterval? = nil,
+        artist: String? = nil
     ) {
         self.id = id
         self.title = title
+        self.artist = artist
         self.fileName = fileName
         self.startTime = startTime
         self.playLength = playLength

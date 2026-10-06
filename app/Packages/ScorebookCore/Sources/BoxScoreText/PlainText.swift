@@ -37,8 +37,9 @@ enum PlainText {
 
         sections.append(lineScoreLines(box.lineScore, labelWidth: labelWidth, battingWidths: battingWidths))
 
+        // Each kind of note on its own line.
         if !box.notes.isEmpty {
-            sections.append([box.notes.joined(separator: " ")])
+            sections.append(box.notes)
         }
 
         // Both pitching tables in one block, each under its own heading.
@@ -46,7 +47,7 @@ enum PlainText {
         sections.append(box.pitching.flatMap { lines(for: $0, labelWidth: labelWidth, columnWidths: pitchingWidths) })
 
         if !box.pitchingNotes.isEmpty {
-            sections.append([box.pitchingNotes.joined(separator: " ")])
+            sections.append(box.pitchingNotes)
         }
 
         return sections.map { $0.joined(separator: "\n") }.joined(separator: "\n\n")

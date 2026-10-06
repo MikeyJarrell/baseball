@@ -53,7 +53,7 @@ public struct GameMenuSheet: View {
                     }
                 }
                 Card {
-                    OptionRow(title: "End game", detail: "Time limit reached, or the last out", end: .chevron,
+                    OptionRow(title: "End game", end: .chevron,
                               action: { askingToEnd = true }) {
                         IconBadge(systemName: "flag.checkered", tint: ScorebookColor.out)
                     }
@@ -91,12 +91,7 @@ public struct GameMenuSheet: View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             HStack(spacing: Spacing.medium) {
                 IconBadge(systemName: "speaker.wave.2")
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Walk-up song length").font(ScorebookFont.headline)
-                    Text("Fades by itself after the introduction and this much song")
-                        .font(ScorebookFont.caption)
-                        .foregroundStyle(ScorebookColor.textSecondary)
-                }
+                Text("Walk-up song length").font(ScorebookFont.headline)
             }
             Stepper(value: seconds, in: 4...60, step: 1) {
                 Text("\(Int(seconds.wrappedValue)) seconds").font(ScorebookFont.headline).monospacedDigit()
@@ -118,11 +113,10 @@ public struct GameMenuSheet: View {
         return "\(end.formatted(date: .omitted, time: .shortened)) · \(left)"
     }
 
-    /// "Diamond Dogs 5, Mudcats 3".
+    /// "Mudcats 3, Diamond Dogs 5": the visiting team first, as in the newspaper box score.
     private var scoreLine: String {
-        let first = context.ourSide ?? .away
         let score = context.situation.score
-        return "\(context.teamName(first)) \(score[first]), \(context.teamName(first.opponent)) \(score[first.opponent])"
+        return "\(context.teamName(.away)) \(score.away), \(context.teamName(.home)) \(score.home)"
     }
 
     /// Records the end of the game, with the score as it stands.

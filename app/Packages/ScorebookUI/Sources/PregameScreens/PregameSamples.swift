@@ -3,7 +3,7 @@
 // Our last game was at the Bombers (known only by numbers) on May 9; the game before that was
 // the Mudcats at home on May 2, with Pat Quinn and Robin Nash taking turns at first base. The
 // saved opponents are the Mudcats (full roster), the Bombers (numbers only) and the Riverhawks
-// (no saved roster, so their lineup is unknown). Today is Saturday, May 23.
+// (no saved roster, so their lineup starts as nine blank numbers). Today is Saturday, May 23.
 
 import Foundation
 import Model
@@ -42,27 +42,38 @@ public enum PregameSamples {
         today: today
     )
 
-    /// Each of our players' usual position and role, as the roster screen would record them.
-    public static let usualRoles: [PlayerID: UsualRole] = [
-        "d1": UsualRole(position: .secondBase, leadsOff: true),
-        "d2": UsualRole(position: .shortstop),
-        "d3": UsualRole(position: .centerField),
-        "d4": UsualRole(position: .firstBase),
-        "d5": UsualRole(position: .thirdBase),
-        "d6": UsualRole(position: .leftField),
-        "d7": UsualRole(position: .rightField),
-        "d8": UsualRole(position: .catcher),
-        "d9": UsualRole(position: .pitcher),
-        "d10": UsualRole(),
-        "d11": UsualRole(position: .firstBase, startsOnBench: true),
-        "d12": UsualRole(position: .pitcher, startsOnBench: true),
-    ]
+    /// Our team before the first game, with each player's usual position and role filled in
+    /// as the roster screen would record them: Moreno usually leads off, Cole is the DH, and
+    /// Nash and Voss usually start on the bench.
+    public static let diamondDogsWithUsuals: Team = {
+        let usual: [PlayerID: (Position?, UsualRole, Bool)] = [
+            "d1": (.secondBase, .batsAndFields, true),
+            "d2": (.shortstop, .batsAndFields, false),
+            "d3": (.centerField, .batsAndFields, false),
+            "d4": (.firstBase, .batsAndFields, false),
+            "d5": (.thirdBase, .batsAndFields, false),
+            "d6": (.leftField, .batsAndFields, false),
+            "d7": (.rightField, .batsAndFields, false),
+            "d8": (.catcher, .batsAndFields, false),
+            "d9": (.pitcher, .batsAndFields, false),
+            "d10": (nil, .batsOnly, false),
+            "d11": (.firstBase, .startsOnBench, false),
+            "d12": (.pitcher, .startsOnBench, false),
+        ]
+        var team = SampleTeams.diamondDogs
+        for i in team.roster.indices {
+            guard let (position, role, leadsOff) = usual[team.roster[i].id] else { continue }
+            team.roster[i].usualPosition = position
+            team.roster[i].usualRole = role
+            team.roster[i].usuallyLeadsOff = leadsOff
+        }
+        return team
+    }()
 
     /// Before our first game: no games yet, so our lineup starts from the roster.
     public static let firstGameInput = PregameInput(
-        ourTeam: SampleTeams.diamondDogs,
+        ourTeam: diamondDogsWithUsuals,
         opponents: [SampleTeams.mudcats, SampleTeams.bombers, riverhawks],
-        usualRoles: usualRoles,
         today: today
     )
 

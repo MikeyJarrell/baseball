@@ -67,12 +67,20 @@ public enum AtBatAction: Equatable, Sendable {
     case openSongSettings
     /// Open the song picker for one of our hitters who has no walk-up song.
     case pickSong(for: PlayerID)
+    /// Go to the home screen (the game menu's Home screen). The game stays in progress, saved,
+    /// and the home screen's Resume scoring brings it back.
+    case goHome
 
     /// Play our hitter's walk-up song, with the announcer introduction first when asked.
     case playWalkUp(Player, withIntroduction: Bool)
     /// Play our pitcher's warm-up song at the changeover when our team takes the field.
     case playWarmUp(Player)
-    /// Stop whatever is playing now (a tap on a playing song button).
+    /// Open the game details: date, start time, innings, home and away.
+    case openGameDetails
+    /// Open the warm-up songs for our pitcher: pick more, or play a different one now.
+    case pickWarmUpSongs(Player)
+    /// Stop whatever is playing now (a tap on a playing song button). It fades out over two
+    /// seconds; a second tap while it fades stops it at once.
     case stopSong
     /// Fade out whatever is playing: a pitch was recorded while the warm-up song played, or
     /// while a walk-up song played with "fade on the first pitch" switched on.
@@ -108,6 +116,9 @@ public enum SongPlayback: Equatable, Sendable {
 ///   - clock: The game clock at a moment, from the rules engine (`RulesEngine.clock(for:at:)`).
 ///     The screen asks it again every few seconds, so the time left and the "Is the game over?"
 ///     question keep up with the clock between events.
+///   - countAfter: What a pitch would do to the count, from the rules engine
+///     (`RulesEngine.countAfter(_:in:)`), for the words under Ball, Strike and Foul. Leave it out
+///     to use the plain count rules.
 ///   - onAction: Called with everything the scorer taps.
 public struct AtBatScreen: View {
     public var setup: GameSetup
@@ -119,6 +130,7 @@ public struct AtBatScreen: View {
     public var undoLabel: String?
     public var redoLabel: String?
     public var clock: (Date) -> GameClock
+    public var countAfter: (PitchResult) -> CountChange
     public var onAction: (AtBatAction) -> Void
 
     public init(
@@ -131,6 +143,7 @@ public struct AtBatScreen: View {
         undoLabel: String? = nil,
         redoLabel: String? = nil,
         clock: ((Date) -> GameClock)? = nil,
+        countAfter: ((PitchResult) -> CountChange)? = nil,
         onAction: @escaping (AtBatAction) -> Void
     ) {
         self.setup = setup
@@ -143,6 +156,8 @@ public struct AtBatScreen: View {
         self.redoLabel = redoLabel
         // Without a clock, read the stored facts as they are (the stand-in engines' clock).
         self.clock = clock ?? { [situation] now in simpleClock(for: situation, at: now) }
+        // Without the rules engine, the plain count rules give the same words.
+        self.countAfter = countAfter ?? { [count = situation.count] pitch in CountChange.after(pitch, from: count) }
         self.onAction = onAction
     }
 
@@ -152,7 +167,8 @@ public struct AtBatScreen: View {
         TimelineView(.periodic(from: .now, by: 15)) { context in
             AtBatLayout(info: AtBatInfo(setup: setup, situation: situation, batterHistory: batterHistory,
                                         songs: songs, settings: settings, songPlayback: songPlayback,
-                                        undoLabel: undoLabel, redoLabel: redoLabel, clock: clock(context.date)),
+                                        undoLabel: undoLabel, redoLabel: redoLabel, clock: clock(context.date),
+                                        countAfter: countAfter),
                         onAction: onAction)
         }
     }
@@ -172,6 +188,8 @@ struct AtBatInfo {
     var undoLabel: String?
     var redoLabel: String?
     var clock: GameClock
+    /// What each pitch would do to the count, from the rules engine.
+    var countAfter: (PitchResult) -> CountChange
 
     /// True when our team is batting.
     var weAreBatting: Bool { setup.ourSide == situation.battingSide }

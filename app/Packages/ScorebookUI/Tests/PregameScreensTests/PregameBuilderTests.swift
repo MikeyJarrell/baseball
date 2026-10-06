@@ -59,7 +59,7 @@ struct LineupStartTests {
 
     @Test("Before the first game: usual positions, the leadoff hitter first, the usual bench on the bench")
     func fromRoster() {
-        let lineup = OurLineup.fromRoster(roster, usual: PregameSamples.usualRoles)
+        let lineup = OurLineup.fromRoster(PregameSamples.diamondDogsWithUsuals.roster)
         #expect(lineup.battingOrder.first == "d1")
         #expect(lineup.battingOrder.count == 10)
         #expect(!lineup.battingOrder.contains("d11"))
@@ -69,7 +69,20 @@ struct LineupStartTests {
         #expect(lineup.defense[.firstBase] == "d4")
         #expect(lineup.defense[.pitcher] == "d9")
         #expect(lineup.emptyPositions.isEmpty)
-        // Cole has no usual position: he bats only.
+        // Cole bats only.
+        #expect(lineup.position(of: "d10") == nil)
+    }
+
+    @Test("Only fielding keeps a player out of the batting order; no role set means bat and field")
+    func fieldsOnlyAndNoRole() {
+        var roster = PregameSamples.diamondDogsWithUsuals.roster
+        // Barros (d9) fields but does not bat; Cole (d10) has no role set and no position.
+        roster[8].usualRole = .fieldsOnly
+        roster[9].usualRole = nil
+        let lineup = OurLineup.fromRoster(roster)
+        #expect(!lineup.battingOrder.contains("d9"))
+        #expect(lineup.defense[.pitcher] == "d9")
+        #expect(lineup.battingOrder.contains("d10"))
         #expect(lineup.position(of: "d10") == nil)
     }
 
@@ -110,7 +123,7 @@ struct ThreeListsTests {
         lineup.addToOrder("d12")
         #expect(lineup.battingOrder.last == "d12")
         #expect(lineup.battingOrder.count == 11)
-        #expect(PregameWording.fieldingLine(for: "d12", in: lineup) == "Bats only")
+        #expect(PregameWording.fieldingLine(for: "d12", in: lineup) == "DH")
     }
 
     @Test("Dragging the ninth hitter to leadoff moves everyone else down one")
@@ -253,7 +266,7 @@ struct AlternatingTests {
 
 // MARK: - Their lineup, three ways
 
-@Suite("Their lineup: names, numbers only, or unknown")
+@Suite("Their lineup: names and numbers, or numbers only")
 struct TheirLineupTests {
     @Test("The Mudcats: names, their batting order from May 2, their May 2 starter pitching")
     func fullRoster() {
@@ -283,23 +296,52 @@ struct TheirLineupTests {
         #expect(team.startingPitcher == "b11")   // number 44 pitched against us May 9
     }
 
-    @Test("The Riverhawks: unknown, nine placeholders, and a placeholder pitcher who does not bat")
-    func unknown() {
-        var draft = PregameSamples.draft(against: "riverhawks")
+    @Test("The Riverhawks, with no saved roster: nine blank numbers, placeholders, and a placeholder pitcher who does not bat")
+    func noSavedRoster() {
+        let draft = PregameSamples.draft(against: "riverhawks")
         let riverhawks = PregameSamples.riverhawks
-        #expect(draft.theirs.mode == .unknown)
-        var team = draft.theirs.gameTeam(for: riverhawks)
+        #expect(draft.theirs.mode == .numbers)
+        let team = draft.theirs.gameTeam(for: riverhawks)
         #expect(team.battingOrder.compactMap { team.player($0)?.displayName } == (1...9).map { "Batter \($0)" })
         let pitcher = team.startingPitcher
         #expect(pitcher.flatMap(team.player)?.displayName == "Pitcher")
         #expect(!team.battingOrder.contains(pitcher ?? ""))
-        // Changing the count up and back keeps the same placeholders.
-        let before = team.battingOrder
-        draft.theirs.setUnknownCount(11)
-        draft.theirs.setUnknownCount(10)
-        team = draft.theirs.gameTeam(for: riverhawks)
-        #expect(team.battingOrder.count == 10)
-        #expect(Array(team.battingOrder.prefix(9)) == before)
+    }
+
+    @Test("A number typed in a Mudcats row is used in the game and saved back to their roster")
+    func numberTypedInNamesRow() throws {
+        var draft = PregameSamples.draft(against: "mudcats")
+        #expect(draft.theirs.mode == .names)
+        draft.theirs.setNumber("#2a3", for: "m3")   // Marcus Hale, #24 on the saved roster
+        let setup = try #require(draft.setup(calendar: pacific))
+        #expect(setup.away.player("m3")?.number == "23")
+        let saved = PregameBuilder.updatedTeam(saved: SampleTeams.mudcats, from: setup.away)
+        #expect(saved.player("m3")?.number == "23")
+        #expect(saved.player("m3")?.name == "Marcus Hale")
+        #expect(saved.roster.count == SampleTeams.mudcats.roster.count)
+        // Erasing the number back to blank keeps the saved one.
+        draft.theirs.setNumber("", for: "m3")
+        #expect(draft.setup(calendar: pacific)?.away.player("m3")?.number == "24")
+    }
+
+    @Test("Numbers typed for a team with no saved roster join it; blanks do not")
+    func numbersSavedToNewRoster() throws {
+        var draft = PregameSamples.draft(against: "riverhawks")
+        let first = try #require(draft.theirs.numbers.first?.id)
+        draft.theirs.setNumber("17", forEntry: first)
+        let setup = try #require(draft.setup(calendar: pacific))
+        let saved = PregameBuilder.updatedTeam(saved: PregameSamples.riverhawks, from: setup.away)
+        #expect(saved.roster.map(\.number) == ["17"])
+    }
+
+    @Test("Dragging reorders their batting order, both ways in")
+    func dragTheirOrder() {
+        var draft = PregameSamples.draft(against: "mudcats")
+        draft.theirs.namedOrder.move(fromOffsets: [8], toOffset: 0)
+        #expect(draft.theirs.battingOrder(for: SampleTeams.mudcats).prefix(2) == ["m9", "m1"])
+        var bombers = PregameSamples.draft(against: "bombers")
+        bombers.theirs.numbers.move(fromOffsets: [0], toOffset: 9)
+        #expect(bombers.theirs.numbers.map(\.number).last == "2")
     }
 
     @Test("A new pitcher typed in starts, joins their roster, and is saved to the team afterward")
@@ -314,11 +356,30 @@ struct TheirLineupTests {
         #expect(saved.roster.last?.number == "55")
     }
 
-    @Test("Saving an unknown lineup's team adds no placeholders")
+    @Test("Saving a lineup of blank numbers adds no placeholders")
     func placeholdersNotSaved() throws {
         let draft = PregameSamples.draft(against: "riverhawks")
         let setup = try #require(draft.setup(calendar: pacific))
         #expect(PregameBuilder.updatedTeam(saved: PregameSamples.riverhawks, from: setup.away).roster.isEmpty)
+    }
+}
+
+// MARK: - Wording
+
+@Suite("What the lists say about our players")
+struct OurWordingTests {
+    @Test("Where each player is now, on the fielding step's list")
+    func status() {
+        var lineup = OurLineup.fromLastGame(SampleSetups.mudcatsAtDiamondDogsAlternatingFirstBase.home, roster: roster)
+        lineup.assign("d12", to: .pitcher)   // Voss pitches without batting
+        #expect(PregameWording.status(of: "d2", in: lineup) == "Shortstop · bats 2nd")
+        #expect(PregameWording.status(of: "d12", in: lineup) == "Pitcher · doesn’t bat")
+        #expect(PregameWording.status(of: "d9", in: lineup) == "DH · bats 9th")
+        #expect(PregameWording.status(of: "d4", in: lineup) == "First base, odd innings · bats 4th")
+        #expect(PregameWording.status(of: "d11", in: lineup) == "First base, even innings · doesn’t bat")
+        lineup.removeFromOrder("d10")
+        #expect(PregameWording.status(of: "d10", in: lineup) == "Bench")
+        #expect(PregameWording.ordinal(11) == "11th" && PregameWording.ordinal(22) == "22nd" && PregameWording.ordinal(3) == "3rd")
     }
 }
 
@@ -367,15 +428,21 @@ struct PitcherTests {
 
 @Suite("Date, start and the time limit as a clock time")
 struct DetailsTests {
-    @Test("9:00 AM start, time limit 12:00 PM, and the limit moves with the start")
-    func clockTimes() {
+    @Test("9:00 AM start, time limit 12:00 PM; the wheels take any minute and the limit moves with the start")
+    func clockTimes() throws {
         var details = GameDetails(day: PregameSamples.today)
         #expect(clock(details.scheduledStart(calendar: pacific)) == "9:00 AM")
         #expect(clock(details.timeLimitEnd(calendar: pacific)) == "12:00 PM")
-        details.moveStart(by: 15)
-        #expect(clock(details.timeLimitEnd(calendar: pacific)) == "12:15 PM")
-        details.moveTimeLimit(by: -5)
+        // The start wheel set to 1:03 PM: the limit stays three hours later, 4:03 PM.
+        let oneOhThree = try #require(pacific.date(bySettingHour: 13, minute: 3, second: 0, of: details.day))
+        details.setStart(oneOhThree, calendar: pacific)
+        #expect(clock(details.scheduledStart(calendar: pacific)) == "1:03 PM")
+        #expect(clock(details.timeLimitEnd(calendar: pacific)) == "4:03 PM")
+        // The limit wheel set to 3:58 PM: two hours fifty-five after the start.
+        let threeFiftyEight = try #require(pacific.date(bySettingHour: 15, minute: 58, second: 0, of: details.day))
+        details.setTimeLimitEnd(threeFiftyEight, calendar: pacific)
         #expect(details.timeLimitMinutes == 175)
+        #expect(details.rules.timeLimitMinutes == 175)
         #expect(PregameWording.day(details.day, calendar: pacific) == "Sat, May 23")
     }
 
@@ -435,12 +502,12 @@ struct SetupTests {
         #expect(draft.setup() == nil)
     }
 
-    @Test("A new opponent gets the name typed and an unknown lineup")
+    @Test("A new opponent gets the name typed and nine blank numbers")
     func newOpponent() throws {
         var draft = PregameDraft(input: PregameSamples.input, newOpponentID: "sharks")
         draft.chooseOpponent(.new)
         draft.newOpponentName = "  Sharks "
-        #expect(draft.theirs.mode == .unknown)
+        #expect(draft.theirs.mode == .numbers)
         let setup = try #require(draft.setup(calendar: pacific))
         #expect(setup.away.name == "Sharks" && setup.away.teamID == "sharks")
         #expect(setup.away.battingOrder.count == 9)

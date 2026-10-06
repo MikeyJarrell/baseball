@@ -14,9 +14,8 @@ import DesignSystem
 /// Our team's season stats.
 ///
 /// - Parameters:
-///   - totals: The season totals from the stats engine.
-///   - games: The games list, for the season record ("9 wins, 5 losses"). Leave it empty to
-///     show no record.
+///   - totals: The season totals from the stats engine, with the season record ("9 wins,
+///     5 losses") and each pitcher's wins and losses.
 ///   - minimumPlateAppearances: Where the hitters' filter starts: hitters with fewer plate
 ///     appearances show a dash for their averages. 10, as in the mockup; 0 shows everyone's.
 ///     Pass back the last choice the screen handed back, so it is remembered.
@@ -26,7 +25,6 @@ import DesignSystem
 ///     picks (`setMinimumPlateAppearances`, `setMinimumInnings`) for the app to keep.
 public struct SeasonStatsScreen: View {
     public var totals: SeasonTotals
-    public var games: [GameSummary]
     public var onRequest: (PostgameRequest) -> Void
 
     /// Which table is showing.
@@ -44,10 +42,9 @@ public struct SeasonStatsScreen: View {
     @State private var minimumPlateAppearances: Int
     @State private var minimumInnings: Int
 
-    public init(totals: SeasonTotals, games: [GameSummary] = [], minimumPlateAppearances: Int = 10,
+    public init(totals: SeasonTotals, minimumPlateAppearances: Int = 10,
                 minimumInnings: Int = 3, onRequest: @escaping (PostgameRequest) -> Void) {
         self.totals = totals
-        self.games = games
         self.onRequest = onRequest
         _minimumPlateAppearances = State(initialValue: minimumPlateAppearances)
         _minimumInnings = State(initialValue: minimumInnings)
@@ -88,7 +85,7 @@ public struct SeasonStatsScreen: View {
             case .pitching: pitchingTable
             }
 
-            Text("Tap a column to sort. The table scrolls sideways; names stay put.")
+            Text("Tap a column to sort.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
                 .padding(.horizontal, Spacing.large)
@@ -109,7 +106,7 @@ public struct SeasonStatsScreen: View {
     /// "Diamond Dogs · 14 games · 9 wins, 5 losses".
     private var subtitle: String {
         var parts = [totals.teamName, PostgameWording.counted(totals.games, "game", "games")]
-        if let record = PostgameWording.record(games) { parts.append(record) }
+        if let record = PostgameWording.record(totals) { parts.append(record) }
         return parts.joined(separator: " · ")
     }
 
@@ -131,7 +128,7 @@ public struct SeasonStatsScreen: View {
         }
         return Group {
             if rows.isEmpty {
-                emptyMessage("No hitters yet. Stats appear here after the first game.")
+                emptyMessage("No hitters yet.")
             } else {
                 StatsTable(
                     rows: rows, nameTitle: "Player", name: \.name, columns: columns,
@@ -156,7 +153,7 @@ public struct SeasonStatsScreen: View {
                 width: column.isRate ? 54 : pitchingWidth(column),
                 text: { line in
                     if column.isRate && StatSorting.hidesRates(line, minimumInnings: minimum) { return "—" }
-                    return column.text(line.stats, games: line.games)
+                    return column.text(line)
                 },
                 isDimmed: { line in column.isRate && StatSorting.hidesRates(line, minimumInnings: minimum) }
             )
@@ -181,11 +178,11 @@ public struct SeasonStatsScreen: View {
         }
     }
 
-    /// How wide a pitching count column is: room for "58.1" innings and three-digit batters
-    /// faced and pitches.
+    /// How wide a pitching count column is: room for "58.1" innings, three-digit batters
+    /// faced and pitches, and "10-10" wins and losses.
     private func pitchingWidth(_ column: PitchingColumn) -> CGFloat {
         switch column {
-        case .innings, .battersFaced, .pitches, .hitBatters: 44
+        case .innings, .battersFaced, .pitches, .hitBatters, .winsAndLosses: 44
         default: 34
         }
     }

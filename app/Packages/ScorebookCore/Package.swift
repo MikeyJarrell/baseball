@@ -23,6 +23,10 @@ let package = Package(
         .library(name: "Stats", targets: ["Stats"]),
         .library(name: "BoxScoreText", targets: ["BoxScoreText"]),
         .library(name: "Storage", targets: ["Storage"]),
+        .library(name: "Scoring", targets: ["Scoring"]),
+        .library(name: "TeamImport", targets: ["TeamImport"]),
+        .executable(name: "TeamLoader", targets: ["TeamLoader"]),
+        .executable(name: "StatsSite", targets: ["StatsSite"]),
     ],
     targets: [
         // The shared vocabulary: players, teams, events, plays, the situation, box scores.
@@ -46,6 +50,23 @@ let package = Package(
         // Saving and loading teams, games and the song list as JSON files.
         .target(name: "Storage", dependencies: ["Model"]),
 
+        // One game being scored: saves each event through storage, replays the game through
+        // the rules engine and works out the box score. The app shell holds one while a game
+        // is open.
+        .target(name: "Scoring", dependencies: ["Model", "GameEngine", "Stats"]),
+
+        // Turning the roster files in the repository's team/ folder into saved teams and
+        // songs, merged with whatever the app already has.
+        .target(name: "TeamImport", dependencies: ["Model"]),
+
+        // The Mac command the loader script (tools/load_team.sh) runs on a copy of the
+        // phone's saved files.
+        .executableTarget(name: "TeamLoader", dependencies: ["Model", "Storage", "TeamImport"]),
+
+        // The Mac command the stats website script (tools/publish_stats.sh) runs on a copy of
+        // the phone's saved files, to write the public stats pages.
+        .executableTarget(name: "StatsSite", dependencies: ["Model", "Storage", "GameEngine", "Stats", "BoxScoreText"]),
+
         // Test helper: bundles the Tests/Scenarios folder and loads a scenario in one line.
         // It lives under Tests/ so the scenario files sit beside the tests that use them.
         // The test folders are excluded so this module only picks up its own code.
@@ -55,7 +76,7 @@ let package = Package(
             path: "Tests",
             exclude: [
                 "ModelTests", "GameEngineTests", "StatsTests",
-                "BoxScoreTextTests", "StorageTests",
+                "BoxScoreTextTests", "StorageTests", "ScoringTests", "TeamImportTests",
             ],
             sources: ["TestSupport"],
             resources: [.copy("Scenarios")]
@@ -75,5 +96,12 @@ let package = Package(
 
         // Tests of saving and loading.
         .testTarget(name: "StorageTests", dependencies: ["Storage", "Model", "SampleData", "TestSupport"]),
+
+        // Tests of scoring a game: saving each event, undo and redo, automatic outs, and whole
+        // games scored event by event matching their box scores.
+        // Tests of reading the roster files and merging them with saved teams.
+        .testTarget(name: "TeamImportTests", dependencies: ["TeamImport", "Model"]),
+
+        .testTarget(name: "ScoringTests", dependencies: ["Scoring", "Storage", "GameEngine", "Stats", "Model", "SampleData", "TestSupport"]),
     ]
 )

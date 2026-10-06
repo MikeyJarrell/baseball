@@ -32,7 +32,7 @@ struct RunnersStep: View {
                     .battingTeam(model.battingLook)
                     .frame(maxHeight: 230)
                     .padding(.horizontal, Spacing.screenEdge)
-                Text("Dot = the app’s guess. Tap any base to change it.")
+                Text("Dot = a guess. Tap a base to change it.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -54,7 +54,7 @@ struct RunnersStep: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomBar(title: bottomTitle(preview), detail: bottomDetail(preview), problem: model.runnerProblem) {
+            BottomBar(title: bottomTitle(preview), detail: "", problem: model.runnerProblem) {
                 SaveButton(enabled: model.canSave) { model.perform(.save) }
             }
         }
@@ -118,13 +118,6 @@ struct RunnersStep: View {
     private func bottomTitle(_ preview: PlayPreview) -> String {
         preview.endsHalfInning ? "Three outs" : "\(PlayWords.outs(preview.outsAfter)) after this"
     }
-
-    /// The line under it: what saving does next.
-    private func bottomDetail(_ preview: PlayPreview) -> String {
-        if preview.endsHalfInning { return "Saving switches sides" }
-        if preview.endsGame { return "Home team ahead: the app asks if the game is over" }
-        return "Then the next batter is up"
-    }
 }
 
 /// One runner's row: who they are, where they started, and a button for every place they
@@ -158,6 +151,8 @@ struct RunnerRow: View {
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(Text(model.name(of: move.runner)))
+        // A fixed name for simulator tests, so they find this runner's buttons by player.
+        .accessibilityIdentifier("runner-row-\(move.runner.rawValue)")
     }
 
     /// One base button: "1st", "2nd", "3rd", "Home" or "Out".
@@ -222,6 +217,9 @@ struct ExtraBaseQuestion: View {
         .background(ScorebookColor.warning.opacity(0.18), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         .padding(.leading, 92)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        // Grouped under a fixed name for simulator tests; VoiceOver still reads each button.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("extra-base-question-\(move.runner.rawValue)")
     }
 
     /// One half of the "on the throw / on an error" switch.
@@ -269,6 +267,9 @@ struct OutQuestion: View {
         .background(ScorebookColor.out.opacity(0.12), in: RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous))
         .padding(.leading, 92)
         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        // Grouped under a fixed name for simulator tests; VoiceOver still reads each button.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("out-question-\(move.runner.rawValue)")
     }
 }
 

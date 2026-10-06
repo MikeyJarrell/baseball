@@ -71,7 +71,7 @@ public struct ManualAdjustmentSheet: View {
     public var body: some View {
         SheetFrame(title: "Manual adjustment", subtitle: "\(situation.half == .top ? "Top" : "Bottom") \(ordinal(situation.inning))",
                    onCancel: { onFinish(.cancel) }) {
-            WarningBox(Text("This overrides the book. Use it only when the field and the book disagree and nobody can say why. Runs added here go to the team in this inning, credited to no player and charged to no pitcher."))
+            WarningBox(Text("Overrides the book. Runs added here count for the team only, not for any player or pitcher."))
 
             SectionLabel("Outs")
             SegmentedChoice(options: [(0, "0"), (1, "1"), (2, "2")], selection: $outs)

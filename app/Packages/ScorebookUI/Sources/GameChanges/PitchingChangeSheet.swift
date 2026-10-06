@@ -4,6 +4,9 @@
 // Pitchers who may come back (each removed pitcher may pitch again once per game, rule
 // 9.12 B) are listed first, from the situation's `eligibleToPitchAgain`. Anyone else who has
 // pitched today is under "Someone else". Nothing is blocked; the scorer records what happened.
+//
+// The new pitcher can take any batting spot, or none: usually the old pitcher's, but it may be
+// the spot of the pinch hitter who just batted for them.
 
 import SwiftUI
 import Model
@@ -31,8 +34,9 @@ public struct PitchingChangeSheet: View {
     @State private var newHand: Hand?
     /// Where the old pitcher goes; missing means they leave the field.
     @State private var oldPitcherMovesTo: Position?
-    /// True when the new pitcher takes the old pitcher's batting spot.
-    @State private var takesBattingSpot = false
+    /// The player whose batting spot the new pitcher takes: usually the old pitcher, or the
+    /// pinch hitter who just batted for them. Missing means the new pitcher does not bat.
+    @State private var battingSpotOf: PlayerID?
 
     /// - Parameters:
     ///   - context: The game's setup and the situation now.
@@ -94,7 +98,7 @@ public struct PitchingChangeSheet: View {
                 Card {
                     ForEach(Array(canPitchAgain.enumerated()), id: \.element) { i, id in
                         if i > 0 { RowDivider() }
-                        row(for: id, detail: [throwsText(context.player(id)), "Pitched earlier today; may come back once (rule 9.12 B)"])
+                        row(for: id, detail: [throwsText(context.player(id)), "Pitched earlier today; can return once"])
                     }
                 }
             }
@@ -105,7 +109,7 @@ public struct PitchingChangeSheet: View {
                     row(for: player.id, detail: [throwsText(player), whereNow(player.id)])
                     RowDivider()
                 }
-                OptionRow(title: "New pitcher", detail: "Number, name and throwing hand",
+                OptionRow(title: "New pitcher",
                           end: .radio(pick == .newPlayer), action: { pick = .newPlayer }) {
                     IconBadge(systemName: "plus")
                 }
@@ -117,7 +121,7 @@ public struct PitchingChangeSheet: View {
                     Card {
                         ForEach(Array(everyoneElse.enumerated()), id: \.element.id) { i, player in
                             if i > 0 { RowDivider() }
-                            row(for: player.id, detail: ["Already pitched today", "your call"])
+                            row(for: player.id, detail: ["Already pitched today"])
                         }
                     }
                 } else {
@@ -152,7 +156,7 @@ public struct PitchingChangeSheet: View {
             InfoBox(Text("Coming out: \(Text(context.name(outgoing) + hand).bold().foregroundStyle(ScorebookColor.textPrimary)) · \(work)"))
             let count = context.situation.count
             if side == context.situation.fieldingSide, count != .fresh, let batter = context.situation.batter {
-                FootNote("Mid-count: \(count.balls)–\(count.strikes) to \(context.shortName(batter)). The league asks a pitcher to finish the batter unless hurt (rule 9.12 B 2). Your call.")
+                FootNote("Mid-count, \(count.balls)–\(count.strikes) to \(context.shortName(batter)). League rule: a pitcher finishes the batter unless hurt.")
             }
         } else {
             InfoBox(Text("Nobody is pitching for the \(context.teamName(side)) yet."))
@@ -183,29 +187,62 @@ public struct PitchingChangeSheet: View {
                 .frame(minHeight: 52)
                 .contentShape(Rectangle())
             }
-            // Offer the batting spot only when the old pitcher has one and the new one does not.
-            if offersBattingSpot, let spot = context.battingSpot(of: outgoing, side) {
+            // Offer a batting spot only when the new pitcher does not already have one.
+            if offersBattingSpot {
                 RowDivider()
-                Toggle(isOn: $takesBattingSpot) {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Bats in \(oldName)’s spot")
-                            .font(ScorebookFont.headline)
-                        Text("\(ordinal(spot + 1)) in the order; \(oldName) leaves the batting order")
-                            .font(ScorebookFont.caption)
-                            .foregroundStyle(ScorebookColor.textSecondary)
-                    }
-                }
-                .tint(ScorebookColor.highlight)
-                .padding(.horizontal, Spacing.large - 2)
-                .frame(minHeight: 58)
+                battingSpotMenu
             }
         }
     }
 
-    /// True when the old pitcher holds a batting spot and the new one does not, so the new
-    /// pitcher could take it.
+    /// Whose batting spot the new pitcher takes, if any: every spot in the order is offered,
+    /// with the old pitcher's first, since a pinch hitter may have batted for them.
+    private var battingSpotMenu: some View {
+        Menu {
+            Button("Doesn’t bat") { battingSpotOf = nil }
+            ForEach(spotChoices, id: \.self) { id in
+                Button(spotWords(id)) { battingSpotOf = id }
+            }
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(battingSpotOf.map(spotWords) ?? "Doesn’t bat")
+                        .font(ScorebookFont.headline)
+                        .foregroundStyle(ScorebookColor.textPrimary)
+                    if let battingSpotOf {
+                        Text("\(context.shortName(battingSpotOf)) leaves the batting order")
+                            .font(ScorebookFont.caption)
+                            .foregroundStyle(ScorebookColor.textSecondary)
+                    }
+                }
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .foregroundStyle(ScorebookColor.textSecondary)
+            }
+            .padding(.horizontal, Spacing.large - 2)
+            .frame(minHeight: 58)
+            .contentShape(Rectangle())
+        }
+        .accessibilityLabel(Text("Batting spot: \(battingSpotOf.map(spotWords) ?? "Doesn’t bat")"))
+    }
+
+    /// Everyone holding a batting spot now, the old pitcher first, then in batting order.
+    private var spotChoices: [PlayerID] {
+        let holders = state.battingOrder.slots.compactMap(\.current)
+        guard let outgoing, holders.contains(outgoing) else { return holders }
+        return [outgoing] + holders.filter { $0 != outgoing }
+    }
+
+    /// "Bats 9th, in Webb’s spot".
+    private func spotWords(_ id: PlayerID) -> String {
+        let spot = context.battingSpot(of: id, side).map { ordinal($0 + 1) } ?? "?"
+        return "Bats \(spot), in \(context.shortName(id))’s spot"
+    }
+
+    /// True when the new pitcher could take a batting spot: they do not hold one already, and
+    /// the team has a batting order.
     private var offersBattingSpot: Bool {
-        guard let outgoing, context.battingSpot(of: outgoing, side) != nil else { return false }
+        guard !state.battingOrder.slots.isEmpty else { return false }
         return pickedPlayer.flatMap { context.battingSpot(of: $0, side) } == nil
     }
 
@@ -251,7 +288,7 @@ public struct PitchingChangeSheet: View {
             team: side,
             newPitcher: newPitcher,
             previousPitcherMovesTo: oldPitcherMovesTo,
-            takesBattingSpotOf: takesBattingSpot && offersBattingSpot ? outgoing : nil
+            takesBattingSpotOf: offersBattingSpot ? battingSpotOf : nil
         )
         onFinish(.record(EnteredEvent(event: GameEvent(kind: .pitchingChange(change)), newPlayers: newPlayers)))
     }

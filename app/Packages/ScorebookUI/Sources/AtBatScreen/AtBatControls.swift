@@ -16,7 +16,7 @@ struct AtBatControls: View {
             if let redo = info.redoLabel { RedoBar(redoLabel: redo, onAction: onAction) }
             BatterRow(info: info, onAction: onAction)
             ChipRow(info: info, onAction: onAction)
-            CountButtons(count: info.situation.count, onAction: onAction)
+            CountButtons(count: info.situation.count, countAfter: info.countAfter, onAction: onAction)
             SongButton(info: info, onAction: onAction)
         }
     }
@@ -260,6 +260,8 @@ struct WarningChipStyle: ButtonStyle {
 /// swinging strike; the small Called button on it records a called strike in one tap.
 struct CountButtons: View {
     var count: Count
+    /// What each pitch would do to the count, from the rules engine.
+    var countAfter: (PitchResult) -> CountChange
     var onAction: (AtBatAction) -> Void
 
     /// True between a long press on Foul (a foul bunt) and the finger lifting, so the lift does
@@ -275,24 +277,24 @@ struct CountButtons: View {
         Grid(horizontalSpacing: Spacing.screenEdge, verticalSpacing: Spacing.screenEdge) {
             GridRow {
                 Button { pitch(.ball) } label: {
-                    CountButtonLabel("Ball", hint: AtBatWording.ballHint(count))
+                    CountButtonLabel("Ball", hint: AtBatWording.hint(countAfter(.ball)))
                 }
                 .buttonStyle(CountButtonStyle.ball)
                 .accessibilityLabel(Text("Ball"))
-                .accessibilityHint(Text(AtBatWording.ballHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.ball))))
 
                 Button { pitch(.swingingStrike) } label: {
                     // The words keep clear of the Called button: an empty space its width sits
                     // beside them, so they shrink to fit the rest at large text sizes.
                     HStack(spacing: 0) {
-                        CountButtonLabel("Strike", hint: AtBatWording.strikeHint(count))
+                        CountButtonLabel("Strike", hint: AtBatWording.hint(countAfter(.swingingStrike)))
                             .frame(maxWidth: .infinity)
                         Color.clear.frame(width: calledWidth + Spacing.small)
                     }
                 }
                 .buttonStyle(CountButtonStyle.strike)
                 .accessibilityLabel(Text("Strike, swinging"))
-                .accessibilityHint(Text(AtBatWording.strikeHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.swingingStrike))))
                 .overlay(alignment: .trailing) { calledButton }
             }
             GridRow {
@@ -302,7 +304,7 @@ struct CountButtons: View {
                 Button {
                     if heldForBunt { heldForBunt = false } else { pitch(.foul) }
                 } label: {
-                    CountButtonLabel("Foul", hint: AtBatWording.foulHint(count))
+                    CountButtonLabel("Foul", hint: AtBatWording.hint(countAfter(.foul), isFoul: true))
                 }
                 .buttonStyle(CountButtonStyle.foul)
                 .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
@@ -312,7 +314,7 @@ struct CountButtons: View {
                 })
                 .sensoryFeedback(.impact, trigger: buntCount)
                 .accessibilityLabel(Text("Foul"))
-                .accessibilityHint(Text(AtBatWording.foulHint(count)))
+                .accessibilityHint(Text(AtBatWording.hint(countAfter(.foul), isFoul: true)))
                 .accessibilityAction(named: Text("Foul bunt")) { pitch(.foulBunt) }
 
                 Button { onAction(.openInPlay(.ballInPlay)) } label: {
@@ -347,7 +349,7 @@ struct CountButtons: View {
         .padding(.bottom, Spacing.extraSmall)
         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
         .accessibilityLabel(Text("Called strike"))
-        .accessibilityHint(Text(AtBatWording.strikeHint(count)))
+        .accessibilityHint(Text(AtBatWording.hint(countAfter(.swingingStrike))))
     }
 
     /// Hands back one pitch to record.
@@ -359,8 +361,9 @@ struct CountButtons: View {
 // MARK: - The song button
 
 /// The song spot across the bottom edge: our hitter's walk-up song (play, then a countdown to
-/// the fade, tap to stop), a way to pick a song for our hitter who has none, our pitcher's
-/// warm-up song at the changeover when we take the field, or an empty gray bar for their hitters.
+/// the fade, tap to fade it out), a way to pick a song for our hitter who has none, our
+/// pitcher's warm-up song at the changeover when we take the field (with a button beside it to
+/// pick more warm-up songs for him), or an empty gray bar for their hitters.
 struct SongButton: View {
     var info: AtBatInfo
     var onAction: (AtBatAction) -> Void
@@ -372,28 +375,43 @@ struct SongButton: View {
         case .noSong(let player):
             Button { onAction(.pickSong(for: player.id)) } label: {
                 SongButtonLabel(icon: "plus", title: "No song for \(AtBatWording.shortName(player))",
-                                detail: "Tap to pick one", iconFill: ScorebookColor.textSecondary)
+                                detail: "", iconFill: ScorebookColor.textSecondary)
             }
             .buttonStyle(QuietBarStyle())
             .accessibilityLabel(Text("No walk-up song for \(player.displayName)"))
             .accessibilityHint(Text("Pick one"))
         case .warmUp(let pitcher, let title):
             let playing = info.songPlayback == .warmUp
-            Button { onAction(playing ? .stopSong : .playWarmUp(pitcher)) } label: {
-                SongButtonLabel(icon: playing ? "stop.fill" : "play.fill", title: title,
-                                detail: playing ? "Playing · stops on the first pitch"
-                                                : "Warm-up for \(AtBatWording.shortName(pitcher)), our pitcher",
-                                iconFill: ScorebookColor.onTheirTeam.opacity(0.25),
-                                iconColor: ScorebookColor.onTheirTeam)
-                    .foregroundStyle(ScorebookColor.onTheirTeam)
+            HStack(spacing: Spacing.small) {
+                Button { onAction(playing ? .stopSong : .playWarmUp(pitcher)) } label: {
+                    SongButtonLabel(icon: playing ? "stop.fill" : "play.fill", title: title,
+                                    detail: playing ? "Playing"
+                                                    : "Warm-up for \(AtBatWording.shortName(pitcher))",
+                                    iconFill: ScorebookColor.onTheirTeam.opacity(0.25),
+                                    iconColor: ScorebookColor.onTheirTeam)
+                        .foregroundStyle(ScorebookColor.onTheirTeam)
+                }
+                .buttonStyle(WarmUpButtonStyle(isActive: playing))
+                .accessibilityLabel(Text(playing ? "Fade out warm-up song, \(title)" : "Play warm-up song, \(title)"))
+                // Pick more warm-up songs for him, or play a different one now.
+                Button { onAction(.pickWarmUpSongs(pitcher)) } label: {
+                    Image(systemName: "music.note.list")
+                        .font(.title3.weight(.semibold))
+                        .foregroundStyle(ScorebookColor.onTheirTeam)
+                        .frame(width: Spacing.songButtonHeight)
+                }
+                .buttonStyle(WarmUpButtonStyle(isActive: false))
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Text("Warm-up songs for \(pitcher.displayName)"))
             }
-            .buttonStyle(WarmUpButtonStyle(isActive: playing))
-            .accessibilityLabel(Text(playing ? "Stop warm-up song, \(title)" : "Play warm-up song, \(title)"))
         case .noWarmUp(let pitcher):
-            SongButtonLabel(icon: "music.note", title: "No warm-up song for \(AtBatWording.shortName(pitcher))",
-                            detail: "Set one on their player page", iconFill: ScorebookColor.textSecondary)
-                .modifier(QuietBar())
-                .accessibilityElement(children: .combine)
+            Button { onAction(.pickWarmUpSongs(pitcher)) } label: {
+                SongButtonLabel(icon: "plus", title: "No warm-up song for \(AtBatWording.shortName(pitcher))",
+                                detail: "", iconFill: ScorebookColor.textSecondary)
+            }
+            .buttonStyle(QuietBarStyle())
+            .accessibilityLabel(Text("No warm-up song for \(pitcher.displayName)"))
+            .accessibilityHint(Text("Pick one"))
         case .theirs:
             // An empty gray bar where the song button would be, so a habit tap plays nothing.
             RoundedRectangle(cornerRadius: Spacing.bigButtonCornerRadius, style: .continuous)
@@ -420,8 +438,8 @@ struct SongButton: View {
                     icon: playing ? "stop.fill" : "play.fill",
                     title: title,
                     detail: playing
-                        ? (info.songPlayback == .introduction ? "Introduction · song next" : "Tap to stop now")
-                        : (withIntro ? "Introduction, then \(seconds) seconds of song" : "\(seconds) seconds, then fades"),
+                        ? (info.songPlayback == .introduction ? "Introduction · song next" : "Playing")
+                        : (withIntro ? "Introduction, then \(seconds) seconds" : "\(seconds) seconds"),
                     iconFill: ScorebookColor.onOurTeam,
                     iconColor: ScorebookColor.ourTeam
                 )
@@ -430,7 +448,7 @@ struct SongButton: View {
             .foregroundStyle(ScorebookColor.onOurTeam)
         }
         .buttonStyle(TeamButtonStyle(.ours, isActive: playing))
-        .accessibilityLabel(Text(playing ? "Stop walk-up song, \(title)" : "Play walk-up song, \(title)"))
+        .accessibilityLabel(Text(playing ? "Fade out walk-up song, \(title)" : "Play walk-up song, \(title)"))
     }
 }
 
@@ -453,7 +471,8 @@ struct SongButtonLabel: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 1) {
                 Text(title).font(ScorebookFont.headline)
-                Text(detail).font(ScorebookFont.caption)
+                // An empty detail leaves the title alone on the button.
+                if !detail.isEmpty { Text(detail).font(ScorebookFont.caption) }
             }
             .lineLimit(1)
             .minimumScaleFactor(0.7)

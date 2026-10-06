@@ -59,8 +59,8 @@ struct ShortNameTests {
         // Give the Diamond Dogs' Jamie Cole the Mudcats leadoff hitter's last name.
         rename(&box, "d10", to: "Jamie Ortiz")
         let text = BoxScorePrinter.text(box, timeZone: pacific)
-        #expect(text.contains("L. Ortiz cf"))
-        #expect(text.contains("J. Ortiz dh"))
+        #expect(text.contains("L. Ortiz CF"))
+        #expect(text.contains("J. Ortiz DH"))
         #expect(text.contains("2B—Ruiz, Webb, J. Ortiz."))
         #expect(text.contains("3B—L. Ortiz."))
     }
@@ -112,12 +112,14 @@ struct LineupTests {
         // the numbers sit in the same columns from the first hitter to the fourteenth.
         let text = BoxScorePrinter.text(box, timeZone: pacific)
         let battingBlocks = text.components(separatedBy: "\n\n")[1...2]
-        for block in battingBlocks {
-            let lengths = Set(block.split(separator: "\n").map(\.count))
+        for (block, table) in zip(battingBlocks, layout.batting) {
+            // The heading and the rows; the pinch hitters' footnote line under them is prose.
+            let tableLines = block.split(separator: "\n").prefix(table.rows.count + 1)
+            let lengths = Set(tableLines.map(\.count))
             #expect(lengths.count == 1, "lines of different lengths: \(lengths)")
         }
-        #expect(text.contains("Montgomery-Wallace dh"))
-        #expect(text.contains("Batter 14 dh"))
+        #expect(text.contains("Montgomery-Wallace DH"))
+        #expect(text.contains("Batter 14 DH"))
     }
 
     @Test("A player who played two positions shows both, joined by a dash")
@@ -125,7 +127,7 @@ struct LineupTests {
         var box = SampleGame.boxScore
         box.away.batting[9].positions = [.ph, .secondBase]
         let mudcats = BoxScorePrinter.layout(box, timeZone: pacific).batting[0]
-        #expect(mudcats.rows[9].label == "Moss ph-2b")
+        #expect(mudcats.rows[9].label == "Moss PH-2B")
     }
 }
 
@@ -141,14 +143,14 @@ struct LineScoreTests {
         let text = BoxScorePrinter.text(box, timeZone: pacific)
         #expect(text.contains("Mudcats      010 00(12) 000 1  — 14  7  1"))
         #expect(text.contains("Diamond Dogs 200 30   0 422 x  — 13  9  1"))
-        #expect(text.hasPrefix("Saturday, May 2\nMudcats 14, Diamond Dogs 13"))
+        #expect(text.hasPrefix("Saturday, May 2\nMudcats 14\nDiamond Dogs 13"))
     }
 
     @Test("A tie puts the visitors first in the headline")
     func tie() {
         var box = SampleGame.boxScore
         box.home.runs = 3
-        #expect(BoxScorePrinter.headline(box) == "Mudcats 3, Diamond Dogs 3")
+        #expect(BoxScorePrinter.headline(box) == "Mudcats 3\nDiamond Dogs 3")
     }
 }
 
@@ -188,20 +190,33 @@ struct NotesTests {
         box.home.pitching[1].stats.pitches = 0
         box.home.pitching[1].stats.strikes = 0
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
-        #expect(notes.last == "Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss —.")
+        #expect(notes.contains("Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss —."))
 
         // With no pitches counted for anybody, the note is left out.
         for i in box.away.pitching.indices { box.away.pitching[i].stats.pitches = 0 }
         for i in box.home.pitching.indices { box.home.pitching[i].stats.pitches = 0 }
-        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes == ["HBP—by Reyes (Ford)."])
+        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes == ["HBP—by Reyes (Ford).", "T—3:12."])
     }
 
-    @Test("When two pitchers hit batters, the hit batters are listed without guessing who hit whom")
+    @Test("An older box score that does not say who hit whom lists the batters without guessing")
     func hitByPitchWithTwoPitchers() {
         var box = SampleGame.boxScore
+        // Box scores saved before the app recorded the pitcher for each hit batter.
+        box.notes.hitBatters = []
+        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes.first == "HBP—by Reyes (Ford).")
         box.away.pitching[0].stats.hitBatters = 1
         box.notes.hitByPitch.append(PlayerTally(player: "d3", name: "Jordan Webb", team: .home, count: 1))
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
         #expect(notes.first == "HBP—Ford, Webb.")
+    }
+
+    @Test("A player with two last names is printed by the first")
+    func twoLastNames() {
+        var box = SampleGame.boxScore
+        let ortiz = box.away.batting[0].player
+        box.away.batting[0].name = "Luis Ortiz Vega"
+        box.surnames = [ortiz: "Ortiz"]
+        let layout = BoxScorePrinter.layout(box, timeZone: pacific)
+        #expect(layout.batting[0].rows[0].label == "Ortiz CF")
     }
 }
