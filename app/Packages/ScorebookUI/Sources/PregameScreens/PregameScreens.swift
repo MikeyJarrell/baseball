@@ -1,13 +1,14 @@
-// PregameScreens: game setup and lineups, in six steps.
+// PregameScreens: game setup and lineups, in seven steps.
 //
-// 1. The game: opponent, date, home or away, innings, and the scheduled start and time limit
-//    on the iOS time wheel (`GameStep`).
-// 2. Our batting order: who bats and in what order, designated non-runners, the bench
+// 1. The opponent (`OpponentStep`).
+// 2. The game's details: date, home or away, innings, and the scheduled start and time limit
+//    on the iOS time wheel (`DetailsStep`).
+// 3. Our batting order: who bats and in what order, designated non-runners, the bench
 //    (`BattingOrderStep`).
-// 3. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
-// 4. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
-// 5. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
-// 6. Review and "Play ball" (`ReviewStep`).
+// 4. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
+// 5. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
+// 6. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
+// 7. Review and "Play ball" (`ReviewStep`).
 //
 // How these screens talk to the rest of the app: `PregameFlow` is handed a `PregameInput`
 // (our team, the saved opponents, recent games, who pitched lately, today) and hands back one
@@ -25,9 +26,13 @@ import Model
 import SampleData
 import DesignSystem
 
-/// The six pregame steps. `ours` is our batting order; `fielding` is where we field.
+/// The seven pregame steps, in order. `game` is the game's details; `ours` is our batting
+/// order; `fielding` is where we field.
 public enum PregameStep: Hashable, CaseIterable, Sendable {
-    case game, ours, fielding, theirs, pitchers, review
+    case opponent, game, ours, fielding, theirs, pitchers, review
+
+    /// Where this step falls in the sequence, counting from 1, for the dots under the title.
+    var number: Int { (Self.allCases.firstIndex(of: self) ?? 0) + 1 }
 }
 
 /// The pregame sequence, from picking the opponent to "Play ball".
@@ -42,7 +47,7 @@ public struct PregameFlow: View {
     ///   - input: Our team, the saved opponents, recent games and who pitched lately.
     ///   - onFinish: Hands back the game setup when the scorer taps "Play ball", or a cancel.
     public init(input: PregameInput, onFinish: @escaping (PregameResult) -> Void) {
-        self.init(draft: PregameDraft(input: input), startingAt: .game, onFinish: onFinish)
+        self.init(draft: PregameDraft(input: input), startingAt: .opponent, onFinish: onFinish)
     }
 
     /// Opens partway through, for previews: the steps before `step` are already behind it.
@@ -57,11 +62,13 @@ public struct PregameFlow: View {
 
     public var body: some View {
         NavigationStack(path: $path) {
-            GameStep(draft: $draft, onCancel: { onFinish(.cancel) }, onNext: { path.append(.ours) })
+            OpponentStep(draft: $draft, onCancel: { onFinish(.cancel) }, onNext: { path.append(.game) })
                 .navigationDestination(for: PregameStep.self) { step in
                     switch step {
-                    case .game:
+                    case .opponent:
                         EmptyView()
+                    case .game:
+                        DetailsStep(draft: $draft, onNext: { path.append(.ours) })
                     case .ours:
                         BattingOrderStep(draft: $draft, onNext: { path.append(.fielding) })
                     case .fielding:

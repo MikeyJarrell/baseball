@@ -1,4 +1,4 @@
-// Step four of six: their lineup, two ways in.
+// Step five of seven: their lineup, two ways in.
 //
 // - Names and numbers, from their saved roster: the batting order from the last game against
 //   them (or their whole roster), dragged into order, with a minus to take someone out. Each
@@ -12,7 +12,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The fourth pregame step: their batting order.
+/// The fifth pregame step: their batting order.
 struct TheirLineupStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
@@ -28,7 +28,7 @@ struct TheirLineupStep: View {
     private var hasNames: Bool { team.roster.contains { !($0.name ?? "").isEmpty } }
 
     var body: some View {
-        StepPage(step: 4, title: "\(team.name) lineup", buttonTitle: "Next: starting pitchers",
+        StepPage(step: .theirs, title: "\(team.name) lineup", buttonTitle: "Next: starting pitchers",
                  blockedReason: theirs.battingOrder(for: team).isEmpty ? "Add at least one hitter." : nil,
                  hidesButton: focusedNumber != nil,
                  onButton: onNext) {
