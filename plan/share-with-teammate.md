@@ -2,7 +2,7 @@
 
 **Goal:** Erick Rosas Lopez scores Diamond Dogs games on his own iPhone while Mikey is out of town, with the team, songs and announcer introductions already in the app, and without his phone ever being plugged into Mikey’s Mac.
 
-**Status:** October 6, 2026. The first copy (build 202610061426) is uploaded to App Store Connect as “Diamond Dogs Scorebook,” with the team from the phone backup of 14:14 that day. Erick (erickrosaslopez6@gmail.com) is invited to Mikey’s App Store Connect account with the Marketing role, limited to this app, and has been texted [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
+**Status:** October 10, 2026. Erick (erickrosaslopez6@gmail.com) accepted his App Store Connect invitation and is in the internal testing group “Team,” which holds build 202610061426 (uploaded October 6 with the team from the phone backup of 14:14 that day; it expires 90 days after upload). Apple has emailed him the install button; his status reads “Invited” until he installs. The group has automatic distribution on, so every later upload reaches him with no further step. He has [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
 
 ## How he gets the app
 
@@ -30,7 +30,7 @@ Each TestFlight copy opens for 90 days. Uploading a new copy restarts the 90 day
 | 1 | Claude | Build the three pieces above and check them on the simulator. Done |
 | 2 | Mikey, or Claude once Mikey signs in on the Mac mini | Create the app’s page in App Store Connect: name “Diamond Dogs Scorebook” (App Store names must be unique; the phone still shows “Scorebook”), bundle id `com.mikeyjarrell.scorebook`, SKU `scorebook`. Claude cannot enter passwords. Done |
 | 3 | Claude, on the Mac mini | Run `tools/upload_to_testflight.sh`, which takes the team from the newest phone backup. Done |
-| 4 | Mikey or Claude | Add Erick as a user with the Marketing role, limited to the Scorebook, and add him to an internal test group. Needs his name and the email address of his Apple account |
+| 4 | Mikey or Claude | Add Erick as a user with the Marketing role, limited to the Scorebook, and add him to an internal test group. Done October 10 |
 | 5 | Mikey | Text him [teammate-instructions.md](teammate-instructions.md) |
 | 6 | Teammate | Follows the instructions; Mikey checks he can see the Diamond Dogs and hear a walk-up song |
 
@@ -50,10 +50,9 @@ Bringing Erick’s games back into Mikey’s season stats. Mikey handles that on
 
 ## Picking this up
 
-What remains once Erick has accepted his App Store Connect invitation:
+What remains:
 
-1. Mikey, in App Store Connect from any browser: Apps, Diamond Dogs Scorebook, TestFlight tab; click + beside Internal Testing, name the group “Team,” add Erick, and add build 202610061426 if the group lacks it. That sends Erick the email with the install button.
-2. If Erick is not offered in the group, he has not accepted the invitation yet. If the build shows “Processing,” Apple is not done with it.
-3. Erick opens the app and should see the Diamond Dogs logo, 9 teams, and hear a walk-up song.
+1. Erick installs from the TestFlight email, opens the app, and should see the Diamond Dogs logo, 9 teams, and hear a walk-up song.
+2. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
 
-Claude cannot do any of this remotely: the App Store Connect pages need Mikey signed in, and Claude cannot enter his password. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
+Claude can work the App Store Connect pages through Chrome on whichever Mac Mikey has signed in on, but cannot enter his password. Two Chromes are connected to Claude (the laptop’s and another Mac’s); a signed-out page after Mikey says he signed in means Claude is driving the wrong one.
