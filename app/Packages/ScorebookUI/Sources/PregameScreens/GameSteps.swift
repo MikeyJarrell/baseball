@@ -1,12 +1,11 @@
-// The first four steps, one question on each screen, so nothing needs scrolling to find:
+// The first two steps.
 //
 // 1. Who we play (`OpponentStep`). Saved opponents are one tap; a new one gets a name typed in.
-// 2. Home or away (`HomeOrAwayStep`).
-// 3. The date and the scheduled start (`WhenStep`), the start on the iOS time wheel, to any
-//    minute (1:03 PM).
-// 4. How long the game runs (`LengthStep`): innings, championship rules, and the time limit as
-//    a clock time on the time wheel. The limit starts three hours after the start and moves
-//    with it.
+// 2. The game's details, all on one screen with no scrolling (`DetailsStep`): the date, home or
+//    away, innings, the scheduled start, the time limit as a clock time, and championship
+//    rules. The start and the time limit are set on the iOS time wheel, to any minute (1:03 PM):
+//    tapping either time opens its wheel under it. The limit starts three hours after the start
+//    and moves with it.
 
 import SwiftUI
 import Model
@@ -21,7 +20,7 @@ struct OpponentStep: View {
     @FocusState private var nameFocused: Bool
 
     var body: some View {
-        StepPage(step: .opponent, title: "Opponent", buttonTitle: "Next: home or away",
+        StepPage(step: .opponent, title: "Opponent", buttonTitle: "Next: game details",
                  blockedReason: draft.opponentChoice == nil ? "Pick an opponent first." : nil,
                  onButton: onNext) {
             Section {
@@ -60,60 +59,51 @@ struct OpponentStep: View {
     }
 }
 
-/// Step two: whether we are the home team.
-struct HomeOrAwayStep: View {
+/// Step two: when we play, home or away, and how long the game runs.
+struct DetailsStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
 
-    var body: some View {
-        StepPage(step: .homeOrAway, title: "Home or away", buttonTitle: "Next: date and start", onButton: onNext) {
-            Section {
-                ChoiceRow(title: "Home", detail: "We bat second", isOn: draft.details.weAreHome,
-                          action: { draft.details.weAreHome = true }) { EmptyView() }
-                    .cardRow()
-                ChoiceRow(title: "Away", detail: "We bat first", isOn: !draft.details.weAreHome,
-                          action: { draft.details.weAreHome = false }) { EmptyView() }
-                    .cardRow()
-            }
-        }
-    }
-}
+    /// Which time wheel is open, if any.
+    @State private var openWheel: Wheel?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
-/// Step three: the day of the game and its scheduled start.
-struct WhenStep: View {
-    @Binding var draft: PregameDraft
-    var onNext: () -> Void
+    /// The two times set on a wheel.
+    private enum Wheel { case start, limit }
 
     var body: some View {
-        StepPage(step: .when, title: "Date and start", buttonTitle: "Next: game length", onButton: onNext) {
+        StepPage(step: .game, title: "Game details", buttonTitle: "Next: batting order", onButton: onNext) {
             Section {
                 DatePicker("Date", selection: $draft.details.day, displayedComponents: .date)
                     .font(ScorebookFont.body)
                     .frame(minHeight: 44)
                     .cardRow()
-            }
-            Section {
-                TimeWheel(label: "Start", time: Binding(get: { draft.details.scheduledStart() },
-                                                        set: { draft.details.setStart($0) }))
-            } header: {
-                SectionHeader(title: "Start", trailing: Text(PregameWording.clock(draft.details.scheduledStart())))
-            }
-        }
-    }
-}
-
-/// Step four: innings, championship rules and the time limit.
-struct LengthStep: View {
-    @Binding var draft: PregameDraft
-    var onNext: () -> Void
-
-    var body: some View {
-        StepPage(step: .length, title: "Game length", buttonTitle: "Next: batting order", onButton: onNext) {
-            Section {
+                HStack {
+                    Text("We are").font(ScorebookFont.body)
+                    Spacer()
+                    Picker("We are", selection: $draft.details.weAreHome) {
+                        Text("Home").tag(true)
+                        Text("Away").tag(false)
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(maxWidth: 190)
+                }
+                .frame(minHeight: 44)
+                .cardRow()
                 ValueStepper(label: "Innings", value: "\(draft.details.innings)",
                              onMinus: { draft.details.changeInnings(by: -1) },
                              onPlus: { draft.details.changeInnings(by: 1) })
                     .cardRow()
+                timeRow("Start", time: draft.details.scheduledStart(), wheel: .start)
+                if openWheel == .start {
+                    timeWheel("Start", Binding(get: { draft.details.scheduledStart() },
+                                               set: { draft.details.setStart($0) }))
+                }
+                timeRow("Time limit", time: draft.details.timeLimitEnd(), wheel: .limit)
+                if openWheel == .limit {
+                    timeWheel("Time limit", Binding(get: { draft.details.timeLimitEnd() },
+                                                    set: { draft.details.setTimeLimitEnd($0) }))
+                }
                 Toggle(isOn: Binding(get: { draft.details.isChampionship },
                                      set: { draft.details.setChampionship($0) })) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -125,12 +115,6 @@ struct LengthStep: View {
                 .tint(ScorebookColor.highlight)
                 .frame(minHeight: 44)
                 .cardRow()
-            }
-            Section {
-                TimeWheel(label: "Time limit", time: Binding(get: { draft.details.timeLimitEnd() },
-                                                             set: { draft.details.setTimeLimitEnd($0) }))
-            } header: {
-                SectionHeader(title: "Time limit", trailing: Text(PregameWording.clock(draft.details.timeLimitEnd())))
             } footer: {
                 Text("A late first pitch moves the time limit later by the same amount.")
                     .font(ScorebookFont.caption)
@@ -138,15 +122,40 @@ struct LengthStep: View {
             }
         }
     }
-}
 
-/// The iOS time wheel, every minute, as a card of its own.
-private struct TimeWheel: View {
-    var label: String
-    @Binding var time: Date
+    /// "Start   9:00 AM": tapping it opens or closes its time wheel.
+    private func timeRow(_ label: String, time: Date, wheel: Wheel) -> some View {
+        Button {
+            withAnimation { openWheel = openWheel == wheel ? nil : wheel }
+        } label: {
+            // At the largest text sizes the label sits above the time, so "12:00 PM" never wraps.
+            let layout = typeSize.isAccessibilitySize
+                ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.extraSmall))
+                : AnyLayout(HStackLayout())
+            layout {
+                Text(label).font(ScorebookFont.body).foregroundStyle(ScorebookColor.textPrimary)
+                if !typeSize.isAccessibilitySize { Spacer() }
+                Text(PregameWording.clock(time))
+                    .lineLimit(1)
+                    .fixedSize()
+                    .font(ScorebookFont.headline.monospacedDigit())
+                    .foregroundStyle(openWheel == wheel ? ScorebookColor.highlight : ScorebookColor.textPrimary)
+                    .padding(.horizontal, Spacing.medium)
+                    .padding(.vertical, Spacing.small)
+                    .background(ScorebookColor.surfaceSecondary, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            }
+            .frame(minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityValue(Text(PregameWording.clock(time)))
+        .accessibilityHint(Text(openWheel == wheel ? "Closes the time wheel" : "Opens the time wheel"))
+        .cardRow()
+    }
 
-    var body: some View {
-        DatePicker(label, selection: $time, displayedComponents: .hourAndMinute)
+    /// The iOS time wheel, every minute.
+    private func timeWheel(_ label: String, _ time: Binding<Date>) -> some View {
+        DatePicker(label, selection: time, displayedComponents: .hourAndMinute)
             .datePickerStyle(.wheel)
             .labelsHidden()
             .frame(maxWidth: .infinity)

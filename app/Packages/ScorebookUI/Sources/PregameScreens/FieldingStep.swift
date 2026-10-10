@@ -1,4 +1,4 @@
-// Step six of ten: where our players field.
+// Step four of seven: where our players field.
 //
 // The field drawing shows each position with who plays it. Tapping a position on the diamond
 // (or its row in the list under it) opens a list of our whole roster: pick who plays there.
@@ -11,7 +11,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The sixth pregame step: our fielders, on the field drawing.
+/// The fourth pregame step: our fielders, on the field drawing.
 struct FieldingStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void

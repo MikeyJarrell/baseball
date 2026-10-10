@@ -47,19 +47,8 @@ A fresh reviewer’s notes are in `feedback/ai/screen-pregame-review.md`. Findin
 - In a throwaway harness app outside the repository (its own iPhone 17 simulator, since deleted), UI tests drove the real screens: Mudcats, Next five times and Play ball, 7 taps and 13.1 seconds from opening to the finished setup, starting from last game’s lineup; the start wheel turned to 1:03 PM; first base tapped on the fielding step, opening the player list; 23 typed into Marcus Hale’s number box; Ray Collins dragged from ninth to fourth.
 - Screenshots in [screen-pregame/](screen-pregame/): `game`, `game-start-wheel`, `game-big`, `game-big-times`; `ours`, `ours-firstgame`, `ours-big` (the batting order at the largest text size); `fielding`, `fielding-picker`, `fielding-dark`, `fielding-big`; `theirs-number-typed`, `theirs-typing` (Next hidden under the keyboard), `theirs-big`, `theirs-after-grip-drag`, `theirs-bombers`, `theirs-riverhawks`, `theirs-mudcats-dark`; `pitchers`; `review`; and `quick-result`, the setup the seven-tap run handed back.
 
-## Changed 2026-10-10: one question per screen
+## Changed 2026-10-10: the opponent gets its own screen
 
-After more testing Mikey found the setup took too much scrolling, so the six steps above became ten, each asking one thing:
+After more testing Mikey found the first screen too long: it had to be scrolled. It is now two screens, so the six steps above are seven. The opponents are on the first (`OpponentStep`), and the date, home or away, innings, start, time limit and championship switch are together on the second (`DetailsStep`), which fits without scrolling. Mikey wants as few taps and as little scrolling as possible, so the small items stay together: a screen for each one was tried and turned down, because it adds a tap per item.
 
-1. Opponent (`OpponentStep`, in `GameSteps.swift`)
-2. Home or away (`HomeOrAwayStep`)
-3. Date and start, with the time wheel always showing (`WhenStep`)
-4. Game length: innings, championship game, and the time limit on its wheel (`LengthStep`)
-5. Batting order
-6. Fielders
-7. Their lineup
-8. Our starting pitcher (`OurPitcherStep`, in `PitchersStep.swift`)
-9. Their starting pitcher (`TheirPitcherStep`)
-10. Review
-
-`GameStep.swift` is now `GameSteps.swift`. `PregameStep` lists the ten in order, and the dots under each title count them from it. Nothing the scorer can set changed, and neither did `PregameDraft` or what the flow hands back. `app/ScorebookUITests/GameSetupWalkthroughTests.swift` walks all ten from “New game” to “Play ball” and keeps a screenshot of each.
+`GameStep.swift` is now `GameSteps.swift` and holds both. `PregameStep` lists the seven in order, and the dots under each title count them from it. Nothing the scorer can set changed, and neither did `PregameDraft` or what the flow hands back. `app/ScorebookUITests/GameSetupWalkthroughTests.swift` walks all seven from “New game” to “Play ball” and keeps a screenshot of each.
