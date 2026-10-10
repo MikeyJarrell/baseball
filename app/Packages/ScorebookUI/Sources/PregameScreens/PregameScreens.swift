@@ -1,16 +1,14 @@
-// PregameScreens: game setup and lineups, in ten steps, one question on each screen.
+// PregameScreens: game setup and lineups, in seven steps.
 //
 // 1. The opponent (`OpponentStep`).
-// 2. Home or away (`HomeOrAwayStep`).
-// 3. The date and the scheduled start, on the iOS time wheel (`WhenStep`).
-// 4. The game's length: innings, championship rules and the time limit (`LengthStep`).
-// 5. Our batting order: who bats and in what order, designated non-runners, the bench
+// 2. The game's details: date, home or away, innings, and the scheduled start and time limit
+//    on the iOS time wheel (`DetailsStep`).
+// 3. Our batting order: who bats and in what order, designated non-runners, the bench
 //    (`BattingOrderStep`).
-// 6. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
-// 7. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
-// 8. Our starting pitcher (`OurPitcherStep`).
-// 9. Their starting pitcher, with throwing hand (`TheirPitcherStep`).
-// 10. Review and "Play ball" (`ReviewStep`).
+// 4. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
+// 5. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
+// 6. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
+// 7. Review and "Play ball" (`ReviewStep`).
 //
 // How these screens talk to the rest of the app: `PregameFlow` is handed a `PregameInput`
 // (our team, the saved opponents, recent games, who pitched lately, today) and hands back one
@@ -28,10 +26,10 @@ import Model
 import SampleData
 import DesignSystem
 
-/// The ten pregame steps, in order. `when` is the date and start; `length` is innings and the
-/// time limit; `ours` is our batting order; `fielding` is where we field.
+/// The seven pregame steps, in order. `game` is the game's details; `ours` is our batting
+/// order; `fielding` is where we field.
 public enum PregameStep: Hashable, CaseIterable, Sendable {
-    case opponent, homeOrAway, when, length, ours, fielding, theirs, ourPitcher, theirPitcher, review
+    case opponent, game, ours, fielding, theirs, pitchers, review
 
     /// Where this step falls in the sequence, counting from 1, for the dots under the title.
     var number: Int { (Self.allCases.firstIndex(of: self) ?? 0) + 1 }
@@ -64,27 +62,21 @@ public struct PregameFlow: View {
 
     public var body: some View {
         NavigationStack(path: $path) {
-            OpponentStep(draft: $draft, onCancel: { onFinish(.cancel) }, onNext: { path.append(.homeOrAway) })
+            OpponentStep(draft: $draft, onCancel: { onFinish(.cancel) }, onNext: { path.append(.game) })
                 .navigationDestination(for: PregameStep.self) { step in
                     switch step {
                     case .opponent:
                         EmptyView()
-                    case .homeOrAway:
-                        HomeOrAwayStep(draft: $draft, onNext: { path.append(.when) })
-                    case .when:
-                        WhenStep(draft: $draft, onNext: { path.append(.length) })
-                    case .length:
-                        LengthStep(draft: $draft, onNext: { path.append(.ours) })
+                    case .game:
+                        DetailsStep(draft: $draft, onNext: { path.append(.ours) })
                     case .ours:
                         BattingOrderStep(draft: $draft, onNext: { path.append(.fielding) })
                     case .fielding:
                         FieldingStep(draft: $draft, onNext: { path.append(.theirs) })
                     case .theirs:
-                        TheirLineupStep(draft: $draft, onNext: { path.append(.ourPitcher) })
-                    case .ourPitcher:
-                        OurPitcherStep(draft: $draft, onNext: { path.append(.theirPitcher) })
-                    case .theirPitcher:
-                        TheirPitcherStep(draft: $draft, onNext: { path.append(.review) })
+                        TheirLineupStep(draft: $draft, onNext: { path.append(.pitchers) })
+                    case .pitchers:
+                        PitchersStep(draft: $draft, onNext: { path.append(.review) })
                     case .review:
                         // A binding, not a copy: a pushed screen keeps whatever it was first
                         // handed, so a plain copy could miss choices made on earlier steps.

@@ -1,4 +1,4 @@
-// Step ten of ten: one look at the game and both lineups, including fielders who don't bat
+// Step seven of seven: one look at the game and both lineups, including fielders who don't bat
 // and positions shared by turns, then "Play ball". Anything odd (an empty position, a third
 // non-runner) is a note, never a block.
 

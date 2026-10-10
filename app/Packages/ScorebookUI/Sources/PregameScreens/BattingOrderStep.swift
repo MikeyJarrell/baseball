@@ -1,4 +1,4 @@
-// Step five of ten: our batting order. Who bats and in what order, the designated non-runners,
+// Step three of seven: our batting order. Who bats and in what order, the designated non-runners,
 // and the bench. Where everyone fields is the next step, because hitters can skip the field and
 // fielders can skip batting.
 //
@@ -12,7 +12,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The fifth pregame step: our batting order and bench.
+/// The third pregame step: our batting order and bench.
 struct BattingOrderStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
