@@ -56,3 +56,12 @@ What remains:
 2. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
 
 Claude can work the App Store Connect pages through Chrome on whichever Mac Mikey has signed in on, but cannot enter his password. Two Chromes are connected to Claude (the laptop’s and another Mac’s); a signed-out page after Mikey says he signed in means Claude is driving the wrong one.
+
+## Uploading when no one is at the Mac mini
+
+Learned October 10, 2026, uploading from the laptop over a remote connection (`ssh`) to the Mac mini:
+
+- **The app cannot be signed over the remote connection.** The signing certificate is only available to programs running in the Mac mini’s signed-in desktop session; the build fails with `errSecInternalComponent`. Starting `tools/upload_to_testflight.sh` as a one-time background job in that session (`launchctl bootstrap gui/501` with a small job file) signs it.
+- **That background job cannot read Dropbox.** Copy the newest phone backup’s `Library/Application Support/Scorebook` folder to a plain folder first (the remote connection can read Dropbox), and hand that folder to the script as the backup to use.
+- **Xcode’s sign-in to the Apple account lapsed that afternoon.** An upload of build 202610101443 succeeded at 15:00; every attempt from 15:13 on, from two different sessions, was refused with “App Store Connect access for 2U9RH88978 is required.” Mikey has to sign in again in Xcode on the Mac mini (Xcode, Settings, Accounts); Claude cannot type his password. Build 202610101536, which has the seven-step game setup, is built and signed in `~/Library/Developer/Xcode/DerivedData/Scorebook-testflight/` on the Mac mini and was not uploaded.
+
