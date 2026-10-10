@@ -50,7 +50,7 @@ final class GameSetupWalkthroughTests: XCTestCase {
             keepScreenshot(app, named: name)
             // The details screen with a time wheel open, the tallest it gets.
             if name == "02 game details" {
-                app.buttons["Start"].tap()
+                app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Start'")).firstMatch.tap()
                 _ = app.buttons["no such button"].waitForExistence(timeout: 0.7)
                 keepScreenshot(app, named: "02 game details, start wheel open")
             }
