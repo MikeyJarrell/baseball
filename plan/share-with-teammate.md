@@ -4,6 +4,8 @@
 
 **Status:** October 10, 2026. Erick (erickrosaslopez6@gmail.com) accepted his App Store Connect invitation and is in the internal testing group “Team,” which holds build 202610061426 (uploaded October 6 with the team from the phone backup of 14:14 that day; it expires 90 days after upload). Apple has emailed him the install button; his status reads “Invited” until he installs. The group has automatic distribution on, so every later upload reaches him with no further step. He has [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
 
+**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). Erick is also in the group, added October 10, and also shows as invited, not yet installed. Adding a tester does not need a new copy of the app: both have the October 6 copy (202610061426).
+
 ## How he gets the app
 
 Through TestFlight, Apple’s app for installing apps that are not in the App Store, on Mikey’s paid Apple Developer account (team 2U9RH88978, Apple account mikey1004@gmail.com).
@@ -56,3 +58,20 @@ What remains:
 2. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
 
 Claude can work the App Store Connect pages through Chrome on whichever Mac Mikey has signed in on, but cannot enter his password. Two Chromes are connected to Claude (the laptop’s and another Mac’s); a signed-out page after Mikey says he signed in means Claude is driving the wrong one.
+
+What Claude can and cannot do in App Store Connect, when Mikey is signed in to it in Chrome: it can read every page, add an accepted person to the test group, and expire a build. It is blocked from inviting a new person to the account, so Mikey fills in that form (Users and Access, +, Marketing role).
+
+## Uploading a new copy: broken from the command line since October 10
+
+`tools/upload_to_testflight.sh` builds fine on the Mac mini, but its last step is refused: “exportArchive Failed to Use Accounts: App Store Connect access for 2U9RH88978 is required.” It worked on October 6. Xcode’s own Organizer window on the mini still uploads, so the account is signed in there; only the command-line tool cannot use it. The cause is not known. The likely one is that Mikey’s Apple password changed on October 6 after that day’s upload. Things to try at the mini: remove and re-add the account under Xcode, Settings, Accounts; watch for a keychain permission dialog during a command-line upload and click Always Allow.
+
+Until that is fixed, a copy goes up by hand on the mini: Xcode, Window, Organizer, select the archive, Distribute App, TestFlight Internal Only, Distribute.
+
+A ready copy is waiting there: “Scorebook WITH TEAM,” version 0.1 (202610101443), same app and same team as the October 6 copy. It has not been uploaded. Nothing depends on it: it only restarts the 90 days.
+
+Two traps met on October 10:
+
+- **Never upload an archive made with Xcode’s Product, Archive.** It has no team inside (31 MB against 275 MB), so a tester opens an empty app, and its build number is 1. One went up as build 1 on October 10 and was expired the same hour. Only the script puts the team in.
+- **The script cannot be run over a remote login to the mini.** Signing fails there because the signing key is locked to the logged-in desktop, and a background job started in the desktop session cannot read Dropbox. Run it from a Claude session on the mini itself, or from a Terminal window there.
+
+Reaching the mini’s screen from the laptop works through Screen Sharing (`vnc://192.168.0.21`, no password asked), and Claude can click there, but only while the laptop is unlocked and on the home network or its VPN.
