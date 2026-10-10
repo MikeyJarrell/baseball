@@ -383,3 +383,47 @@ SESSLOG:[2026-10-06 14:20]
 
 ### Files
 - [phone] games/D682B449-….json: Cleary in the starting batting order; the extra-hitter entry removed
+
+---
+
+## [2026-10-06 14:37] Scorebook app live; team reloaded
+SESSLOG:[2026-10-06 14:37]
+
+**Project(s):** baseball
+
+### Decisions
+- The app is live: the October 4 game was a real game scored on the phone, so the televised dress rehearsal is dropped from the plan.
+
+### Follow-ups
+- [ ] Publish the stats website when Mikey wants it (tools/publish_stats.sh).
+
+### Files
+- [modified] PROJECT_INDEX.md, plan/README.md
+
+### Context
+The team reload found nothing to change (another session had already loaded the extra warm-up songs; all 24 warm-up and walk-up files play), and it copied Jackson Cleary’s name recording from the phone back to ~/Dropbox/baseball/intros/names/.
+
+---
+
+## [2026-10-06 14:38] The Scorebook on Erick’s iPhone through TestFlight
+SESSLOG:[2026-10-06 14:38]
+
+**Project(s):** baseball
+
+### Decisions
+- Erick gets the app through TestFlight as an internal tester (Marketing role, this app only), not a public link: no Apple review of an app carrying 24 commercial songs.
+- The team, songs and announcer recordings are built into TestFlight copies, taken from the newest phone backup rather than the roster CSVs, so player identities match Mikey’s phone. The app puts them in place only when it opens with no team saved.
+- App Store Connect name “Diamond Dogs Scorebook”; the phone still shows “Scorebook.”
+- No way to send Erick’s games back to Mikey’s phone yet; Mikey will handle that on his return.
+
+### Follow-ups
+- [ ] Once Erick accepts his App Store Connect invitation: TestFlight tab, Internal Testing group “Team,” add Erick and build 202610061426.
+- [ ] Erick confirms he sees the Diamond Dogs and hears a walk-up song.
+- [ ] Bringing Erick’s games into Mikey’s season stats, after the trip.
+
+### Files
+- [created] `plan/share-with-teammate.md`, `plan/teammate-instructions.md`, `tools/upload_to_testflight.sh`, `app/Scorebook/StarterTeam.swift`
+- [modified] `app/Scorebook/AppModel.swift`, `app/Scorebook.xcodeproj/project.pbxproj` (starter-team copy step, script sandboxing off for the app), `app/Scorebook-Info.plist` (no special encryption), `tools/install_on_phone.sh`, `plan/install-on-iphone.md`, `plan/README.md`, `PROJECT_INDEX.md`
+
+### Context
+Mikey’s developer account turned out to be paid already (team 2U9RH88978; its signing permission runs a year), so the weekly reinstall is over and the docs now say so. The first upload failed until Mikey registered the bundle id and created the App Store Connect page; his Apple account was locked partway and he unlocked it. Build 202610061426 is uploaded, Erick is invited and has his instructions; the last step is adding him to the internal test group after he accepts, which only Mikey can do because it needs his sign-in. New copies can only be uploaded from the Mac mini.

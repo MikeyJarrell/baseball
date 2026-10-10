@@ -1,6 +1,6 @@
 # Putting the Scorebook on your iPhone
 
-The app goes on your phone from the Mac, through Xcode, using your ordinary Apple account. There is no App Store step and nothing to pay. The catch: Apple only lets an app installed this way open for seven days, so once a week you plug the phone in and press one button. Your games, teams and songs stay on the phone through every reinstall.
+The app goes on your phone from the Mac, through Xcode, using your ordinary Apple account. There is no App Store step and nothing to pay. The catch: Apple only lets an app installed this way open for seven days, so once a week you plug the phone in and press one button. (Since October 2026 the app is signed with Mikey’s paid developer account instead, and an install opens for a year; the seven-day steps below apply only to a free account.) Your games, teams and songs stay on the phone through every reinstall.
 
 The phone needs iOS 18 or later (Settings, General, About, iOS Version).
 

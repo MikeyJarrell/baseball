@@ -89,6 +89,6 @@ Four to six jobs at a time is a sensible pace, so Mikey is not reviewing ten thi
 
 ## What Mikey has to do
 
-1. Put the app on the phone: plug it into the Mac and follow [install-on-iphone.md](install-on-iphone.md). The app goes on with Mikey’s free Apple account, so it stops opening after seven days and needs reinstalling from the Mac. The Apple Developer Program, $99 a year, removes that limit and lets a coach install it through TestFlight, Apple’s system for testing apps before release; that waits until someone else needs the app.
+1. Put the app on the phone: plug it into the Mac and follow [install-on-iphone.md](install-on-iphone.md). The app goes on with Mikey’s paid Apple Developer account, so an install opens for a year. Other players get it through TestFlight, Apple’s system for testing apps before release ([share-with-teammate.md](share-with-teammate.md)).
 2. Collect each player’s song and the time it should start, into [team/roster.csv](../team/roster.csv). On the Mac, `python3 tools/walkup_songs.py` downloads each song, cuts a clip around the hook, evens out the loudness, and saves it to the Dropbox folder `baseball/songs/`; on the phone, the app imports them from Dropbox through the Files app.
 3. Record the announcer introductions in the app, once it can record.
