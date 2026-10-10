@@ -472,3 +472,26 @@ SESSLOG:[2026-10-10 15:37]
 
 ### Context
 The tester was added in the first half hour. The rest went to a new upload Mikey asked for, which was never needed and did not land. The command-line upload that worked on October 6 is now refused on the mini with an account error, from a remote login, from a Terminal window there, and from a Claude session on the mini, while Xcode’s own Organizer still uploads; an early conclusion that Xcode was signed out was wrong. Driving the mini’s screen from the laptop through Screen Sharing got as far as opening the Organizer before the laptop lost its network and then locked.
+
+---
+
+## [2026-10-10 15:50] Game setup: the opponent gets its own screen
+SESSLOG:[2026-10-10 15:50]
+
+**Project(s):** baseball
+
+### Decisions
+- The first setup screen was too long to use without scrolling. It is now two: the opponents, then the date, home or away, innings, start, time limit and championship switch together. Seven steps where there were six.
+- Mikey wants as few taps and as little scrolling as possible. A screen for each small item (ten steps, with the two pitchers split as well) was built first and turned down: it adds a tap per item. Split a screen only when it does not fit.
+- A simulator test now walks the whole setup from “New game” to “Play ball.”
+
+### Follow-ups
+- [ ] Upload the copy with the new setup screens to TestFlight: build 202610101536 is built with the team inside and waiting in Xcode’s Organizer on the Mac mini (Distribute App, TestFlight Internal Only), since command-line uploads are refused there.
+- [ ] The new setup screens are not on Mikey’s phone; he said they need not be for now.
+
+### Files
+- [created] `app/ScorebookUITests/GameSetupWalkthroughTests.swift`
+- [modified] `app/Packages/ScorebookUI/Sources/PregameScreens/` (`GameStep.swift` became `GameSteps.swift`; step numbering in the others), `plan/handoffs/screen-pregame.md`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`
+
+### Context
+The laptop has no Xcode, so everything was built and tested on the Mac mini over a remote connection, from a throwaway copy. The TestFlight upload Mikey asked for did not go through: signing fails over a remote connection, a background job in the desktop session fixes that but cannot read Dropbox, and once both were worked around the upload was refused with the account error the session before this one had already met and written up in `plan/share-with-teammate.md`: the command line cannot use the Apple account on the Mac mini, though Xcode’s Organizer window still can. This session first read that as Xcode being signed out, which the other session had already ruled out. The Mac mini’s main baseball folder has uncommitted edits to the Xcode project and the app’s settings file that this session did not make and did not touch.

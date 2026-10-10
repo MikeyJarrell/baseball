@@ -1,4 +1,4 @@
-// The building blocks the five pregame steps share: the page with its step dots and big
+// The building blocks the pregame steps share: the page with its step dots and big
 // button along the bottom, section labels, choice rows with a round mark, the − value +
 // stepper, chips, the gray information box, and a layout that wraps chips onto new lines.
 // They copy the approved mockup (plan/mockups/index.html, the `pg-` screens), using only the
@@ -10,11 +10,11 @@ import DesignSystem
 
 // MARK: - The page
 
-/// One pregame step: a list of cards on the gray background, the title with six step dots
+/// One pregame step: a list of cards on the gray background, the title with the step dots
 /// under it, and the big button pinned to the bottom edge.
 struct StepPage<Content: View>: View {
-    /// Which step this is, 1 to 6, for the dots.
-    var step: Int
+    /// Which step this is, for the dots.
+    var step: PregameStep
     var title: String
     /// The words on the big button: "Next: our lineup".
     var buttonTitle: String
@@ -45,10 +45,10 @@ struct StepPage<Content: View>: View {
                         .font(ScorebookFont.headline)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
-                    StepDots(step: step)
+                    StepDots(step: step.number)
                 }
                 .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text("\(title), step \(step) of \(StepDots.count)"))
+                .accessibilityLabel(Text("\(title), step \(step.number) of \(StepDots.count)"))
                 .accessibilityAddTraits(.isHeader)
             }
         }
@@ -92,10 +92,10 @@ struct StepPage<Content: View>: View {
     }
 }
 
-/// Six small dots under the title, filled up to the current step.
+/// Small dots under the title, one for each step, filled up to the current step.
 struct StepDots: View {
     /// How many pregame steps there are.
-    static let count = 6
+    static let count = PregameStep.allCases.count
     var step: Int
 
     var body: some View {
