@@ -427,3 +427,12 @@ SESSLOG:[2026-10-06 14:38]
 
 ### Context
 Mikey’s developer account turned out to be paid already (team 2U9RH88978; its signing permission runs a year), so the weekly reinstall is over and the docs now say so. The first upload failed until Mikey registered the bundle id and created the App Store Connect page; his Apple account was locked partway and he unlocked it. Build 202610061426 is uploaded, Erick is invited and has his instructions; the last step is adding him to the internal test group after he accepts, which only Mikey can do because it needs his sign-in. New copies can only be uploaded from the Mac mini.
+
+---
+
+## [2026-10-10 14:33] Matthew Glatt invited as a second TestFlight tester
+
+Mikey invited Matthew Glatt (biggio330@aol.com) to the App Store Connect account with the Marketing role; the invitation shows as pending. Claude is blocked from sending invitations or changing anyone’s access there, so Mikey filled in the form. Both Erick and Matthew show “All Apps” rather than the Scorebook alone, which changes nothing while the Scorebook is the only app.
+
+### Follow-ups
+- [ ] Once Matthew accepts: Mikey adds him to the “Team” group on the TestFlight tab and texts him `plan/teammate-instructions.md`.
