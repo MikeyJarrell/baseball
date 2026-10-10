@@ -427,3 +427,23 @@ SESSLOG:[2026-10-06 14:38]
 
 ### Context
 Mikey’s developer account turned out to be paid already (team 2U9RH88978; its signing permission runs a year), so the weekly reinstall is over and the docs now say so. The first upload failed until Mikey registered the bundle id and created the App Store Connect page; his Apple account was locked partway and he unlocked it. Build 202610061426 is uploaded, Erick is invited and has his instructions; the last step is adding him to the internal test group after he accepts, which only Mikey can do because it needs his sign-in. New copies can only be uploaded from the Mac mini.
+---
+
+## [2026-10-10 14:57] Erick added to the Scorebook’s TestFlight group
+SESSLOG:[2026-10-10 14:57]
+
+**Project(s):** baseball
+
+### Decisions
+- Erick accepted his App Store Connect invitation; he is now in the internal testing group “Team” with build 202610061426, and Apple emailed him the install button. Mikey texted him the remaining steps.
+- The group has automatic distribution on, so later uploads reach him with no further step (the setting cannot be changed later).
+
+### Follow-ups
+- [ ] Erick confirms he sees the Diamond Dogs logo, 9 teams, and hears a walk-up song.
+- [ ] Bringing Erick’s games into Mikey’s season stats, after the trip.
+
+### Files
+- [modified] `plan/share-with-teammate.md`, `PROJECT_INDEX.md`: status now “in the testing group, waiting on him to install”
+
+### Context
+The earlier note that Claude cannot work App Store Connect was wrong: it can, through Chrome on a Mac where Mikey has signed in, though it cannot type his password. Most of the session went to driving the wrong Chrome: two are connected to Claude (the laptop’s and another Mac’s, probably the Mini), the laptop’s connected partway through, and the list was not rechecked before Mikey was told his sign-in had not worked. A signed-out page after he says he signed in means the wrong browser; list the browsers again. The app’s permission check also refuses a batch that types and clicks Create in one go; the same steps pass one at a time after Mikey’s explicit yes.

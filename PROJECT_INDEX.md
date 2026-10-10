@@ -18,6 +18,6 @@
 | On-screen text | Trimmed: about 125 self-evident or explanatory lines shortened or cut ([handoff](plan/handoffs/trim-app-text.md)); on the phone |
 | Stats website | Built: `tools/publish_stats.sh` reads the games off the plugged-in phone and publishes season stats, box scores and player pages to mikeyjarrell.com/dogs/ (full names, hidden from search engines) ([handoff](plan/handoffs/stats-website.md)); published October 6 with the corrected Whales game. Rerun after each game |
 | In use at games | Live: the first real game was scored on the phone on October 4, 2026; fixes from it are on the phone |
-| Erick’s iPhone | Through TestFlight on Mikey’s paid developer account, with the team and songs built into the app; first copy uploaded and Erick invited October 6, waiting on him to accept ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
+| Erick’s iPhone | Through TestFlight on Mikey’s paid developer account, with the team and songs built into the app; first copy uploaded October 6; Erick added to the internal testing group October 10 and emailed the install button, waiting on him to install ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
 
 No deadlines have been assigned.
