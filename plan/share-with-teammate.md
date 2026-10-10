@@ -4,7 +4,7 @@
 
 **Status:** October 6, 2026. The first copy (build 202610061426) is uploaded to App Store Connect as “Diamond Dogs Scorebook,” with the team from the phone backup of 14:14 that day. Erick (erickrosaslopez6@gmail.com) is invited to Mikey’s App Store Connect account with the Marketing role, limited to this app, and has been texted [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
 
-**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group with build 202610061426; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). When Mikey is signed in to App Store Connect in Chrome, Claude can add an accepted person to the test group, but is blocked from inviting a new person to the account, so Mikey fills in that form himself. Erick is also in the group, added October 10, and also shows as invited, not yet installed.
+**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). Erick is also in the group, added October 10, and also shows as invited, not yet installed. Adding a tester does not need a new copy of the app: both have the October 6 copy (202610061426).
 
 ## How he gets the app
 
@@ -58,4 +58,19 @@ What remains once Erick has accepted his App Store Connect invitation:
 2. If Erick is not offered in the group, he has not accepted the invitation yet. If the build shows “Processing,” Apple is not done with it.
 3. Erick opens the app and should see the Diamond Dogs logo, 9 teams, and hear a walk-up song.
 
-Claude cannot do any of this remotely: the App Store Connect pages need Mikey signed in, and Claude cannot enter his password. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
+What Claude can and cannot do in App Store Connect, when Mikey is signed in to it in Chrome: it can read every page, add an accepted person to the test group, and expire a build. It is blocked from inviting a new person to the account, so Mikey fills in that form (Users and Access, +, Marketing role).
+
+## Uploading a new copy: broken from the command line since October 10
+
+`tools/upload_to_testflight.sh` builds fine on the Mac mini, but its last step is refused: “exportArchive Failed to Use Accounts: App Store Connect access for 2U9RH88978 is required.” It worked on October 6. Xcode’s own Organizer window on the mini still uploads, so the account is signed in there; only the command-line tool cannot use it. The cause is not known. The likely one is that Mikey’s Apple password changed on October 6 after that day’s upload. Things to try at the mini: remove and re-add the account under Xcode, Settings, Accounts; watch for a keychain permission dialog during a command-line upload and click Always Allow.
+
+Until that is fixed, a copy goes up by hand on the mini: Xcode, Window, Organizer, select the archive, Distribute App, TestFlight Internal Only, Distribute.
+
+A ready copy is waiting there: “Scorebook WITH TEAM,” version 0.1 (202610101443), same app and same team as the October 6 copy. It has not been uploaded. Nothing depends on it: it only restarts the 90 days.
+
+Two traps met on October 10:
+
+- **Never upload an archive made with Xcode’s Product, Archive.** It has no team inside (31 MB against 275 MB), so a tester opens an empty app, and its build number is 1. One went up as build 1 on October 10 and was expired the same hour. Only the script puts the team in.
+- **The script cannot be run over a remote login to the mini.** Signing fails there because the signing key is locked to the logged-in desktop, and a background job started in the desktop session cannot read Dropbox. Run it from a Claude session on the mini itself, or from a Terminal window there.
+
+Reaching the mini’s screen from the laptop works through Screen Sharing (`vnc://192.168.0.21`, no password asked), and Claude can click there, but only while the laptop is unlocked and on the home network or its VPN.
