@@ -447,3 +447,25 @@ SESSLOG:[2026-10-10 14:57]
 
 ### Context
 The earlier note that Claude cannot work App Store Connect was wrong: it can, through Chrome on a Mac where Mikey has signed in, though it cannot type his password. Most of the session went to driving the wrong Chrome: two are connected to Claude (the laptop’s and another Mac’s, probably the Mini), the laptop’s connected partway through, and the list was not rechecked before Mikey was told his sign-in had not worked. A signed-out page after he says he signed in means the wrong browser; list the browsers again. The app’s permission check also refuses a batch that types and clicks Create in one go; the same steps pass one at a time after Mikey’s explicit yes.
+---
+
+## [2026-10-10 15:50] Game setup: the opponent gets its own screen
+SESSLOG:[2026-10-10 15:50]
+
+**Project(s):** baseball
+
+### Decisions
+- The first setup screen was too long to use without scrolling. It is now two: the opponents, then the date, home or away, innings, start, time limit and championship switch together. Seven steps where there were six.
+- Mikey wants as few taps and as little scrolling as possible. A screen for each small item (ten steps, with the two pitchers split as well) was built first and turned down: it adds a tap per item. Split a screen only when it does not fit.
+- A simulator test now walks the whole setup from “New game” to “Play ball.”
+
+### Follow-ups
+- [ ] Mikey signs in again in Xcode on the Mac mini (Xcode, Settings, Accounts); then upload a copy with the new setup screens to TestFlight. Build 202610101536 is built and signed there, not uploaded.
+- [ ] The new setup screens are not on Mikey’s phone; he said they need not be for now.
+
+### Files
+- [created] `app/ScorebookUITests/GameSetupWalkthroughTests.swift`
+- [modified] `app/Packages/ScorebookUI/Sources/PregameScreens/` (`GameStep.swift` became `GameSteps.swift`; step numbering in the others), `plan/handoffs/screen-pregame.md`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`
+
+### Context
+The laptop has no Xcode, so everything was built and tested on the Mac mini over a remote connection, from a throwaway copy. The TestFlight upload Mikey asked for did not go through: signing fails over a remote connection, a background job in the desktop session fixes that but cannot read Dropbox, and once both were worked around Apple refused the upload because Xcode’s sign-in had lapsed (another session’s uploads failed the same way from 15:13; its upload of build 202610101443 at 15:00 succeeded and does not have this change). The steps are in `plan/share-with-teammate.md`. The Mac mini’s main baseball folder has uncommitted edits to the Xcode project and the app’s settings file that this session did not make and did not touch.
