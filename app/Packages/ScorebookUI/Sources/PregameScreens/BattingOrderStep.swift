@@ -1,4 +1,4 @@
-// Step two of six: our batting order. Who bats and in what order, the designated non-runners,
+// Step five of ten: our batting order. Who bats and in what order, the designated non-runners,
 // and the bench. Where everyone fields is the next step, because hitters can skip the field and
 // fielders can skip batting.
 //
@@ -12,7 +12,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The second pregame step: our batting order and bench.
+/// The fifth pregame step: our batting order and bench.
 struct BattingOrderStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
@@ -26,7 +26,7 @@ struct BattingOrderStep: View {
     private var lineup: OurLineup { draft.ours }
 
     var body: some View {
-        StepPage(step: 2, title: "Batting order", buttonTitle: "Next: fielders",
+        StepPage(step: .ours, title: "Batting order", buttonTitle: "Next: fielders",
                  blockedReason: lineup.battingOrder.isEmpty ? "Add at least one hitter." : nil,
                  onButton: onNext) {
             battingOrderSection

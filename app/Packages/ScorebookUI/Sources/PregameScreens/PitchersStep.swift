@@ -1,17 +1,39 @@
-// Step five of six: each team's starting pitcher, with throwing hand.
+// Steps eight and nine: each team's starting pitcher, with throwing hand, a screen each.
 //
-// Ours lists the roster with whoever pitched most recently first. Picking someone puts them at
-// position 1; if they were fielding somewhere else, the old pitcher takes that position (the
-// same swap as on the fielders list). Theirs lists anyone who has pitched against us first,
-// then the rest of their lineup and roster, "Not known yet", and "Someone new" (number, name
-// and throwing hand). A pitcher whose throwing hand is unknown can have it set here.
+// Ours (`OurPitcherStep`) lists the roster with whoever pitched most recently first. Picking
+// someone puts them at position 1; if they were fielding somewhere else, the old pitcher takes
+// that position (the same swap as on the fielders list). Theirs (`TheirPitcherStep`) lists
+// anyone who has pitched against us first, then the rest of their lineup and roster, "Not known
+// yet", and "Someone new" (number, name and throwing hand). A pitcher whose throwing hand is
+// unknown can have it set here.
 
 import SwiftUI
 import Model
 import DesignSystem
 
-/// The fifth pregame step: starting pitchers.
-struct PitchersStep: View {
+/// The eighth pregame step: our starting pitcher.
+struct OurPitcherStep: View {
+    @Binding var draft: PregameDraft
+    var onNext: () -> Void
+
+    var body: some View {
+        StepPage(step: .ourPitcher, title: "Our starting pitcher",
+                 buttonTitle: "Next: \(draft.opponentName) pitcher", onButton: onNext) {
+            Section {
+                ForEach(draft.ourPitcherChoices) { choice in
+                    PitcherRow(draft: $draft, choice: choice, look: .ours,
+                               line: PregameWording.ourPitcherLine(choice.lastPitched, lastGame: draft.input.lastGame?.scheduledStart),
+                               isOn: draft.ourPitcher == choice.id) {
+                        draft.ours.assign(choice.id, to: .pitcher)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The ninth pregame step: their starting pitcher.
+struct TheirPitcherStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
 
@@ -22,22 +44,12 @@ struct PitchersStep: View {
     @State private var newHand: Hand?
 
     var body: some View {
-        StepPage(step: 5, title: "Starting pitchers", buttonTitle: "Next: review", onButton: onNext) {
-            Section {
-                ForEach(draft.ourPitcherChoices) { choice in
-                    pitcherRow(choice, look: .ours,
-                               line: PregameWording.ourPitcherLine(choice.lastPitched, lastGame: draft.input.lastGame?.scheduledStart),
-                               isOn: draft.ourPitcher == choice.id) {
-                        draft.ours.assign(choice.id, to: .pitcher)
-                    }
-                }
-            } header: {
-                SectionHeader(title: draft.input.ourTeam.name)
-            }
-
+        StepPage(step: .theirPitcher, title: "\(draft.opponentName) starting pitcher",
+                 buttonTitle: "Next: review", onButton: onNext) {
             Section {
                 ForEach(draft.theirPitcherChoices) { choice in
-                    pitcherRow(choice, look: .theirs, line: PregameWording.theirPitcherLine(choice.lastPitched),
+                    PitcherRow(draft: $draft, choice: choice, look: .theirs,
+                               line: PregameWording.theirPitcherLine(choice.lastPitched),
                                isOn: draft.theirs.pitcher == choice.id) {
                         draft.theirs.pitcher = choice.id
                     }
@@ -50,8 +62,6 @@ struct PitchersStep: View {
                 AddRow(title: "Someone new", systemImage: newOpen ? "xmark" : "plus") { newOpen.toggle() }
                     .cardRow()
                 if newOpen { newPitcherForm.cardRow() }
-            } header: {
-                SectionHeader(title: draft.opponentName)
             }
         }
     }
@@ -60,30 +70,6 @@ struct PitchersStep: View {
     private var theirPitcherUnknown: Bool {
         guard let id = draft.theirs.pitcher else { return true }
         return !draft.theirPitcherChoices.contains { $0.id == id }
-    }
-
-    /// One pitcher: number badge, name, when they last pitched and which hand they throw with,
-    /// and the round mark. A chosen pitcher with no known hand gets Right and Left buttons.
-    private func pitcherRow(_ choice: PitcherChoice, look: TeamLook, line: String, isOn: Bool,
-                            action: @escaping () -> Void) -> some View {
-        let player = draft.player(choice.id) ?? choice.player
-        let detail = [line, PregameWording.throwsLine(player.throwsWith)].compactMap { $0 }.joined(separator: " · ")
-        return VStack(alignment: .leading, spacing: Spacing.small) {
-            ChoiceRow(title: player.displayName, detail: detail, isOn: isOn, action: action) {
-                PlayerNumberBadge(PregameWording.badge(player), look: look, size: 36).accessibilityHidden(true)
-            }
-            if isOn, choice.player.throwsWith == nil {
-                HStack(spacing: Spacing.small) {
-                    Text("Throws").font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
-                    ForEach(Hand.allCases, id: \.self) { hand in
-                        Button(hand == .right ? "Right" : "Left") { draft.handEdits[choice.id] = hand }
-                            .buttonStyle(ChipStyle(isOn: draft.handEdits[choice.id] == hand))
-                    }
-                }
-                .padding(.leading, 36 + Spacing.medium)
-            }
-        }
-        .cardRow()
     }
 
     /// Number, name and throwing hand for a pitcher not on their roster.
@@ -116,5 +102,38 @@ struct PitchersStep: View {
             }
         }
         .padding(.vertical, Spacing.extraSmall)
+    }
+}
+
+/// One pitcher: number badge, name, when they last pitched and which hand they throw with,
+/// and the round mark. A chosen pitcher with no known hand gets Right and Left buttons.
+private struct PitcherRow: View {
+    @Binding var draft: PregameDraft
+    var choice: PitcherChoice
+    var look: TeamLook
+    /// When they last pitched: "Pitched last game, Sep 26".
+    var line: String
+    var isOn: Bool
+    var action: () -> Void
+
+    var body: some View {
+        let player = draft.player(choice.id) ?? choice.player
+        let detail = [line, PregameWording.throwsLine(player.throwsWith)].compactMap { $0 }.joined(separator: " · ")
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            ChoiceRow(title: player.displayName, detail: detail, isOn: isOn, action: action) {
+                PlayerNumberBadge(PregameWording.badge(player), look: look, size: 36).accessibilityHidden(true)
+            }
+            if isOn, choice.player.throwsWith == nil {
+                HStack(spacing: Spacing.small) {
+                    Text("Throws").font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
+                    ForEach(Hand.allCases, id: \.self) { hand in
+                        Button(hand == .right ? "Right" : "Left") { draft.handEdits[choice.id] = hand }
+                            .buttonStyle(ChipStyle(isOn: draft.handEdits[choice.id] == hand))
+                    }
+                }
+                .padding(.leading, 36 + Spacing.medium)
+            }
+        }
+        .cardRow()
     }
 }

@@ -7,86 +7,110 @@ import SwiftUI
 import Model
 import DesignSystem
 
-#Preview("1. The game") {
+#Preview("1. Opponent") {
     PregameFlow(input: PregameSamples.input) { _ in }
 }
 
-#Preview("1. The game, Mudcats picked, dark") {
-    PregameFlow.sample(against: "mudcats", at: .game).preferredColorScheme(.dark)
+#Preview("1. Opponent, Mudcats picked, dark") {
+    PregameFlow.sample(against: "mudcats", at: .opponent).preferredColorScheme(.dark)
 }
 
-#Preview("2. Batting order, from last game") {
+#Preview("2. Home or away") {
+    PregameFlow.sample(against: "mudcats", at: .homeOrAway)
+}
+
+#Preview("3. Date and start") {
+    PregameFlow.sample(against: "mudcats", at: .when)
+}
+
+#Preview("3. Date and start, largest text") {
+    PregameFlow.sample(against: "mudcats", at: .when).environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("4. Game length") {
+    PregameFlow.sample(against: "mudcats", at: .length)
+}
+
+#Preview("4. Game length, dark") {
+    PregameFlow.sample(against: "mudcats", at: .length).preferredColorScheme(.dark)
+}
+
+#Preview("5. Batting order, from last game") {
     PregameFlow.sample(against: "mudcats", at: .ours)
 }
 
-#Preview("2. Batting order, before the first game") {
+#Preview("5. Batting order, before the first game") {
     PregameFlow.sample(against: "mudcats", at: .ours, firstGame: true)
 }
 
-#Preview("2. Batting order, dark") {
+#Preview("5. Batting order, dark") {
     PregameFlow.sample(against: "mudcats", at: .ours).preferredColorScheme(.dark)
 }
 
-#Preview("2. Batting order, largest text") {
+#Preview("5. Batting order, largest text") {
     PregameFlow.sample(against: "mudcats", at: .ours).environment(\.dynamicTypeSize, .accessibility5)
 }
 
-#Preview("3. Fielders") {
+#Preview("6. Fielders") {
     PregameFlow.sample(against: "mudcats", at: .fielding)
 }
 
-#Preview("3. Fielders, dark") {
+#Preview("6. Fielders, dark") {
     PregameFlow.sample(against: "mudcats", at: .fielding).preferredColorScheme(.dark)
 }
 
-#Preview("3. Fielders, largest text") {
+#Preview("6. Fielders, largest text") {
     PregameFlow.sample(against: "mudcats", at: .fielding).environment(\.dynamicTypeSize, .accessibility5)
 }
 
-#Preview("4. Mudcats, names and numbers") {
+#Preview("7. Mudcats, names and numbers") {
     PregameFlow.sample(against: "mudcats", at: .theirs)
 }
 
-#Preview("4. Bombers, numbers only") {
+#Preview("7. Bombers, numbers only") {
     PregameFlow.sample(against: "bombers", at: .theirs)
 }
 
-#Preview("4. Riverhawks, blank numbers") {
+#Preview("7. Riverhawks, blank numbers") {
     PregameFlow.sample(against: "riverhawks", at: .theirs)
 }
 
-#Preview("4. Mudcats, largest text") {
+#Preview("7. Mudcats, largest text") {
     PregameFlow.sample(against: "mudcats", at: .theirs).environment(\.dynamicTypeSize, .accessibility5)
 }
 
-#Preview("4. Bombers, numbers only, largest text") {
+#Preview("7. Bombers, numbers only, largest text") {
     PregameFlow.sample(against: "bombers", at: .theirs).environment(\.dynamicTypeSize, .accessibility5)
 }
 
-#Preview("4. Bombers, dark") {
+#Preview("7. Bombers, dark") {
     PregameFlow.sample(against: "bombers", at: .theirs).preferredColorScheme(.dark)
 }
 
-#Preview("5. Starting pitchers, Mudcats") {
-    PregameFlow.sample(against: "mudcats", at: .pitchers)
+#Preview("8. Our starting pitcher") {
+    PregameFlow.sample(against: "mudcats", at: .ourPitcher)
 }
 
-#Preview("5. Starting pitchers, Riverhawks, largest text") {
-    PregameFlow.sample(against: "riverhawks", at: .pitchers).environment(\.dynamicTypeSize, .accessibility5)
+#Preview("9. Their starting pitcher, Mudcats") {
+    PregameFlow.sample(against: "mudcats", at: .theirPitcher)
 }
 
-#Preview("6. Review, Mudcats") {
+#Preview("9. Their starting pitcher, Riverhawks, largest text") {
+    PregameFlow.sample(against: "riverhawks", at: .theirPitcher).environment(\.dynamicTypeSize, .accessibility5)
+}
+
+#Preview("10. Review, Mudcats") {
     PregameFlow.sample(against: "mudcats", at: .review)
 }
 
-#Preview("6. Review, Bombers") {
+#Preview("10. Review, Bombers") {
     PregameFlow.sample(against: "bombers", at: .review)
 }
 
-#Preview("6. Review, Riverhawks, dark") {
+#Preview("10. Review, Riverhawks, dark") {
     PregameFlow.sample(against: "riverhawks", at: .review).preferredColorScheme(.dark)
 }
 
-#Preview("6. Review, largest text") {
+#Preview("10. Review, largest text") {
     PregameFlow.sample(against: "mudcats", at: .review).environment(\.dynamicTypeSize, .accessibility5)
 }
