@@ -4,7 +4,7 @@
 
 **Status:** October 6, 2026. The first copy (build 202610061426) is uploaded to App Store Connect as “Diamond Dogs Scorebook,” with the team from the phone backup of 14:14 that day. Erick (erickrosaslopez6@gmail.com) is invited to Mikey’s App Store Connect account with the Marketing role, limited to this app, and has been texted [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
 
-**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, and has not yet accepted. Once he accepts, Mikey adds him to the “Team” group on the app’s TestFlight tab and sends him the same [instructions](teammate-instructions.md). Claude can read the App Store Connect pages when Mikey is signed in to Chrome, but is blocked from inviting people or changing their access, so Mikey does those steps himself.
+**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group with build 202610061426; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). When Mikey is signed in to App Store Connect in Chrome, Claude can add an accepted person to the test group, but is blocked from inviting a new person to the account, so Mikey fills in that form himself. Erick is also in the group, added October 10, and also shows as invited, not yet installed.
 
 ## How he gets the app
 

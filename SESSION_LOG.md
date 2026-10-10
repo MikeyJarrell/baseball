@@ -435,4 +435,5 @@ Mikey’s developer account turned out to be paid already (team 2U9RH88978; its 
 Mikey invited Matthew Glatt (biggio330@aol.com) to the App Store Connect account with the Marketing role; the invitation shows as pending. Claude is blocked from sending invitations or changing anyone’s access there, so Mikey filled in the form. Both Erick and Matthew show “All Apps” rather than the Scorebook alone, which changes nothing while the Scorebook is the only app.
 
 ### Follow-ups
-- [ ] Once Matthew accepts: Mikey adds him to the “Team” group on the TestFlight tab and texts him `plan/teammate-instructions.md`.
+- [x] Matthew accepted and Claude added him to the “Team” group, which sent him the TestFlight email.
+- [ ] Mikey texts Matthew `plan/teammate-instructions.md`; Matthew and Erick both still show as invited, not installed.
