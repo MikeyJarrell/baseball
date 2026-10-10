@@ -1,29 +1,26 @@
-// Step one of six: the opponent, the date, home or away, innings, the scheduled start and
-// the time limit as a clock time. Saved opponents are one tap; a new one gets a name typed in.
-// The start and the time limit are set on the iOS time wheel, to any minute (1:03 PM): tapping
-// either time opens its wheel under it. The limit starts three hours after the start and moves
-// with it.
+// The first two steps.
+//
+// 1. Who we play (`OpponentStep`). Saved opponents are one tap; a new one gets a name typed in.
+// 2. The game's details, all on one screen with no scrolling (`DetailsStep`): the date, home or
+//    away, innings, the scheduled start, the time limit as a clock time, and championship
+//    rules. The start and the time limit are set on the iOS time wheel, to any minute (1:03 PM):
+//    tapping either time opens its wheel under it. The limit starts three hours after the start
+//    and moves with it.
 
 import SwiftUI
 import Model
 import DesignSystem
 
-/// The first pregame step: who we play and when.
-struct GameStep: View {
+/// Step one: who we play.
+struct OpponentStep: View {
     @Binding var draft: PregameDraft
     var onCancel: () -> Void
     var onNext: () -> Void
 
     @FocusState private var nameFocused: Bool
-    /// Which time wheel is open, if any.
-    @State private var openWheel: Wheel?
-    @Environment(\.dynamicTypeSize) private var typeSize
-
-    /// The two times set on a wheel.
-    private enum Wheel { case start, limit }
 
     var body: some View {
-        StepPage(step: 1, title: "New game", buttonTitle: "Next: batting order",
+        StepPage(step: .opponent, title: "Opponent", buttonTitle: "Next: game details",
                  blockedReason: draft.opponentChoice == nil ? "Pick an opponent first." : nil,
                  onButton: onNext) {
             Section {
@@ -52,10 +49,30 @@ struct GameStep: View {
                         .frame(minHeight: 44)
                         .cardRow()
                 }
-            } header: {
-                SectionHeader(title: "Opponent")
             }
+        }
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button("Cancel", action: onCancel)
+            }
+        }
+    }
+}
 
+/// Step two: when we play, home or away, and how long the game runs.
+struct DetailsStep: View {
+    @Binding var draft: PregameDraft
+    var onNext: () -> Void
+
+    /// Which time wheel is open, if any.
+    @State private var openWheel: Wheel?
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The two times set on a wheel.
+    private enum Wheel { case start, limit }
+
+    var body: some View {
+        StepPage(step: .game, title: "Game details", buttonTitle: "Next: batting order", onButton: onNext) {
             Section {
                 DatePicker("Date", selection: $draft.details.day, displayedComponents: .date)
                     .font(ScorebookFont.body)
@@ -98,17 +115,10 @@ struct GameStep: View {
                 .tint(ScorebookColor.highlight)
                 .frame(minHeight: 44)
                 .cardRow()
-            } header: {
-                SectionHeader(title: "Game")
             } footer: {
                 Text("A late first pitch moves the time limit later by the same amount.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
-            }
-        }
-        .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button("Cancel", action: onCancel)
             }
         }
     }

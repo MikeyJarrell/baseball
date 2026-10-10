@@ -75,3 +75,7 @@ Two traps met on October 10:
 - **The script cannot be run over a remote login to the mini.** Signing fails there because the signing key is locked to the logged-in desktop, and a background job started in the desktop session cannot read Dropbox. Run it from a Claude session on the mini itself, or from a Terminal window there.
 
 Reaching the mini’s screen from the laptop works through Screen Sharing (`vnc://192.168.0.21`, no password asked), and Claude can click there, but only while the laptop is unlocked and on the home network or its VPN.
+
+A second copy is waiting there too: version 0.1 (202610101536), built by the script on October 10 with the team inside and the seven-step game setup (the opponent on its own screen). It has not been uploaded, and it is the one to send if testers should get the new setup screens.
+
+The script did build and sign that copy over a remote login, with two workarounds: it was started as a one-time background job in the desktop session (`launchctl bootstrap gui/501` with a small job file), and the newest phone backup’s `Library/Application Support/Scorebook` folder was first copied to a plain folder, which the script was handed as the backup to use. The upload step was then refused with the same account error.
