@@ -11,14 +11,28 @@
 # the settings. Games are left out. The app puts these in place the first time it opens with
 # no team saved; a phone that already has a team keeps its own.
 #
-# Signing and the upload go through the Apple account Xcode has signed in (team 2U9RH88978).
-# Apple then takes from a few minutes to a few hours to process the copy before testers get it.
+# Signing and the upload need no Xcode sign-in (the command-line upload stopped working with it
+# after Mikey's password change on October 6). They use what lives in ~/.appstoreconnect/ on the
+# Mac mini, outside the repository:
+#   private_keys/AuthKey_6X6QWG95X7.p8   Mikey's App Store Connect key (made October 10)
+#   distribution/signing.keychain-db     the Apple Distribution certificate and its private key,
+#                                        in a keychain of their own, unlocked with the password
+#                                        in distribution/keychain-password, so signing never
+#                                        stops for a dialog on the Mac's screen
+# and the "Scorebook App Store" provisioning profile, installed in Xcode's profiles folder.
+# The certificate runs until October 10, 2027.
+# Apple then takes from a few minutes to a few hours to process the copy. The internal test
+# group "Team" gets every build, so Erick's TestFlight offers it as soon as processing ends.
 
 set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 BACKUPS="$HOME/Dropbox/baseball/phone-backups"
 TEAM_ID="2U9RH88978"
+KEY_ID="6X6QWG95X7"
+ISSUER_ID="7e8e45fc-8082-464c-bd53-f51f2f45f798"
+KEY_FILE="$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8"
+SIGNING="$HOME/.appstoreconnect/distribution"
 WORK="$HOME/Library/Developer/Xcode/DerivedData/Scorebook-testflight"
 
 STAGE_ONLY=""
@@ -50,6 +64,7 @@ ARCHIVE="$WORK/Scorebook-$BUILD_NUMBER.xcarchive"
 echo "Building copy $BUILD_NUMBER (a few minutes)…"
 xcodebuild archive -project "$REPO/app/Scorebook.xcodeproj" -scheme Scorebook -configuration Release \
     -destination "generic/platform=iOS" -archivePath "$ARCHIVE" -allowProvisioningUpdates \
+    -authenticationKeyPath "$KEY_FILE" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID" \
     SCOREBOOK_STARTER_TEAM="$STARTER" CURRENT_PROJECT_VERSION="$BUILD_NUMBER" -quiet
 
 # Check the team made it into the app.
@@ -58,7 +73,10 @@ if [[ ! -d "$ARCHIVE/Products/Applications/Scorebook.app/StarterTeam/teams" ]]; 
     exit 1
 fi
 
-# How to send it: straight to App Store Connect, signed for distribution by Xcode.
+# Unlock the signing keychain for this run.
+security unlock-keychain -p "$(cat "$SIGNING/keychain-password")" "$SIGNING/signing.keychain-db"
+
+# How to send it: straight to App Store Connect, signed with the distribution certificate.
 OPTIONS="$WORK/ExportOptions.plist"
 cat > "$OPTIONS" <<PLIST
 <?xml version="1.0" encoding="UTF-8"?>
@@ -68,7 +86,10 @@ cat > "$OPTIONS" <<PLIST
     <key>method</key><string>app-store-connect</string>
     <key>destination</key><string>upload</string>
     <key>teamID</key><string>$TEAM_ID</string>
-    <key>signingStyle</key><string>automatic</string>
+    <key>signingStyle</key><string>manual</string>
+    <key>signingCertificate</key><string>Apple Distribution</string>
+    <key>provisioningProfiles</key>
+    <dict><key>com.mikeyjarrell.scorebook</key><string>Scorebook App Store</string></dict>
     <key>manageAppVersionAndBuildNumber</key><false/>
 </dict>
 </plist>
@@ -76,6 +97,7 @@ PLIST
 
 echo "Uploading to App Store Connect…"
 xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist "$OPTIONS" \
-    -exportPath "$WORK/export-$BUILD_NUMBER" -allowProvisioningUpdates
+    -exportPath "$WORK/export-$BUILD_NUMBER" \
+    -authenticationKeyPath "$KEY_FILE" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER_ID"
 
 echo "Done. Copy $BUILD_NUMBER is uploaded; testers get it once Apple finishes processing it."
