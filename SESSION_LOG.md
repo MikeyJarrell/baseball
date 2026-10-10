@@ -430,10 +430,25 @@ Mikey’s developer account turned out to be paid already (team 2U9RH88978; its 
 
 ---
 
-## [2026-10-10 14:33] Matthew Glatt invited as a second TestFlight tester
+## [2026-10-10 15:37] Matthew Glatt added as a second TestFlight tester; new upload stuck
+SESSLOG:[2026-10-10 15:37]
 
-Mikey invited Matthew Glatt (biggio330@aol.com) to the App Store Connect account with the Marketing role; the invitation shows as pending. Claude is blocked from sending invitations or changing anyone’s access there, so Mikey filled in the form. Both Erick and Matthew show “All Apps” rather than the Scorebook alone, which changes nothing while the Scorebook is the only app.
+**Project(s):** baseball
+
+### Decisions
+- Matthew Glatt (biggio330@aol.com) is the second tester: Marketing role, in the “Team” test group with Erick. Mikey sent the account invitation himself because Claude is blocked from inviting people; Claude added him to the group.
+- Adding a tester needs no new copy of the app. Both testers have the October 6 copy (202610061426).
+- Build 1, uploaded by hand from an Xcode Product, Archive with no team inside, was expired the same hour.
 
 ### Follow-ups
-- [x] Matthew accepted and Claude added him to the “Team” group, which sent him the TestFlight email.
 - [ ] Mikey texts Matthew `plan/teammate-instructions.md`; Matthew and Erick both still show as invited, not installed.
+- [ ] Optional: upload the waiting copy “Scorebook WITH TEAM” (202610101443) from Xcode’s Organizer on the Mac mini. The session “Sharing app with teammate” on the mini was asked to do it and needs Mikey to approve its request to control Xcode.
+- [ ] At the mini: get command-line uploads working again (remove and re-add the account in Xcode, Settings, Accounts), then rerun `tools/upload_to_testflight.sh`.
+- [ ] The main folder on the mini has uncommitted changes from Xcode re-saving the project at 14:53 (`app/Scorebook-Info.plist`, `project.pbxproj`); review and discard them there.
+
+### Files
+- [modified] `plan/share-with-teammate.md` — second tester, what Claude can do in App Store Connect, the broken command-line upload and the two traps
+- [modified] `PROJECT_INDEX.md` — Matthew’s row, Erick’s row
+
+### Context
+The tester was added in the first half hour. The rest went to a new upload Mikey asked for, which was never needed and did not land. The command-line upload that worked on October 6 is now refused on the mini with an account error, from a remote login, from a Terminal window there, and from a Claude session on the mini, while Xcode’s own Organizer still uploads; an early conclusion that Xcode was signed out was wrong. Driving the mini’s screen from the laptop through Screen Sharing got as far as opening the Organizer before the laptop lost its network and then locked.
