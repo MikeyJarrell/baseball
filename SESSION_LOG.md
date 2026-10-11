@@ -495,3 +495,20 @@ SESSLOG:[2026-10-10 15:50]
 
 ### Context
 The laptop has no Xcode, so everything was built and tested on the Mac mini over a remote connection, from a throwaway copy. The TestFlight upload Mikey asked for did not go through: signing fails over a remote connection, a background job in the desktop session fixes that but cannot read Dropbox, and once both were worked around the upload was refused with the account error the session before this one had already met and written up in `plan/share-with-teammate.md`: the command line cannot use the Apple account on the Mac mini, though Xcode’s Organizer window still can. This session first read that as Xcode being signed out, which the other session had already ruled out. The Mac mini’s main baseball folder has uncommitted edits to the Xcode project and the app’s settings file that this session did not make and did not touch.
+
+## [2026-10-10 16:40] TestFlight uploads fixed with an App Store Connect key
+SESSLOG:[2026-10-10 16:40]
+
+**Project(s):** baseball
+
+### Decisions
+- Uploads use Mikey’s App Store Connect key (6X6QWG95X7, in `~/.appstoreconnect/private_keys/` on the Mac mini) instead of Xcode’s sign-in, which the command line could no longer use after October 6.
+- The key has no access to Apple’s cloud-managed signing, so an Apple Distribution certificate and the “Scorebook App Store” profile were made through Apple’s API. The certificate’s private key sits in its own keychain, unlocked by the script, because in the login keychain signing stopped for a dialog on the mini’s screen.
+- Build 202610101443 uploaded at 16:11 and is open to the “Team” group. Mikey was added to the group; Matthew Glatt’s invitation was resent twice.
+
+### Follow-ups
+- [ ] Matt finds the TestFlight email (likely AOL spam) and installs.
+- [ ] Back up Mikey’s phone before he installs the TestFlight copy over the one installed from the Mac.
+
+### Files
+- [modified] `tools/upload_to_testflight.sh`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`
