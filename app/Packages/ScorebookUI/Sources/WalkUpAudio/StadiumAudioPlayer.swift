@@ -3,10 +3,12 @@
 //
 // What it does, in game terms:
 // - When our hitter comes up, one tap plays their walk-up song. If they have an announcer
-//   introduction, the song fades in underneath the voice, the way stadiums do it, and reaches
-//   full volume at its start point (the hook) just as the announcer finishes. The song then
-//   fades out by itself after 12 seconds of song (the walk-up length setting), or sooner
-//   when the button is tapped again, with a fade of about two seconds.
+//   introduction, the song plays quietly underneath the voice, the way stadiums do it, then
+//   rises once the announcer has finished and reaches full volume at its start point (the
+//   hook). The song then fades out by itself after 12 seconds of song (the walk-up length
+//   setting), or sooner when the button is tapped again, with a fade of about two seconds.
+//   When there is a delay before the at-bat, "keep playing" calls the automatic fade off and
+//   the song plays on until it is faded by hand.
 // - When our team takes the field, it plays the pitcher's warm-up song over and over until
 //   it is stopped or the first pitch is recorded, and fades by itself after five minutes in
 //   case nobody stops it.
@@ -58,6 +60,8 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     public private(set) var isPlayingIntroduction = false
     /// True while the music is fading out.
     public private(set) var isFadingOut = false
+    /// True while a walk-up song is being kept playing past its length (`keepWalkUpPlaying`).
+    public private(set) var isKeptPlaying = false
     /// What is playing: a walk-up, a preview in the song library, a warm-up song, or an
     /// introduction on its own.
     public private(set) var activity: Activity = .idle
@@ -77,7 +81,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// When the walk-up song's automatic fade begins, by the phone's clock: the song's
     /// start plus its length, less the 2-second fade (so with 12 seconds of song, 10 seconds
     /// after the song starts). The song is silent `fadeLength` seconds later. Missing when no
-    /// walk-up song is lined up.
+    /// walk-up song is lined up, and while one is being kept playing.
     private(set) var fadeBeginsAt: Date?
 
     /// What is playing now, for the song button: the introduction, a song, or a warm-up,
@@ -90,9 +94,9 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         case .introduction:
             return AudioPlayback(phase: .introduction)
         case .walkUp where isPlayingIntroduction:
-            return AudioPlayback(phase: .introduction, song: nowPlaying)
+            return AudioPlayback(phase: .introduction, song: nowPlaying, keepsPlaying: isKeptPlaying)
         case .walkUp:
-            return AudioPlayback(phase: .song, song: nowPlaying, fadesAt: fadeBeginsAt)
+            return AudioPlayback(phase: .song, song: nowPlaying, fadesAt: fadeBeginsAt, keepsPlaying: isKeptPlaying)
         case .preview:
             return AudioPlayback(phase: .song, song: nowPlaying)
         case .warmUp:
@@ -197,6 +201,12 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         var songOffset: TimeInterval = 0
         /// Seconds of song before it goes quiet by itself; missing means until stopped.
         var songLength: TimeInterval?
+        /// For a walk-up: the first sample of the track after the stretch lined up to play,
+        /// where "keep playing" carries on from.
+        var frameAfterSong: AVAudioFramePosition?
+        /// True once the rest of the track has been lined up behind the walk-up's own stretch
+        /// ("keep playing"), so the end of that stretch is no longer the end of the song.
+        var restOfTrackQueued = false
         /// For repeating warm-ups: the length of the first pass (from the offset to the end of
         /// the track), and where each later pass begins and how long it lasts.
         var firstPass: TimeInterval?
@@ -205,7 +215,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         /// When the introduction finishes.
         var introductionEnd: Double?
         /// While the song fades in under the announcer: when the fade-in started and how long
-        /// the introduction is (the song is at full volume when it ends).
+        /// the introduction is (the song rises to full volume once it ends).
         var fadeInStart: Double?
         var fadeInLength: TimeInterval = 0
         /// When an introduction played on its own, echo tail included, is over.
@@ -214,6 +224,10 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         var fadeStart: Double?
         var fadeSeconds: TimeInterval = 2
         var fadeFrom: Float = 1
+        /// While the music comes back from a called-off fade: when that started, and the
+        /// volume it started from.
+        var comeBackStart: Double?
+        var comeBackFrom: Float = 1
     }
 
     /// Makes the player.
@@ -355,6 +369,18 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         guard let song = library.song(song) else { return }
         beginPlay(.preview, song: song)
         startSong(song, from: seconds, length: nil, repeating: false)
+    }
+
+    public func keepWalkUpPlaying() {
+        guard isPlaying, activity == .walkUp, currentSong != nil else { return }
+        // A fade already under way (the automatic one, or a tap on the button) is called
+        // off, and the music comes back up.
+        if isFadingOut { cancelFade() }
+        guard !isKeptPlaying else { return }
+        isKeptPlaying = true
+        // If the song is not lined up yet (its introduction is still being made),
+        // `startWalkUp` does this once it is.
+        queueRestOfTrack()
     }
 
     public func fadeOut() {
@@ -573,6 +599,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         nowPlaying = song?.id
         isPlaying = true
         isFadingOut = false
+        isKeptPlaying = false
         lastProblem = nil
         timing = Timing()
         fadeBeginsAt = nil
@@ -583,11 +610,11 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     }
 
     /// Plays a walk-up. With an introduction, the song starts at the same moment as the
-    /// voice, from early enough that it reaches its start point just as the announcer
-    /// finishes: silent at first, about a third of full volume under the voice, full volume at
-    /// the end of the introduction (see `WalkUpMath.walkUpPlan` and `fadeInVolume`). Then the
-    /// usual length of song plays. Without one, the song starts at its start point at full
-    /// volume. Timed to the sample.
+    /// voice: silent at first, about a third of full volume under the voice, then rising to
+    /// full volume once the announcer has finished, from early enough that it reaches its
+    /// start point just as it reaches full volume (see `WalkUpMath.walkUpPlan` and
+    /// `fadeInVolume`). Then the usual length of song plays. Without one, the song starts at
+    /// its start point at full volume. Timed to the sample.
     private func startWalkUp(song: Song?, introduction: AVAudioPCMBuffer?) {
         currentIntroduction = introduction
         let file = song.flatMap { openFile(for: $0) }
@@ -612,15 +639,17 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
                 startPoint: song.startTime, introductionLength: introductionLength,
                 songLength: WalkUpMath.songLength(for: song, walkUpLength: walkUpLength))
             // The whole walk-up is one stretch of song: from where it starts under the voice,
-            // for the introduction plus the usual length. The countdown and the automatic fade
-            // at the end work on that stretch.
+            // for the introduction, the rise after it, and the usual length. The countdown and
+            // the automatic fade at the end work on that stretch.
             scheduleSong(song, file: file, from: plan.startsAt, length: plan.totalLength, repeating: false,
                          startingAt: begin)
             if introduction != nil {
                 graph.songNode.volume = 0   // silent at first; `tick` raises it
                 timing.fadeInStart = begin
-                timing.fadeInLength = plan.fullVolumeAfter
+                timing.fadeInLength = introductionLength
             }
+            // "Keep playing" was asked for before the song was lined up.
+            if isKeptPlaying { queueRestOfTrack() }
             graph.songNode.play(at: AVAudioTime(hostTime: AVAudioTime.hostTime(forSeconds: begin)))
         } else {
             // An introduction with no song: done once the echo dies away.
@@ -693,14 +722,16 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         } else {
             // The audio system calls this from its own thread (`@Sendable`), so it hops back
             // to the main thread first. At the end of the track (or of the walk-up length),
-            // finish, if this is still the current play.
+            // finish, if this is still the current play and the rest of the track has not
+            // been lined up behind it ("keep playing").
             graph.songNode.scheduleSegment(file, startingFrame: startFrame, frameCount: frames, at: nil,
                                            completionCallbackType: .dataPlayedBack) { @Sendable [weak self] _ in
                 Task { @MainActor in
-                    guard let self, self.playNumber == number else { return }
+                    guard let self, self.playNumber == number, !self.timing.restOfTrackQueued else { return }
                     self.finish()
                 }
             }
+            timing.frameAfterSong = startFrame + AVAudioFramePosition(frames)
         }
 
         let start = startingAt ?? (Self.audioClockNow() + 0.05)
@@ -712,6 +743,26 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             fadeBeginsAt = Date(timeIntervalSinceNow: start + fadeAfter - Self.audioClockNow())
         }
         return start
+    }
+
+    /// Lines up the rest of the track behind a walk-up's own stretch, with no gap, and calls
+    /// off the automatic fade: the song now plays until it is faded or stopped, or the track
+    /// ends. Does nothing when the song is not lined up yet or the track has no more to play.
+    private func queueRestOfTrack() {
+        guard let song = currentSong, let file = openFile(for: song), timing.songLength != nil,
+              let next = timing.frameAfterSong, next < file.length else { return }
+        let number = playNumber
+        graph.songNode.scheduleSegment(file, startingFrame: next, frameCount: AVAudioFrameCount(clamping: file.length - next),
+                                       at: nil, completionCallbackType: .dataPlayedBack) { @Sendable [weak self] _ in
+            Task { @MainActor in
+                guard let self, self.playNumber == number else { return }
+                self.finish()
+            }
+        }
+        timing.restOfTrackQueued = true
+        timing.songLength = nil
+        fadeBeginsAt = nil
+        timeLeft = nil
     }
 
     /// Lines up one pass through the warm-up song; when it has been read, lines up the next.
@@ -791,12 +842,13 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         switch activity {
         case .walkUp:
             let inIntroduction = old.introductionEnd.map { now < $0 } ?? false
-            if !inIntroduction, let start = old.songStart, now >= start, let length = old.songLength,
-               let song = currentSong {
+            if !inIntroduction, let start = old.songStart, now >= start, let song = currentSong {
                 // Past the announcer: carry on with the time that was left, at full volume.
+                // A song being kept playing has no time limit and carries on to the end of
+                // the track.
                 let intoSong = now - start
-                let left = length - intoSong
-                guard left > 0.5 else { finish(); return }
+                let left = old.songLength.map { $0 - intoSong }
+                if let left, left <= 0.5 { finish(); return }
                 startSong(song, from: old.songOffset + intoSong, length: left, repeating: false,
                           failureMessage: Self.speakerChangedMessage)
             } else {
@@ -821,10 +873,19 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
     /// Starts lowering the volume to silence over `seconds`.
     private func beginFade(over seconds: TimeInterval) {
         isFadingOut = true
+        timing.comeBackStart = nil
         timing.fadeStart = Self.audioClockNow()
         timing.fadeSeconds = max(0.05, seconds)
         timing.fadeFrom = graph.engine.mainMixerNode.outputVolume
         startTicker()
+    }
+
+    /// Calls off a fade that is under way; `tick` brings the volume back up over a moment.
+    private func cancelFade() {
+        isFadingOut = false
+        timing.fadeStart = nil
+        timing.comeBackStart = Self.audioClockNow()
+        timing.comeBackFrom = graph.engine.mainMixerNode.outputVolume
     }
 
     /// Runs `tick` fifty times a second while something is playing or recording, often enough
@@ -908,6 +969,13 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
             }
         }
 
+        // Coming back up from a fade that was called off ("keep playing").
+        if let comeBackStart = timing.comeBackStart {
+            let progress = (now - comeBackStart) / WalkUpMath.comeBackLength
+            graph.engine.mainMixerNode.outputVolume = WalkUpMath.comeBackVolume(progress: progress, startingFrom: timing.comeBackFrom)
+            if progress >= 1 { timing.comeBackStart = nil }
+        }
+
         // The countdown and the position in the track.
         setIfChanged(\.timeLeft, countdown(at: now)?.rounded(toPlaces: 1))
         if let start = timing.songStart, now >= start {
@@ -967,6 +1035,7 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         isPlaying = false
         isPlayingIntroduction = false
         isFadingOut = false
+        isKeptPlaying = false
         nowPlaying = nil
         playbackPosition = nil
         timeLeft = nil

@@ -71,6 +71,10 @@ public protocol WalkUpAudioPlayer: AnyObject, Observable {
     func playWalkUp(for player: Player, withIntroduction: Bool)
     /// Plays any song from a given point, for previewing in the song library.
     func playPreview(_ song: SongID, from seconds: TimeInterval)
+    /// Keeps the playing walk-up song going past its length, for a delay before the at-bat:
+    /// the automatic fade is called off (one already under way comes back up) and the song
+    /// plays until it is faded or stopped, or the track ends.
+    func keepWalkUpPlaying()
     /// Fades out whatever is playing over about two seconds.
     func fadeOut()
     /// Stops whatever is playing at once.
@@ -100,6 +104,9 @@ extension WalkUpAudioPlayer {
     public var playback: AudioPlayback {
         isPlaying ? AudioPlayback(phase: .song, song: nowPlaying) : AudioPlayback(phase: .idle)
     }
+
+    /// Players that cannot keep a walk-up song going do nothing.
+    public func keepWalkUpPlaying() {}
 }
 
 /// What the walk-up audio player is doing now.
@@ -121,13 +128,18 @@ public struct AudioPlayback: Codable, Equatable, Hashable, Sendable {
     public var song: SongID?
     /// When the walk-up song starts fading out by itself: 2 seconds before the walk-up length
     /// (or the song's own play length) is up, so the song is silent exactly at the end of it.
-    /// Missing during the introduction, for a warm-up song, and when nothing is playing.
+    /// Missing during the introduction, for a warm-up song, when nothing is playing, and
+    /// while the walk-up song is being kept playing.
     public var fadesAt: Date?
+    /// True while a walk-up is being kept playing past its length (`keepWalkUpPlaying`): it
+    /// no longer fades by itself.
+    public var keepsPlaying: Bool
 
-    public init(phase: Phase, song: SongID? = nil, fadesAt: Date? = nil) {
+    public init(phase: Phase, song: SongID? = nil, fadesAt: Date? = nil, keepsPlaying: Bool = false) {
         self.phase = phase
         self.song = song
         self.fadesAt = fadesAt
+        self.keepsPlaying = keepsPlaying
     }
 }
 

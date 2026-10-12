@@ -172,6 +172,9 @@ struct GameScreen: View {
     /// What the song button shows, from the audio player.
     private var songPlayback: SongPlayback {
         guard let playback = app.audio?.playback else { return .idle }
+        // A walk-up being kept playing shows that way from the moment it is asked for, the
+        // introduction included.
+        if playback.keepsPlaying { return .keptPlaying }
         switch playback.phase {
         case .idle: return .idle
         case .introduction: return .introduction
@@ -233,6 +236,8 @@ struct GameScreen: View {
             app.audio?.playWalkUp(for: player, withIntroduction: withIntroduction && app.settings.playIntroductions)
         case .playWarmUp(let player):
             app.audio?.playWarmUp(for: player)
+        case .keepSongPlaying:
+            app.audio?.keepWalkUpPlaying()
         case .stopSong:
             // A two-second fade, the same for walk-up and warm-up songs; a second tap while it
             // fades stops it at once.

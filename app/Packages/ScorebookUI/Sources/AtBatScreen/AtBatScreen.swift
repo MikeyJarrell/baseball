@@ -79,6 +79,9 @@ public enum AtBatAction: Equatable, Sendable {
     case openGameDetails
     /// Open the warm-up songs for our pitcher: pick more, or play a different one now.
     case pickWarmUpSongs(Player)
+    /// Keep the playing walk-up song going past its length, for a delay before the at-bat (the
+    /// "Keep playing" button beside a playing song). It then plays until it is faded.
+    case keepSongPlaying
     /// Stop whatever is playing now (a tap on a playing song button). It fades out over two
     /// seconds; a second tap while it fades stops it at once.
     case stopSong
@@ -96,6 +99,8 @@ public enum SongPlayback: Equatable, Sendable {
     case introduction
     /// The walk-up song is playing and fades out by itself at `endsAt`. The button counts down.
     case song(endsAt: Date)
+    /// The walk-up is being kept playing past its length. It plays until it is faded.
+    case keptPlaying
     /// Our pitcher's warm-up song is playing. It plays until stopped or the first pitch.
     case warmUp
 }
@@ -361,10 +366,11 @@ struct AtBatLayout: View {
     /// Hands back a tap from the buttons. A pitch, a ball in play or an intentional walk is
     /// the first pitch of the moment, so it also fades the warm-up song, and the walk-up song
     /// when "fade on the first pitch" is switched on and the batter has not had a pitch yet.
+    /// A walk-up song being kept playing has no end of its own, so any pitch fades it.
     private func recordWithFade(_ action: AtBatAction) {
         if action.isPitchLike {
             switch info.songPlayback {
-            case .warmUp:
+            case .warmUp, .keptPlaying:
                 onAction(.fadeOutSong)
             case .introduction, .song:
                 if info.settings.fadeSongOnFirstPitch && info.situation.count == .fresh { onAction(.fadeOutSong) }

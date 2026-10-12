@@ -1,7 +1,7 @@
 // The arithmetic behind walk-up timing, kept apart from the sound so it can be tested on its
-// own: when the automatic fade begins, how loud the music is partway through a fade, how
-// long until silence (the countdown), where a repeating warm-up song is in its track, and
-// which slice of a sound file to play.
+// own: how the song rises under the announcer, when the automatic fade begins, how loud the
+// music is partway through a fade, how long until silence (the countdown), where a repeating
+// warm-up song is in its track, and which slice of a sound file to play.
 
 import Foundation
 import Model
@@ -15,59 +15,58 @@ enum WalkUpMath {
     }
 
     /// How a walk-up is laid out when the announcer introduces the batter. The song starts at
-    /// the same moment as the introduction, early enough that it reaches its start point
-    /// (the hook) just as the announcer finishes: `introductionLength` seconds before the
-    /// start point, but never before the top of the track. It plays quietly under the voice
-    /// and is at full volume when the introduction ends; then the usual length of song plays.
-    /// With no introduction (length 0), the song simply starts at its start point.
+    /// the same moment as the introduction and plays quietly under the voice. Only once the
+    /// announcer has finished does it rise to full volume, over `finalRiseLength` seconds, so
+    /// the end of the player's name is never covered. It starts early enough to reach its
+    /// start point (the hook) just as it reaches full volume: the introduction plus the rise
+    /// before the start point, but never before the top of the track. Then the usual length
+    /// of song plays. With no introduction (length 0), the song simply starts at its start
+    /// point.
     struct WalkUpPlan: Equatable {
         /// Seconds into the track where the song starts playing.
         var startsAt: TimeInterval
         /// Seconds after the tap's moment when the song reaches full volume: the end of the
-        /// introduction (0 with no introduction).
+        /// introduction plus the rise after it (0 with no introduction).
         var fullVolumeAfter: TimeInterval
-        /// Seconds from the start of the walk-up until it is silent: the introduction plus the
-        /// walk-up length. The countdown counts this down.
+        /// Seconds from the start of the walk-up until it is silent: the introduction, the
+        /// rise after it, and the walk-up length. The countdown counts this down.
         var totalLength: TimeInterval
     }
 
     /// Lays out a walk-up: see `WalkUpPlan`. With 12 seconds of song, a start point at
-    /// 0:20 and a 4-second introduction, the song starts at 0:16, is at full volume at 0:20
-    /// as the announcer finishes, and goes silent 16 seconds after the tap.
+    /// 0:20 and a 4-second introduction, the song starts at 0:14.5, rises from 0:18.5 as the
+    /// announcer finishes, is at full volume at 0:20, and goes silent 17.5 seconds after the tap.
     static func walkUpPlan(startPoint: TimeInterval, introductionLength: TimeInterval,
                            songLength: TimeInterval) -> WalkUpPlan {
         let intro = max(0, introductionLength)
-        return WalkUpPlan(startsAt: max(0, startPoint - intro),
-                          fullVolumeAfter: intro,
-                          totalLength: intro + songLength)
+        let lead = intro > 0 ? intro + finalRiseLength : 0
+        return WalkUpPlan(startsAt: max(0, startPoint - lead),
+                          fullVolumeAfter: lead,
+                          totalLength: lead + songLength)
     }
 
     /// About a third of full volume: how loud the song is under the announcer's voice.
     static let underVoiceLevel: Float = 0.33
     /// Seconds the song takes to rise from silence to `underVoiceLevel` at the start.
     static let gentleRiseLength: TimeInterval = 2
-    /// Seconds the song takes to rise from `underVoiceLevel` to full volume, ending as the
-    /// announcer finishes.
-    static let finalRiseLength: TimeInterval = 1
+    /// Seconds the song takes to rise from `underVoiceLevel` to full volume, starting when
+    /// the announcer finishes.
+    static let finalRiseLength: TimeInterval = 1.5
 
-    /// The song's volume, 0 to 1, `elapsed` seconds into an introduction `introductionLength`
-    /// seconds long: silent at first, rising gently to about a third under the voice, holding
-    /// there, then rising to full volume over the last second so it is at full volume exactly
-    /// when the announcer finishes. A very short introduction gets one smooth rise all the way.
+    /// The song's volume, 0 to 1, `elapsed` seconds into a walk-up whose introduction is
+    /// `introductionLength` seconds long: silent at first, rising gently to about a third
+    /// under the voice, holding there until the announcer has finished, then rising to full
+    /// volume over the next `finalRiseLength` seconds.
     static func fadeInVolume(elapsed: TimeInterval, introductionLength: TimeInterval) -> Float {
-        let total = max(0, introductionLength)
-        guard elapsed < total else { return 1 }
+        let intro = max(0, introductionLength)
+        guard intro > 0 else { return 1 }
         guard elapsed > 0 else { return 0 }
-        let finalRise = min(finalRiseLength, total)
-        let underEnds = total - finalRise          // when the last rise begins
-        let gentleRise = min(gentleRiseLength, underEnds)
+        let gentleRise = min(gentleRiseLength, intro)
         if elapsed < gentleRise {
             return underVoiceLevel * smoothStep(elapsed / gentleRise)
         }
-        if elapsed < underEnds { return underVoiceLevel }
-        // The last rise starts from a third, or from silence if there was no time under the voice.
-        let from: Float = underEnds > 0 ? underVoiceLevel : 0
-        return from + (1 - from) * smoothStep((elapsed - underEnds) / finalRise)
+        if elapsed < intro { return underVoiceLevel }
+        return underVoiceLevel + (1 - underVoiceLevel) * smoothStep((elapsed - intro) / finalRiseLength)
     }
 
     /// An S-shaped step from 0 to 1: starts and ends gently, so a volume change has no bump.
@@ -89,6 +88,16 @@ enum WalkUpMath {
     static func fadeVolume(progress: Double, startingFrom start: Float) -> Float {
         let remaining = Float(1 - min(max(progress, 0), 1))
         return start * remaining * remaining
+    }
+
+    /// Seconds the music takes to come back to full volume when a fade is called off (the
+    /// scorer asked to keep the song playing while it was fading).
+    static let comeBackLength: TimeInterval = 0.4
+
+    /// The volume partway through coming back from a called-off fade. `progress` runs from 0
+    /// (the fade was just called off, at volume `start`) to 1 (full volume again).
+    static func comeBackVolume(progress: Double, startingFrom start: Float) -> Float {
+        start + (1 - start) * smoothStep(progress)
     }
 
     /// Seconds until a walk-up song goes quiet, for the countdown: from `now` to the song's

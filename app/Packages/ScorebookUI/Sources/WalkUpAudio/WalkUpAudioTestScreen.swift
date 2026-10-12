@@ -92,6 +92,8 @@ public struct WalkUpAudioTestScreen: View {
             HStack {
                 Button("Fade out") { player.fadeOut() }.disabled(!player.isPlaying)
                 Spacer()
+                Button("Keep playing") { player.keepWalkUpPlaying() }.disabled(player.activity != .walkUp)
+                Spacer()
                 Button("Stop now", role: .destructive) { player.stop() }.disabled(!player.isPlaying)
             }
             .buttonStyle(.bordered)

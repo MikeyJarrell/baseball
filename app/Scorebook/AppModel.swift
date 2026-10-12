@@ -75,7 +75,8 @@ final class AppModel {
         isUITest = launch.isUITest
         do {
             let folders = try launch.folders()
-            // A TestFlight copy carries the team; put it in place the first time it opens.
+            // A TestFlight copy carries the team and the season's finished games: the team is
+            // put in place the first time it opens, and each game the first time it is offered.
             if !launch.isUITest { try StarterTeam.installIfNeeded(into: folders.data) }
             let storage = try FileStorage(dataFolder: folders.data, backupsFolder: folders.backups)
             self.storage = storage

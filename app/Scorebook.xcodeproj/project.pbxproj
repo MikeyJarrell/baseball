@@ -269,7 +269,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Copies a starter team (teams, song list, song files, announcer recordings) into the app\n# when the build is given one, as tools/upload_to_testflight.sh does. Other builds carry none.\nset -e\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/StarterTeam\"\nrm -rf \"$DEST\"\nif [ -n \"$SCOREBOOK_STARTER_TEAM\" ]; then\n  cp -R \"$SCOREBOOK_STARTER_TEAM\" \"$DEST\"\nfi\n";
+			shellScript = "# Copies a starter team (teams, song list, song files, announcer recordings, games) into the app\n# when the build is given one, as tools/upload_to_testflight.sh does. Other builds carry none.\nset -e\nDEST=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/StarterTeam\"\nrm -rf \"$DEST\"\nif [ -n \"$SCOREBOOK_STARTER_TEAM\" ]; then\n  cp -R \"$SCOREBOOK_STARTER_TEAM\" \"$DEST\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
