@@ -447,3 +447,68 @@ SESSLOG:[2026-10-10 14:57]
 
 ### Context
 The earlier note that Claude cannot work App Store Connect was wrong: it can, through Chrome on a Mac where Mikey has signed in, though it cannot type his password. Most of the session went to driving the wrong Chrome: two are connected to Claude (the laptop’s and another Mac’s, probably the Mini), the laptop’s connected partway through, and the list was not rechecked before Mikey was told his sign-in had not worked. A signed-out page after he says he signed in means the wrong browser; list the browsers again. The app’s permission check also refuses a batch that types and clicks Create in one go; the same steps pass one at a time after Mikey’s explicit yes.
+
+---
+
+## [2026-10-10 15:37] Matthew Glatt added as a second TestFlight tester; new upload stuck
+SESSLOG:[2026-10-10 15:37]
+
+**Project(s):** baseball
+
+### Decisions
+- Matthew Glatt (biggio330@aol.com) is the second tester: Marketing role, in the “Team” test group with Erick. Mikey sent the account invitation himself because Claude is blocked from inviting people; Claude added him to the group.
+- Adding a tester needs no new copy of the app. Both testers have the October 6 copy (202610061426).
+- Build 1, uploaded by hand from an Xcode Product, Archive with no team inside, was expired the same hour.
+
+### Follow-ups
+- [ ] Mikey texts Matthew `plan/teammate-instructions.md`; Matthew and Erick both still show as invited, not installed.
+- [ ] Optional: upload the waiting copy “Scorebook WITH TEAM” (202610101443) from Xcode’s Organizer on the Mac mini. The session “Sharing app with teammate” on the mini was asked to do it and needs Mikey to approve its request to control Xcode.
+- [ ] At the mini: get command-line uploads working again (remove and re-add the account in Xcode, Settings, Accounts), then rerun `tools/upload_to_testflight.sh`.
+- [ ] The main folder on the mini has uncommitted changes from Xcode re-saving the project at 14:53 (`app/Scorebook-Info.plist`, `project.pbxproj`); review and discard them there.
+
+### Files
+- [modified] `plan/share-with-teammate.md` — second tester, what Claude can do in App Store Connect, the broken command-line upload and the two traps
+- [modified] `PROJECT_INDEX.md` — Matthew’s row, Erick’s row
+
+### Context
+The tester was added in the first half hour. The rest went to a new upload Mikey asked for, which was never needed and did not land. The command-line upload that worked on October 6 is now refused on the mini with an account error, from a remote login, from a Terminal window there, and from a Claude session on the mini, while Xcode’s own Organizer still uploads; an early conclusion that Xcode was signed out was wrong. Driving the mini’s screen from the laptop through Screen Sharing got as far as opening the Organizer before the laptop lost its network and then locked.
+
+---
+
+## [2026-10-10 15:50] Game setup: the opponent gets its own screen
+SESSLOG:[2026-10-10 15:50]
+
+**Project(s):** baseball
+
+### Decisions
+- The first setup screen was too long to use without scrolling. It is now two: the opponents, then the date, home or away, innings, start, time limit and championship switch together. Seven steps where there were six.
+- Mikey wants as few taps and as little scrolling as possible. A screen for each small item (ten steps, with the two pitchers split as well) was built first and turned down: it adds a tap per item. Split a screen only when it does not fit.
+- A simulator test now walks the whole setup from “New game” to “Play ball.”
+
+### Follow-ups
+- [ ] Upload the copy with the new setup screens to TestFlight: build 202610101536 is built with the team inside and waiting in Xcode’s Organizer on the Mac mini (Distribute App, TestFlight Internal Only), since command-line uploads are refused there.
+- [ ] The new setup screens are not on Mikey’s phone; he said they need not be for now.
+
+### Files
+- [created] `app/ScorebookUITests/GameSetupWalkthroughTests.swift`
+- [modified] `app/Packages/ScorebookUI/Sources/PregameScreens/` (`GameStep.swift` became `GameSteps.swift`; step numbering in the others), `plan/handoffs/screen-pregame.md`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`
+
+### Context
+The laptop has no Xcode, so everything was built and tested on the Mac mini over a remote connection, from a throwaway copy. The TestFlight upload Mikey asked for did not go through: signing fails over a remote connection, a background job in the desktop session fixes that but cannot read Dropbox, and once both were worked around the upload was refused with the account error the session before this one had already met and written up in `plan/share-with-teammate.md`: the command line cannot use the Apple account on the Mac mini, though Xcode’s Organizer window still can. This session first read that as Xcode being signed out, which the other session had already ruled out. The Mac mini’s main baseball folder has uncommitted edits to the Xcode project and the app’s settings file that this session did not make and did not touch.
+
+## [2026-10-10 16:40] TestFlight uploads fixed with an App Store Connect key
+SESSLOG:[2026-10-10 16:40]
+
+**Project(s):** baseball
+
+### Decisions
+- Uploads use Mikey’s App Store Connect key (6X6QWG95X7, in `~/.appstoreconnect/private_keys/` on the Mac mini) instead of Xcode’s sign-in, which the command line could no longer use after October 6.
+- The key has no access to Apple’s cloud-managed signing, so an Apple Distribution certificate and the “Scorebook App Store” profile were made through Apple’s API. The certificate’s private key sits in its own keychain, unlocked by the script, because in the login keychain signing stopped for a dialog on the mini’s screen.
+- Build 202610101443 uploaded at 16:11 and is open to the “Team” group. Mikey was added to the group; Matthew Glatt’s invitation was resent twice.
+
+### Follow-ups
+- [ ] Matt finds the TestFlight email (likely AOL spam) and installs.
+- [ ] Back up Mikey’s phone before he installs the TestFlight copy over the one installed from the Mac.
+
+### Files
+- [modified] `tools/upload_to_testflight.sh`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`

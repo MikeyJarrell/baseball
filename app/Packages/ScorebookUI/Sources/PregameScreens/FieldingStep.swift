@@ -1,4 +1,4 @@
-// Step three of six: where our players field.
+// Step four of seven: where our players field.
 //
 // The field drawing shows each position with who plays it. Tapping a position on the diamond
 // (or its row in the list under it) opens a list of our whole roster: pick who plays there.
@@ -11,7 +11,7 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The third pregame step: our fielders, on the field drawing.
+/// The fourth pregame step: our fielders, on the field drawing.
 struct FieldingStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
@@ -22,7 +22,7 @@ struct FieldingStep: View {
     private var lineup: OurLineup { draft.ours }
 
     var body: some View {
-        StepPage(step: 3, title: "Fielders", buttonTitle: "Next: \(draft.opponentName) lineup", onButton: onNext) {
+        StepPage(step: .fielding, title: "Fielders", buttonTitle: "Next: \(draft.opponentName) lineup", onButton: onNext) {
             Section {
                 FieldDrawing(highlightedPositions: picking.map { [$0.position] } ?? [], onTap: { tap in
                     if case .position(let position) = tap { picking = PickedPosition(position: position) }

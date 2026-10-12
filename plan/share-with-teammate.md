@@ -2,7 +2,9 @@
 
 **Goal:** Erick Rosas Lopez scores Diamond Dogs games on his own iPhone while Mikey is out of town, with the team, songs and announcer introductions already in the app, and without his phone ever being plugged into Mikey’s Mac.
 
-**Status:** October 10, 2026. Erick (erickrosaslopez6@gmail.com) accepted his App Store Connect invitation and is in the internal testing group “Team,” which holds build 202610061426 (uploaded October 6 with the team from the phone backup of 14:14 that day; it expires 90 days after upload). Apple has emailed him the install button; his status reads “Invited” until he installs. The group has automatic distribution on, so every later upload reaches him with no further step. He has [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
+**Status:** October 10, 2026. Erick (erickrosaslopez6@gmail.com) accepted his App Store Connect invitation and is in the internal testing group “Team,” which holds build 202610061426 (uploaded October 6 with the team from the phone backup of 14:14 that day; it expires 90 days after upload) and build 202610101443 (uploaded October 10, same team). Apple has emailed him the install button; his status reads “Invited” until he installs. The group has automatic distribution on, so every later upload reaches him with no further step. He has [his instructions](teammate-instructions.md). Mikey is out of town from October 6.
+
+**Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). Erick is also in the group, added October 10, and also shows as invited, not yet installed. Adding a tester does not need a new copy of the app: both have the October 6 copy (202610061426).
 
 ## How he gets the app
 
@@ -56,3 +58,28 @@ What remains:
 2. A new copy of the app can only be uploaded from the Mac mini, where Xcode is signed in to Mikey’s account (`tools/upload_to_testflight.sh`); a copy expires 90 days after upload.
 
 Claude can work the App Store Connect pages through Chrome on whichever Mac Mikey has signed in on, but cannot enter his password. Two Chromes are connected to Claude (the laptop’s and another Mac’s); a signed-out page after Mikey says he signed in means Claude is driving the wrong one.
+
+What Claude can and cannot do in App Store Connect, when Mikey is signed in to it in Chrome: it can read every page, add an accepted person to the test group, and expire a build. It is blocked from inviting a new person to the account, so Mikey fills in that form (Users and Access, +, Marketing role).
+
+## Uploading a new copy
+
+`tools/upload_to_testflight.sh` on the Mac mini builds the app with the team inside and uploads it, with no Xcode sign-in. From October 6 to 10 the command-line upload was refused (“App Store Connect access for 2U9RH88978 is required”) although Xcode’s Organizer window could still upload; Mikey’s password change on October 6 is the likely cause, never confirmed. Since October 10 the script uses an App Store Connect key instead, and signs with its own distribution certificate, so Xcode’s sign-in no longer matters. What it uses, all in `~/.appstoreconnect/` on the mini and outside Git:
+
+- `private_keys/AuthKey_6X6QWG95X7.p8`: Mikey’s App Store Connect key (issuer 7e8e45fc-8082-464c-bd53-f51f2f45f798). It has no access to Apple’s cloud-managed signing, which is why the certificate below exists.
+- `distribution/signing.keychain-db`: the Apple Distribution certificate (made through the API on October 10, runs to October 10, 2027) and its private key, in a keychain of their own that the script unlocks with `distribution/keychain-password`. In the login keychain, signing stopped for a permission dialog on the mini’s screen.
+- The “Scorebook App Store” provisioning profile, made through the API and installed in Xcode’s profiles folder.
+
+The internal group “Team” has access to every build, so a processed upload reaches Erick with no further step.
+
+Build 202610101443 (“Scorebook WITH TEAM”) went up this way on October 10 at 16:11, finished processing that evening, and is open to the “Team” group. Mikey was added to the group the same evening; Matthew Glatt’s TestFlight invitation was resent twice, since he had not received it (an AOL address).
+
+Two traps met on October 10:
+
+- **Never upload an archive made with Xcode’s Product, Archive.** It has no team inside (31 MB against 275 MB), so a tester opens an empty app, and its build number is 1. One went up as build 1 on October 10 and was expired the same hour. Only the script puts the team in.
+- **The script could not be run over a remote login to the mini.** Signing failed there because the signing key was locked to the logged-in desktop, and a background job started in the desktop session cannot read Dropbox. The signing key now sits in its own keychain that the script unlocks, which may lift the first problem; not tried. Run it from a Claude session on the mini itself, or from a Terminal window there.
+
+Reaching the mini’s screen from the laptop works through Screen Sharing (`vnc://192.168.0.21`, no password asked), and Claude can click there, but only while the laptop is unlocked and on the home network or its VPN.
+
+A second copy waits in Xcode’s Organizer on the mini: version 0.1 (202610101536), built by the script on October 10 with the team inside and the seven-step game setup (the opponent on its own screen). It has not been uploaded, and it is the one to send if testers should get the new setup screens; running the script again builds a fresh copy with the same code.
+
+The script did build and sign that copy over a remote login, with two workarounds: it was started as a one-time background job in the desktop session (`launchctl bootstrap gui/501` with a small job file), and the newest phone backup’s `Library/Application Support/Scorebook` folder was first copied to a plain folder, which the script was handed as the backup to use. The upload step was then refused with the account error that the key has since fixed.
