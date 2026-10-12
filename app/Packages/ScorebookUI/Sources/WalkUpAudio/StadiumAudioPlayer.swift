@@ -1265,6 +1265,10 @@ extension StadiumAudioPlayer {
         graph.engine.stop()
         NotificationCenter.default.post(name: .AVAudioEngineConfigurationChange, object: graph.engine)
     }
+
+    /// For testing only (debug builds): the overall volume, which fades lower and "keep
+    /// playing" brings back to 1.
+    var mainVolumeForTesting: Float { graph.engine.mainMixerNode.outputVolume }
 }
 #endif
 

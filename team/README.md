@@ -24,7 +24,7 @@ To find the album audio for a request, search YouTube Music from the command lin
 ~/.stacher/youtube-dl --flat-playlist --playlist-end 3 --print "%(id)s | %(title)s" "https://music.youtube.com/search?q=low+rider+war#songs"
 ```
 
-When a player wants a particular line heard, find when it is sung with `mlx_whisper` (installed in Anaconda) on the first minute of the track, using `--word-timestamps True`, and set the hook just before the line. The announcer finishes as the song reaches its hook, so the line then comes in clear.
+When a player wants a particular line heard, find when it is sung with `mlx_whisper` (installed in Anaconda) on the first minute of the track, using `--word-timestamps True`, and set the hook just before the line. The song reaches its hook a second and a half after the announcer finishes, at full volume, so the line then comes in clear.
 
 ## Announcer introductions
 
