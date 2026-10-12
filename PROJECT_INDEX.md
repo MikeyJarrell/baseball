@@ -20,6 +20,6 @@
 | Game setup screens | The opponent has its own screen and the date, home or away, innings, start, time limit and championship switch share the next one, which fits without scrolling; seven steps where there were six ([handoff](plan/handoffs/screen-pregame.md)). Accepted October 10; not on Mikey’s phone or TestFlight yet |
 | In use at games | Live: the first real game was scored on the phone on October 4, 2026; fixes from it are on the phone |
 | Erick’s iPhone | Through TestFlight on Mikey’s paid developer account, with the team and songs built into the app; first copy uploaded October 6; Erick added to the internal testing group October 10 and emailed the install button, waiting on him to install ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
-| Matthew Glatt’s iPhone | Second TestFlight tester (biggio330@aol.com), invited and added to the “Team” test group October 10; waiting on him to install. Uploading a new copy from the command line has been refused since October 10; a ready copy waits in Xcode’s Organizer on the Mac mini ([plan](plan/share-with-teammate.md)) |
+| Matthew Glatt’s iPhone | Second TestFlight tester (biggio330@aol.com), invited and added to the “Team” test group October 10; waiting on him to install. Build 202610101443 uploaded October 10 with an App Store Connect key, which `tools/upload_to_testflight.sh` now uses, so uploads no longer depend on Xcode’s sign-in; his invitation was resent twice that evening ([plan](plan/share-with-teammate.md)) |
 
 No deadlines have been assigned.
