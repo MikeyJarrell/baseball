@@ -59,7 +59,7 @@ cp -R "$DATA/songs" "$STARTER/songs"
 [[ -d "$DATA/games" ]] && cp -R "$DATA/games/." "$STARTER/games/"
 echo "Team from $(basename "$SOURCE"): $(ls "$STARTER/teams" | wc -l | tr -d ' ') teams," \
      "$(ls "$STARTER/songs/audio" | wc -l | tr -d ' ') song and announcer files," \
-     "$(ls "$STARTER/games" | wc -l | tr -d ' ') games" \
+     "saved games: $(ls "$STARTER/games" | wc -l | tr -d ' ')" \
      "($(du -sh "$STARTER" | cut -f1))."
 if [[ -n "$STAGE_ONLY" ]]; then exit 0; fi
 
