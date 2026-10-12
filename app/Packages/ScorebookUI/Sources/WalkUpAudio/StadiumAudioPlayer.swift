@@ -7,8 +7,8 @@
 //   rises once the announcer has finished and reaches full volume at its start point (the
 //   hook). The song then fades out by itself after 12 seconds of song (the walk-up length
 //   setting), or sooner when the button is tapped again, with a fade of about two seconds.
-//   When there is a delay before the at-bat, "keep playing" calls the automatic fade off and
-//   the song plays on until it is faded by hand.
+//   When there is a delay before the at-bat, the Extend button ("keep playing" in this file)
+//   calls the automatic fade off and the song plays on until it is faded by hand.
 // - When our team takes the field, it plays the pitcher's warm-up song over and over until
 //   it is stopped or the first pitch is recorded, and fades by itself after five minutes in
 //   case nobody stops it.

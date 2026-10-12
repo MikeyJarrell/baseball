@@ -361,7 +361,7 @@ struct CountButtons: View {
 // MARK: - The song button
 
 /// The song spot across the bottom edge: our hitter's walk-up song (play, then a countdown to
-/// the fade, tap to fade it out, with a "Keep playing" button beside it while it plays, for a
+/// the fade, tap to fade it out, with an "Extend" button beside it while it plays, for a
 /// delay before the at-bat), a way to pick a song for our hitter who has none, our
 /// pitcher's warm-up song at the changeover when we take the field (with a button beside it to
 /// pick more warm-up songs for him), or an empty gray bar for their hitters.
@@ -426,8 +426,9 @@ struct SongButton: View {
     }
 
     /// Our hitter's walk-up song: play (with the introduction first), then a countdown to the
-    /// fade; a tap while playing stops it. While it plays, a "Keep playing" button sits beside
-    /// it: a tap calls off the automatic fade, and the song plays until either button fades it.
+    /// fade; a tap while playing stops it. While it plays, an "Extend" button sits beside it: a
+    /// tap calls off the automatic fade, and the song plays until either button fades it.
+    /// (Not "Keep playing": those are the words on the "Is the game over?" question.)
     private func walkUpButton(_ player: Player, title: String, length: TimeInterval) -> some View {
         let playing = info.songPlayback != .idle && info.songPlayback != .warmUp
         let kept = info.songPlayback == .keptPlaying
@@ -461,7 +462,7 @@ struct SongButton: View {
                     VStack(spacing: 2) {
                         Image(systemName: kept ? "speaker.slash.fill" : "infinity")
                             .font(.title3.weight(.bold))
-                        Text(kept ? "Fade out" : "Keep playing")
+                        Text(kept ? "Fade out" : "Extend")
                             .font(ScorebookFont.caption.weight(.semibold))
                             .lineLimit(1)
                             .minimumScaleFactor(0.7)
@@ -471,7 +472,7 @@ struct SongButton: View {
                 }
                 .buttonStyle(TeamButtonStyle(.ours, isActive: kept))
                 .fixedSize(horizontal: true, vertical: false)
-                .accessibilityLabel(Text(kept ? "Fade out walk-up song" : "Keep walk-up song playing"))
+                .accessibilityLabel(Text(kept ? "Fade out walk-up song" : "Extend walk-up song"))
             }
         }
     }
