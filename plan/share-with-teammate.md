@@ -38,6 +38,19 @@ Each TestFlight copy opens for 90 days. Uploading a new copy restarts the 90 day
 
 Allow a day between steps 3 and 6: Apple takes anywhere from minutes to a few hours to process a new upload before it can be tested.
 
+## The season’s games on a teammate’s phone
+
+Since October 11, 2026 the TestFlight copy also carries the games saved on Mikey’s phone, taken from the same phone backup as the team. Each time the app opens, every finished game the phone has not been offered before is copied in, so the games list, box scores and season stats show the season so far. A phone that got its team from an earlier copy gets the games on its first opening of the new one. The rules (`StarterGames.swift` in Storage, with tests):
+
+- A game the phone already has is left exactly as it is. On Mikey’s own phone nothing changes.
+- A game deleted on a phone stays deleted. The phone keeps a small list of the games it has been offered (`starter-games.json` beside its saved files).
+- When a later copy carries a corrected version of a game, it replaces the one copied in before, unless that game was changed on the phone.
+- Games still in progress are never copied.
+
+A game only reaches the testers through an upload, and an upload takes its games from the newest phone backup. After a game: plug the phone in, run `tools/publish_stats.sh` for the website as before, make a backup (any run of `tools/load_team.sh` makes one), then `tools/upload_to_testflight.sh`.
+
+The October 4 game in build BUILD_NUMBER_HERE comes from the backup of 14:14 on October 6, made just before Jackson Cleary was moved into the starting order. Testers therefore see him indented like a substitute in that box score; every stat is the same. The next upload made after a fresh phone backup corrects it on their phones by itself.
+
 ## Roster or song changes while Mikey is away
 
 The copy of the team inside the app only fills an empty app, so it cannot change his team later. A roster change while Mikey is away is typed into the app on the teammate’s phone, the way Mikey would on his own.

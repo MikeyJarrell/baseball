@@ -80,7 +80,7 @@ public enum AtBatAction: Equatable, Sendable {
     /// Open the warm-up songs for our pitcher: pick more, or play a different one now.
     case pickWarmUpSongs(Player)
     /// Keep the playing walk-up song going past its length, for a delay before the at-bat (the
-    /// "Keep playing" button beside a playing song). It then plays until it is faded.
+    /// "Extend" button beside a playing song). It then plays until it is faded.
     case keepSongPlaying
     /// Stop whatever is playing now (a tap on a playing song button). It fades out over two
     /// seconds; a second tap while it fades stops it at once.
