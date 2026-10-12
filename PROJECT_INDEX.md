@@ -1,6 +1,6 @@
 # Baseball — project dashboard
 
-**Last reviewed:** October 6, 2026
+**Last reviewed:** October 11, 2026
 
 | Item | Status |
 |---|---|
@@ -17,7 +17,9 @@
 | Mid-game fixes and box score tidy-up | Built: songs fade out over two seconds when stopped; Lineups and rosters in the Subs menu (late lineup cards, names, numbers, new players); warm-up songs added mid-game; game details (date, start, innings, home and away); the fielders check on the diamond with first initials; players with two last names go by the first (Torres, Rosas); Undo skips the defense check; box score with one team per headline line, capital positions, one note per line, no pinch-hitter or “ran for” notes ([handoff](plan/handoffs/mid-game-editing.md)). On the phone |
 | On-screen text | Trimmed: about 125 self-evident or explanatory lines shortened or cut ([handoff](plan/handoffs/trim-app-text.md)); on the phone |
 | Stats website | Built: `tools/publish_stats.sh` reads the games off the plugged-in phone and publishes season stats, box scores and player pages to mikeyjarrell.com/dogs/ (full names, hidden from search engines) ([handoff](plan/handoffs/stats-website.md)); published October 6 with the corrected Whales game. Rerun after each game |
-| Game setup screens | The opponent has its own screen and the date, home or away, innings, start, time limit and championship switch share the next one, which fits without scrolling; seven steps where there were six ([handoff](plan/handoffs/screen-pregame.md)). Accepted October 10; not on Mikey’s phone or TestFlight yet |
+| Game setup screens | The opponent has its own screen and the date, home or away, innings, start, time limit and championship switch share the next one, which fits without scrolling; seven steps where there were six ([handoff](plan/handoffs/screen-pregame.md)). Accepted October 10; on TestFlight since October 11 (build 202610112217), not installed on Mikey’s phone from the Mac |
+| Walk-up music fixes from the first game | Built October 11: the song stays quiet until the announcer has finished, then rises over a second and a half; an Extend button beside a playing walk-up song keeps it going through a delay until it is faded by hand or the next pitch ([handoff](plan/handoffs/walk-up-audio.md)). On TestFlight (build 202610112217); not heard on a phone yet |
+| Games on teammates’ phones | The TestFlight copy carries the finished games from Mikey’s phone backup, copied onto each phone once ([plan](plan/share-with-teammate.md)). Build 202610112217 carries the October 4 game as it was before Cleary was moved into the starting order; a fresh phone backup and upload corrects it |
 | In use at games | Live: the first real game was scored on the phone on October 4, 2026; fixes from it are on the phone |
 | Erick’s iPhone | Through TestFlight on Mikey’s paid developer account, with the team and songs built into the app; first copy uploaded October 6; Erick added to the internal testing group October 10 and emailed the install button, waiting on him to install ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
 | Matthew Glatt’s iPhone | Second TestFlight tester (biggio330@aol.com), invited and added to the “Team” test group October 10; waiting on him to install. Build 202610101443 uploaded October 10 with an App Store Connect key, which `tools/upload_to_testflight.sh` now uses, so uploads no longer depend on Xcode’s sign-in; his invitation was resent twice that evening ([plan](plan/share-with-teammate.md)) |

@@ -6,6 +6,8 @@
 
 **Second tester:** October 10, 2026. Matthew Glatt (biggio330@aol.com) is invited the same way, with the Marketing role, has accepted, and is in the “Team” test group; TestFlight shows him as invited, not yet installed. He follows the same [instructions](teammate-instructions.md). Erick is also in the group, added October 10, and also shows as invited, not yet installed. Adding a tester does not need a new copy of the app: both have the October 6 copy (202610061426).
 
+**Third copy:** October 11, 2026. Build 202610112217 went up at 22:19 with the same team, the October 4 game inside (see “The season’s games on a teammate’s phone”), the seven-step game setup, the later fade-in under the announcer and the Extend button for walk-up songs. Erick and Matthew had both installed by then and saw no games.
+
 ## How he gets the app
 
 Through TestFlight, Apple’s app for installing apps that are not in the App Store, on Mikey’s paid Apple Developer account (team 2U9RH88978, Apple account mikey1004@gmail.com).
@@ -49,7 +51,7 @@ Since October 11, 2026 the TestFlight copy also carries the games saved on Mikey
 
 A game only reaches the testers through an upload, and an upload takes its games from the newest phone backup. After a game: plug the phone in, run `tools/publish_stats.sh` for the website as before, make a backup (any run of `tools/load_team.sh` makes one), then `tools/upload_to_testflight.sh`.
 
-The October 4 game in build BUILD_NUMBER_HERE comes from the backup of 14:14 on October 6, made just before Jackson Cleary was moved into the starting order. Testers therefore see him indented like a substitute in that box score; every stat is the same. The next upload made after a fresh phone backup corrects it on their phones by itself.
+The October 4 game in build 202610112217 comes from the backup of 14:14 on October 6, made just before Jackson Cleary was moved into the starting order. Testers therefore see him indented like a substitute in that box score; every stat is the same. The next upload made after a fresh phone backup corrects it on their phones by itself.
 
 ## Roster or song changes while Mikey is away
 
@@ -94,5 +96,7 @@ Two traps met on October 10:
 Reaching the mini’s screen from the laptop works through Screen Sharing (`vnc://192.168.0.21`, no password asked), and Claude can click there, but only while the laptop is unlocked and on the home network or its VPN.
 
 A second copy waits in Xcode’s Organizer on the mini: version 0.1 (202610101536), built by the script on October 10 with the team inside and the seven-step game setup (the opponent on its own screen). It has not been uploaded, and it is the one to send if testers should get the new setup screens; running the script again builds a fresh copy with the same code.
+
+On October 11 the whole script, upload included, ran from the laptop over a remote login this way, with the two workarounds below; the job file and a copy of the backup sat in a plain folder on the mini (`~/tmp-walkup`, since removed). The simulator tests (`swift test`, `xcodebuild test`) run over a plain remote login with no workaround.
 
 The script did build and sign that copy over a remote login, with two workarounds: it was started as a one-time background job in the desktop session (`launchctl bootstrap gui/501` with a small job file), and the newest phone backup’s `Library/Application Support/Scorebook` folder was first copied to a plain folder, which the script was handed as the backup to use. The upload step was then refused with the account error that the key has since fixed.
