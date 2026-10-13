@@ -1,6 +1,7 @@
 // Previews of the batting screen: every sample situation, our hitter with a song (idle, during
-// the introduction, and counting down), our hitter without one, their hitter known only by
-// number, the "Is the game over?" pop-up, light and dark mode, and the largest text size.
+// the introduction, counting down, and kept playing), our hitter without one, their hitter
+// known only by number, the "Is the game over?" pop-up, light and dark mode, and the largest
+// text size.
 //
 // The previews are also the screen's demo: tapping a button shows what it would hand back.
 
@@ -111,6 +112,10 @@ struct AtBatPreview: View {
 
 #Preview("Our hitter with a song, counting down") {
     AtBatPreview(sample: SampleSituations.basesLoadedTwoOutsFullCount, playback: .song(endsAt: Date().addingTimeInterval(8)))
+}
+
+#Preview("Our hitter with a song, kept playing") {
+    AtBatPreview(sample: SampleSituations.basesLoadedTwoOutsFullCount, playback: .keptPlaying)
 }
 
 #Preview("Our hitter without a song (Fisk)") {

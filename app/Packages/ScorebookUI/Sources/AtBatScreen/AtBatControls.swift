@@ -361,7 +361,8 @@ struct CountButtons: View {
 // MARK: - The song button
 
 /// The song spot across the bottom edge: our hitter's walk-up song (play, then a countdown to
-/// the fade, tap to fade it out), a way to pick a song for our hitter who has none, our
+/// the fade, tap to fade it out, with an "Extend" button beside it while it plays, for a
+/// delay before the at-bat), a way to pick a song for our hitter who has none, our
 /// pitcher's warm-up song at the changeover when we take the field (with a button beside it to
 /// pick more warm-up songs for him), or an empty gray bar for their hitters.
 struct SongButton: View {
@@ -425,30 +426,55 @@ struct SongButton: View {
     }
 
     /// Our hitter's walk-up song: play (with the introduction first), then a countdown to the
-    /// fade; a tap while playing stops it.
+    /// fade; a tap while playing stops it. While it plays, an "Extend" button sits beside it: a
+    /// tap calls off the automatic fade, and the song plays until either button fades it.
+    /// (Not "Keep playing": those are the words on the "Is the game over?" question.)
     private func walkUpButton(_ player: Player, title: String, length: TimeInterval) -> some View {
         let playing = info.songPlayback != .idle && info.songPlayback != .warmUp
+        let kept = info.songPlayback == .keptPlaying
         let withIntro = info.settings.playIntroductions && player.introduction != nil
         let seconds = Int(length.rounded())
-        return Button {
-            onAction(playing ? .stopSong : .playWalkUp(player, withIntroduction: withIntro))
-        } label: {
-            HStack(spacing: Spacing.medium) {
-                SongButtonLabel(
-                    icon: playing ? "stop.fill" : "play.fill",
-                    title: title,
-                    detail: playing
-                        ? (info.songPlayback == .introduction ? "Introduction · song next" : "Playing")
-                        : (withIntro ? "Introduction, then \(seconds) seconds" : "\(seconds) seconds"),
-                    iconFill: ScorebookColor.onOurTeam,
-                    iconColor: ScorebookColor.ourTeam
-                )
-                if playing { SongCountdown(playback: info.songPlayback, length: length) }
+        return HStack(spacing: Spacing.small) {
+            Button {
+                onAction(playing ? .stopSong : .playWalkUp(player, withIntroduction: withIntro))
+            } label: {
+                HStack(spacing: Spacing.medium) {
+                    SongButtonLabel(
+                        icon: playing ? "stop.fill" : "play.fill",
+                        title: title,
+                        detail: kept ? "Playing until you fade it"
+                            : playing
+                            ? (info.songPlayback == .introduction ? "Introduction · song next" : "Playing")
+                            : (withIntro ? "Introduction, then \(seconds) seconds" : "\(seconds) seconds"),
+                        iconFill: ScorebookColor.onOurTeam,
+                        iconColor: ScorebookColor.ourTeam
+                    )
+                    if playing && !kept { SongCountdown(playback: info.songPlayback, length: length) }
+                }
+                .foregroundStyle(ScorebookColor.onOurTeam)
             }
-            .foregroundStyle(ScorebookColor.onOurTeam)
+            .buttonStyle(TeamButtonStyle(.ours, isActive: playing))
+            .accessibilityLabel(Text(playing ? "Fade out walk-up song, \(title)" : "Play walk-up song, \(title)"))
+            if playing {
+                // For a delay before the at-bat: the first tap keeps the song going, the
+                // second fades it out.
+                Button { onAction(kept ? .stopSong : .keepSongPlaying) } label: {
+                    VStack(spacing: 2) {
+                        Image(systemName: kept ? "speaker.slash.fill" : "infinity")
+                            .font(.title3.weight(.bold))
+                        Text(kept ? "Fade out" : "Extend")
+                            .font(ScorebookFont.caption.weight(.semibold))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .foregroundStyle(ScorebookColor.onOurTeam)
+                    .frame(width: Spacing.songButtonHeight + Spacing.large)
+                }
+                .buttonStyle(TeamButtonStyle(.ours, isActive: kept))
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Text(kept ? "Fade out walk-up song" : "Extend walk-up song"))
+            }
         }
-        .buttonStyle(TeamButtonStyle(.ours, isActive: playing))
-        .accessibilityLabel(Text(playing ? "Fade out walk-up song, \(title)" : "Play walk-up song, \(title)"))
     }
 }
 

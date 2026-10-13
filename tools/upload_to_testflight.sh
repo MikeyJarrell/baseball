@@ -1,15 +1,19 @@
 #!/bin/bash
-# Sends a new copy of the Scorebook to TestFlight, with the team built in, for phones that are
-# never plugged into this Mac (Erick's). See plan/share-with-teammate.md.
+# Sends a new copy of the Scorebook to TestFlight, with the team and the season's games built
+# in, for phones that are never plugged into this Mac (Erick's, Matt's). See
+# plan/share-with-teammate.md.
 #
 #     tools/upload_to_testflight.sh                  # team from the newest phone backup
 #     tools/upload_to_testflight.sh <backup folder>  # team from that backup instead
 #     tools/upload_to_testflight.sh --stage-only DIR # just lay out the starter team in DIR
 #
 # The team comes from a copy of Mikey's phone in ~/Dropbox/baseball/phone-backups/ (made by
-# tools/load_team.sh): every team, the song list, every song file and announcer recording, and
-# the settings. Games are left out. The app puts these in place the first time it opens with
-# no team saved; a phone that already has a team keeps its own.
+# tools/load_team.sh): every team, the song list, every song file and announcer recording, the
+# settings, and the games. The app puts the team in place the first time it opens with no team
+# saved; a phone that already has a team keeps its own. The finished games go onto every phone
+# that does not have them, once each: one deleted on a phone stays deleted, and a phone's own
+# copy of a game is never replaced (see StarterGames.swift). Games still in progress are
+# skipped by the app.
 #
 # Signing and the upload need no Xcode sign-in (the command-line upload stopped working with it
 # after Mikey's password change on October 6). They use what lives in ~/.appstoreconnect/ on the
@@ -46,14 +50,16 @@ if [[ ! -d "$DATA/teams" ]]; then
     exit 1
 fi
 
-# Lay out the starter team: everything the app saves except games.
+# Lay out the starter team: everything the app saves.
 STARTER="${STAGE_ONLY:-$WORK/StarterTeam}"
-rm -rf "$STARTER" && mkdir -p "$STARTER"
+rm -rf "$STARTER" && mkdir -p "$STARTER/games"
 cp -R "$DATA/teams" "$STARTER/teams"
 cp -R "$DATA/songs" "$STARTER/songs"
 [[ -f "$DATA/settings.json" ]] && cp "$DATA/settings.json" "$STARTER/settings.json"
+[[ -d "$DATA/games" ]] && cp -R "$DATA/games/." "$STARTER/games/"
 echo "Team from $(basename "$SOURCE"): $(ls "$STARTER/teams" | wc -l | tr -d ' ') teams," \
-     "$(ls "$STARTER/songs/audio" | wc -l | tr -d ' ') song and announcer files" \
+     "$(ls "$STARTER/songs/audio" | wc -l | tr -d ' ') song and announcer files," \
+     "saved games: $(ls "$STARTER/games" | wc -l | tr -d ' ')" \
      "($(du -sh "$STARTER" | cut -f1))."
 if [[ -n "$STAGE_ONLY" ]]; then exit 0; fi
 
