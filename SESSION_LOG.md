@@ -512,3 +512,34 @@ SESSLOG:[2026-10-10 16:40]
 
 ### Files
 - [modified] `tools/upload_to_testflight.sh`, `plan/share-with-teammate.md`, `PROJECT_INDEX.md`
+
+---
+
+## [2026-10-12 19:55] Later fade-in, an Extend button, and the season’s games on teammates’ phones
+SESSLOG:[2026-10-12 19:55]
+
+**Project(s):** baseball
+
+### Decisions
+- The TestFlight copy carries the games saved on Mikey’s phone, from the same phone backup as the team. Each finished game is copied onto a phone once: a phone’s own copy is never replaced, a deleted game stays deleted, and a corrected game in a later copy replaces only one the app itself copied in and nobody changed since (`StarterGames.swift`).
+- The walk-up song stays at a third of full volume until the announcer has finished, then rises over a second and a half and reaches full volume at the hook. Walk-ups with an introduction run a second and a half longer.
+- An Extend button beside a playing walk-up song calls off the automatic fade, bringing the music back if the fade had started. The song then plays until either button fades it, the next pitch is recorded, or the track ends.
+- The button is “Extend”, not “Keep playing”, which is already the answer to “Is the game over?”.
+- Build 202610112217 was uploaded on October 11 at 22:19 and Apple finished processing it. It also carries the seven-step game setup.
+- The whole upload ran from the laptop over a remote login to the Mac mini, with the two workarounds in `plan/share-with-teammate.md`.
+
+### Still Open
+- Should finished games move between phones without the Mac? (recorded in OPEN_QUESTIONS.md)
+
+### Follow-ups
+- [ ] Mikey listens to the fade-in and tries Extend on his own phone. Nobody has heard either on a phone.
+- [ ] Before Mikey installs the TestFlight copy over the one installed from the Mac, back up the phone: the last correction to the October 4 game (Cleary tenth in the starting order) is on the phone and nowhere else.
+- [ ] Erick and Matt tap Update in TestFlight and confirm the October 4 game appears.
+- [ ] Next time the phone is plugged into the Mac: make a fresh backup and upload again, which puts Cleary right in the testers’ box score.
+
+### Files
+- [created] `app/Packages/ScorebookCore/Sources/Storage/StarterGames.swift`, `app/Packages/ScorebookCore/Tests/StorageTests/StarterGamesTests.swift`, `app/Packages/ScorebookUI/Tests/WalkUpAudioTests/KeepPlayingTests.swift`, `OPEN_QUESTIONS.md`
+- [modified] `app/Packages/ScorebookUI/Sources/WalkUpAudio/` (`WalkUpMath.swift`, `StadiumAudioPlayer.swift`), `app/Packages/ScorebookUI/Sources/AtBatScreen/`, `app/Packages/ScorebookCore/Sources/Model/WalkUpAudioService.swift`, `app/Scorebook/` (`StarterTeam.swift`, `GameScreen.swift`, `AppModel.swift`), `tools/upload_to_testflight.sh`, `plan/share-with-teammate.md`, `plan/handoffs/walk-up-audio.md`, `PROJECT_INDEX.md`, `AGENTS.md`, `team/README.md`
+
+### Context
+Three fixes from the first real game. Teammates saw no games because the copy of the app they install carried the team and never the games; the music reached full volume as the announcer finished and covered the end of the name; and there was no way to hold a walk-up song through a delay. Tried and dropped: remembering only a fingerprint of each game offered to a phone, which would have let an upload made from an older backup overwrite the game on the phone it was scored on, so the record also says whether the app copied the game in. The newest phone backup is from just before Cleary was moved into the starting order, so testers see him indented like a substitute until the next upload after a fresh backup. All tests passed on the Mac mini (game logic, the screens, ten whole-app tests, and four new tests that really play a song), and a trial build on a clean simulator showed the game arriving on a new phone and on a phone that had the team already, and staying away once deleted.
