@@ -81,6 +81,8 @@ struct SavedBoxScore: View {
     var id: GameID
     var onRequest: (PostgameRequest) -> Void
     @State private var box: BoxScore?
+    /// True while "Resume this game?" is showing.
+    @State private var askingToResume = false
 
     var body: some View {
         Group {
@@ -90,6 +92,21 @@ struct SavedBoxScore: View {
             } else {
                 ProgressView()
             }
+        }
+        .toolbar {
+            // A game stopped early (a postponed game) can be picked up where it stopped.
+            if app.finishedGames.contains(where: { $0.id == id }) {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Resume") { askingToResume = true }
+                }
+            }
+        }
+        .confirmationDialog("Resume this game where it stopped?", isPresented: $askingToResume, titleVisibility: .visible) {
+            Button("Resume this game") {
+                Task { if await app.reopenGame(id) { onRequest(.done) } }
+            }
+        } message: {
+            Text("It comes off the season stats until it is ended again. Resume scoring is then on the home screen.")
         }
         .task(id: id) { box = await app.boxScore(for: id) }
     }
