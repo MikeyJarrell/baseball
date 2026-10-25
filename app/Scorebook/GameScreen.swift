@@ -63,13 +63,16 @@ enum GameSheet: Identifiable, Equatable {
 enum GameCover: Identifiable, Equatable {
     /// The in-play sequence, opened from this situation.
     case playEntry(PlayEntryStart, Situation)
-    /// The game overview.
+    /// The game overview, from the Box score button: no fixing.
     case overview
+    /// The play-by-play, from Manual adjustment, to fix plays and pitches.
+    case fixPlays
 
     var id: String {
         switch self {
         case .playEntry(let start, _): "play-\(start)"
         case .overview: "overview"
+        case .fixPlays: "fix-plays"
         }
     }
 }
@@ -232,6 +235,8 @@ struct GameScreen: View {
             sheet = .gameDetails
         case .openLineups:
             sheet = .lineups
+        case .openPlayFixing:
+            cover = .fixPlays
         case .deleteGame:
             let id = session.game.id
             app.audio?.stop()
@@ -473,7 +478,9 @@ struct GameScreen: View {
                 }
             }
         case .overview:
-            OverviewPage(session: session, onClose: { cover = nil })
+            OverviewPage(session: session, canFix: false, onClose: { cover = nil })
+        case .fixPlays:
+            OverviewPage(session: session, canFix: true, onClose: { cover = nil })
         }
     }
 

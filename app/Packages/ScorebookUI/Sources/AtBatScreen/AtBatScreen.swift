@@ -77,6 +77,8 @@ public enum AtBatAction: Equatable, Sendable {
     case playWarmUp(Player)
     /// Open the game details: date, start time, innings, home and away.
     case openGameDetails
+    /// Open the play-by-play to fix any play or pitch (the game menu's Manual adjustment).
+    case openPlayFixing
     /// Open both teams' lineups and rosters, to finish entering them after a rushed start.
     case openLineups
     /// Delete this game, after the scorer confirmed. Nothing of it is kept but the backup.

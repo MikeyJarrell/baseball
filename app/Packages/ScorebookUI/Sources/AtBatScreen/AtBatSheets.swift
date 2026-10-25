@@ -39,7 +39,7 @@ struct GameMenuSheet: View {
                 }
                 Section("Manual adjustment") {
                     row("Fix a play or a pitch", detail: "Every play so far", icon: "list.bullet.rectangle") {
-                        choose(.openBoxScore)
+                        choose(.openPlayFixing)
                     }
                     row("Set outs, count, score or runners", detail: nil, icon: "slider.horizontal.3") {
                         choose(.openManualAdjustment)

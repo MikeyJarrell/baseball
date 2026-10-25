@@ -56,7 +56,7 @@ final class SmokeTests: XCTestCase {
 
         let link = app.buttons["Dropped third strike instead"]
         XCTAssertTrue(link.waitForExistence(timeout: 10), "the link on the defense check")
-        XCTAssertTrue(app.buttons["Everyone’s where they were"].exists, "the defense check itself")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Everyone’s")).firstMatch.exists, "the defense check itself")
         keepScreenshot(app, named: "defense check after a strikeout")
 
         link.tap()
@@ -67,7 +67,7 @@ final class SmokeTests: XCTestCase {
         app.buttons["Cancel"].tap()
 
         // Backed out: the inning still ends, so the check comes back.
-        XCTAssertTrue(app.buttons["Everyone’s where they were"].waitForExistence(timeout: 5), "the check back again")
+        XCTAssertTrue(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Everyone’s")).firstMatch.waitForExistence(timeout: 5), "the check back again")
     }
 
     /// Deleting the game in progress from the games list: Edit, Delete, the question naming
@@ -85,13 +85,13 @@ final class SmokeTests: XCTestCase {
         XCTAssertTrue(app.buttons["Ball"].waitForExistence(timeout: 10))
         // The batting screen slides up over the home screen when the app opens; a tap while it
         // is still sliding is lost, so tap the menu again until it opens.
-        let firstRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Manual adjustment")).firstMatch
+        let firstRow = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Date, start")).firstMatch
         for _ in 0..<3 where !firstRow.exists {
             app.buttons["Game menu"].tap()
             _ = firstRow.waitForExistence(timeout: 2)
         }
-        // The menu opens half-height, with Home screen further down its list.
-        let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Home screen")).firstMatch
+        // The menu fills the screen, with Pause near the bottom of its list.
+        let home = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Pause and go")).firstMatch
         for _ in 0..<4 where !home.isHittable { firstRow.swipeUp() }
         XCTAssertTrue(home.exists, "Home screen in the game menu")
         home.tap()
