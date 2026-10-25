@@ -240,6 +240,28 @@ final class AppModel {
         }
     }
 
+    /// Takes back the end of a finished game, so it can be scored again from where it stopped:
+    /// a game postponed partway through and picked up on another day. Refused while another
+    /// game is in progress, since one game is scored at a time.
+    func reopenGame(_ id: GameID) async -> Bool {
+        guard let storage else { return false }
+        if let session, !session.isFinished, session.game.id != id {
+            problem = "A game is still in progress. End it first."
+            return false
+        }
+        do {
+            var game = try await storage.loadGame(id)
+            while let last = game.events.last, case .endOfGame = last.kind { game.events.removeLast() }
+            try await storage.saveGame(game)
+            session = await GameSession.resume(game, storage: storage, engine: engine, stats: stats)
+            await reloadGames()
+            return true
+        } catch {
+            problem = "The game could not be reopened. (\(error.localizedDescription))"
+            return false
+        }
+    }
+
     /// Closes the finished game, so the home screen no longer offers to resume it.
     func closeFinishedGame() {
         if session?.isFinished == true { session = nil }
