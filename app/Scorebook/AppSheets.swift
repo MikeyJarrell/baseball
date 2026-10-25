@@ -21,9 +21,14 @@ struct PregameCover: View {
     var onStarted: () -> Void
     var onCancel: () -> Void
 
+    /// Our players whose names were recorded on the announcer step.
+    @State private var recorded: Set<PlayerID> = []
+    /// The player whose name is being recorded.
+    @State private var recording: Player?
+
     var body: some View {
         if let input = app.pregameInput() {
-            PregameFlow(input: input) { result in
+            PregameFlow(input: input, recordedNames: recorded, onRecordName: record) { result in
                 switch result {
                 case .playBall(let setup):
                     Task { if await app.startGame(setup) { onStarted() } }
@@ -31,9 +36,28 @@ struct PregameCover: View {
                     onCancel()
                 }
             }
+            .sheet(item: $recording) { player in
+                NameRecordingSheet(player: player) { kept in
+                    recording = nil
+                    guard let kept else { return }
+                    recorded.insert(player.id)
+                    Task { await app.setNameIntroduction(kept, for: player.id) }
+                }
+            }
         } else {
             EmptyPage(text: "Set up your team first, in Teams.")
                 .onTapGesture(perform: onCancel)
+        }
+    }
+
+    /// Opens the recorder for one of our players. A player typed in on the setup screens goes
+    /// on the saved team first, so the recording has somewhere to be kept.
+    private func record(_ player: Player) {
+        Task {
+            if let team = app.ourTeam, team.player(player.id) == nil {
+                await app.updateSavedPlayer(player, teamID: team.id)
+            }
+            recording = app.ourTeam?.player(player.id) ?? player
         }
     }
 }

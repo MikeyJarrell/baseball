@@ -6,8 +6,10 @@
 // 3. Our batting order: who bats and in what order, designated non-runners, the bench
 //    (`BattingOrderStep`).
 // 4. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
+// 4b. Only when one of our hitters has no recorded name (a new player): record it for the
+//    announcer (`AnnouncerStep`), through the app's recorder.
 // 5. Their lineup: every name on their saved roster, or numbers (`TheirLineupStep`).
-// 6. Their starting pitcher, with throwing hand (`PitchersStep`).
+// 6. Their fielders, on the same screen as ours (`FieldingStep` with `ours: false`).
 //
 // Every step but the last has Skip, which starts the game with what is set so far.
 // 7. Review and "Play ball" (`ReviewStep`).
@@ -31,7 +33,7 @@ import DesignSystem
 /// The seven pregame steps, in order. `game` is the game's details; `ours` is our batting
 /// order; `fielding` is where we field.
 public enum PregameStep: Hashable, CaseIterable, Sendable {
-    case opponent, game, ours, fielding, theirs, pitchers, review
+    case opponent, game, ours, fielding, announcer, theirs, theirFielding, review
 
     /// Where this step falls in the sequence, counting from 1, for the dots under the title.
     var number: Int { (Self.allCases.firstIndex(of: self) ?? 0) + 1 }
@@ -41,6 +43,11 @@ public enum PregameStep: Hashable, CaseIterable, Sendable {
 public struct PregameFlow: View {
     /// Called once, with the finished setup or a cancel.
     var onFinish: (PregameResult) -> Void
+    /// Our players whose names have been recorded since the draft began (on the announcer step).
+    var recordedNames: Set<PlayerID> = []
+    /// Opens the app's name recorder for one of our players, from the announcer step. Missing
+    /// leaves that step out.
+    var onRecordName: ((Player) -> Void)?
 
     @State private var draft: PregameDraft
     @State private var path: [PregameStep]
@@ -48,8 +55,15 @@ public struct PregameFlow: View {
     /// - Parameters:
     ///   - input: Our team, the saved opponents, recent games and who pitched lately.
     ///   - onFinish: Hands back the game setup when the scorer taps "Play ball", or a cancel.
-    public init(input: PregameInput, onFinish: @escaping (PregameResult) -> Void) {
+    /// - Parameters:
+    ///   - recordedNames: Our players whose names the app has recorded since setup began.
+    ///   - onRecordName: Opens the name recorder for one of our players. Leave it out to skip
+    ///     the announcer step.
+    public init(input: PregameInput, recordedNames: Set<PlayerID> = [], onRecordName: ((Player) -> Void)? = nil,
+                onFinish: @escaping (PregameResult) -> Void) {
         self.init(draft: PregameDraft(input: input), startingAt: .opponent, onFinish: onFinish)
+        self.recordedNames = recordedNames
+        self.onRecordName = onRecordName
     }
 
     /// Opens partway through, for previews: the steps before `step` are already behind it.
@@ -74,11 +88,17 @@ public struct PregameFlow: View {
                     case .ours:
                         BattingOrderStep(draft: $draft, onNext: { path.append(.fielding) })
                     case .fielding:
-                        FieldingStep(draft: $draft, onNext: { path.append(.theirs) })
+                        FieldingStep(draft: $draft, onNext: {
+                            let ask = onRecordName != nil && !draft.needsNameRecording(recordedNames).isEmpty
+                            path.append(ask ? .announcer : .theirs)
+                        })
+                    case .announcer:
+                        AnnouncerStep(draft: $draft, recordedNames: recordedNames, onRecord: onRecordName ?? { _ in },
+                                      onNext: { path.append(.theirs) })
                     case .theirs:
-                        TheirLineupStep(draft: $draft, onNext: { path.append(.pitchers) })
-                    case .pitchers:
-                        PitchersStep(draft: $draft, onNext: { path.append(.review) })
+                        TheirLineupStep(draft: $draft, onNext: { path.append(.theirFielding) })
+                    case .theirFielding:
+                        FieldingStep(draft: $draft, ours: false, onNext: { path.append(.review) })
                     case .review:
                         // A binding, not a copy: a pushed screen keeps whatever it was first
                         // handed, so a plain copy could miss choices made on earlier steps.

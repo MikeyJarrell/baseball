@@ -1,4 +1,5 @@
-// Step four of seven: where our players field.
+// Where each team fields: ours (step four) and theirs, after their lineup. Both teams get the
+// same screen; only ours has positions shared by turns.
 //
 // The field drawing shows each position with who plays it. Tapping a position on the diamond
 // (or its row in the list under it) opens a list of our whole roster: pick who plays there.
@@ -11,18 +12,25 @@ import SwiftUI
 import Model
 import DesignSystem
 
-/// The fourth pregame step: our fielders, on the field drawing.
+/// A fielders step, on the field drawing: ours, or theirs (`ours: false`).
 struct FieldingStep: View {
     @Binding var draft: PregameDraft
+    var ours: Bool = true
     var onNext: () -> Void
 
     /// The position whose player list is open.
     @State private var picking: PickedPosition?
 
     private var lineup: OurLineup { draft.ours }
+    /// Who plays each position for this team.
+    private var defense: [Position: PlayerID] { draft.fieldingDefense(ours: ours) }
+    /// Looks up one of this team's players.
+    private func player(_ id: PlayerID) -> Player? { draft.fieldingPlayers(ours: ours).first { $0.id == id } }
 
     var body: some View {
-        StepPage(step: .fielding, title: "Fielders", buttonTitle: "Next: \(draft.opponentName) lineup", onButton: onNext) {
+        StepPage(step: ours ? .fielding : .theirFielding,
+                 title: ours ? "Fielders" : "\(draft.opponentName) fielders",
+                 buttonTitle: ours ? "Next: \(draft.opponentName) lineup" : "Next: review", onButton: onNext) {
             Section {
                 FieldDrawing(highlightedPositions: picking.map { [$0.position] } ?? [], onTap: { tap in
                     if case .position(let position) = tap { picking = PickedPosition(position: position) }
@@ -37,6 +45,17 @@ struct FieldingStep: View {
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .padding(.horizontal, Spacing.extraSmall)
                     .bareRow()
+                if let pitcher = defense[.pitcher].flatMap(player), pitcher.throwsWith == nil || draft.handEdits[pitcher.id] != nil {
+                    HStack(spacing: Spacing.small) {
+                        Text("\(pitcher.lastName) throws").font(ScorebookFont.body)
+                        Spacer()
+                        ForEach(Hand.allCases, id: \.self) { hand in
+                            Button(hand == .right ? "Right" : "Left") { draft.handEdits[pitcher.id] = hand }
+                                .buttonStyle(ChipStyle(isOn: draft.handEdits[pitcher.id] == hand))
+                        }
+                    }
+                    .cardRow()
+                }
             }
             Section {
                 ForEach(Position.allCases, id: \.self) { position in
@@ -47,7 +66,7 @@ struct FieldingStep: View {
             }
         }
         .sheet(item: $picking) { picked in
-            FielderPicker(draft: $draft, position: picked.position) { picking = nil }
+            FielderPicker(draft: $draft, position: picked.position, ours: ours) { picking = nil }
                 .presentationDetents([.large])
         }
     }
@@ -56,9 +75,9 @@ struct FieldingStep: View {
     /// last names for a position shared by turns.
     private var fielderTags: [Position: FielderNameTag] {
         var tags: [Position: FielderNameTag] = [:]
-        for (position, id) in lineup.defense {
-            guard let starter = lineup.player(id) else { continue }
-            let second = lineup.alternates[position].flatMap(lineup.player)
+        for (position, id) in defense {
+            guard let starter = player(id) else { continue }
+            let second = ours ? lineup.alternates[position].flatMap(lineup.player) : nil
             tags[position] = second.map { FielderNameTag(sharing: starter, with: $0) } ?? FielderNameTag(starter)
         }
         return tags
@@ -66,10 +85,10 @@ struct FieldingStep: View {
 
     /// One position in the list under the drawing: its number, who plays it, whether they bat.
     private func positionRow(_ position: Position) -> some View {
-        let starter = lineup.defense[position].flatMap(lineup.player)
-        let second = lineup.alternates[position].flatMap(lineup.player)
+        let starter = defense[position].flatMap(player)
+        let second = ours ? lineup.alternates[position].flatMap(lineup.player) : nil
         var detail = PregameWording.positionName(position)
-        if let starter, !lineup.isBatting(starter.id) { detail += " · doesn’t bat" }
+        if let starter, ours ? !lineup.isBatting(starter.id) : !draft.theirStatus(of: starter.id).contains("bats") { detail += " · doesn’t bat" }
         if let second { detail += " · \(second.lastName) in even innings" }
         return Button {
             picking = PickedPosition(position: position)
@@ -109,6 +128,7 @@ struct PickedPosition: Identifiable, Equatable {
 struct FielderPicker: View {
     @Binding var draft: PregameDraft
     var position: Position
+    var ours: Bool = true
     var onDone: () -> Void
 
     private var lineup: OurLineup { draft.ours }
@@ -116,7 +136,7 @@ struct FielderPicker: View {
     @State private var choosingAlternate = false
 
     var body: some View {
-        let starter = lineup.defense[position]
+        let starter = draft.fieldingDefense(ours: ours)[position]
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -132,15 +152,17 @@ struct FielderPicker: View {
                         }
                         .buttonStyle(ChipStyle())
                     } else {
-                        PlayerGrid(lineup.roster.map { choice($0, isOn: starter == $0.id) }) { id in
-                            draft.ours.assign(id, to: position); onDone()
+                        PlayerGrid(draft.fieldingPlayers(ours: ours).map { choice($0, isOn: starter == $0.id) }) { id in
+                            draft.assignFielder(id, to: position, ours: ours); onDone()
                         }
                         HStack(spacing: Spacing.small) {
                             if starter != nil {
-                                Button("Nobody") { draft.ours.assign(nil, to: position); onDone() }
+                                Button("Nobody") { draft.assignFielder(nil, to: position, ours: ours); onDone() }
                                     .buttonStyle(ChipStyle())
-                                Button("Take turns by inning…") { choosingAlternate = true }
-                                    .buttonStyle(ChipStyle())
+                                if ours {
+                                    Button("Take turns by inning…") { choosingAlternate = true }
+                                        .buttonStyle(ChipStyle())
+                                }
                             }
                         }
                     }
@@ -158,7 +180,8 @@ struct FielderPicker: View {
 
     /// One of our players in the grid, with where they are now.
     private func choice(_ player: Player, isOn: Bool) -> PlayerGrid.Choice {
-        PlayerGrid.Choice(id: player.id, name: player.displayName,
-                          detail: PregameWording.status(of: player.id, in: lineup), isChosen: isOn)
+        PlayerGrid.Choice(id: player.id, name: ours ? player.displayName : PregameWording.theirHitter(player),
+                          detail: ours ? PregameWording.status(of: player.id, in: lineup) : draft.theirStatus(of: player.id),
+                          isChosen: isOn)
     }
 }
