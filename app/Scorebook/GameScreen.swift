@@ -25,6 +25,7 @@ import WalkUpAudio
 import AtBatScreen
 import PlayEntry
 import GameChanges
+import PregameScreens
 import PostgameScreens
 import BoxScoreText
 
@@ -317,8 +318,12 @@ struct GameScreen: View {
         case .gameDetails:
             GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
         case .lineups:
-            LineupsSheet(context: context, onFinish: done)
-                .presentationDetents([.large])
+            LineupEditorPage(setup: session.setup, onDone: { away, home in
+                sheet = nil
+                Task { await applyRosters(away: away, home: home) }
+            }, onCancel: { sheet = nil })
+            .presentationDetents([.large])
+            .interactiveDismissDisabled()
         case .warmUpSongs(let pitcher):
             if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
                 WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
@@ -406,6 +411,22 @@ struct GameScreen: View {
                 await openNameRecorder(for: player)
             }
         }
+    }
+
+    /// Puts the lineups fixed on Rosters into the game, one team at a time, and saves anyone
+    /// new to their saved team.
+    private func applyRosters(away: GameTeam, home: GameTeam) async {
+        for (side, team) in [(TeamSide.away, away), (.home, home)] {
+            let before = session.setup[side]
+            guard team.roster != before.roster || team.battingOrder != before.battingOrder || team.defense != before.defense
+                    || team.designatedNonRunners != before.designatedNonRunners || team.fieldingRotations != before.fieldingRotations
+            else { continue }
+            guard await session.editStartingLineup(team, on: side) else { return }
+            for player in team.roster where before.player(player.id) != player && !player.isUnnamed {
+                await app.updateSavedPlayer(player, teamID: team.teamID)
+            }
+        }
+        cueOurNextHitter()
     }
 
     /// Opens the name recorder once the sheet before it has slid away.

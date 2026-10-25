@@ -220,6 +220,7 @@ public enum RosterWords {
         "Jaguares": "JAG",
         "Lemon Grove Athletics": "LGA",
         "Riptide": "RIP",
+        "San Diego Huskies": "HUS",
     ]
 }
 
