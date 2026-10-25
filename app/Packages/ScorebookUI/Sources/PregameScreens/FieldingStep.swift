@@ -27,7 +27,7 @@ struct FieldingStep: View {
                 FieldDrawing(highlightedPositions: picking.map { [$0.position] } ?? [], onTap: { tap in
                     if case .position(let position) = tap { picking = PickedPosition(position: position) }
                 })
-                .fielderNames(fielderNames)
+                .fieldersAsNames(fielderTags)
                 .frame(height: 330)
                 .frame(maxWidth: .infinity)
                 .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
@@ -48,21 +48,20 @@ struct FieldingStep: View {
         }
         .sheet(item: $picking) { picked in
             FielderPicker(draft: $draft, position: picked.position) { picking = nil }
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
         }
     }
 
-    /// The name written under each position on the drawing, with the first initial since
-    /// teammates can share a last name: "J. Quinn", or "J. Quinn/K. Nash" for a position
-    /// shared by turns.
-    private var fielderNames: [Position: String] {
-        var names: [Position: String] = [:]
+    /// The name written at each position on the drawing: first name over last name, or both
+    /// last names for a position shared by turns.
+    private var fielderTags: [Position: FielderNameTag] {
+        var tags: [Position: FielderNameTag] = [:]
         for (position, id) in lineup.defense {
             guard let starter = lineup.player(id) else { continue }
             let second = lineup.alternates[position].flatMap(lineup.player)
-            names[position] = second.map { "\(starter.initialAndLastName)/\($0.initialAndLastName)" } ?? starter.initialAndLastName
+            tags[position] = second.map { FielderNameTag(sharing: starter, with: $0) } ?? FielderNameTag(starter)
         }
-        return names
+        return tags
     }
 
     /// One position in the list under the drawing: its number, who plays it, whether they bat.
@@ -76,7 +75,7 @@ struct FieldingStep: View {
             picking = PickedPosition(position: position)
         } label: {
             HStack(spacing: Spacing.medium) {
-                PositionCircle(position: position)
+                PositionLabel(position: position)
                 VStack(alignment: .leading, spacing: 2) {
                     if let starter {
                         Text(second == nil ? starter.displayName : "\(starter.lastName) / \(second?.lastName ?? "")")
@@ -113,52 +112,43 @@ struct FielderPicker: View {
     var onDone: () -> Void
 
     private var lineup: OurLineup { draft.ours }
+    /// True after "Take turns by inning…": the grid then picks the even-innings player.
+    @State private var choosingAlternate = false
 
     var body: some View {
         let starter = lineup.defense[position]
         NavigationStack {
-            List {
-                Section {
-                    ForEach(lineup.roster) { player in
-                        playerRow(player, isOn: starter == player.id) {
-                            draft.ours.assign(player.id, to: position)
-                        }
-                    }
-                    if starter != nil {
-                        ChoiceRow(title: "Nobody", detail: nil, isOn: false,
-                                  action: { draft.ours.assign(nil, to: position); onDone() }) {
-                            IconBadge(systemName: "xmark", tint: ScorebookColor.out)
-                        }
-                        .cardRow()
-                    }
-                } header: {
-                    SectionHeader(title: "Who plays \(position.name)?")
-                }
-
-                if let starter, let starterPlayer = lineup.player(starter) {
-                    Section {
-                        ChoiceRow(title: "Nobody else", detail: "\(starterPlayer.lastName) plays every inning",
-                                  isOn: lineup.alternates[position] == nil,
-                                  action: { draft.ours.setAlternate(nil, at: position); onDone() }) { EmptyView() }
-                            .cardRow()
-                        ForEach(lineup.roster.filter { $0.id != starter }) { player in
-                            playerRow(player, isOn: lineup.alternates[position] == player.id) {
-                                draft.ours.setAlternate(player.id, at: position)
-                            }
-                        }
-                    } header: {
-                        SectionHeader(title: "Alternate with…")
-                    } footer: {
-                        Text("\(starterPlayer.lastName) plays \(position.name) in odd innings; the player you pick, in even innings.")
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.medium) {
+                    if choosingAlternate, let starter, let starterPlayer = lineup.player(starter) {
+                        Text("Who plays \(position.name) in even innings? \(starterPlayer.lastName) plays the odd ones.")
                             .font(ScorebookFont.caption)
                             .foregroundStyle(ScorebookColor.textSecondary)
+                        PlayerGrid(lineup.roster.filter { $0.id != starter }.map { choice($0, isOn: lineup.alternates[position] == $0.id) }) { id in
+                            draft.ours.setAlternate(id, at: position); onDone()
+                        }
+                        Button("Nobody else: \(starterPlayer.lastName) plays every inning") {
+                            draft.ours.setAlternate(nil, at: position); onDone()
+                        }
+                        .buttonStyle(ChipStyle())
+                    } else {
+                        PlayerGrid(lineup.roster.map { choice($0, isOn: starter == $0.id) }) { id in
+                            draft.ours.assign(id, to: position); onDone()
+                        }
+                        HStack(spacing: Spacing.small) {
+                            if starter != nil {
+                                Button("Nobody") { draft.ours.assign(nil, to: position); onDone() }
+                                    .buttonStyle(ChipStyle())
+                                Button("Take turns by inning…") { choosingAlternate = true }
+                                    .buttonStyle(ChipStyle())
+                            }
+                        }
                     }
                 }
+                .padding(Spacing.large)
             }
-            .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
             .background(ScorebookColor.background)
-            .navigationTitle(PregameWording.positionName(position))
+            .navigationTitle("Who plays \(position.name)?")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) { Button("Done", action: onDone) }
@@ -166,12 +156,9 @@ struct FielderPicker: View {
         }
     }
 
-    /// One of our players: number badge, name, where they are now, and the round mark.
-    private func playerRow(_ player: Player, isOn: Bool, pick: @escaping () -> Void) -> some View {
-        ChoiceRow(title: player.displayName, detail: PregameWording.status(of: player.id, in: lineup), isOn: isOn,
-                  action: { pick(); onDone() }) {
-            PlayerNumberBadge(PregameWording.badge(player), look: .ours, size: 36).accessibilityHidden(true)
-        }
-        .cardRow()
+    /// One of our players in the grid, with where they are now.
+    private func choice(_ player: Player, isOn: Bool) -> PlayerGrid.Choice {
+        PlayerGrid.Choice(id: player.id, name: player.displayName,
+                          detail: PregameWording.status(of: player.id, in: lineup), isChosen: isOn)
     }
 }

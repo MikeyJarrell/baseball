@@ -133,7 +133,7 @@ public struct DefenseSheet: View {
             FieldDrawing(highlightedPositions: Set(changedPositions), onTap: { tap in
                 if case .position(let position) = tap { openPosition = OpenPosition(position: position) }
             })
-            .fielderNames(fielderNames)
+            .fieldersAsNames(fielderTags)
             .frame(height: 300)
             .frame(maxWidth: .infinity)
             .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
@@ -151,17 +151,17 @@ public struct DefenseSheet: View {
         }
         .sheet(item: $openPosition) { open in
             playerPicker(for: open.position)
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
         }
     }
 
-    /// The name on the drawing at each position: first initial and last name, "J. Webb".
-    private var fielderNames: [Position: String] {
-        var names: [Position: String] = [:]
+    /// The name on the drawing at each position: first name over last name.
+    private var fielderTags: [Position: FielderNameTag] {
+        var tags: [Position: FielderNameTag] = [:]
         for (position, id) in draft {
-            names[position] = context.player(id)?.initialAndLastName ?? context.shortName(id)
+            tags[position] = context.player(id).map(FielderNameTag.init) ?? FielderNameTag(first: context.shortName(id))
         }
-        return names
+        return tags
     }
 
     private var subtitle: String {
@@ -208,19 +208,15 @@ public struct DefenseSheet: View {
         let whereOnSheet = Dictionary(draft.map { ($0.value, $0.key) }, uniquingKeysWith: { first, _ in first })
         return NavigationStack {
             ScrollView {
-                Card {
-                    ForEach(Array(context.team(side).roster.enumerated()), id: \.element.id) { i, player in
-                        if i > 0 { RowDivider() }
-                        PlayerChoiceRow(context: context, player: player.id,
-                                        detail: whereOnSheet[player.id].map { "Now at \(positionTitle($0))" } ?? "Not in the field",
-                                        look: look, isSelected: here == player.id,
-                                        action: { put(player.id, at: position) })
-                    }
+                VStack(alignment: .leading, spacing: Spacing.medium) {
+                    PlayerGrid(context.team(side).roster.map { player in
+                        PlayerGrid.Choice(id: player.id, name: player.displayName,
+                                          detail: whereOnSheet[player.id].map { positionTitle($0) } ?? "Not in the field",
+                                          isChosen: here == player.id)
+                    }) { id in put(id, at: position) }
                     if here != nil {
-                        RowDivider()
-                        OptionRow(title: "Nobody", detail: "Leave \(position.name) empty", action: { put(nil, at: position) }) {
-                            IconBadge(systemName: "xmark", tint: ScorebookColor.out)
-                        }
+                        Button("Nobody: leave \(position.name) empty") { put(nil, at: position) }
+                            .buttonStyle(ChipStyle(isOn: false))
                     }
                 }
                 .padding(Spacing.large)
@@ -261,7 +257,8 @@ public struct DefenseSheet: View {
             Button {
                 onFinish(.record(EnteredEvent(event: GameEvent(kind: .defenseConfirmed(DefenseConfirmed(team: side))))))
             } label: {
-                Label("Everyone’s where they were", systemImage: "checkmark")
+                // The first time out there is nowhere they were before.
+                Label(context.situation.inning == 1 ? "Everyone’s in place" : "Everyone’s where they were", systemImage: "checkmark")
             }
             .buttonStyle(TeamButtonStyle(look))
         } else {

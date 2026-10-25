@@ -89,6 +89,7 @@ struct BattingOrderStep: View {
                 .cardRow()
                 .moveDisabled(true)
             }
+            NewPlayerRow { number, name in draft.ours.addNewPlayer(name: name, number: number) }
         } header: {
             SectionHeader(title: "Batting order · \(lineup.battingOrder.count)",
                           trailing: Text("Non-runners ") + Text("\(lineup.nonRunners.count) of \(draft.nonRunnerLimit)")

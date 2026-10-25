@@ -1,8 +1,5 @@
-// Step six of seven: each team's starting pitcher, with throwing hand.
-//
-// Ours lists the roster with whoever pitched most recently first. Picking someone puts them at
-// position 1; if they were fielding somewhere else, the old pitcher takes that position (the
-// same swap as on the fielders list). Theirs lists anyone who has pitched against us first,
+// Step six of seven: their starting pitcher, with throwing hand. Ours is whoever is at
+// pitcher on the fielders step. The list lists anyone who has pitched against us first,
 // then the rest of their lineup and roster, "Not known yet", and "Someone new" (number, name
 // and throwing hand). A pitcher whose throwing hand is unknown can have it set here.
 
@@ -22,19 +19,7 @@ struct PitchersStep: View {
     @State private var newHand: Hand?
 
     var body: some View {
-        StepPage(step: .pitchers, title: "Starting pitchers", buttonTitle: "Next: review", onButton: onNext) {
-            Section {
-                ForEach(draft.ourPitcherChoices) { choice in
-                    pitcherRow(choice, look: .ours,
-                               line: PregameWording.ourPitcherLine(choice.lastPitched, lastGame: draft.input.lastGame?.scheduledStart),
-                               isOn: draft.ourPitcher == choice.id) {
-                        draft.ours.assign(choice.id, to: .pitcher)
-                    }
-                }
-            } header: {
-                SectionHeader(title: draft.input.ourTeam.name)
-            }
-
+        StepPage(step: .pitchers, title: "\(draft.opponentName) pitcher", buttonTitle: "Next: review", onButton: onNext) {
             Section {
                 ForEach(draft.theirPitcherChoices) { choice in
                     pitcherRow(choice, look: .theirs, line: PregameWording.theirPitcherLine(choice.lastPitched),

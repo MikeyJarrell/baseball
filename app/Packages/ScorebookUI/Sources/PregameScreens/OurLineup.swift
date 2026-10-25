@@ -81,6 +81,17 @@ public struct OurLineup: Equatable, Sendable {
         battingOrder.append(id)
     }
 
+    /// Adds someone not on the saved roster (a player who just showed up): on the roster and at
+    /// the bottom of the batting order. They are saved to the team after "Play ball".
+    public mutating func addNewPlayer(name: String, number: String) {
+        let name = name.trimmingCharacters(in: .whitespaces)
+        let number = number.trimmingCharacters(in: .whitespaces)
+        guard !name.isEmpty || !number.isEmpty else { return }
+        let player = Player(name: name.isEmpty ? nil : name, number: number.isEmpty ? nil : number)
+        roster.append(player)
+        battingOrder.append(player.id)
+    }
+
     /// Takes a player out of the batting order. Anyone who leaves the order also stops being a
     /// designated non-runner, since a non-runner is a hitter. If they field, they keep their position.
     public mutating func removeFromOrder(_ id: PlayerID) {

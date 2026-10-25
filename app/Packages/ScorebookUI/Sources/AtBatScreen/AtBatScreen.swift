@@ -77,6 +77,10 @@ public enum AtBatAction: Equatable, Sendable {
     case playWarmUp(Player)
     /// Open the game details: date, start time, innings, home and away.
     case openGameDetails
+    /// Open both teams' lineups and rosters, to finish entering them after a rushed start.
+    case openLineups
+    /// Delete this game, after the scorer confirmed. Nothing of it is kept but the backup.
+    case deleteGame
     /// Open the warm-up songs for our pitcher: pick more, or play a different one now.
     case pickWarmUpSongs(Player)
     /// Keep the playing walk-up song going past its length, for a delay before the at-bat (the
@@ -301,7 +305,7 @@ struct AtBatLayout: View {
             }
         )
         .accessibilityAction(named: Text("Box score")) { onAction(.openBoxScore) }
-        .sheet(isPresented: $showingMenu) {
+        .fullScreenCover(isPresented: $showingMenu) {
             GameMenuSheet(info: info) { action in
                 showingMenu = false
                 if let action { onAction(action) }
