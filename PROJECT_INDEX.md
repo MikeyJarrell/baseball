@@ -1,6 +1,6 @@
 # Baseball — project dashboard
 
-**Last reviewed:** October 11, 2026
+**Last reviewed:** October 25, 2026
 
 | Item | Status |
 |---|---|
@@ -23,5 +23,7 @@
 | In use at games | Live: the first real game was scored on the phone on October 4, 2026; fixes from it are on the phone |
 | Erick’s iPhone | Through TestFlight on Mikey’s paid developer account, with the team and songs built into the app; first copy uploaded October 6; Erick added to the internal testing group October 10 and emailed the install button, waiting on him to install ([plan](plan/share-with-teammate.md), [his instructions](plan/teammate-instructions.md)) |
 | Matthew Glatt’s iPhone | Second TestFlight tester (biggio330@aol.com), invited and added to the “Team” test group October 10; waiting on him to install. Build 202610101443 uploaded October 10 with an App Store Connect key, which `tools/upload_to_testflight.sh` now uses, so uploads no longer depend on Xcode’s sign-in; his invitation was resent twice that evening ([plan](plan/share-with-teammate.md)) |
+| Setup and game menu rework | Built October 25: names on the fielders diamond and a full-screen player grid; both teams get the same batting order (non-runners, New player) and fielders screens; Skip on every setup screen; an announcer step for hitters with no recorded name; a full-screen game menu (game details, rosters, manual adjustment, music and PA, exit game, with Delete); Rosters uses the setup screens mid-game, with plays following each batting spot; play fixing only under Manual adjustment; Resume on a finished game’s box score ([handoff](plan/handoffs/setup-and-menu-rework.md)). All tests pass; the first half is on the phone, the rest goes on at the next plug-in |
+| Rosters | Read from the league site October 25: Ed Hunter (#27) joined us; six opponents’ players added; the Huskies added for the playoffs. On the phone, with Ed’s songs and his recorded name |
 
 No deadlines have been assigned.

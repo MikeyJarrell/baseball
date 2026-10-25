@@ -543,3 +543,22 @@ SESSLOG:[2026-10-12 19:55]
 
 ### Context
 Three fixes from the first real game. Teammates saw no games because the copy of the app they install carried the team and never the games; the music reached full volume as the announcer finished and covered the end of the name; and there was no way to hold a walk-up song through a delay. Tried and dropped: remembering only a fingerprint of each game offered to a phone, which would have let an upload made from an older backup overwrite the game on the phone it was scored on, so the record also says whether the app copied the game in. The newest phone backup is from just before Cleary was moved into the starting order, so testers see him indented like a substitute until the next upload after a fresh backup. All tests passed on the Mac mini (game logic, the screens, ten whole-app tests, and four new tests that really play a song), and a trial build on a clean simulator showed the game arriving on a new phone and on a phone that had the team already, and staying away once deleted.
+
+## [2026-10-25 09:05] Ed Hunter, current rosters, and the setup and game menu rework
+SESSLOG:[2026-10-25 09:05]
+
+**Project(s):** baseball
+
+### Decisions
+- Both teams get identical batting order and fielders screens; their lineup always starts from every saved name.
+- Skip on every setup step starts the game; lineups are finished later from the game menu’s Rosters, which reuses the setup screens and keeps recorded plays with each batting spot.
+- The game menu is full screen in five groups; Delete this game asks first. Play fixing lives only under Manual adjustment.
+- The Riptide game (called after 3½ innings, October 18) stays saved as called and can be resumed from its box score.
+
+### Follow-ups
+- [ ] Install the second half of the rework (opponent fielders, announcer step, Rosters page, Music and PA, play fixing) when Mikey plugs in the phone after the October 25 game: `SCOREBOOK_DEVICE=00008150-00011C203A40401C tools/install_on_phone.sh` (the script’s own phone search no longer finds the phone).
+
+### Files
+- [created] `plan/handoffs/setup-and-menu-rework.md`, `app/Packages/ScorebookUI/Sources/DesignSystem/PlayerGrid.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/AnnouncerStep.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/LineupEditorPage.swift`, `app/Packages/ScorebookCore/Tests/ScoringTests/StartingLineupEditTests.swift`
+- [deleted] `app/Packages/ScorebookUI/Sources/PregameScreens/PitchersStep.swift`
+- [modified] `team/roster.csv`, `team/opponents.csv`, pregame, game changes, at-bat, overview and app shell sources, `PROJECT_INDEX.md`

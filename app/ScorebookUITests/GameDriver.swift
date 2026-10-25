@@ -535,7 +535,7 @@ final class GameDriver {
     /// they take, confirm. A defense check that is open first is put off with "Later"; it comes
     /// back after the change.
     private func enterPitchingChange(_ change: PitchingChange, before: Situation, index: Int) throws {
-        if app.buttons["Everyone’s where they were"].exists {
+        if button(startingWith: "Everyone’s").exists {
             try tap(app.buttons["Later"], "\"Later\" on the defense check")
         }
         try tap(button(startingWith: "Pitching: "), "the pitcher on the field")
@@ -581,14 +581,14 @@ final class GameDriver {
             return
         }
         // A defense check open for the next half-inning is put off first.
-        if app.buttons["Everyone’s where they were"].exists {
+        if button(startingWith: "Everyone’s").exists {
             try tap(app.buttons["Later"], "\"Later\" on the defense check")
         }
         try tap(app.buttons["Game menu"], "the game menu")
-        // The menu opens half-height; End game is at the bottom of its list.
+        // The menu fills the screen; End game is near the bottom of its list.
         let endGame = button(startingWith: "End game")
         for _ in 0..<4 where !endGame.exists || !endGame.isHittable {
-            button(startingWith: "Manual adjustment").swipeUp()
+            button(startingWith: "Date, start").swipeUp()
         }
         try tap(endGame, "\"End game\" in the game menu")
         let reason: String = switch end.reason {

@@ -28,7 +28,7 @@ struct TheirLineupStep: View {
     private var theirs: TheirLineup { draft.theirs }
 
     var body: some View {
-        StepPage(step: .theirs, title: "\(team.name) lineup", buttonTitle: "Next: starting pitchers",
+        StepPage(step: .theirs, title: "\(team.name) lineup", buttonTitle: "Next: \(team.name) fielders",
                  blockedReason: theirs.battingOrder(for: team).isEmpty ? "Add at least one hitter." : nil,
                  hidesButton: focusedNumber != nil,
                  onButton: onNext) {
