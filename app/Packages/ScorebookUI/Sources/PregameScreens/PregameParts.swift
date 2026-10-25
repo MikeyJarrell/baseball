@@ -45,7 +45,7 @@ struct StepPage<Content: View>: View {
                         .font(ScorebookFont.headline)
                         .lineLimit(1)
                         .minimumScaleFactor(0.6)
-                    StepDots(step: step.number)
+                    if !editingInGame { StepDots(step: step.number) }
                 }
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(Text("\(title), step \(step.number) of \(StepDots.count)"))
@@ -55,7 +55,7 @@ struct StepPage<Content: View>: View {
         .toolbar {
             // Skip: start the game now with what is set so far; the rest can be filled in from
             // the game menu's Rosters during the game.
-            if !isPlayBall, let skip {
+            if !isPlayBall, !editingInGame, let skip {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Skip", action: skip)
                 }
@@ -69,6 +69,8 @@ struct StepPage<Content: View>: View {
 
     /// Starts the game straight away, when the setup so far is enough to play (an opponent is picked).
     @Environment(\.pregameSkip) private var skip
+    /// True on Rosters during a game: the big button says "Done".
+    @Environment(\.editingInGame) private var editingInGame
 
     /// The big button pinned to the bottom edge, with why it cannot be tapped yet above it.
     private var footer: some View {
@@ -86,7 +88,7 @@ struct StepPage<Content: View>: View {
                     .disabled(blockedReason != nil)
                     .opacity(blockedReason == nil ? 1 : 0.4)
                 } else {
-                    Button(buttonTitle, action: onButton)
+                    Button(editingInGame ? "Done" : buttonTitle, action: onButton)
                         .buttonStyle(PrimaryButtonStyle())
                         .disabled(blockedReason != nil)
                 }

@@ -21,9 +21,14 @@ struct PregameCover: View {
     var onStarted: () -> Void
     var onCancel: () -> Void
 
+    /// Our players whose names were recorded on the announcer step.
+    @State private var recorded: Set<PlayerID> = []
+    /// The player whose name is being recorded.
+    @State private var recording: Player?
+
     var body: some View {
         if let input = app.pregameInput() {
-            PregameFlow(input: input) { result in
+            PregameFlow(input: input, recordedNames: recorded, onRecordName: record) { result in
                 switch result {
                 case .playBall(let setup):
                     Task { if await app.startGame(setup) { onStarted() } }
@@ -31,20 +36,53 @@ struct PregameCover: View {
                     onCancel()
                 }
             }
+            .sheet(item: $recording) { player in
+                NameRecordingSheet(player: player) { kept in
+                    recording = nil
+                    guard let kept else { return }
+                    recorded.insert(player.id)
+                    Task { await app.setNameIntroduction(kept, for: player.id) }
+                }
+            }
         } else {
             EmptyPage(text: "Set up your team first, in Teams.")
                 .onTapGesture(perform: onCancel)
+        }
+    }
+
+    /// Opens the recorder for one of our players. A player typed in on the setup screens goes
+    /// on the saved team first, so the recording has somewhere to be kept.
+    private func record(_ player: Player) {
+        Task {
+            if let team = app.ourTeam, team.player(player.id) == nil {
+                await app.updateSavedPlayer(player, teamID: team.id)
+            }
+            recording = app.ourTeam?.player(player.id) ?? player
         }
     }
 }
 
 // MARK: - Walk-up song settings
 
-/// How much song plays before it fades, whether the first pitch fades it, and whether
-/// announcer introductions play first. Opened from the batting screen's menu.
+/// Music and PA, from the game menu: how much song plays before it fades, whether the first
+/// pitch fades it, whether announcer introductions play, and each of our players' walk-up
+/// song, warm-up songs and recorded name, any of which can be changed here.
 struct SongSettingsSheet: View {
     @Environment(AppModel.self) private var app
     @Environment(\.dismiss) private var dismiss
+
+    /// What is open on top of the page.
+    private enum Open: Identifiable {
+        case walkUp(Player), warmUp(Player), name(Player)
+        var id: String {
+            switch self {
+            case .walkUp(let p): "walk-\(p.id.rawValue)"
+            case .warmUp(let p): "warm-\(p.id.rawValue)"
+            case .name(let p): "name-\(p.id.rawValue)"
+            }
+        }
+    }
+    @State private var open: Open?
 
     var body: some View {
         NavigationStack {
@@ -55,8 +93,6 @@ struct SongSettingsSheet: View {
                             in: 4...60, step: 1) {
                         Text("\(Int(app.settings.walkUpSongSeconds)) seconds of song")
                     }
-                }
-                Section {
                     Toggle("Fade on the first pitch", isOn: Binding(
                         get: { app.settings.fadeSongOnFirstPitch },
                         set: { on in Task { await app.updateSettings { $0.fadeSongOnFirstPitch = on } } }))
@@ -70,12 +106,59 @@ struct SongSettingsSheet: View {
                             Task { await app.updateSettings { $0.keepScreenAwakeDuringGames = on } }
                         }))
                 }
+                Section("Players") {
+                    ForEach(app.ourTeam?.roster ?? []) { player in
+                        playerRow(player)
+                    }
+                }
             }
-            .navigationTitle("Songs")
+            .navigationTitle("Music and PA")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .sheet(item: $open) { shown in
+                switch shown {
+                case .walkUp(let player):
+                    SongPickerSheet(player: player.id) { song in
+                        open = nil
+                        guard let song, let team = app.ourTeam else { return }
+                        Task {
+                            await app.setWalkUpSong(song, for: player.id, teamID: team.id)
+                            app.cueOurNextHitter()
+                        }
+                    }
+                case .warmUp(let player):
+                    if let team = app.ourTeam {
+                        WarmUpSongsSheet(pitcher: player, teamID: team.id) { open = nil }
+                    }
+                case .name(let player):
+                    NameRecordingSheet(player: player) { kept in
+                        open = nil
+                        if let kept { Task { await app.setNameIntroduction(kept, for: player.id) } }
+                    }
+                }
+            }
         }
-        .presentationDetents([.medium, .large])
+    }
+
+    /// One player: their name, their walk-up song, and buttons for the walk-up song, the
+    /// warm-up songs and recording their name.
+    private func playerRow(_ player: Player) -> some View {
+        let song = player.walkUpSongID.flatMap { app.audio?.library.song($0) }
+        let recorded = player.introduction != nil && player.introduction?.source != .phoneVoice
+        return VStack(alignment: .leading, spacing: Spacing.small) {
+            Text(player.displayName).font(ScorebookFont.headline)
+            Text(song.map { "Walk-up: \($0.title)" } ?? "No walk-up song")
+                .font(ScorebookFont.caption)
+                .foregroundStyle(ScorebookColor.textSecondary)
+            HStack(spacing: Spacing.small) {
+                Button("Walk-up") { open = .walkUp(player) }
+                Button("Warm-up") { open = .warmUp(player) }
+                Button(recorded ? "Re-record name" : "Record name") { open = .name(player) }
+            }
+            .buttonStyle(.bordered)
+            .font(ScorebookFont.caption)
+        }
+        .padding(.vertical, Spacing.extraSmall)
     }
 }
 
@@ -250,6 +333,8 @@ struct WarmUpSongsSheet: View {
 /// scorer enters there takes the old event's place, keeping its id and time.
 struct OverviewPage: View {
     var session: GameSession
+    /// True from Manual adjustment: the play-by-play opens and its plays can be fixed.
+    var canFix: Bool = true
     var onClose: () -> Void
 
     /// An event being entered again, and where the game stood before it.
@@ -267,7 +352,8 @@ struct OverviewPage: View {
     var body: some View {
         GameOverview(log: session.log, boxScore: session.boxScore,
                      plateAppearances: session.plateAppearancesByPlayer,
-                     situation: session.isFinished ? nil : session.situation) { action in
+                     situation: session.isFinished ? nil : session.situation,
+                     startingTab: canFix ? .plays : .score, canFix: canFix) { action in
             switch action {
             case .backToBatting:
                 onClose()

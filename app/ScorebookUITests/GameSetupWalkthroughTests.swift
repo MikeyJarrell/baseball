@@ -39,7 +39,7 @@ final class GameSetupWalkthroughTests: XCTestCase {
             ("Next: batting order", "03 batting order"),
             ("Next: fielders", "04 fielders"),
             ("Next: Mudcats lineup", "05 their lineup"),
-            ("Next: starting pitchers", "06 starting pitchers"),
+            ("Next: Mudcats fielders", "06 their fielders"),
             ("Next: review", "07 review"),
         ]
         for (button, name) in screens {

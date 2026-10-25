@@ -79,12 +79,12 @@ import DesignSystem
     PregameFlow.sample(against: "bombers", at: .theirs).preferredColorScheme(.dark)
 }
 
-#Preview("6. Starting pitchers, Mudcats") {
-    PregameFlow.sample(against: "mudcats", at: .pitchers)
+#Preview("6. Mudcats fielders") {
+    PregameFlow.sample(against: "mudcats", at: .theirFielding)
 }
 
-#Preview("6. Starting pitchers, Riverhawks, largest text") {
-    PregameFlow.sample(against: "riverhawks", at: .pitchers).environment(\.dynamicTypeSize, .accessibility5)
+#Preview("6. Riverhawks fielders, largest text") {
+    PregameFlow.sample(against: "riverhawks", at: .theirFielding).environment(\.dynamicTypeSize, .accessibility5)
 }
 
 #Preview("7. Review, Mudcats") {

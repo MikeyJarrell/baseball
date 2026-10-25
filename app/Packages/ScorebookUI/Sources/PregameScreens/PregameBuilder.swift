@@ -183,6 +183,51 @@ public struct PregameDraft: Equatable, Sendable {
         return PregameBuilder.pitcherChoices(players: ordered, history: input.pitching)
     }
 
+    // MARK: Names for the announcer
+
+    /// Our hitters with no recorded name for the announcer (a new player, say), in batting
+    /// order, leaving out any recorded since setup began.
+    public func needsNameRecording(_ recorded: Set<PlayerID>) -> [Player] {
+        ours.battingOrder.compactMap(ours.player).filter { player in
+            guard !recorded.contains(player.id), !(player.name ?? "").isEmpty else { return false }
+            return player.introduction == nil || player.introduction?.source == .phoneVoice
+        }
+    }
+
+    // MARK: Fielders, for either team's fielders step
+
+    /// Everyone who can field for a team: our roster, or their lineup and roster (stand-ins
+    /// such as "Batter 3" left out).
+    public func fieldingPlayers(ours: Bool) -> [Player] {
+        guard !ours else { return self.ours.roster }
+        guard let team = opponent else { return [] }
+        let everyone = theirs.roster(for: team).filter { $0.placeholder == nil || !$0.isUnnamed }
+        let order = theirs.battingOrder(for: team)
+        return order.compactMap { id in everyone.first { $0.id == id } } + everyone.filter { !order.contains($0.id) }
+    }
+
+    /// Who plays each position for a team.
+    public func fieldingDefense(ours: Bool) -> [Position: PlayerID] {
+        ours ? self.ours.defense : theirs.defense
+    }
+
+    /// Puts a player at a position for a team (a swap when they were fielding elsewhere).
+    public mutating func assignFielder(_ id: PlayerID?, to position: Position, ours: Bool) {
+        if ours { self.ours.assign(id, to: position) } else { theirs.assign(id, to: position) }
+    }
+
+    /// Where one of their players is now, for their fielders step: "SS · bats 2nd", "Bench".
+    public func theirStatus(of id: PlayerID) -> String {
+        var parts: [String] = []
+        if let position = theirs.defense.first(where: { $0.value == id })?.key { parts.append(position.abbreviation.uppercased()) }
+        if let team = opponent, let spot = theirs.battingOrder(for: team).firstIndex(of: id) {
+            parts.append("bats \(PregameWording.ordinal(spot + 1))")
+        } else if !parts.isEmpty {
+            parts.append("doesn’t bat")
+        }
+        return parts.isEmpty ? "Bench" : parts.joined(separator: " · ")
+    }
+
     /// Our starting pitcher: whoever is at position 1.
     public var ourPitcher: PlayerID? { ours.defense[.pitcher] }
 

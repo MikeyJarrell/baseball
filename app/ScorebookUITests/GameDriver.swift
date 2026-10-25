@@ -491,7 +491,9 @@ final class GameDriver {
 
     /// The defense check when our team takes the field: nobody moved.
     private func confirmDefense(team: TeamSide, before: Situation, index: Int) throws {
-        let confirm = app.buttons["Everyone’s where they were"]
+        // The first time out the button says the team is in place; after that, where they were.
+        let confirm = app.buttons.matching(NSPredicate(format: "label == %@ OR label == %@",
+                                                       "Everyone’s where they were", "Everyone’s in place")).firstMatch
         let saveChanges = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "Save ", " change")).firstMatch
         if !appears(confirm, within: 3), !saveChanges.exists {
             // The check is not open by itself: open it from the Defense button on the banner.

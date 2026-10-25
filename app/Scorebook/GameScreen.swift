@@ -25,6 +25,7 @@ import WalkUpAudio
 import AtBatScreen
 import PlayEntry
 import GameChanges
+import PregameScreens
 import PostgameScreens
 import BoxScoreText
 
@@ -62,13 +63,16 @@ enum GameSheet: Identifiable, Equatable {
 enum GameCover: Identifiable, Equatable {
     /// The in-play sequence, opened from this situation.
     case playEntry(PlayEntryStart, Situation)
-    /// The game overview.
+    /// The game overview, from the Box score button: no fixing.
     case overview
+    /// The play-by-play, from Manual adjustment, to fix plays and pitches.
+    case fixPlays
 
     var id: String {
         switch self {
         case .playEntry(let start, _): "play-\(start)"
         case .overview: "overview"
+        case .fixPlays: "fix-plays"
         }
     }
 }
@@ -231,6 +235,8 @@ struct GameScreen: View {
             sheet = .gameDetails
         case .openLineups:
             sheet = .lineups
+        case .openPlayFixing:
+            cover = .fixPlays
         case .deleteGame:
             let id = session.game.id
             app.audio?.stop()
@@ -317,8 +323,12 @@ struct GameScreen: View {
         case .gameDetails:
             GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
         case .lineups:
-            LineupsSheet(context: context, onFinish: done)
-                .presentationDetents([.large])
+            LineupEditorPage(setup: session.setup, onDone: { away, home in
+                sheet = nil
+                Task { await applyRosters(away: away, home: home) }
+            }, onCancel: { sheet = nil })
+            .presentationDetents([.large])
+            .interactiveDismissDisabled()
         case .warmUpSongs(let pitcher):
             if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
                 WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
@@ -408,6 +418,22 @@ struct GameScreen: View {
         }
     }
 
+    /// Puts the lineups fixed on Rosters into the game, one team at a time, and saves anyone
+    /// new to their saved team.
+    private func applyRosters(away: GameTeam, home: GameTeam) async {
+        for (side, team) in [(TeamSide.away, away), (.home, home)] {
+            let before = session.setup[side]
+            guard team.roster != before.roster || team.battingOrder != before.battingOrder || team.defense != before.defense
+                    || team.designatedNonRunners != before.designatedNonRunners || team.fieldingRotations != before.fieldingRotations
+            else { continue }
+            guard await session.editStartingLineup(team, on: side) else { return }
+            for player in team.roster where before.player(player.id) != player && !player.isUnnamed {
+                await app.updateSavedPlayer(player, teamID: team.teamID)
+            }
+        }
+        cueOurNextHitter()
+    }
+
     /// Opens the name recorder once the sheet before it has slid away.
     private func openNameRecorder(for id: PlayerID) async {
         try? await Task.sleep(for: .milliseconds(450))
@@ -452,7 +478,9 @@ struct GameScreen: View {
                 }
             }
         case .overview:
-            OverviewPage(session: session, onClose: { cover = nil })
+            OverviewPage(session: session, canFix: false, onClose: { cover = nil })
+        case .fixPlays:
+            OverviewPage(session: session, canFix: true, onClose: { cover = nil })
         }
     }
 
