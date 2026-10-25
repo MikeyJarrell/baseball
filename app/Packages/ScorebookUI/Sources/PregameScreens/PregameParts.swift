@@ -52,11 +52,23 @@ struct StepPage<Content: View>: View {
                 .accessibilityAddTraits(.isHeader)
             }
         }
+        .toolbar {
+            // Skip: start the game now with what is set so far; the rest can be filled in from
+            // the game menu's Rosters during the game.
+            if !isPlayBall, let skip {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Skip", action: skip)
+                }
+            }
+        }
         .toolbarBackground(ScorebookColor.background, for: .navigationBar)
         .safeAreaInset(edge: .bottom, spacing: 0) {
             if !hidesButton { footer }
         }
     }
+
+    /// Starts the game straight away, when the setup so far is enough to play (an opponent is picked).
+    @Environment(\.pregameSkip) private var skip
 
     /// The big button pinned to the bottom edge, with why it cannot be tapped yet above it.
     private var footer: some View {
@@ -221,15 +233,15 @@ struct IconBadge: View {
     }
 }
 
-/// A fielding position's number in a ring, as on a scorecard: "6".
-struct PositionCircle: View {
+/// A fielding position's short name at the left of a row: "SS".
+struct PositionLabel: View {
     var position: Position
 
     var body: some View {
-        Text("\(position.number)")
-            .font(.system(size: 16, weight: .heavy).monospacedDigit())
-            .frame(width: 36, height: 36)
-            .overlay(Circle().strokeBorder(ScorebookColor.textPrimary, lineWidth: 2.5))
+        Text(position.abbreviation.uppercased())
+            .font(.system(size: 15, weight: .heavy))
+            .foregroundStyle(ScorebookColor.textSecondary)
+            .frame(width: 36, alignment: .leading)
             .accessibilityHidden(true)
     }
 }
@@ -463,5 +475,60 @@ struct FlowLayout: Layout {
         }
         if !current.items.isEmpty { rows.append(current) }
         return rows
+    }
+}
+
+// MARK: - A player who just showed up
+
+/// "+ New player", opening a number box and a name box with an Add button: for a player who is
+/// not on the saved roster. Used on both teams' batting orders.
+struct NewPlayerRow: View {
+    /// Called with the number and name typed, when Add is tapped.
+    var onAdd: (_ number: String, _ name: String) -> Void
+
+    @State private var open = false
+    @State private var number = ""
+    @State private var name = ""
+
+    var body: some View {
+        AddRow(title: "New player", systemImage: open ? "xmark" : "person.badge.plus") { open.toggle() }
+            .cardRow()
+            .moveDisabled(true)
+        if open {
+            HStack(spacing: Spacing.small) {
+                TextField("No.", text: $number)
+                    .keyboardType(.numberPad)
+                    .frame(width: 64)
+                TextField("Name", text: $name)
+                    .textInputAutocapitalization(.words)
+                Button("Add") {
+                    onAdd(number, name)
+                    number = ""
+                    name = ""
+                    open = false
+                }
+                .buttonStyle(ChipStyle(isOn: true))
+                .disabled(number.trimmingCharacters(in: .whitespaces).isEmpty && name.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+            .font(ScorebookFont.headline)
+            .textFieldStyle(.roundedBorder)
+            .cardRow()
+            .moveDisabled(true)
+        }
+    }
+}
+
+// MARK: - Skip
+
+/// Starts the game now with the setup so far, from the Skip button on every step. Missing until
+/// an opponent is picked.
+private struct PregameSkipKey: EnvironmentKey {
+    static let defaultValue: (@MainActor @Sendable () -> Void)? = nil
+}
+
+extension EnvironmentValues {
+    var pregameSkip: (@MainActor @Sendable () -> Void)? {
+        get { self[PregameSkipKey.self] }
+        set { self[PregameSkipKey.self] = newValue }
     }
 }

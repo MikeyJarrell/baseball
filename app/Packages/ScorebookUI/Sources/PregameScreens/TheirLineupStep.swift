@@ -1,4 +1,5 @@
-// Step five of seven: their lineup, two ways in.
+// Their lineup, which starts from every name on their saved roster (or, for a team with no
+// saved names, numbers typed in batting order).
 //
 // - Names and numbers, from their saved roster: the batting order from the last game against
 //   them (or their whole roster), dragged into order, with a minus to take someone out. Each
@@ -25,20 +26,12 @@ struct TheirLineupStep: View {
 
     private var team: Team { draft.opponent ?? Team(id: draft.newOpponentID, name: "Opponent") }
     private var theirs: TheirLineup { draft.theirs }
-    private var hasNames: Bool { team.roster.contains { !($0.name ?? "").isEmpty } }
 
     var body: some View {
         StepPage(step: .theirs, title: "\(team.name) lineup", buttonTitle: "Next: starting pitchers",
                  blockedReason: theirs.battingOrder(for: team).isEmpty ? "Add at least one hitter." : nil,
                  hidesButton: focusedNumber != nil,
                  onButton: onNext) {
-            Section {
-                modeRow(.names, "Names and numbers",
-                        hasNames ? "From the saved \(team.name) roster" : "No saved names yet")
-                    .disabled(!hasNames)
-                    .opacity(hasNames ? 1 : 0.5)
-                modeRow(.numbers, "Numbers only", nil)
-            }
             switch theirs.mode {
             case .names: namesSection
             case .numbers: numbersSection
@@ -50,13 +43,6 @@ struct TheirLineupStep: View {
                 Button("Done") { focusedNumber = nil }
             }
         }
-    }
-
-    /// One of the two ways in, as a choice row.
-    private func modeRow(_ mode: TheirLineupMode, _ title: String, _ detail: String?) -> some View {
-        ChoiceRow(title: title, detail: detail, isOn: theirs.mode == mode,
-                  action: { draft.theirs.mode = mode }) { EmptyView() }
-            .cardRow()
     }
 
     /// A box for a jersey number: digits only, with the number pad.
@@ -80,14 +66,20 @@ struct TheirLineupStep: View {
 
     private var namesSection: some View {
         Section {
-            ForEach(Array(theirs.namedOrder.enumerated()), id: \.element) { index, id in
-                if let player = team.player(id) {
+            ForEach(Array(theirs.battingOrder(for: team).enumerated()), id: \.element) { index, id in
+                if let player = theirs.roster(for: team).first(where: { $0.id == id }) {
                     let box = numberBox(Binding(get: { theirs.numberEdits[id] ?? player.number ?? "" },
                                                 set: { draft.theirs.setNumber($0, for: id) }),
                                         focus: id, label: "Number for \(player.displayName)")
                     let remove = RemoveButton(label: "Take \(player.displayName) out of their batting order") {
                         draft.theirs.namedOrder.removeAll { $0 == id }
                     }
+                    let isNonRunner = theirs.nonRunners.contains(id)
+                    let nonRunner = Button(isNonRunner ? "NR" : "Runs") { draft.theirs.toggleNonRunner(id) }
+                        .buttonStyle(ChipStyle(isOn: isNonRunner, onColor: ScorebookColor.sequenceBadge, onText: ScorebookColor.onStrike))
+                        .fixedSize()
+                        .accessibilityLabel(Text("Designated non-runner"))
+                        .accessibilityValue(Text(isNonRunner ? "On" : "Off"))
                     // Tapping the name types in the number box too.
                     let name = Button { focusedNumber = id } label: {
                         Group {
@@ -110,12 +102,13 @@ struct TheirLineupStep: View {
                         if typeSize.isAccessibilitySize {
                             VStack(alignment: .leading, spacing: Spacing.extraSmall) {
                                 name
-                                HStack(spacing: Spacing.small) { box; remove }
+                                HStack(spacing: Spacing.small) { box; nonRunner; remove }
                             }
                         } else {
                             Grip()
                             box
                             name
+                            nonRunner
                             remove
                         }
                     }
@@ -143,6 +136,7 @@ struct TheirLineupStep: View {
                     .moveDisabled(true)
                 }
             }
+            NewPlayerRow { number, name in draft.theirs.addNewHitter(name: name, number: number) }
         } header: {
             SectionHeader(title: "Batting order · \(theirs.battingOrder(for: team).count)")
         } footer: {

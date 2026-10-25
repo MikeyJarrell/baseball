@@ -115,10 +115,6 @@ struct DetailsStep: View {
                 .tint(ScorebookColor.highlight)
                 .frame(minHeight: 44)
                 .cardRow()
-            } footer: {
-                Text("A late first pitch moves the time limit later by the same amount.")
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
             }
         }
     }

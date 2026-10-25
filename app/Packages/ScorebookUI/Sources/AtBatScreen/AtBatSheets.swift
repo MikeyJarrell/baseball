@@ -1,6 +1,5 @@
-// The two sheets the batting screen opens itself: the game menu (manual adjustment, an error
-// with nobody moving, the time limit, editing the batter, the game details, our pitcher's
-// warm-up songs, the walk-up song length, end game)
+// The two sheets the batting screen opens itself: the game menu, full screen, in five groups
+// (game details, rosters, manual adjustment, music and PA, exit game)
 // and the "Is the game over?" pop-up. Neither records anything itself: each hands its choice
 // back to the screen as an `AtBatAction`.
 
@@ -16,49 +15,66 @@ struct GameMenuSheet: View {
 
     /// Whether the end-game choices are showing.
     @State private var confirmingEnd = false
+    /// Whether "Delete this game?" is showing.
+    @State private var confirmingDelete = false
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    row("Manual adjustment", detail: "Set outs, count, score or runners", icon: "slider.horizontal.3") {
+                Section("Game details") {
+                    row("Date, start, innings, home and away", detail: nil, icon: "calendar") {
+                        choose(.openGameDetails)
+                    }
+                    if let line = AtBatWording.limitLine(info.clock) {
+                        row("Time limit", detail: line, icon: "clock") { choose(.openTimeLimit) }
+                    }
+                }
+                Section("Rosters") {
+                    row("Lineups and rosters", detail: "Both teams: names, numbers, batting order", icon: "list.number") {
+                        choose(.openLineups)
+                    }
+                    row("Edit this batter", detail: "Name, number, batting side", icon: "pencil") {
+                        choose(.openBatterOptions)
+                    }
+                }
+                Section("Manual adjustment") {
+                    row("Fix a play or a pitch", detail: "Every play so far", icon: "list.bullet.rectangle") {
+                        choose(.openBoxScore)
+                    }
+                    row("Set outs, count, score or runners", detail: nil, icon: "slider.horizontal.3") {
                         choose(.openManualAdjustment)
                     }
                     row("Error, nobody moved", detail: "Like a dropped foul pop-up", icon: "xmark.circle") {
                         choose(.openErrorWithNoAdvance)
                     }
-                    if let line = AtBatWording.limitLine(info.clock) {
-                        row("Time limit", detail: line, icon: "clock") { choose(.openTimeLimit) }
-                    }
-                    row("Edit this batter", detail: "Name, number, batting side", icon: "pencil") {
-                        choose(.openBatterOptions)
-                    }
-                    row("Game details", detail: "Date, start time, innings, home and away", icon: "calendar") {
-                        choose(.openGameDetails)
-                    }
+                }
+                Section("Music and PA") {
                     if let pitcher = ourPitcher {
                         row("Warm-up songs", detail: pitcher.displayName, icon: "music.note.list") {
                             choose(.pickWarmUpSongs(pitcher))
                         }
                     }
-                    row("Home screen", detail: "The game stays in progress", icon: "house") {
-                        choose(.goHome)
-                    }
-                    row("Walk-up song length",
-                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds",
+                    row("Walk-up songs, length and introductions",
+                        detail: "\(Int(info.settings.walkUpSongSeconds.rounded())) seconds of song",
                         icon: "speaker.wave.2") {
                         choose(.openSongSettings)
                     }
                 }
-                Section {
+                Section("Exit game") {
+                    row("Pause and go to the home screen", detail: "Resume it from there any time", icon: "pause.circle") {
+                        choose(.goHome)
+                    }
                     Button(role: .destructive) { confirmingEnd = true } label: {
-                        Label {
-                            Text("End game").font(ScorebookFont.headline)
-                        } icon: {
-                            Image(systemName: "flag.checkered")
-                        }
-                        .foregroundStyle(ScorebookColor.out)
-                        .frame(minHeight: Spacing.minimumTapSize)
+                        Label("End game", systemImage: "flag.checkered")
+                            .font(ScorebookFont.headline)
+                            .foregroundStyle(ScorebookColor.out)
+                            .frame(minHeight: Spacing.minimumTapSize)
+                    }
+                    Button(role: .destructive) { confirmingDelete = true } label: {
+                        Label("Delete this game", systemImage: "trash")
+                            .font(ScorebookFont.headline)
+                            .foregroundStyle(ScorebookColor.out)
+                            .frame(minHeight: Spacing.minimumTapSize)
                     }
                 }
             }
@@ -78,8 +94,13 @@ struct GameMenuSheet: View {
             } message: {
                 Text(AtBatWording.scoreLine(info.setup, info.situation.score))
             }
+            .alert("Do you really want to delete this game?", isPresented: $confirmingDelete) {
+                Button("Delete game", role: .destructive) { choose(.deleteGame) }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("All the data will be lost.")
+            }
         }
-        .presentationDetents([.medium, .large])
     }
 
     /// Our pitcher now, when our team has one in the game.
@@ -99,7 +120,7 @@ struct GameMenuSheet: View {
     }
 
     /// One menu row: an icon, a title over a smaller line, and a chevron.
-    private func row(_ title: String, detail: String, icon: String, action: @escaping () -> Void) -> some View {
+    private func row(_ title: String, detail: String?, icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: Spacing.medium) {
                 Image(systemName: icon)
@@ -108,7 +129,7 @@ struct GameMenuSheet: View {
                     .foregroundStyle(ScorebookColor.inPlay)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title).font(ScorebookFont.headline)
-                    Text(detail).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
+                    if let detail { Text(detail).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary) }
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right")

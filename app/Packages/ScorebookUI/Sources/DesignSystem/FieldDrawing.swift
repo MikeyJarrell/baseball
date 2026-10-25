@@ -1,7 +1,8 @@
 // The field drawing: grass, dirt, foul lines and bases, the nine fielding positions as
-// tappable circles, runners, throws and outs. Used by the batting screen (zoomed to the
-// infield, with runners' name tags), the in-play sequence (the whole field, fielders tappable)
-// and the game overview, at different sizes. Drawn in code, so it is sharp at any size.
+// tappable circles (or, for choosing who plays where, as the fielders' names), runners, throws
+// and outs. Used by the batting screen (zoomed to the infield, with runners' name tags), the
+// in-play sequence (the whole field, fielders tappable), the fielders screens before and during
+// the game, and the game overview, at different sizes. Drawn in code, so it is sharp at any size.
 //
 // The interface (what the drawing is given, what it hands back) is the contract the
 // foundation job wrote: `FieldTap`, `FieldRunnerMarker`, and `FieldDrawing`'s initializer and
@@ -91,6 +92,35 @@ public struct FieldBaseRunner: Equatable, Sendable {
     }
 }
 
+/// The words written at one position when the fielders are drawn as names: the first name
+/// over the last ("Jon" over "Marianowits"), or one line for a player known only by number
+/// ("#22") or a stand-in ("Batter 4").
+public struct FielderNameTag: Equatable, Sendable {
+    public var first: String
+    public var last: String?
+
+    public init(first: String, last: String? = nil) {
+        self.first = first
+        self.last = last
+    }
+
+    /// The tag for one player: first name over last name ("Torres" for Jonathan Torres Benitez,
+    /// who goes by his first last name), else their one name, number or stand-in label.
+    public init(_ player: Player) {
+        let words = (player.name ?? "").split(separator: " ")
+        if words.count > 1, let first = words.first {
+            self.init(first: String(first), last: player.lastName)
+        } else {
+            self.init(first: player.displayName)
+        }
+    }
+
+    /// The tag for a position two players share by turns: both last names, "Quinn" over "& Nash".
+    public init(sharing starter: Player, with second: Player) {
+        self.init(first: starter.lastName, last: "& \(second.lastName)")
+    }
+}
+
 /// How much of the field the drawing shows.
 public enum FieldZoom: Sendable {
     /// Foul line to foul line and the whole outfield, with all nine fielders. For the in-play
@@ -114,8 +144,8 @@ public enum FieldZoom: Sendable {
 /// - `onTap`: called with whatever the scorer taps. Leave it out for a drawing that only shows.
 ///
 /// More options, each returning a changed copy: `.zoom(_:)`, `.showsFielders(_:)`,
-/// `.fielderNames(_:)`, `.baseRunners(_:)`, `.battingTeam(_:)`, `.hitLocation(_:)` and
-/// `.errorPositions(_:)`.
+/// `.fielderNames(_:)`, `.fieldersAsNames(_:)`, `.baseRunners(_:)`, `.battingTeam(_:)`,
+/// `.hitLocation(_:)` and `.errorPositions(_:)`.
 public struct FieldDrawing: View {
     public var occupiedBases: Set<Base>
     public var highlightedPositions: Set<Position>
@@ -127,6 +157,8 @@ public struct FieldDrawing: View {
     var zoomLevel: FieldZoom = .wholeField
     var fieldersShown: Bool?
     var namesByPosition: [Position: String] = [:]
+    /// When set, each fielder is drawn as their name at their spot instead of a numbered circle.
+    var nameTags: [Position: FielderNameTag]?
     var runnersOnBases: [Base: FieldBaseRunner] = [:]
     var teamLook: TeamLook?
     var hitSpot: FieldPoint?
@@ -155,7 +187,9 @@ public struct FieldDrawing: View {
                 throwArrows(map)
                 runnerPaths(map)
                 bases(map)
-                if showFielders {
+                if let nameTags {
+                    fielderNameTags(nameTags, map)
+                } else if showFielders {
                     fielders(map)
                 }
                 hitMarker(map)
@@ -327,6 +361,62 @@ public struct FieldDrawing: View {
         }
     }
 
+    /// The nine fielders as their names, for picking who plays where: each name sits on its
+    /// fielder's spot, the first name over the last, and a position nobody plays shows its short
+    /// name ("SS") in a dashed outline. A highlighted position is filled blue. Tapping a name
+    /// hands back that position.
+    private func fielderNameTags(_ tags: [Position: FielderNameTag], _ map: Mapper) -> some View {
+        // The shortstop and second baseman stand 88 drawing units apart, so a name is kept a
+        // little narrower than that and shrinks to fit.
+        let maxTextWidth = 74 * map.scale
+        let corner = 9 * map.scale
+        return ZStack(alignment: .topLeading) {
+            ForEach(Position.allCases, id: \.self) { position in
+                let tag = tags[position]
+                let isPicked = highlightedPositions.contains(position)
+                let shape = RoundedRectangle(cornerRadius: corner, style: .continuous)
+                Button { onTap?(.position(position)) } label: {
+                    VStack(spacing: 0) {
+                        if let tag {
+                            Text(tag.first)
+                                .font(.system(size: max(11, 14 * map.scale), weight: .heavy))
+                            if let last = tag.last {
+                                Text(last)
+                                    .font(.system(size: max(9, 11 * map.scale), weight: .semibold))
+                            }
+                        } else {
+                            Text(position.abbreviation.uppercased())
+                                .font(.system(size: max(11, 14 * map.scale), weight: .heavy))
+                        }
+                    }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.55)
+                    .foregroundStyle(isPicked ? Color.white : (tag == nil ? ScorebookColor.textSecondary : ScorebookColor.textPrimary))
+                    .frame(maxWidth: maxTextWidth)
+                    .padding(.horizontal, 5 * map.scale)
+                    .padding(.vertical, 3 * map.scale)
+                    .background {
+                        if isPicked {
+                            shape.fill(ScorebookColor.highlight)
+                        } else if tag == nil {
+                            shape.fill(ScorebookColor.surface.opacity(0.75))
+                                .overlay(shape.strokeBorder(ScorebookColor.textSecondary, style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])))
+                        } else {
+                            shape.fill(ScorebookColor.surface)
+                                .overlay(shape.strokeBorder(ScorebookColor.textPrimary.opacity(0.8), lineWidth: max(1, 1.5 * map.scale)))
+                        }
+                    }
+                    .frame(minWidth: Spacing.minimumTapSize, minHeight: Spacing.minimumTapSize)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .disabled(onTap == nil)
+                .position(map.point(Layout.position(position)))
+                .accessibilityLabel(Text("\(position.name.capitalized): \(tag.map { [$0.first, $0.last].compactMap { $0 }.joined(separator: " ") } ?? "nobody")"))
+            }
+        }
+    }
+
     /// A dashed blue arrow for each throw in the tap sequence: shortstop to first base for a 6-3.
     private func throwArrows(_ map: Mapper) -> some View {
         let pairs = zip(tapSequence, tapSequence.dropFirst()).filter { $0 != $1 }
@@ -477,6 +567,13 @@ extension FieldDrawing {
     /// Use it when our team is in the field; their fielders are known by position only.
     public func fielderNames(_ names: [Position: String]) -> FieldDrawing {
         var copy = self; copy.namesByPosition = names; return copy
+    }
+
+    /// Draws each fielder as their name at their spot, with no numbered circles: for choosing
+    /// who plays where. A position left out shows its short name in a dashed outline, so it can
+    /// still be tapped. Tapping a name hands back `.position`.
+    public func fieldersAsNames(_ tags: [Position: FielderNameTag]) -> FieldDrawing {
+        var copy = self; copy.nameTags = tags; return copy
     }
 
     /// Runners standing on base, each with a tappable name tag. The bases light up by themselves.
@@ -779,6 +876,19 @@ private let previewNames: [Position: String] = [
     }
     .padding()
     .background(ScorebookColor.background)
+}
+
+#Preview("Fielders as names, shortstop picked, nobody in right") {
+    FieldDrawing(highlightedPositions: [.shortstop], onTap: { _ in })
+        .fieldersAsNames([
+            .pitcher: FielderNameTag(first: "Chris", last: "Strong"), .catcher: FielderNameTag(first: "Allan", last: "Nojadera"),
+            .firstBase: FielderNameTag(first: "Darin", last: "Dietrich"), .secondBase: FielderNameTag(first: "Aidan", last: "Kurt"),
+            .thirdBase: FielderNameTag(first: "Yered", last: "Teodosio"), .shortstop: FielderNameTag(first: "Jon", last: "Marianowits"),
+            .leftField: FielderNameTag(first: "Jonathan", last: "Torres"), .centerField: FielderNameTag(first: "Gaven", last: "Lejano"),
+        ])
+        .frame(height: 330)
+        .padding()
+        .background(ScorebookColor.background)
 }
 
 #Preview("Largest text size") {

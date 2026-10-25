@@ -44,6 +44,8 @@ public struct TheirLineup: Equatable, Sendable {
     public var newPlayers: [Player]
     /// Their starting pitcher. Missing means not known yet: a placeholder "Pitcher" starts.
     public var pitcher: PlayerID?
+    /// Their hitters declared designated non-runners.
+    public var nonRunners: [PlayerID] = []
     /// The id of that placeholder pitcher.
     public let placeholderPitcherID: PlayerID
 
@@ -107,6 +109,17 @@ public struct TheirLineup: Equatable, Sendable {
         numbers[i].number = String(text.filter(\.isNumber).prefix(3))
     }
 
+    /// Adds a hitter who is not on their saved roster to the bottom of the batting order.
+    public mutating func addNewHitter(name: String, number: String) {
+        let id = addNewPlayer(name: name, number: number, throwsWith: nil)
+        namedOrder.append(id)
+    }
+
+    /// Declares one of their hitters a designated non-runner, or takes it back.
+    public mutating func toggleNonRunner(_ id: PlayerID) {
+        if nonRunners.contains(id) { nonRunners.removeAll { $0 == id } } else { nonRunners.append(id) }
+    }
+
     /// Adds someone typed in on the spot (a pitcher not on their saved roster) and returns their id.
     @discardableResult
     public mutating func addNewPlayer(name: String, number: String, throwsWith: Hand?) -> PlayerID {
@@ -144,7 +157,7 @@ public struct TheirLineup: Equatable, Sendable {
     public func battingOrder(for team: Team) -> [PlayerID] {
         switch mode {
         case .names:
-            let onRoster = Set(team.roster.map(\.id))
+            let onRoster = Set(team.roster.map(\.id) + newPlayers.map(\.id))
             return namedOrder.filter { onRoster.contains($0) }
         case .numbers:
             return numberedPlayers(for: team).map(\.id)
@@ -187,6 +200,7 @@ public struct TheirLineup: Equatable, Sendable {
             roster: PregameBuilder.applying(handEdits, to: players),
             battingOrder: battingOrder(for: team),
             defense: startingPitcher.map { [FielderAssignment(position: .pitcher, player: $0)] } ?? [],
+            designatedNonRunners: battingOrder(for: team).filter { nonRunners.contains($0) },
             shortName: team.shortName
         )
     }

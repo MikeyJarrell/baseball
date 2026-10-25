@@ -6,8 +6,10 @@
 // 3. Our batting order: who bats and in what order, designated non-runners, the bench
 //    (`BattingOrderStep`).
 // 4. Our fielders, on the field drawing, with positions shared by turns (`FieldingStep`).
-// 5. Their lineup: names and numbers, or numbers only (`TheirLineupStep`).
-// 6. Starting pitchers for both teams, with throwing hands (`PitchersStep`).
+// 5. Their lineup: every name on their saved roster, or numbers (`TheirLineupStep`).
+// 6. Their starting pitcher, with throwing hand (`PitchersStep`).
+//
+// Every step but the last has Skip, which starts the game with what is set so far.
 // 7. Review and "Play ball" (`ReviewStep`).
 //
 // How these screens talk to the rest of the app: `PregameFlow` is handed a `PregameInput`
@@ -85,5 +87,13 @@ public struct PregameFlow: View {
                 }
         }
         .tint(ScorebookColor.inPlay)
+        .environment(\.pregameSkip, skip)
+    }
+
+    /// Skip: starts the game with the setup as it stands, once an opponent is picked.
+    private var skip: (@MainActor @Sendable () -> Void)? {
+        guard let setup = draft.setup() else { return nil }
+        let finish = onFinish
+        return { finish(.playBall(setup)) }
     }
 }

@@ -42,6 +42,7 @@ enum GameSheet: Identifiable, Equatable {
     case songSettings
     case pickSong(PlayerID)
     case gameDetails
+    case lineups
     case warmUpSongs(PlayerID)
     /// Record one of our players' names for their announcer introduction.
     case recordName(PlayerID)
@@ -228,6 +229,13 @@ struct GameScreen: View {
             sheet = .pickSong(player)
         case .openGameDetails:
             sheet = .gameDetails
+        case .openLineups:
+            sheet = .lineups
+        case .deleteGame:
+            let id = session.game.id
+            app.audio?.stop()
+            onLeave()
+            Task { await app.deleteGame(id) }
         case .pickWarmUpSongs(let pitcher):
             sheet = .warmUpSongs(pitcher.id)
         case .goHome:
@@ -308,6 +316,9 @@ struct GameScreen: View {
             }
         case .gameDetails:
             GameDetailsSheet(context: context, canSwitchHomeAndAway: session.canSwitchHomeAndAway, onFinish: done)
+        case .lineups:
+            LineupsSheet(context: context, onFinish: done)
+                .presentationDetents([.large])
         case .warmUpSongs(let pitcher):
             if let player = session.setup.player(pitcher), let side = session.setup.side(of: pitcher) {
                 WarmUpSongsSheet(pitcher: player, teamID: session.setup[side].teamID) { sheet = nil }
