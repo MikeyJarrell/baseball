@@ -17,6 +17,10 @@
 # nothing but the built pages; GitHub Pages serves it at mikeyjarrell.com/dogs/. The first
 # publish creates that repository and turns Pages on. Search engines are asked not to list it.
 #
+# Before publishing, the builder lists unlikely scoring in each game (a batter scoring on his
+# own single, a substitution undone straight after, two copies of one player) and stops. Once
+# each finding is fixed in the app or confirmed, run again with STATS_CHECKED=1 in front.
+#
 # Nothing on the phone is changed: the games and teams are only read, and the app keeps running.
 
 set -euo pipefail

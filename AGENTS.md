@@ -17,6 +17,7 @@ Read [README.md](README.md) for the folder map and [PROJECT_INDEX.md](PROJECT_IN
 - The laptop has no Xcode, so `swift test` fails there. Build, test and upload on the Mac mini over `ssh mini-ip` (`ssh mini` does not resolve away from home), from a throwaway copy; long jobs go in the background there, since the VPN drops. The remote upload steps are in [plan/share-with-teammate.md](plan/share-with-teammate.md).
 - The walk-up audio tests (`WalkUpAudioTests`) play a test tone through the Mac’s speakers. Skip them (`-skip-testing:WalkUpAudioTests`) unless audio code changed and Mikey is not nearby.
 - `tools/install_on_phone.sh` and `tools/load_team.sh` no longer find the phone by themselves; run them with `SCOREBOOK_DEVICE=00008150-00011C203A40401C`.
+- After every game, before publishing stats: `tools/publish_stats.sh` lists unlikely scoring in each game (a batter scoring on his own single, a substitution undone, two copies of one player, a pitcher nobody named, one pitcher every inning) and stops. Also read the game’s play-by-play yourself for anything else improbable. Put each finding to Mikey, fix what he confirms on the phone, and only then publish with `STATS_CHECKED=1`.
 - Run `tools/install_on_phone.sh`, `tools/load_team.sh` and `tools/publish_stats.sh` yourself once Mikey says the phone is plugged in; never hand him those commands. Only what he must do in person (recording with `tools/record_intros.py`, listening) gets a command for him.
 
 ## Current focus
