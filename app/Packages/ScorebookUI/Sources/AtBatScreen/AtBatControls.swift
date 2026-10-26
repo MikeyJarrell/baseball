@@ -1,6 +1,6 @@
 // The bottom half of the batting screen, where the thumb lives: the batter with the big Subs
 // button beside them, the row of small buttons led by Undo, the 2×2 block of count buttons,
-// and the song button across the bottom edge.
+// and the song button across the bottom edge, with the soundboard button beside it.
 
 import SwiftUI
 import Model
@@ -17,7 +17,20 @@ struct AtBatControls: View {
             BatterRow(info: info, onAction: onAction)
             ChipRow(info: info, onAction: onAction)
             CountButtons(count: info.situation.count, countAfter: info.countAfter, onAction: onAction)
-            SongButton(info: info, onAction: onAction)
+            HStack(spacing: Spacing.small) {
+                // The soundboard, beside the song button.
+                Button { onAction(.openSoundboard) } label: {
+                    Image(systemName: "speaker.wave.3.fill")
+                        .font(.system(size: 22, weight: .bold))
+                        .frame(width: 64)
+                        .frame(maxHeight: .infinity)
+                }
+                .buttonStyle(PlainActionButtonStyle())
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel(Text("Soundboard"))
+                SongButton(info: info, onAction: onAction)
+            }
+            .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

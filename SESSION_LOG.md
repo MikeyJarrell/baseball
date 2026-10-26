@@ -562,3 +562,21 @@ SESSLOG:[2026-10-25 09:05]
 - [created] `plan/handoffs/setup-and-menu-rework.md`, `app/Packages/ScorebookUI/Sources/DesignSystem/PlayerGrid.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/AnnouncerStep.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/LineupEditorPage.swift`, `app/Packages/ScorebookCore/Tests/ScoringTests/StartingLineupEditTests.swift`
 - [deleted] `app/Packages/ScorebookUI/Sources/PregameScreens/PitchersStep.swift`
 - [modified] `team/roster.csv`, `team/opponents.csv`, pregame, game changes, at-bat, overview and app shell sources, `PROJECT_INDEX.md`
+
+## [2026-10-26 10:45] Soundboard, Chris’s and Ed’s songs, the El Cajones game corrected
+SESSLOG:[2026-10-26 10:45]
+
+**Project(s):** baseball
+
+### Decisions
+- Soundboard: a speaker button beside the song button, a full-screen grid of 11 sounds from `team/soundboard.csv`; sounds play like warm-up songs, so a pitch fades them.
+- Chris walks up to the Home Depot Beat (was Hard Workin’ Man) and has I’m In Miami Bitch as an extra warm-up song.
+- Ed’s walk-up is the album’s edited version: in the explicit one the word comes at 2:09, 2:19 and in the chorus after 2:29, so no start point near 2:22 avoids it.
+- The October 25 game corrected as in the handoff; installed on the phone.
+
+### Still Open
+- Mikey remembers Bobby driving in Jonathan on a single up the middle; no play in the October 25 record matches (Bobby’s hits: a double in the 3rd and a single in the 7th with nobody on, a single in the 8th moving Allan to second).
+
+### Files
+- [created] `team/soundboard.csv`
+- [modified] `team/roster.csv`, `team/warmup_extras.csv`, `tools/walkup_songs.py`, team loader and import, song library, audio player, batting screen, app shell, pregame batting orders, `team/README.md`, `AGENTS.md`, `plan/handoffs/setup-and-menu-rework.md`

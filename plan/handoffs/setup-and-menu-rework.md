@@ -31,3 +31,9 @@ A finished game’s box score (Games list) has Resume, which takes back the end 
 ## Tests
 
 All game-logic tests (`swift test`, with two new ones in `StartingLineupEditTests`), all screen tests and all ten whole-app simulator tests pass. The setup walkthrough now has eight screens.
+
+## October 26 additions
+
+- Names in both batting orders open a page to fix name, number and batting side (`PlayerEditSheet`), at setup and from Rosters. The old Rosters page (installed October 25) did nothing when a name was tapped.
+- The soundboard: a speaker button beside the song button opens `SoundboardSheet`, a grid of the sounds listed in `team/soundboard.csv` (`SongLibrary.soundboard`, filled by the team loader). `StadiumAudioPlayer.playSound` plays one once from its start point, the way a warm-up song plays, so the next pitch fades it.
+- The El Cajones game of October 25 was corrected from Mikey’s account: Chris and Darin declared non-runners; Aidan’s first-inning run for Chris recorded as a non-runner’s runner (the pinch runner and the two substitutions that undid it removed); Monroy (#28) pitching from the 4th with the starter (Mendoza) to catcher; Tyler pitching from two out in the 7th; the second Erick the app made on his re-entry merged with the first. Yered’s pinch run for Erick and Erick’s re-entry stay as substitutions. The game as scored is in `~/Dropbox/baseball/phone-backups/2026-10-26-101839/el-cajones-as-scored.json`.

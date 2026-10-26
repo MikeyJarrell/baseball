@@ -534,3 +534,59 @@ extension EnvironmentValues {
         set { self[PregameSkipKey.self] = newValue }
     }
 }
+
+// MARK: - Fixing a player's details
+
+/// A player's name, number and batting side, from a tap on their name in a batting order.
+struct PlayerEditSheet: View {
+    var player: Player
+    /// Called with the player as edited.
+    var onSave: (Player) -> Void
+    var onCancel: () -> Void
+
+    @State private var name: String
+    @State private var number: String
+    @State private var bats: BattingSide?
+
+    init(player: Player, onSave: @escaping (Player) -> Void, onCancel: @escaping () -> Void) {
+        self.player = player
+        self.onSave = onSave
+        self.onCancel = onCancel
+        _name = State(initialValue: player.name ?? "")
+        _number = State(initialValue: player.number ?? "")
+        _bats = State(initialValue: player.bats)
+    }
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                TextField("Name", text: $name).textInputAutocapitalization(.words)
+                TextField("Number", text: $number).keyboardType(.numberPad)
+                Picker("Bats", selection: $bats) {
+                    Text("Not known").tag(BattingSide?.none)
+                    Text("Right").tag(BattingSide?.some(.right))
+                    Text("Left").tag(BattingSide?.some(.left))
+                    Text("Switch").tag(BattingSide?.some(.switchHitter))
+                }
+            }
+            .navigationTitle(player.displayName)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Cancel", action: onCancel) }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") {
+                        var edited = player
+                        let typedName = name.trimmingCharacters(in: .whitespaces)
+                        let typedNumber = String(number.filter(\.isNumber).prefix(3))
+                        edited.name = typedName.isEmpty ? nil : typedName
+                        edited.number = typedNumber.isEmpty ? nil : typedNumber
+                        edited.bats = bats
+                        onSave(edited)
+                    }
+                    .bold()
+                }
+            }
+        }
+        .presentationDetents([.large])
+    }
+}

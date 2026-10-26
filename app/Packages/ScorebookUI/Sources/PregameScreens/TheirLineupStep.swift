@@ -18,6 +18,8 @@ struct TheirLineupStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
 
+    /// The player whose name and number are open to fix.
+    @State private var editing: Player?
     /// Whether the "Add to batting order" chips are showing.
     @State private var addOpen = false
     /// The number box being typed in: a saved player's id, or a numbers-only entry's id.
@@ -36,6 +38,9 @@ struct TheirLineupStep: View {
             case .names: namesSection
             case .numbers: numbersSection
             }
+        }
+        .sheet(item: $editing) { player in
+            PlayerEditSheet(player: player, onSave: { draft.theirs.update($0); editing = nil }, onCancel: { editing = nil })
         }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
@@ -80,8 +85,8 @@ struct TheirLineupStep: View {
                         .fixedSize()
                         .accessibilityLabel(Text("Designated non-runner"))
                         .accessibilityValue(Text(isNonRunner ? "On" : "Off"))
-                    // Tapping the name types in the number box too.
-                    let name = Button { focusedNumber = id } label: {
+                    // Tapping the name opens their name, number and batting side to fix.
+                    let name = Button { editing = player } label: {
                         Group {
                             if let name = player.name, !name.isEmpty {
                                 Text(name)
@@ -94,7 +99,7 @@ struct TheirLineupStep: View {
                         .contentShape(Rectangle())
                     }
                     .buttonStyle(.plain)
-                    .accessibilityHint(Text("Type their number"))
+                    .accessibilityHint(Text("Edit name and number"))
                     HStack(spacing: Spacing.small) {
                         OrderNumber(spot: index + 1)
                         // At the largest text sizes the name gets its own line, with the number

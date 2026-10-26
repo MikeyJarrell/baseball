@@ -92,6 +92,11 @@ public struct OurLineup: Equatable, Sendable {
         battingOrder.append(player.id)
     }
 
+    /// Puts in a player's edited name, number or batting side.
+    public mutating func update(_ player: Player) {
+        if let i = roster.firstIndex(where: { $0.id == player.id }) { roster[i] = player }
+    }
+
     /// Takes a player out of the batting order. Anyone who leaves the order also stops being a
     /// designated non-runner, since a non-runner is a hitter. If they field, they keep their position.
     public mutating func removeFromOrder(_ id: PlayerID) {

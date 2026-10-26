@@ -15,6 +15,8 @@ Read [README.md](README.md) for the folder map and [PROJECT_INDEX.md](PROJECT_IN
 - Keep credentials, bulky datasets, and recordings out of Git. Song files and other bulk files for the app live in `~/Dropbox/baseball/` (see its README).
 - Leave delivered or frozen documents unchanged unless explicitly asked.
 - The laptop has no Xcode, so `swift test` fails there. Build, test and upload on the Mac mini over `ssh mini-ip` (`ssh mini` does not resolve away from home), from a throwaway copy; long jobs go in the background there, since the VPN drops. The remote upload steps are in [plan/share-with-teammate.md](plan/share-with-teammate.md).
+- The walk-up audio tests (`WalkUpAudioTests`) play a test tone through the Mac’s speakers. Skip them (`-skip-testing:WalkUpAudioTests`) unless audio code changed and Mikey is not nearby.
+- `tools/install_on_phone.sh` and `tools/load_team.sh` no longer find the phone by themselves; run them with `SCOREBOOK_DEVICE=00008150-00011C203A40401C`.
 - Run `tools/install_on_phone.sh`, `tools/load_team.sh` and `tools/publish_stats.sh` yourself once Mikey says the phone is plugged in; never hand him those commands. Only what he must do in person (recording with `tools/record_intros.py`, listening) gets a command for him.
 
 ## Current focus

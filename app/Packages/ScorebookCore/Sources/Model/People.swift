@@ -302,15 +302,28 @@ public struct Song: Identifiable, Codable, Equatable, Hashable, Sendable {
     }
 }
 
-/// Every imported song, plus the announcer echo setting. Saved as `songs/library.json`.
+/// Every imported song, plus the announcer echo setting and the soundboard. Saved as
+/// `songs/library.json`.
 public struct SongLibrary: Codable, Equatable, Hashable, Sendable {
     public var songs: [Song]
     /// How much stadium echo to add to recorded introductions, from 0 (none) to 1 (lots).
     public var announcerEcho: Double
+    /// The soundboard's sounds, in the order they show: songs and effects for breaks in the game.
+    public var soundboard: [SongID]
 
-    public init(songs: [Song] = [], announcerEcho: Double = 0.5) {
+    public init(songs: [Song] = [], announcerEcho: Double = 0.5, soundboard: [SongID] = []) {
         self.songs = songs
         self.announcerEcho = announcerEcho
+        self.soundboard = soundboard
+    }
+
+    // Reading from JSON: a library saved before the soundboard has none.
+    private enum CodingKeys: String, CodingKey { case songs, announcerEcho, soundboard }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        songs = try c.decode([Song].self, forKey: .songs)
+        announcerEcho = try c.decodeIfPresent(Double.self, forKey: .announcerEcho) ?? 0.5
+        soundboard = try c.decodeIfPresent([SongID].self, forKey: .soundboard) ?? []
     }
 
     /// Finds a song by id.

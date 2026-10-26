@@ -77,6 +77,8 @@ public enum AtBatAction: Equatable, Sendable {
     case playWarmUp(Player)
     /// Open the game details: date, start time, innings, home and away.
     case openGameDetails
+    /// Open the soundboard: songs and sound effects for breaks in the game.
+    case openSoundboard
     /// Open the play-by-play to fix any play or pitch (the game menu's Manual adjustment).
     case openPlayFixing
     /// Open both teams' lineups and rosters, to finish entering them after a rushed start.
