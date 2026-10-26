@@ -14,8 +14,8 @@ struct DecisionTests {
     @Test("The winning pitcher has a W after their name, the losing pitcher an L, everyone else nothing")
     func winAndLoss() {
         let pitching = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific).pitching
-        #expect(pitching[0].rows.map(\.label) == ["Collins", "Reyes L"])
-        #expect(pitching[1].rows.map(\.label) == ["Barros W", "Voss"])
+        #expect(pitching[0].rows.map(\.label) == ["R. Collins", "G. Reyes L"])
+        #expect(pitching[1].rows.map(\.label) == ["S. Barros W", "T. Voss"])
     }
 
     @Test("A game with no decisions (a tie, or one still going) marks nobody")
@@ -24,7 +24,7 @@ struct DecisionTests {
         box.away.pitching[1].decision = nil
         box.home.pitching[0].decision = nil
         let pitching = BoxScorePrinter.layout(box, timeZone: pacific).pitching
-        #expect(pitching.flatMap { $0.rows.map(\.label) } == ["Collins", "Reyes", "Barros", "Voss"])
+        #expect(pitching.flatMap { $0.rows.map(\.label) } == ["R. Collins", "G. Reyes", "S. Barros", "T. Voss"])
     }
 }
 
@@ -39,13 +39,13 @@ struct HitBatterTests {
             HitBatterNote(batter: "d2", batterName: "Chris Tate", team: .home, pitcher: "m12", pitcherName: "Gus Reyes", count: 2),
         ]
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
-        #expect(notes.first == "HBP—by Collins (Webb), by Reyes (Ford, Tate 2).")
+        #expect(notes.first == "HBP—by R. Collins (J. Webb), by G. Reyes (C. Ford, C. Tate 2).")
 
         // A batter hit when nobody knew who was pitching is listed alone, at the end.
         box.notes.hitBatters.insert(
             HitBatterNote(batter: "d7", batterName: "Drew Lang", team: .home, pitcher: nil, pitcherName: nil, count: 1), at: 0)
         let withUnknown = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
-        #expect(withUnknown.first == "HBP—by Collins (Webb), by Reyes (Ford, Tate 2), Lang.")
+        #expect(withUnknown.first == "HBP—by R. Collins (J. Webb), by G. Reyes (C. Ford, C. Tate 2), D. Lang.")
     }
 
     @Test("With nobody hit by a pitch there is no HBP note")
@@ -65,7 +65,7 @@ struct RanForTests {
         let notes = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific).notes
         #expect(!SampleGame.boxScore.notes.ranForNonRunners.isEmpty)
         #expect(!notes.contains { $0.contains("ran for") })
-        #expect(notes.last == "SF—Ruiz, Fisk.")
+        #expect(notes.last == "SF—D. Ruiz, M. Fisk.")
     }
 }
 
@@ -94,8 +94,8 @@ struct SubstituteLineTests {
     @Test("A pinch hitter is pushed in under the player he batted for, with no letter and no footnote")
     func noFootnotes() {
         let layout = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific)
-        #expect(layout.batting[0].rows[9].paddedLabel == "  Moss PH")
-        #expect(layout.batting[1].rows[9].paddedLabel == "  Voss P")
+        #expect(layout.batting[0].rows[9].paddedLabel == "  K. Moss PH")
+        #expect(layout.batting[1].rows[9].paddedLabel == "  T. Voss P")
         let text = BoxScorePrinter.text(SampleGame.boxScore, timeZone: pacific)
         #expect(!text.contains("a-"))
         #expect(!text.contains("popped out for"))

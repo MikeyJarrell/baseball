@@ -2,7 +2,7 @@
 // same screen; only ours has positions shared by turns.
 //
 // The field drawing shows each position with who plays it. Tapping a position on the diamond
-// (or its row in the list under it) opens a list of our whole roster: pick who plays there.
+// opens every player's name: pick who plays there.
 // Picking someone already fielding swaps the two. Anyone can field, whether or not they bat,
 // so a pitcher who does not hit is just a fielder who is not in the batting order. Under the
 // players, "Alternate with…" shares the position by turns: the starter plays odd innings and
@@ -38,13 +38,7 @@ struct FieldingStep: View {
                 .fieldersAsNames(fielderTags)
                 .frame(height: 330)
                 .frame(maxWidth: .infinity)
-                .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
                 .bareRow()
-                Text("Tap a position to pick who plays it.")
-                    .font(ScorebookFont.caption)
-                    .foregroundStyle(ScorebookColor.textSecondary)
-                    .padding(.horizontal, Spacing.extraSmall)
-                    .bareRow()
                 if let pitcher = defense[.pitcher].flatMap(player), pitcher.throwsWith == nil || draft.handEdits[pitcher.id] != nil {
                     HStack(spacing: Spacing.small) {
                         Text("\(pitcher.lastName) throws").font(ScorebookFont.body)
@@ -56,13 +50,6 @@ struct FieldingStep: View {
                     }
                     .cardRow()
                 }
-            }
-            Section {
-                ForEach(Position.allCases, id: \.self) { position in
-                    positionRow(position).cardRow()
-                }
-            } header: {
-                SectionHeader(title: "Fielders")
             }
         }
         .sheet(item: $picking) { picked in
@@ -83,38 +70,6 @@ struct FieldingStep: View {
         return tags
     }
 
-    /// One position in the list under the drawing: its number, who plays it, whether they bat.
-    private func positionRow(_ position: Position) -> some View {
-        let starter = defense[position].flatMap(player)
-        let second = ours ? lineup.alternates[position].flatMap(lineup.player) : nil
-        var detail = PregameWording.positionName(position)
-        if let starter, ours ? !lineup.isBatting(starter.id) : !draft.theirStatus(of: starter.id).contains("bats") { detail += " · doesn’t bat" }
-        if let second { detail += " · \(second.lastName) in even innings" }
-        return Button {
-            picking = PickedPosition(position: position)
-        } label: {
-            HStack(spacing: Spacing.medium) {
-                PositionLabel(position: position)
-                VStack(alignment: .leading, spacing: 2) {
-                    if let starter {
-                        Text(second == nil ? starter.displayName : "\(starter.lastName) / \(second?.lastName ?? "")")
-                            .font(ScorebookFont.headline)
-                    } else {
-                        Text("Nobody").font(ScorebookFont.headline).foregroundStyle(ScorebookColor.out)
-                    }
-                    Text(detail).font(ScorebookFont.caption).foregroundStyle(ScorebookColor.textSecondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(ScorebookColor.textSecondary)
-                    .accessibilityHidden(true)
-            }
-            .frame(minHeight: 44)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityHint(Text("Pick who plays \(position.name)"))
-    }
 }
 
 /// A position picked on the drawing, so the player list can open as a sheet.
@@ -178,10 +133,8 @@ struct FielderPicker: View {
         }
     }
 
-    /// One of our players in the grid, with where they are now.
+    /// One player in the grid, by name.
     private func choice(_ player: Player, isOn: Bool) -> PlayerGrid.Choice {
-        PlayerGrid.Choice(id: player.id, name: ours ? player.displayName : PregameWording.theirHitter(player),
-                          detail: ours ? PregameWording.status(of: player.id, in: lineup) : draft.theirStatus(of: player.id),
-                          isChosen: isOn)
+        PlayerGrid.Choice(id: player.id, name: ours ? player.displayName : PregameWording.theirHitter(player), isChosen: isOn)
     }
 }

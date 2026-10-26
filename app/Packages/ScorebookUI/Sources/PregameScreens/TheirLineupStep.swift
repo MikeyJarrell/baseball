@@ -20,8 +20,6 @@ struct TheirLineupStep: View {
 
     /// The player whose name and number are open to fix.
     @State private var editing: Player?
-    /// Whether the "Add to batting order" chips are showing.
-    @State private var addOpen = false
     /// The number box being typed in: a saved player's id, or a numbers-only entry's id.
     @FocusState private var focusedNumber: PlayerID?
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -35,7 +33,7 @@ struct TheirLineupStep: View {
                  hidesButton: focusedNumber != nil,
                  onButton: onNext) {
             switch theirs.mode {
-            case .names: namesSection
+            case .names: namesSection; benchSection
             case .numbers: numbersSection
             }
         }
@@ -125,22 +123,6 @@ struct TheirLineupStep: View {
             }
             .onMove { draft.theirs.namedOrder.move(fromOffsets: $0, toOffset: $1) }
 
-            let notBatting = team.roster.filter { !theirs.namedOrder.contains($0.id) }
-            if !notBatting.isEmpty {
-                AddRow(title: "Add to batting order", systemImage: addOpen ? "xmark" : "plus") { addOpen.toggle() }
-                    .cardRow()
-                    .moveDisabled(true)
-                if addOpen {
-                    FlowLayout {
-                        ForEach(notBatting) { player in
-                            Button(PregameWording.theirHitter(player)) { draft.theirs.addToNamedOrder(player.id) }
-                                .buttonStyle(ChipStyle())
-                        }
-                    }
-                    .cardRow()
-                    .moveDisabled(true)
-                }
-            }
             NewPlayerRow { number, name in draft.theirs.addNewHitter(name: name, number: number) }
         } header: {
             SectionHeader(title: "Batting order · \(theirs.battingOrder(for: team).count)")
@@ -148,6 +130,34 @@ struct TheirLineupStep: View {
             Text("Hold a row and drag to reorder.")
                 .font(ScorebookFont.caption)
                 .foregroundStyle(ScorebookColor.textSecondary)
+        }
+    }
+
+    /// Their players not batting, each with a Bat button, as on our batting order.
+    private var benchSection: some View {
+        Section {
+            let bench = theirs.roster(for: team).filter { player in
+                !theirs.battingOrder(for: team).contains(player.id) && (player.placeholder == nil || !player.isUnnamed)
+            }
+            if bench.isEmpty {
+                Text("Everyone is batting.")
+                    .font(ScorebookFont.body)
+                    .foregroundStyle(ScorebookColor.textSecondary)
+                    .cardRow()
+            }
+            ForEach(bench) { player in
+                HStack(spacing: Spacing.medium) {
+                    Text(PregameWording.theirHitter(player)).font(ScorebookFont.headline)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Button { draft.theirs.addToNamedOrder(player.id) } label: { Label("Bat", systemImage: "plus") }
+                        .buttonStyle(ChipStyle())
+                        .accessibilityLabel(Text("Add \(player.displayName) to the batting order"))
+                }
+                .frame(minHeight: 44)
+                .cardRow()
+            }
+        } header: {
+            SectionHeader(title: "Bench")
         }
     }
 

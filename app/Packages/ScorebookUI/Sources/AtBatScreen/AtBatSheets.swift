@@ -44,9 +44,6 @@ struct GameMenuSheet: View {
                     row("Set outs, count, score or runners", detail: nil, icon: "slider.horizontal.3") {
                         choose(.openManualAdjustment)
                     }
-                    row("Error, nobody moved", detail: "Like a dropped foul pop-up", icon: "xmark.circle") {
-                        choose(.openErrorWithNoAdvance)
-                    }
                 }
                 Section("Music and PA") {
                     if let pitcher = ourPitcher {
