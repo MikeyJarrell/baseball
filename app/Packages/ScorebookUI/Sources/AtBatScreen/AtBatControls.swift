@@ -162,7 +162,7 @@ struct BatterRow: View {
 
 // MARK: - Undo and the small buttons
 
-/// Undo, then HBP, IBB and Foul tip. Right after strike three, the dropped-third-strike chip takes Foul
+/// Undo, then HBP, IBB, Foul tip and E (an error with nobody moving). Right after strike three, the dropped-third-strike chip takes Foul
 /// tip's place until the next event (as "Dropped K"); HBP and IBB stay, since the next batter is already up.
 struct ChipRow: View {
     var info: AtBatInfo
@@ -230,6 +230,9 @@ struct ChipRow: View {
         } else {
             Button("Foul tip") { pitch(.foulTip) }
         }
+        // An error with nobody moving, such as a dropped foul pop-up.
+        Button("E") { onAction(.openErrorWithNoAdvance) }
+            .accessibilityLabel(Text("Error, nobody moved"))
     }
 
     /// Hands back one pitch to record.

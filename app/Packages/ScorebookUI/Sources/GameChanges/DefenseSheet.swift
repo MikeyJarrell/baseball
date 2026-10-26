@@ -138,7 +138,6 @@ public struct DefenseSheet: View {
             .frame(maxWidth: .infinity)
             .accessibilityHidden(true)   // VoiceOver uses the list of positions below instead
             .padding(.bottom, Spacing.small)
-            FootNote("Picking someone already in the field swaps the two.")
             Card {
                 ForEach(Array(Position.allCases.enumerated()), id: \.element) { i, position in
                     if i > 0 { RowDivider() }
@@ -210,9 +209,7 @@ public struct DefenseSheet: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     PlayerGrid(context.team(side).roster.map { player in
-                        PlayerGrid.Choice(id: player.id, name: player.displayName,
-                                          detail: whereOnSheet[player.id].map { positionTitle($0) } ?? "Not in the field",
-                                          isChosen: here == player.id)
+                        PlayerGrid.Choice(id: player.id, name: player.displayName, isChosen: here == player.id)
                     }) { id in put(id, at: position) }
                     if here != nil {
                         Button("Nobody: leave \(position.name) empty") { put(nil, at: position) }

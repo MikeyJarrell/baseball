@@ -5,7 +5,6 @@
 // - The batting order: any number of hitters, dragged into order (or moved with VoiceOver's
 //   actions), a minus button to take someone out, and the non-runner switch. The league allows
 //   two designated non-runners; the header says "1 of 2", and a third asks first, then is allowed.
-// - "Add to batting order": chips of everyone not batting.
 // - The bench: everyone who neither bats nor fields, each with a "Bat" button.
 
 import SwiftUI
@@ -17,8 +16,6 @@ struct BattingOrderStep: View {
     @Binding var draft: PregameDraft
     var onNext: () -> Void
 
-    /// Whether the "Add to batting order" chips are showing.
-    @State private var addOpen = false
     /// The player whose name and number are open to fix.
     @State private var editing: Player?
     /// A hitter waiting on the "past the league's limit" question.
@@ -68,32 +65,6 @@ struct BattingOrderStep: View {
             }
             .onMove { draft.ours.moveInOrder(fromOffsets: $0, toOffset: $1) }
 
-            AddRow(title: "Add to batting order", systemImage: addOpen ? "xmark" : "plus") { addOpen.toggle() }
-                .cardRow()
-                .moveDisabled(true)
-            if addOpen {
-                Group {
-                    if lineup.notBatting.isEmpty {
-                        Text("Everyone is already batting.")
-                            .font(ScorebookFont.body)
-                            .foregroundStyle(ScorebookColor.textSecondary)
-                    } else {
-                        FlowLayout {
-                            ForEach(lineup.notBatting) { player in
-                                Button {
-                                    draft.ours.addToOrder(player.id)
-                                } label: {
-                                    Text(player.lastName) + Text(chipPosition(player.id)).foregroundStyle(ScorebookColor.textSecondary)
-                                }
-                                .buttonStyle(ChipStyle())
-                                .accessibilityLabel(Text("Add \(player.displayName) to the batting order"))
-                            }
-                        }
-                    }
-                }
-                .cardRow()
-                .moveDisabled(true)
-            }
             NewPlayerRow { number, name in draft.ours.addNewPlayer(name: name, number: number) }
         } header: {
             SectionHeader(title: "Batting order · \(lineup.battingOrder.count)",
