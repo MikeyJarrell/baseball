@@ -46,6 +46,8 @@ public struct TheirLineup: Equatable, Sendable {
     public var pitcher: PlayerID?
     /// Their hitters declared designated non-runners.
     public var nonRunners: [PlayerID] = []
+    /// Saved players whose name, number or batting side the scorer edited, by id.
+    public var edits: [PlayerID: Player] = [:]
     /// Who plays each position other than pitcher, where we know it.
     public var fielders: [Position: PlayerID] = [:]
     /// The id of that placeholder pitcher.
@@ -143,6 +145,16 @@ public struct TheirLineup: Equatable, Sendable {
         namedOrder.append(id)
     }
 
+    /// Puts in one of their players' edited name, number or batting side.
+    public mutating func update(_ player: Player) {
+        if let i = newPlayers.firstIndex(where: { $0.id == player.id }) {
+            newPlayers[i] = player
+        } else {
+            edits[player.id] = player
+            numberEdits[player.id] = nil
+        }
+    }
+
     /// Declares one of their hitters a designated non-runner, or takes it back.
     public mutating func toggleNonRunner(_ id: PlayerID) {
         if nonRunners.contains(id) { nonRunners.removeAll { $0 == id } } else { nonRunners.append(id) }
@@ -167,7 +179,7 @@ public struct TheirLineup: Equatable, Sendable {
     /// to blank leaves the saved number as it was.
     public func savedPlayers(for team: Team) -> [Player] {
         team.roster.map { player in
-            var player = player
+            var player = edits[player.id] ?? player
             if mode == .names, let typed = numberEdits[player.id], !typed.isEmpty { player.number = typed }
             return player
         }

@@ -162,6 +162,72 @@ struct SongSettingsSheet: View {
     }
 }
 
+// MARK: - Soundboard
+
+/// The soundboard, from the speaker button beside the song button: a grid of songs and sound
+/// effects for breaks in the game (a 1-2-3 inning, a mound visit). A tap plays one; a tap on
+/// the one playing fades it. Like a warm-up song, the next pitch fades it too. The sounds and
+/// their order come from team/soundboard.csv through tools/load_team.sh.
+struct SoundboardSheet: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                let ids = app.audio?.library.soundboard ?? []
+                if ids.isEmpty {
+                    Text("No sounds yet. Add them to team/soundboard.csv and load the team.")
+                        .foregroundStyle(ScorebookColor.textSecondary)
+                        .padding()
+                }
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: Spacing.small), GridItem(.flexible(), spacing: Spacing.small)],
+                          spacing: Spacing.small) {
+                    ForEach(ids, id: \.self) { id in
+                        if let song = app.audio?.library.song(id) { tile(song) }
+                    }
+                }
+                .padding(Spacing.large)
+            }
+            .background(ScorebookColor.background)
+            .navigationTitle("Soundboard")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+        .presentationDetents([.large])
+    }
+
+    /// One sound: its name over the artist, filled while it plays.
+    private func tile(_ song: Song) -> some View {
+        let playback = app.audio?.playback
+        let playing = playback?.phase == .warmUp && playback?.song == song.id
+        let shape = RoundedRectangle(cornerRadius: Spacing.cornerRadius, style: .continuous)
+        return Button {
+            if playing { app.audio?.fadeOut() } else { app.audio?.playSound(song.id) }
+        } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                HStack {
+                    Image(systemName: playing ? "stop.fill" : "play.fill")
+                    Spacer()
+                }
+                .font(.system(size: 15, weight: .bold))
+                Text(song.title).font(ScorebookFont.headline).lineLimit(2).minimumScaleFactor(0.8)
+                if let artist = song.artist, !artist.isEmpty {
+                    Text(artist).font(ScorebookFont.caption).lineLimit(1)
+                        .foregroundStyle(playing ? Color.white.opacity(0.85) : ScorebookColor.textSecondary)
+                }
+            }
+            .foregroundStyle(playing ? Color.white : ScorebookColor.textPrimary)
+            .frame(maxWidth: .infinity, minHeight: 84, alignment: .topLeading)
+            .padding(Spacing.medium)
+            .background(playing ? ScorebookColor.warmUpMusic : ScorebookColor.surface, in: shape)
+            .contentShape(shape)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(playing ? "Stop \(song.title)" : "Play \(song.title)"))
+    }
+}
+
 // MARK: - Song picker
 
 /// Every song in the library, to give one of our hitters a walk-up song. Hands back the song

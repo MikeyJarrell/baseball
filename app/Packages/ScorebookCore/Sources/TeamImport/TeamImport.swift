@@ -136,6 +136,23 @@ public struct ExtraWarmUpRow: Equatable, Sendable {
     }
 }
 
+/// One sound on the soundboard, as `team/soundboard.csv` has it.
+public struct SoundRow: Equatable, Sendable {
+    public var sound: String
+    public var artist: String
+    /// Where in the track it starts: "1:14".
+    public var start: String
+    /// The whole track's file name in `~/Dropbox/baseball/songs/`.
+    public var file: String
+
+    /// Reads every row of `team/soundboard.csv` that has a file.
+    public static func read(_ text: String) -> [SoundRow] {
+        CSV.rows(text).map { r in
+            SoundRow(sound: r["sound"] ?? "", artist: r["artist"] ?? "", start: r["start"] ?? "", file: r["file"] ?? "")
+        }.filter { !$0.file.isEmpty }
+    }
+}
+
 /// One opponent's registered player, as `team/opponents.csv` has them.
 public struct OpponentRow: Equatable, Sendable {
     public var team: String
@@ -265,7 +282,8 @@ public enum TeamImport {
     ///   - recordedNames: The players whose names were recorded for a pieced introduction,
     ///     by their file name stem ("aidan-kurt").
     public static func merge(teams: [Team], library: SongLibrary, roster: [RosterRow], opponents: [OpponentRow],
-                             extraWarmUps: [ExtraWarmUpRow] = [], durations: [String: TimeInterval] = [:],
+                             extraWarmUps: [ExtraWarmUpRow] = [], sounds: [SoundRow] = [],
+                             durations: [String: TimeInterval] = [:],
                              recordedNames: Set<String> = []) -> ImportResult {
         var notes: [String] = []
         var library = library
@@ -274,7 +292,7 @@ public enum TeamImport {
         // Every file the roster files name. A song matched by title and artist (one imported on
         // the phone by hand) must not be one of these, or a whole warm-up track could take over a
         // teammate's walk-up clip of the same song.
-        let namedFiles = Set(roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file))
+        let namedFiles = Set(roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file) + sounds.map(\.file))
 
         // Songs first, so players can point at them.
         func song(file: String, title: String, artist: String, start: TimeInterval) -> SongID? {
@@ -390,6 +408,10 @@ public enum TeamImport {
                 notes.append(existing == nil ? "Opponent added: \(name), \(team.roster.count) players"
                                              : "Opponent updated: \(name)")
             }
+        }
+        // The soundboard, in the file's order.
+        if !sounds.isEmpty {
+            library.soundboard = sounds.compactMap { song(file: $0.file, title: $0.sound, artist: $0.artist, start: RosterWords.seconds($0.start)) }
         }
         return ImportResult(teamsToSave: toSave, library: library, audioFiles: audioFiles, notes: notes)
     }

@@ -26,6 +26,10 @@ To find the album audio for a request, search YouTube Music from the command lin
 
 When a player wants a particular line heard, find when it is sung with `mlx_whisper` (installed in Anaconda) on the first minute of the track, using `--word-timestamps True`, and set the hook just before the line. The song reaches its hook a second and a half after the announcer finishes, at full volume, so the line then comes in clear.
 
+## Soundboard
+
+[soundboard.csv](soundboard.csv) lists the soundboard’s sounds in the order the app shows them: the name, the artist, the source, and `start`, where in the track it begins (“Easy as 1-2-3” starts at 1:14, on the line). `python3 tools/walkup_songs.py` keeps each whole track as `sound-<name>.m4a` and fills in `file`; `tools/load_team.sh` puts them on the phone. In a game, the speaker button beside the song button opens the soundboard: a tap plays a sound, a second tap or the next pitch fades it.
+
 ## Announcer introductions
 
 Each introduction is pieced together on the phone from short recordings in Mikey’s voice: “Now batting,” then the player’s number and their name. Every number from 0 to 99 and 00 is recorded once for the whole team, so a player who gets a number later, or changes it, needs nothing new recorded: type the number into the app or the roster’s `number` column. A player with no number yet, or a number not recorded (such as 07), is introduced by name alone.

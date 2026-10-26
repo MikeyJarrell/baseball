@@ -19,6 +19,8 @@ struct BattingOrderStep: View {
 
     /// Whether the "Add to batting order" chips are showing.
     @State private var addOpen = false
+    /// The player whose name and number are open to fix.
+    @State private var editing: Player?
     /// A hitter waiting on the "past the league's limit" question.
     @State private var pendingNonRunner: PlayerID?
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -31,6 +33,9 @@ struct BattingOrderStep: View {
                  onButton: onNext) {
             battingOrderSection
             benchSection
+        }
+        .sheet(item: $editing) { player in
+            PlayerEditSheet(player: player, onSave: { draft.ours.update($0); editing = nil }, onCancel: { editing = nil })
         }
         .confirmationDialog(pastLimitTitle, isPresented: Binding(get: { pendingNonRunner != nil },
                                                                  set: { if !$0 { pendingNonRunner = nil } }),
@@ -102,14 +107,20 @@ struct BattingOrderStep: View {
     private func hitterRow(_ player: Player, spot: Int) -> some View {
         let isNonRunner = lineup.isNonRunner(player.id)
         // The name and where they field.
-        let name = VStack(alignment: .leading, spacing: 2) {
-            (Text(player.displayName) + Text(player.number.map { "  #\($0)" } ?? "").foregroundStyle(ScorebookColor.textSecondary))
-                .font(ScorebookFont.headline)
-            Text(PregameWording.fieldingLine(for: player.id, in: lineup))
-                .font(ScorebookFont.caption)
-                .foregroundStyle(ScorebookColor.textSecondary)
+        // Tapping the name opens their name, number and batting side to fix.
+        let name = Button { editing = player } label: {
+            VStack(alignment: .leading, spacing: 2) {
+                (Text(player.displayName) + Text(player.number.map { "  #\($0)" } ?? "").foregroundStyle(ScorebookColor.textSecondary))
+                    .font(ScorebookFont.headline)
+                Text(PregameWording.fieldingLine(for: player.id, in: lineup))
+                    .font(ScorebookFont.caption)
+                    .foregroundStyle(ScorebookColor.textSecondary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .buttonStyle(.plain)
+        .accessibilityHint(Text("Edit name and number"))
         // The non-runner switch and the minus button.
         let buttons = HStack(spacing: Spacing.small) {
             Button(isNonRunner ? "Non-runner" : "Runs") { tapNonRunner(player.id) }

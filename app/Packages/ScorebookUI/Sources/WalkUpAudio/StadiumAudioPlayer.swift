@@ -406,6 +406,18 @@ public final class StadiumAudioPlayer: WalkUpAudioPlayer {
         startSong(song, from: song.startTime, length: nil, repeating: true)
     }
 
+    /// Plays a soundboard sound from its start point to the end of the track, once. It plays
+    /// the way a warm-up song does: a tap on the song button or the next pitch fades it.
+    public func playSound(_ id: SongID) {
+        stopAtOnce()
+        guard let song = library.song(id) else {
+            lastProblem = "That sound is no longer in the song library."
+            return
+        }
+        beginPlay(.warmUp, song: song)
+        startSong(song, from: song.startTime, length: nil, repeating: false)
+    }
+
     // MARK: - Announcer introductions
 
     /// Asks the scorer for permission to use the microphone, if they have not been asked
