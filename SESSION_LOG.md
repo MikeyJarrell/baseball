@@ -589,3 +589,6 @@ SESSLOG:[2026-10-26 10:45]
 - “Error, nobody moved” left the game menu for an E button in the row with HBP and IBB.
 - Box scores (app and website) print a first initial with every last name, and leave out who made the errors; the team’s error count stays in the line score.
 - The duplicate “Rosas” is off the saved team. Mikey’s 5th-inning double on October 25 is a single with second on the throw. Installed, and the site republished.
+
+### Closed out October 26
+The repository was made public at Mikey’s request; nothing secret is in it (keys and certificates live outside Git on the Mac mini). Everything from these two days is on the phone and accepted to main.
