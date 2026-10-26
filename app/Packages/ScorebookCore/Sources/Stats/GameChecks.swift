@@ -60,15 +60,21 @@ public enum GameChecks {
         for side in TeamSide.allCases {
             let team = setup[side]
             // Two copies of one player: the same number, or one name the last word of another.
-            let players = team.roster
+            // One entry per player (a game saved by an older copy of the app can list one twice).
+            var seen = Set<PlayerID>()
+            let players = team.roster.filter { seen.insert($0.id).inserted }
+            if players.count < team.roster.count {
+                found.append("\(team.name): some players are listed twice in this game’s roster.")
+            }
             for (i, a) in players.enumerated() {
                 for b in players[(i + 1)...] {
                     let sameNumber = a.number != nil && a.number == b.number && !(a.number ?? "").isEmpty
+                    // One known only by a last name that is the other's ("Leyva", "Anthony Leyva").
                     let an = a.name ?? "", bn = b.name ?? ""
-                    let nested = !an.isEmpty && !bn.isEmpty && an != bn
-                        && (an.split(separator: " ").contains { bn.hasSuffix(" \($0)") || bn == String($0) }
-                            || bn.split(separator: " ").contains { an.hasSuffix(" \($0)") || an == String($0) })
-                    if sameNumber && nested || (!team.isOurs ? false : nested && sameNumber) {
+                    let aWords = an.split(separator: " "), bWords = bn.split(separator: " ")
+                    let nested = (aWords.count == 1 && bWords.count > 1 && b.lastName == an)
+                        || (bWords.count == 1 && aWords.count > 1 && a.lastName == bn)
+                    if nested {
                         found.append("\(team.name): \(a.displayName) and \(b.displayName) may be the same player.")
                     } else if sameNumber {
                         found.append("\(team.name): \(a.displayName) and \(b.displayName) both wear #\(a.number ?? "").")

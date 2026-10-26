@@ -580,3 +580,5 @@ SESSLOG:[2026-10-26 10:45]
 ### Files
 - [created] `team/soundboard.csv`
 - [modified] `team/roster.csv`, `team/warmup_extras.csv`, `tools/walkup_songs.py`, team loader and import, song library, audio player, batting screen, app shell, pregame batting orders, `team/README.md`, `AGENTS.md`, `plan/handoffs/setup-and-menu-rework.md`
+- Published to mikeyjarrell.com/dogs/ after Mikey confirmed each finding: Rodriguez scoring from first in the 2nd and Chris scoring from first on Darin’s single (a deep hit, Darin slow) stand; Rodriguez and Randall both wear #21; Riptide’s pitcher is unknown.
+- The October 4 Whales game listed six players twice in its own roster (named and number-only, same player), so the box score showed numbers: one entry each now. El Cajones’ hitters typed in by last name were merged with their roster entries in the October 25 game and the saved team, with their numbers, also in `team/opponents.csv`. “Monroy #28” stays unmatched: Daniel Monroy or Salvador Monroy Fuentes.
