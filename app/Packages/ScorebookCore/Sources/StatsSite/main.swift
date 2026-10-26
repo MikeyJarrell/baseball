@@ -60,6 +60,22 @@ let engine = ScorebookRulesEngine()
 let stats = StatsEngine()
 let logs = games.map { engine.replay($0).log }
 let boxScores = logs.map { stats.boxScore(for: $0) }
+
+// Before anything is published: unlikely scoring in each game, for the scorer to confirm.
+// The publish stops here unless STATS_CHECKED=1 says every finding has been looked at.
+var anyFindings = false
+for (game, log) in zip(games, logs) {
+    let findings = GameChecks.findings(in: game, log: log)
+    guard !findings.isEmpty else { continue }
+    anyFindings = true
+    let ours = game.setup.ourSide ?? .home
+    print("\nTo check in the game against \(game.setup[ours.opponent].name) on \(game.setup.scheduledStart.formatted(date: .abbreviated, time: .omitted)):")
+    for finding in findings { print("  - \(finding)") }
+}
+if anyFindings, ProcessInfo.processInfo.environment["STATS_CHECKED"] != "1" {
+    print("\nNothing was published. Fix these in the app, or, once each is confirmed, run again with STATS_CHECKED=1.")
+    exit(3)
+}
 let season = stats.seasonTotals(for: logs, team: ourTeam.id)
 // The tables list only players who have played: the season totals carry the whole roster.
 let batters = season.batting.filter { $0.games > 0 }
