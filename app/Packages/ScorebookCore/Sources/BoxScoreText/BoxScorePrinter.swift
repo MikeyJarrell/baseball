@@ -2,7 +2,7 @@
 //
 // `BoxScorePrinter.layout` works out every line a newspaper sports page would print for a
 // game: the headline with the score (one team to a line), each team's batting lines (ab r h
-// bi) and totals, the line score by inning, the notes, one kind to a line ("E—Kim, Tate.",
+// bi) and totals, the line score by inning, the notes, one kind to a line ("2B—Ruiz, Webb.",
 // "DP—Mudcats 2."), the pitching lines (ip h r bb so) with the winning and losing pitchers
 // marked "W" and "L", and the notes under them, ending with the game's length ("T—3:12."). `BoxScorePrinter.text` turns that layout into plain text
 // for the share sheet; the BoxScorePicture module draws the same layout as a picture.
@@ -116,15 +116,14 @@ public enum BoxScorePrinter {
 
     // MARK: - Notes
 
-    /// The notes under the line score, in the newspaper's usual order: errors, double plays,
-    /// triple plays, runners left on base, doubles, triples, home runs, stolen bases, caught
+    /// The notes under the line score, in the newspaper's usual order: double plays, triple plays, runners left on base, doubles, triples, home runs, stolen bases, caught
     /// stealing, sacrifice bunts ("S"), sacrifice flies. A note with nobody in it is left out.
     /// Who ran for a designated non-runner is not printed: it happens most innings and tells
-    /// the reader little.
+    /// the reader little. Nor is who made the errors (the team's count is in the line score):
+    /// in a casual league nobody needs that in print.
     static func notes(_ box: BoxScore, _ names: ShortNames) -> [String] {
         let n = box.notes
         let entries: [(String, String?)] = [
-            ("E", playerList(n.errors, names)),
             ("DP", teamList(n.doublePlays, keepZeros: false)),
             ("TP", teamList(n.triplePlays, keepZeros: false)),
             ("LOB", teamList(n.leftOnBase, keepZeros: true)),

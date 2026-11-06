@@ -480,7 +480,11 @@ struct SetupTests {
         #expect(setup.home.battingOrder == SampleSetups.diamondDogsAtBombers.away.battingOrder)
         #expect(setup.home.defense == SampleSetups.diamondDogsAtBombers.away.defense)
         #expect(setup.home.shortName == "DOGS" && setup.away.shortName == "MUD")
-        #expect(setup.away.defense == [FielderAssignment(position: .pitcher, player: "m9")])
+        // Their pitcher is whoever pitched against us last; their other fielders start where
+        // they played in the last game against us.
+        #expect(setup.away.startingPitcher == "m9")
+        let lastFielders = SampleSetups.mudcatsAtDiamondDogsAlternatingFirstBase.away.defense.filter { $0.position != .pitcher }
+        #expect(setup.away.defense.filter { $0.position != .pitcher } == lastFielders.filter { $0.player != "m9" })
     }
 
     @Test("Away puts us in the top of the inning")

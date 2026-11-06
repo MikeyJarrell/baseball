@@ -44,6 +44,12 @@ public struct TheirLineup: Equatable, Sendable {
     public var newPlayers: [Player]
     /// Their starting pitcher. Missing means not known yet: a placeholder "Pitcher" starts.
     public var pitcher: PlayerID?
+    /// Their hitters declared designated non-runners.
+    public var nonRunners: [PlayerID] = []
+    /// Saved players whose name, number or batting side the scorer edited, by id.
+    public var edits: [PlayerID: Player] = [:]
+    /// Who plays each position other than pitcher, where we know it.
+    public var fielders: [Position: PlayerID] = [:]
     /// The id of that placeholder pitcher.
     public let placeholderPitcherID: PlayerID
 
@@ -82,7 +88,12 @@ public struct TheirLineup: Equatable, Sendable {
         if numbers.isEmpty { numbers = (0..<9).map { _ in NumberEntry() } }
 
         let recentPitcher = PregameBuilder.mostRecent(pitching.filter { onRoster.contains($0.player) })?.player
-        return TheirLineup(mode: hasNames ? .names : .numbers, namedOrder: order, numbers: numbers, pitcher: recentPitcher)
+        var lineup = TheirLineup(mode: hasNames ? .names : .numbers, namedOrder: order, numbers: numbers, pitcher: recentPitcher)
+        // Their fielders start where they played against us last time.
+        for spot in lastGame?.defense ?? [] where spot.position != .pitcher && onRoster.contains(spot.player) && spot.player != recentPitcher {
+            lineup.fielders[spot.position] = spot.player
+        }
+        return lineup
     }
 
     // MARK: Editing
@@ -107,6 +118,48 @@ public struct TheirLineup: Equatable, Sendable {
         numbers[i].number = String(text.filter(\.isNumber).prefix(3))
     }
 
+    /// Who plays each position, the pitcher included.
+    public var defense: [Position: PlayerID] {
+        var all = fielders
+        all[.pitcher] = pitcher
+        return all
+    }
+
+    /// Puts one of their players at a position, as on our fielders step: someone already
+    /// fielding elsewhere swaps with whoever was here. `nil` empties the position.
+    public mutating func assign(_ id: PlayerID?, to position: Position) {
+        var all = defense
+        let previous = all[position]
+        if let id, let old = all.first(where: { $0.value == id })?.key, old != position {
+            all[old] = previous
+        }
+        all[position] = id
+        pitcher = all[.pitcher]
+        all[.pitcher] = nil
+        fielders = all
+    }
+
+    /// Adds a hitter who is not on their saved roster to the bottom of the batting order.
+    public mutating func addNewHitter(name: String, number: String) {
+        let id = addNewPlayer(name: name, number: number, throwsWith: nil)
+        namedOrder.append(id)
+    }
+
+    /// Puts in one of their players' edited name, number or batting side.
+    public mutating func update(_ player: Player) {
+        if let i = newPlayers.firstIndex(where: { $0.id == player.id }) {
+            newPlayers[i] = player
+        } else {
+            edits[player.id] = player
+            numberEdits[player.id] = nil
+        }
+    }
+
+    /// Declares one of their hitters a designated non-runner, or takes it back.
+    public mutating func toggleNonRunner(_ id: PlayerID) {
+        if nonRunners.contains(id) { nonRunners.removeAll { $0 == id } } else { nonRunners.append(id) }
+    }
+
     /// Adds someone typed in on the spot (a pitcher not on their saved roster) and returns their id.
     @discardableResult
     public mutating func addNewPlayer(name: String, number: String, throwsWith: Hand?) -> PlayerID {
@@ -126,7 +179,7 @@ public struct TheirLineup: Equatable, Sendable {
     /// to blank leaves the saved number as it was.
     public func savedPlayers(for team: Team) -> [Player] {
         team.roster.map { player in
-            var player = player
+            var player = edits[player.id] ?? player
             if mode == .names, let typed = numberEdits[player.id], !typed.isEmpty { player.number = typed }
             return player
         }
@@ -144,7 +197,7 @@ public struct TheirLineup: Equatable, Sendable {
     public func battingOrder(for team: Team) -> [PlayerID] {
         switch mode {
         case .names:
-            let onRoster = Set(team.roster.map(\.id))
+            let onRoster = Set(team.roster.map(\.id) + newPlayers.map(\.id))
             return namedOrder.filter { onRoster.contains($0) }
         case .numbers:
             return numberedPlayers(for: team).map(\.id)
@@ -186,7 +239,11 @@ public struct TheirLineup: Equatable, Sendable {
             isOurs: false,
             roster: PregameBuilder.applying(handEdits, to: players),
             battingOrder: battingOrder(for: team),
-            defense: startingPitcher.map { [FielderAssignment(position: .pitcher, player: $0)] } ?? [],
+            defense: (startingPitcher.map { [FielderAssignment(position: .pitcher, player: $0)] } ?? [])
+                + fielders.filter { id in players.contains { $0.id == id.value } && id.value != startingPitcher }
+                    .map { FielderAssignment(position: $0.key, player: $0.value) }
+                    .sorted { $0.position < $1.position },
+            designatedNonRunners: battingOrder(for: team).filter { nonRunners.contains($0) },
             shortName: team.shortName
         )
     }

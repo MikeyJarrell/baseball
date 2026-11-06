@@ -9,7 +9,8 @@ writes the clip's file name, and where the hook falls inside the clip, back into
 A pitcher's warm-up song plays until the first pitch, so it is kept whole: the full track,
 with its loudness evened out, saved as "<player>-warmup.m4a". A pitcher's extra warm-up
 songs, listed one per row in team/warmup_extras.csv, are kept whole the same way, saved as
-"<player>-warmup-<song>.m4a", and their file names written back into that file.
+"<player>-warmup-<song>.m4a", and their file names written back into that file. So are the
+soundboard's sounds in team/soundboard.csv, saved as "sound-<name>.m4a".
 
 Run from the repository root:
 
@@ -28,6 +29,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 ROSTER = REPO / "team" / "roster.csv"
 EXTRAS = REPO / "team" / "warmup_extras.csv"
+SOUNDBOARD = REPO / "team" / "soundboard.csv"
 SONGS_DIR = Path.home() / "Dropbox" / "baseball" / "songs"
 YT_DLP = Path.home() / ".stacher" / "youtube-dl"  # the yt-dlp copy Stacher keeps up to date
 FFMPEG = "ffmpeg"
@@ -188,6 +190,39 @@ def main():
         writer.writerows(rows)
 
     extra_warmups(redo)
+    soundboard(redo)
+
+
+def soundboard(redo):
+    """The soundboard's sounds from team/soundboard.csv, each kept whole as "sound-<name>.m4a".
+    The app starts each at its `start` time and plays it until it is stopped."""
+    if not SOUNDBOARD.exists():
+        return
+    with SOUNDBOARD.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        columns = reader.fieldnames
+        rows = list(reader)
+    for number, row in enumerate(rows, start=1):
+        if not row["source"]:
+            continue
+        out_path = SONGS_DIR / f"sound-{slug(row['sound']) or number}.m4a"
+        if out_path.exists() and row["file"] and not redo:
+            print(f"skip   sound: {out_path.name} already saved")
+            continue
+        print(f"fetch  sound: {row['sound']}")
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                source = download(row["source"], Path(tmp))
+                keep_whole(source, out_path, row["sound"], row["artist"])
+        except (RuntimeError, subprocess.CalledProcessError) as problem:
+            print(f"FAILED {row['sound']}: {problem}")
+            continue
+        row["file"] = out_path.name
+        print(f"saved  {out_path.name}")
+    with SOUNDBOARD.open("w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=columns)
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 def extra_warmups(redo):

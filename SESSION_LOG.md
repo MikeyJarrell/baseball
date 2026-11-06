@@ -543,3 +543,52 @@ SESSLOG:[2026-10-12 19:55]
 
 ### Context
 Three fixes from the first real game. Teammates saw no games because the copy of the app they install carried the team and never the games; the music reached full volume as the announcer finished and covered the end of the name; and there was no way to hold a walk-up song through a delay. Tried and dropped: remembering only a fingerprint of each game offered to a phone, which would have let an upload made from an older backup overwrite the game on the phone it was scored on, so the record also says whether the app copied the game in. The newest phone backup is from just before Cleary was moved into the starting order, so testers see him indented like a substitute until the next upload after a fresh backup. All tests passed on the Mac mini (game logic, the screens, ten whole-app tests, and four new tests that really play a song), and a trial build on a clean simulator showed the game arriving on a new phone and on a phone that had the team already, and staying away once deleted.
+
+## [2026-10-25 09:05] Ed Hunter, current rosters, and the setup and game menu rework
+SESSLOG:[2026-10-25 09:05]
+
+**Project(s):** baseball
+
+### Decisions
+- Both teams get identical batting order and fielders screens; their lineup always starts from every saved name.
+- Skip on every setup step starts the game; lineups are finished later from the game menu’s Rosters, which reuses the setup screens and keeps recorded plays with each batting spot.
+- The game menu is full screen in five groups; Delete this game asks first. Play fixing lives only under Manual adjustment.
+- The Riptide game (called after 3½ innings, October 18) stays saved as called and can be resumed from its box score.
+
+### Follow-ups
+- [ ] Install the second half of the rework (opponent fielders, announcer step, Rosters page, Music and PA, play fixing) when Mikey plugs in the phone after the October 25 game: `SCOREBOOK_DEVICE=00008150-00011C203A40401C tools/install_on_phone.sh` (the script’s own phone search no longer finds the phone).
+
+### Files
+- [created] `plan/handoffs/setup-and-menu-rework.md`, `app/Packages/ScorebookUI/Sources/DesignSystem/PlayerGrid.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/AnnouncerStep.swift`, `app/Packages/ScorebookUI/Sources/PregameScreens/LineupEditorPage.swift`, `app/Packages/ScorebookCore/Tests/ScoringTests/StartingLineupEditTests.swift`
+- [deleted] `app/Packages/ScorebookUI/Sources/PregameScreens/PitchersStep.swift`
+- [modified] `team/roster.csv`, `team/opponents.csv`, pregame, game changes, at-bat, overview and app shell sources, `PROJECT_INDEX.md`
+
+## [2026-10-26 10:45] Soundboard, Chris’s and Ed’s songs, the El Cajones game corrected
+SESSLOG:[2026-10-26 10:45]
+
+**Project(s):** baseball
+
+### Decisions
+- Soundboard: a speaker button beside the song button, a full-screen grid of 11 sounds from `team/soundboard.csv`; sounds play like warm-up songs, so a pitch fades them.
+- Chris walks up to the Home Depot Beat (was Hard Workin’ Man) and has I’m In Miami Bitch as an extra warm-up song.
+- Ed’s walk-up is the album’s edited version: in the explicit one the word comes at 2:09, 2:19 and in the chorus after 2:29, so no start point near 2:22 avoids it.
+- The October 25 game corrected as in the handoff; installed on the phone.
+
+### Still Open
+- Mikey remembers Bobby driving in Jonathan on a single up the middle; no play in the October 25 record matches (Bobby’s hits: a double in the 3rd and a single in the 7th with nobody on, a single in the 8th moving Allan to second).
+
+### Files
+- [created] `team/soundboard.csv`
+- [modified] `team/roster.csv`, `team/warmup_extras.csv`, `tools/walkup_songs.py`, team loader and import, song library, audio player, batting screen, app shell, pregame batting orders, `team/README.md`, `AGENTS.md`, `plan/handoffs/setup-and-menu-rework.md`
+- Published to mikeyjarrell.com/dogs/ after Mikey confirmed each finding: Rodriguez scoring from first in the 2nd and Chris scoring from first on Darin’s single (a deep hit, Darin slow) stand; Rodriguez and Randall both wear #21; Riptide’s pitcher is unknown.
+- The October 4 Whales game listed six players twice in its own roster (named and number-only, same player), so the box score showed numbers: one entry each now. El Cajones’ hitters typed in by last name were merged with their roster entries in the October 25 game and the saved team, with their numbers, also in `team/opponents.csv`. “Monroy #28” stays unmatched: Daniel Monroy or Salvador Monroy Fuentes.
+
+## [2026-10-26 12:00] Setup screens trimmed, initials and no error names in box scores
+
+- Setup: no “Add to batting order” (the bench’s Bat buttons do it; their lineup got the same bench); the fielders screens are the drawing alone; the player grid shows names only; no note about swapping on the defense check.
+- “Error, nobody moved” left the game menu for an E button in the row with HBP and IBB.
+- Box scores (app and website) print a first initial with every last name, and leave out who made the errors; the team’s error count stays in the line score.
+- The duplicate “Rosas” is off the saved team. Mikey’s 5th-inning double on October 25 is a single with second on the throw. Installed, and the site republished.
+
+### Closed out October 26
+The repository was made public at Mikey’s request; nothing secret is in it (keys and certificates live outside Git on the Mac mini). Everything from these two days is on the phone and accepted to main.
