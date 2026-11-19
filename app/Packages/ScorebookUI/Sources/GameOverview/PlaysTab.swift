@@ -25,7 +25,11 @@ struct PlaysTab: View {
     @State private var showPitches = false
     @State private var fixing: PlayRow?
 
-    init(log: PlayLog, situation: Situation?, onAction: @escaping (GameOverviewAction) -> Void) {
+    /// False on the box score from the batting screen: the rows only show.
+    var canFix: Bool = true
+
+    init(log: PlayLog, situation: Situation?, canFix: Bool = true, onAction: @escaping (GameOverviewAction) -> Void) {
+        self.canFix = canFix
         self.log = log
         self.situation = situation
         self.onAction = onAction
@@ -59,6 +63,7 @@ struct PlaysTab: View {
                         VStack(spacing: 0) {
                             ForEach(section.rows) { row in
                                 PlayRowView(row: row) { fixing = row }
+                                    .disabled(!canFix)
                                 if row.id != section.rows.last?.id {
                                     Divider().overlay(ScorebookColor.divider)
                                 }
@@ -72,7 +77,7 @@ struct PlaysTab: View {
                     }
                 }
 
-                Text("Tap a play to fix it.")
+                Text(canFix ? "Tap a play to fix it." : "To fix a play: game menu, Manual adjustment.")
                     .font(ScorebookFont.caption)
                     .foregroundStyle(ScorebookColor.textSecondary)
                     .padding(.horizontal, Spacing.extraSmall)

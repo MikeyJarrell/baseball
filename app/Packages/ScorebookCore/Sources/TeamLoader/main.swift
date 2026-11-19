@@ -91,11 +91,14 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
         guard let text = try? String(contentsOf: extrasFile, encoding: .utf8) else { fail("warmup_extras.csv could not be read") }
         extraWarmUps = ExtraWarmUpRow.read(text)
     }
+    // The soundboard is optional too.
+    let soundsFile = teamFolder.appendingPathComponent("soundboard.csv")
+    let sounds = (try? String(contentsOf: soundsFile, encoding: .utf8)).map(SoundRow.read) ?? []
     guard !roster.isEmpty else { fail("roster.csv has no players") }
 
     // Every song file the roster names must be there and play.
     var durations: [String: TimeInterval] = [:]
-    let files = Set((roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file)).filter { !$0.isEmpty })
+    let files = Set((roster.flatMap { [$0.clipFile, $0.warmUpFile] } + extraWarmUps.map(\.file) + sounds.map(\.file)).filter { !$0.isEmpty })
     for file in files.sorted() {
         guard let length = await playableLength(songsFolder.appendingPathComponent(file)) else {
             fail("\(file) is missing from \(songsFolder.path) or will not play")
@@ -134,7 +137,7 @@ func load(dataFolder: URL, teamFolder: URL, songsFolder: URL, introsFolder: URL?
     if !saved.damaged.isEmpty { fail("some saved team files could not be read: \(saved.damaged.map(\.fileName))") }
     let library = try await storage.loadSongLibrary()
     let result = TeamImport.merge(teams: saved.items, library: library, roster: roster, opponents: opponents,
-                                  extraWarmUps: extraWarmUps, durations: durations, recordedNames: recordedNames)
+                                  extraWarmUps: extraWarmUps, sounds: sounds, durations: durations, recordedNames: recordedNames)
 
     // Song files first, then the library that names them, then the teams that use them.
     for file in Set(result.audioFiles).sorted() {

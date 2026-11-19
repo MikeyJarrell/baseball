@@ -1,9 +1,8 @@
-// Shortening players' names the way a newspaper box score does: last names only, with a
-// first initial added only when two players in the game share a last name.
+// Shortening players' names for the box score: first initial and last name, since teammates
+// share last names (three Teodosios on the Diamond Dogs).
 //
-// "Danny Ruiz" prints as "Ruiz". If both teams have an Ortiz, Luis Ortiz prints as
-// "L. Ortiz" and Ana Ortiz as "A. Ortiz". If even the initials match (Luis and Leo Ortiz),
-// both print in full. A name that is only a number or a stand-in ("#22", "Batter 4")
+// "Danny Ruiz" prints as "D. Ruiz". If even the initials match (Luis and Leo Ortiz), both
+// print in full. A name that is only a number or a stand-in ("#22", "Batter 4")
 // is printed whole, since its last word alone would mean nothing. A last name of more
 // than one word keeps all of it: "Elly De La Cruz" is "De La Cruz". A player with two Spanish
 // last names goes by the first, given as `Player.surname`: Jonathan Torres Benitez is "Torres".
@@ -49,25 +48,18 @@ public struct ShortNames: Equatable, Sendable {
     /// Works out short names for a list of players and their full names. `surnames` gives the
     /// last name on its own for players whose last name is not the last word of their name.
     public init(fullNames list: [(PlayerID, String)], surnames: [PlayerID: String] = [:]) {
-        // Group the players by last name, ignoring capital letters.
         let parts = list.map { (id: $0.0, parts: NameParts($0.1, surname: surnames[$0.0])) }
-        var countByLastName: [String: Int] = [:]
-        for entry in parts {
-            countByLastName[entry.parts.lastName.lowercased(), default: 0] += 1
-        }
 
-        // Among players who share a last name, count how many share an initial too.
+        // Count how many players share an initial and last name.
         var countByInitialed: [String: Int] = [:]
-        for entry in parts where countByLastName[entry.parts.lastName.lowercased()]! > 1 {
+        for entry in parts {
             countByInitialed[entry.parts.initialed.lowercased(), default: 0] += 1
         }
 
         var names: [PlayerID: String] = [:]
         for entry in parts {
             let p = entry.parts
-            if countByLastName[p.lastName.lowercased()]! == 1 {
-                names[entry.id] = p.lastName
-            } else if countByInitialed[p.initialed.lowercased()]! == 1 {
+            if countByInitialed[p.initialed.lowercased()]! == 1 {
                 names[entry.id] = p.initialed
             } else {
                 names[entry.id] = p.fullName

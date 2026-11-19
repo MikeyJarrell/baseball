@@ -482,6 +482,94 @@ public final class GameSession {
         return true
     }
 
+    /// Replaces one team's starting lineup (batting order, fielders, designated non-runners,
+    /// roster) with one fixed on the game menu's Rosters page, after a rushed start. Everything
+    /// already recorded follows the batting order by spot: if the hitter listed third was really
+    /// someone else, every plate appearance, run and stolen base of the third spot becomes theirs.
+    /// Fielding credit goes by position, so it follows the new fielders by itself. Once a team's
+    /// order has come around, its length can no longer change here (use Add a hitter).
+    public func editStartingLineup(_ team: GameTeam, on side: TeamSide) async -> Bool {
+        await oneAtATime { await self.editStartingLineupNow(team, on: side) }
+    }
+
+    @discardableResult
+    private func editStartingLineupNow(_ team: GameTeam, on side: TeamSide) async -> Bool {
+        let old = game.setup[side]
+        let oldOrder = old.battingOrder, newOrder = team.battingOrder
+        // Plate appearances the team has had: a different length is only safe before the order
+        // comes around, since every spot after the change would shift.
+        let appearances = log.entries.filter { $0.half.battingSide == side && $0.plateAppearance != nil }.count
+        if oldOrder.count != newOrder.count, appearances > min(oldOrder.count, newOrder.count) {
+            saveProblem = "The \(old.name) order has already come around, so hitters can’t be added to or taken out of the starting order now. Use Subs, Add a hitter."
+            return false
+        }
+        // Who each spot's references become: the player listed there before → the one listed now.
+        var map: [PlayerID: PlayerID] = [:]
+        for i in 0..<min(oldOrder.count, newOrder.count) where oldOrder[i] != newOrder[i] {
+            map[oldOrder[i]] = newOrder[i]
+        }
+        var changed = game
+        var newTeam = team
+        newTeam.teamID = old.teamID
+        newTeam.name = old.name
+        newTeam.isOurs = old.isOurs
+        newTeam.shortName = old.shortName
+        changed.setup[side] = newTeam
+        changed.events = game.events.map { Self.remappingBatters($0, team: side, map) }
+        guard changed != game else { return true }
+        guard await saveWhole(changed) else { return false }
+        redoStack.removeAll()
+        await recordAutomaticOuts()
+        return true
+    }
+
+    /// One event with the batting team's hitters and runners renamed through `map`, leaving
+    /// pitchers and fielders alone.
+    static func remappingBatters(_ event: GameEvent, team side: TeamSide, _ map: [PlayerID: PlayerID]) -> GameEvent {
+        guard !map.isEmpty else { return event }
+        func m(_ id: PlayerID) -> PlayerID { map[id] ?? id }
+        func moves(_ list: [RunnerMove]) -> [RunnerMove] { list.map { var move = $0; move.runner = m(move.runner); return move } }
+        var event = event
+        switch event.kind {
+        case .ballInPlay(var play):
+            play.runners = moves(play.runners)
+            event.kind = .ballInPlay(play)
+        case .pitch(var pitch):
+            if var play = pitch.droppedThirdStrike {
+                play.runners = moves(play.runners)
+                pitch.droppedThirdStrike = play
+                event.kind = .pitch(pitch)
+            }
+        case .runnerAction(var action):
+            action.moves = moves(action.moves)
+            event.kind = .runnerAction(action)
+        case .substitution(var sub) where sub.team == side:
+            sub.batting = sub.batting.map { var change = $0; change.incoming = m(change.incoming); change.replacing = m(change.replacing); return change }
+            event.kind = .substitution(sub)
+        case .runnerForNonRunner(var r):
+            r.runner = m(r.runner)
+            r.replacing = m(r.replacing)
+            event.kind = .runnerForNonRunner(r)
+        case .pitchingChange(var change) where change.team == side:
+            change.takesBattingSpotOf = change.takesBattingSpotOf.map(m)
+            event.kind = .pitchingChange(change)
+        case .addHitter(var add) where add.team == side:
+            add.player = m(add.player)
+            event.kind = .addHitter(add)
+        case .manualAdjustment(var adjustment):
+            if var runners = adjustment.runners {
+                runners.first = runners.first.map(m)
+                runners.second = runners.second.map(m)
+                runners.third = runners.third.map(m)
+                adjustment.runners = runners
+                event.kind = .manualAdjustment(adjustment)
+            }
+        default:
+            break
+        }
+        return event
+    }
+
     /// Applies a lineup correction and replays. Clears Redo.
     @discardableResult
     private func correctLineupNow(_ correction: LineupCorrection) async -> Bool {

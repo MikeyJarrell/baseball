@@ -38,9 +38,11 @@ final class GameSetupWalkthroughTests: XCTestCase {
             ("Next: game details", "02 game details"),
             ("Next: batting order", "03 batting order"),
             ("Next: fielders", "04 fielders"),
-            ("Next: Mudcats lineup", "05 their lineup"),
-            ("Next: starting pitchers", "06 starting pitchers"),
-            ("Next: review", "07 review"),
+            // Our sample players have no recorded names, so the announcer step comes next.
+            ("Next: Mudcats lineup", "05 announcer"),
+            ("Next: Mudcats lineup", "06 their lineup"),
+            ("Next: Mudcats fielders", "07 their fielders"),
+            ("Next: review", "08 review"),
         ]
         for (button, name) in screens {
             XCTAssertTrue(app.buttons[button].waitForExistence(timeout: 5), button)

@@ -28,56 +28,55 @@ struct SampleGameTextTests {
         Mudcats 3
 
         MUDCATS             ab  r  h bi
-        Ortiz CF             3  1  2  0
-        Ruiz SS              2  0  1  1
-        Hale 1B              3  0  1  0
-        Diaz LF              2  1  1  1
-        Kim 3B               2  1  1  0
-        Park RF              3  0  0  0
-        Varga C              1  0  0  0
-        Bell 2B              2  0  1  1
-        Collins P            1  0  0  0
-          Moss PH            1  0  0  0
-          Reyes P            0  0  0  0
+        L. Ortiz CF          3  1  2  0
+        D. Ruiz SS           2  0  1  1
+        M. Hale 1B           3  0  1  0
+        T. Diaz LF           2  1  1  1
+        S. Kim 3B            2  1  1  0
+        E. Park RF           3  0  0  0
+        J. Varga C           1  0  0  0
+        N. Bell 2B           2  0  1  1
+        R. Collins P         1  0  0  0
+          K. Moss PH         1  0  0  0
+          G. Reyes P         0  0  0  0
         Totals              20  3  7  3
 
         DIAMOND DOGS        ab  r  h bi
-        Moreno 2B            2  1  1  1
-        Tate SS              2  1  1  1
-        Webb CF              3  1  1  1
-        Quinn 1B             3  0  1  0
-        Shaw 3B              2  0  1  1
-        Ford LF              1  1  0  0
-        Lang RF              2  0  1  0
-        Fisk C               1  0  0  1
-        Barros P             2  0  1  0
-          Voss P             0  0  0  0
-        Cole DH              2  1  2  0
+        A. Moreno 2B         2  1  1  1
+        C. Tate SS           2  1  1  1
+        J. Webb CF           3  1  1  1
+        P. Quinn 1B          3  0  1  0
+        R. Shaw 3B           2  0  1  1
+        C. Ford LF           1  1  0  0
+        D. Lang RF           2  0  1  0
+        M. Fisk C            1  0  0  1
+        S. Barros P          2  0  1  0
+          T. Voss P          0  0  0  0
+        J. Cole DH           2  1  2  0
         Totals              20  5  9  5
 
         Mudcats      011 10  —  3  7  1
         Diamond Dogs 201 11  —  5  9  1
 
-        E—Kim, Tate.
         DP—Mudcats 2, Diamond Dogs 2.
         LOB—Mudcats 6, Diamond Dogs 4.
-        2B—Ruiz, Webb, Cole.
-        3B—Ortiz.
-        HR—Diaz, Tate.
-        SB—Park, Cole.
-        CS—Webb.
-        S—Tate.
-        SF—Ruiz, Fisk.
+        2B—D. Ruiz, J. Webb, J. Cole.
+        3B—L. Ortiz.
+        HR—T. Diaz, C. Tate.
+        SB—E. Park, J. Cole.
+        CS—J. Webb.
+        S—C. Tate.
+        SF—D. Ruiz, M. Fisk.
 
         MUDCATS             ip  h  r bb so
-        Collins              3  6  3  1  2
-        Reyes L              2  3  2  0  0
+        R. Collins           3  6  3  1  2
+        G. Reyes L           2  3  2  0  0
         DIAMOND DOGS        ip  h  r bb so
-        Barros W             4  6  3  2  1
-        Voss                 1  1  0  1  1
+        S. Barros W          4  6  3  2  1
+        T. Voss              1  1  0  1  1
 
-        HBP—by Reyes (Ford).
-        Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss 13-9.
+        HBP—by G. Reyes (C. Ford).
+        Pitches-strikes—R. Collins 47-30, G. Reyes 23-15, S. Barros 57-35, T. Voss 13-9.
         T—3:12.
         """
         let printed = BoxScorePrinter.text(SampleGame.boxScore, timeZone: pacific)
@@ -115,6 +114,6 @@ struct SampleGameTextTests {
     func substitutes() {
         let mudcats = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific).batting[0]
         let labels = mudcats.rows.map(\.paddedLabel)
-        #expect(Array(labels[8...10]) == ["Collins P", "  Moss PH", "  Reyes P"])
+        #expect(Array(labels[8...10]) == ["R. Collins P", "  K. Moss PH", "  G. Reyes P"])
     }
 }

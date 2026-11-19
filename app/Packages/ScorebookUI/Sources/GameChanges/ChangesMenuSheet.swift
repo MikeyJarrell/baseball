@@ -1,7 +1,7 @@
 // The changes menu: what the batting screen's one big substitution button opens. A short
-// list of every kind of change, each opening its own sheet inside this one: lineups and
-// rosters (fixing names, numbers and who batted where), pitcher, fielders, pinch hitter, pinch
-// runner, runner for a designated non-runner, add a hitter.
+// list of every in-game change, each opening its own sheet inside this one: pitcher, fielders,
+// pinch hitter, pinch runner, runner for a designated non-runner, add a hitter. Fixing the
+// lineups themselves is Rosters in the game menu.
 
 import SwiftUI
 import Model
@@ -34,11 +34,6 @@ public struct ChangesMenuSheet: View {
     public var body: some View {
         SheetFrame(title: "Changes", subtitle: "\(context.teamName(situation.battingSide)) batting",
                    onCancel: { onFinish(.cancel) }) {
-            Card {
-                row(.lineups, icon: "list.number", title: "Lineups and rosters",
-                    detail: "Names, numbers, batting order")
-            }
-            .padding(.bottom, Spacing.medium)
             Card {
                 row(.pitcher, icon: "baseball", title: "Pitching change", detail: pitcherDetail)
                 RowDivider()

@@ -77,6 +77,9 @@ public struct GameOverview: View {
     public var plateAppearances: [PlayerID: [PlateAppearanceSummary]]
     public var situation: Situation?
     public var onAction: (GameOverviewAction) -> Void
+    /// True when plays can be fixed from the play-by-play: from the game menu's Manual
+    /// adjustment, not from the Box score button.
+    public var canFix: Bool
 
     @State private var tab: GameOverviewTab
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -87,8 +90,10 @@ public struct GameOverview: View {
         plateAppearances: [PlayerID: [PlateAppearanceSummary]],
         situation: Situation? = nil,
         startingTab: GameOverviewTab = .score,
+        canFix: Bool = true,
         onAction: @escaping (GameOverviewAction) -> Void
     ) {
+        self.canFix = canFix
         self.log = log
         self.boxScore = boxScore
         self.plateAppearances = plateAppearances
@@ -112,7 +117,7 @@ public struct GameOverview: View {
                 case .pitchers:
                     PitchersTab(setup: log.setup, boxScore: boxScore, situation: situation)
                 case .plays:
-                    PlaysTab(log: log, situation: situation, onAction: onAction)
+                    PlaysTab(log: log, situation: situation, canFix: canFix, onAction: onAction)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

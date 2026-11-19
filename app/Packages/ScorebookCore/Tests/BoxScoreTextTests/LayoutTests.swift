@@ -9,14 +9,14 @@ import SampleData
 
 @Suite("Shortened names")
 struct ShortNameTests {
-    @Test("Last names only, unless two players in the game share one")
+    @Test("First initial and last name, for every player")
     func lastNamesOnly() {
         let names = ShortNames(fullNames: [
             ("a1", "Luis Ortiz"), ("h1", "Ana Ortiz"), ("h2", "Chris Tate"),
         ])
         #expect(names.name(for: "a1", fallback: "") == "L. Ortiz")
         #expect(names.name(for: "h1", fallback: "") == "A. Ortiz")
-        #expect(names.name(for: "h2", fallback: "") == "Tate")
+        #expect(names.name(for: "h2", fallback: "") == "C. Tate")
     }
 
     @Test("When the initials match too, both players are printed in full")
@@ -35,7 +35,7 @@ struct ShortNameTests {
         #expect(names.name(for: "a", fallback: "") == "#22")
         #expect(names.name(for: "b", fallback: "") == "Batter 4")
         #expect(names.name(for: "c", fallback: "") == "Ichiro")
-        #expect(names.name(for: "d", fallback: "") == "Griffey Jr.")
+        #expect(names.name(for: "d", fallback: "") == "K. Griffey Jr.")
         #expect(names.name(for: "e", fallback: "") == "Unknown player")
     }
 
@@ -47,10 +47,10 @@ struct ShortNameTests {
         ])
         #expect(names.name(for: "a", fallback: "") == "E. De La Cruz")
         #expect(names.name(for: "d", fallback: "") == "A. de la Cruz")
-        #expect(names.name(for: "b", fallback: "") == "Van Buren")
-        #expect(names.name(for: "c", fallback: "") == "St. Clair")
+        #expect(names.name(for: "b", fallback: "") == "M. Van Buren")
+        #expect(names.name(for: "c", fallback: "") == "P. St. Clair")
         // "Van" here is a first name, so only "Smith" is the last name.
-        #expect(names.name(for: "e", fallback: "") == "Smith")
+        #expect(names.name(for: "e", fallback: "") == "V. Smith")
     }
 
     @Test("A shared last name across the two teams gets initials in the batting lines and the notes")
@@ -61,7 +61,7 @@ struct ShortNameTests {
         let text = BoxScorePrinter.text(box, timeZone: pacific)
         #expect(text.contains("L. Ortiz CF"))
         #expect(text.contains("J. Ortiz DH"))
-        #expect(text.contains("2B—Ruiz, Webb, J. Ortiz."))
+        #expect(text.contains("2B—D. Ruiz, J. Webb, J. Ortiz."))
         #expect(text.contains("3B—L. Ortiz."))
     }
 
@@ -127,7 +127,7 @@ struct LineupTests {
         var box = SampleGame.boxScore
         box.away.batting[9].positions = [.ph, .secondBase]
         let mudcats = BoxScorePrinter.layout(box, timeZone: pacific).batting[0]
-        #expect(mudcats.rows[9].label == "Moss PH-2B")
+        #expect(mudcats.rows[9].label == "K. Moss PH-2B")
     }
 }
 
@@ -168,10 +168,16 @@ struct NotesTests {
     @Test("A player who did something twice has the count after their name, and the visitors come first")
     func countsAndOrder() {
         var box = SampleGame.boxScore
-        box.notes.errors = [PlayerTally(player: "d2", name: "Chris Tate", team: .home, count: 1),
-                            PlayerTally(player: "m2", name: "Danny Ruiz", team: .away, count: 2)]
+        box.notes.doubles = [PlayerTally(player: "d2", name: "Chris Tate", team: .home, count: 1),
+                             PlayerTally(player: "m2", name: "Danny Ruiz", team: .away, count: 2)]
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).notes
-        #expect(notes.first == "E—Ruiz 2, Tate.")
+        #expect(notes.contains("2B—D. Ruiz 2, C. Tate."))
+    }
+
+    @Test("Who made the errors is left out of the notes")
+    func noErrorsNote() {
+        let notes = BoxScorePrinter.layout(SampleGame.boxScore, timeZone: pacific).notes
+        #expect(!notes.contains { $0.hasPrefix("E—") })
     }
 
     @Test("A note with nobody in it is left out, and so is a team with no double plays")
@@ -190,12 +196,12 @@ struct NotesTests {
         box.home.pitching[1].stats.pitches = 0
         box.home.pitching[1].stats.strikes = 0
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
-        #expect(notes.contains("Pitches-strikes—Collins 47-30, Reyes 23-15, Barros 57-35, Voss —."))
+        #expect(notes.contains("Pitches-strikes—R. Collins 47-30, G. Reyes 23-15, S. Barros 57-35, T. Voss —."))
 
         // With no pitches counted for anybody, the note is left out.
         for i in box.away.pitching.indices { box.away.pitching[i].stats.pitches = 0 }
         for i in box.home.pitching.indices { box.home.pitching[i].stats.pitches = 0 }
-        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes == ["HBP—by Reyes (Ford).", "T—3:12."])
+        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes == ["HBP—by G. Reyes (C. Ford).", "T—3:12."])
     }
 
     @Test("An older box score that does not say who hit whom lists the batters without guessing")
@@ -203,11 +209,11 @@ struct NotesTests {
         var box = SampleGame.boxScore
         // Box scores saved before the app recorded the pitcher for each hit batter.
         box.notes.hitBatters = []
-        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes.first == "HBP—by Reyes (Ford).")
+        #expect(BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes.first == "HBP—by G. Reyes (C. Ford).")
         box.away.pitching[0].stats.hitBatters = 1
         box.notes.hitByPitch.append(PlayerTally(player: "d3", name: "Jordan Webb", team: .home, count: 1))
         let notes = BoxScorePrinter.layout(box, timeZone: pacific).pitchingNotes
-        #expect(notes.first == "HBP—Ford, Webb.")
+        #expect(notes.first == "HBP—C. Ford, J. Webb.")
     }
 
     @Test("A player with two last names is printed by the first")
@@ -217,6 +223,6 @@ struct NotesTests {
         box.away.batting[0].name = "Luis Ortiz Vega"
         box.surnames = [ortiz: "Ortiz"]
         let layout = BoxScorePrinter.layout(box, timeZone: pacific)
-        #expect(layout.batting[0].rows[0].label == "Ortiz CF")
+        #expect(layout.batting[0].rows[0].label == "L. Ortiz CF")
     }
 }

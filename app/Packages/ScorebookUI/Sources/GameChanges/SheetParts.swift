@@ -262,15 +262,15 @@ struct IconBadge: View {
     }
 }
 
-/// A fielding position's number in a ring, as on a scorecard: "6".
+/// A fielding position's short name at the left of a row: "SS".
 struct PositionCircle: View {
     var position: Position
 
     var body: some View {
-        Text("\(position.number)")
-            .font(.system(size: 17, weight: .heavy).monospacedDigit())
-            .frame(width: 40, height: 40)
-            .overlay(Circle().strokeBorder(ScorebookColor.textPrimary, lineWidth: 2.5))
+        Text(position.abbreviation.uppercased())
+            .font(.system(size: 15, weight: .heavy))
+            .foregroundStyle(ScorebookColor.textSecondary)
+            .frame(width: 36, alignment: .leading)
             .accessibilityHidden(true)
     }
 }

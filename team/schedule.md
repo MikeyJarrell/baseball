@@ -9,7 +9,7 @@ San Diego Adult Baseball League, Sunday 18A division. From the [league’s Diamo
 | September 27 | 9:00 AM | Jaguares | Away | Chollas | Lost 4–7 |
 | October 4 | 1:00 PM | GWW Whales | Away | Chollas | |
 | October 11 | 9:00 AM | Cannonballers | Home | Lakeside Pony | |
-| October 18 | 9:00 AM | Riptide | Away | Chollas | |
+| October 18 | 9:00 AM | Riptide | Away | Chollas | Stopped after 3½ innings, down 1–2: the field was not reserved. Resume or replay undecided |
 | October 25 | 9:00 AM | El Cajones | Home | Chollas | |
 | November 1 | 9:00 AM | Lemon Grove Athletics | Home | Hilton Head | |
 
